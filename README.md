@@ -3,10 +3,14 @@
 Learn **Spanish** (for English speakers) or **English** (for Spanish speakers) with games.
 Free, open source, works offline. No account, no ads, no tracking.
 
+**▶ Play now: https://doonoo.github.io/polyglot-game-master/** · **📱 [Android app (APK)](https://github.com/doonoo/polyglot-game-master/releases/download/latest/PolyglotGameMaster.apk)**
+
 ## Get it
 
-- **Android:** download `PolyglotGameMaster.apk` from the [latest build](../../releases/tag/latest) and open it on your phone. (Android asks you to allow installs from your browser or file manager the first time.) New versions install over the old one and keep your progress.
-- **iPhone or any phone/computer:** open the web app at `https://<your-username>.github.io/polyglot-game-master/`, then use **Share → Add to Home Screen** (iPhone) or **⋮ → Install app** (Android Chrome). It works offline after the first visit.
+- **Android:** download [`PolyglotGameMaster.apk`](https://github.com/doonoo/polyglot-game-master/releases/download/latest/PolyglotGameMaster.apk) from the [latest build](../../releases/tag/latest) and open it on your phone. (Android asks you to allow installs from your browser or file manager the first time.) New versions install over the old one and keep your progress.
+- **iPhone:** open the [web app](https://doonoo.github.io/polyglot-game-master/) in Safari, then **Share → Add to Home Screen**.
+- **PC / Mac:** open the [web app](https://doonoo.github.io/polyglot-game-master/) in Chrome, Edge or Brave and click the install icon in the address bar to get it as a desktop app. Edge has the most natural voices.
+- Everything works offline after the first visit.
 
 ## What's inside
 
