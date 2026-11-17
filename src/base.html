@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Polyglot Game Master</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEEBFA; --bg2:#E4DFF8; --card:#FFFFFF; --ink:#1C1A33; --muted:#5F5A80; --line:#D9D4EE;
+  --violet:#5B4BD6; --violet-deep:#3B2DA8; --violet-soft:#ECE9FF; --gold:#F2B01E; --gold-deep:#C98A00; --gold-soft:#FFF4D6;
+  --red:#D93A40; --red-soft:#FDE6E7; --green:#1F8A5B; --green-soft:#DFF5EA; --sea:#1C9BB8; --sea-soft:#DDF4F8;
+  --field:#FBFAFF; --shadow:0 2px 0 rgba(28,26,51,.08), 0 10px 24px -14px rgba(59,45,168,.35);
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14122A; --bg2:#1B1838; --card:#221F40; --ink:#EEECFB; --muted:#A9A4CC; --line:#38335F;
+    --violet:#9D91FF; --violet-deep:#6E5FF0; --violet-soft:#2E2A58; --gold:#F5BE45; --gold-deep:#B9860F; --gold-soft:#3A3120;
+    --red:#FF6B70; --red-soft:#3D2230; --green:#4FD195; --green-soft:#1A3A30; --sea:#49C6E0; --sea-soft:#163843;
+    --field:#1A1834; --shadow:0 2px 0 rgba(0,0,0,.25), 0 12px 26px -14px rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14122A; --bg2:#1B1838; --card:#221F40; --ink:#EEECFB; --muted:#A9A4CC; --line:#38335F;
+  --violet:#9D91FF; --violet-deep:#6E5FF0; --violet-soft:#2E2A58; --gold:#F5BE45; --gold-deep:#B9860F; --gold-soft:#3A3120;
+  --red:#FF6B70; --red-soft:#3D2230; --green:#4FD195; --green-soft:#1A3A30; --sea:#49C6E0; --sea-soft:#163843;
+  --field:#1A1834; --shadow:0 2px 0 rgba(0,0,0,.25), 0 12px 26px -14px rgba(0,0,0,.6);
+  color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;
+  background-color:var(--bg);
+  background-image:radial-gradient(var(--line) 1.2px, transparent 1.3px);
+  background-size:22px 22px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--card)}
+h1,h2,h3,.display{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;letter-spacing:-0.01em}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--violet);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 56px}
+[hidden]{display:none!important}
+
+.topbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:2px 0 0}
+.topbar label{font-size:.9rem;color:var(--muted);font-weight:700}
+.topbar select{width:auto;padding:6px 10px;border-radius:999px;font-weight:700;background:var(--card)}
+.ui-status{font-size:.9rem;color:var(--muted);text-align:right;margin:4px 0 0}
+/* ---------- Hero ---------- */
+.hero{position:relative;overflow:hidden;border-radius:24px;padding:26px 22px 22px;margin:8px 0 20px;color:#fff;
+  background:linear-gradient(140deg,#6A55F0 0%,#3B2DA8 55%,#24186F 100%);box-shadow:0 18px 40px -20px rgba(59,45,168,.8)}
+.hero::after{content:"";position:absolute;inset:auto -40px -60px auto;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#FFD45C,#F2B01E 55%,transparent 56%);opacity:.95}
+.hero .title{position:relative;z-index:1;font-size:clamp(2.3rem,10vw,3.5rem);font-weight:800;line-height:.92;margin:0}
+.hero .title span{display:block;color:#FFD45C}
+.hero .lede{position:relative;z-index:1;color:rgba(255,255,255,.85);margin:12px 0 16px;max-width:30ch}
+.glyphs{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:6px;max-width:75%}
+.glyphs span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:3px 11px;font-size:.88rem;backdrop-filter:blur(4px)}
+
+/* ---------- Menu ---------- */
+.continue{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--gold);color:#1C1A33;border:0;border-radius:18px;padding:15px 18px;margin-bottom:22px;box-shadow:0 5px 0 var(--gold-deep)}
+.continue:active{transform:translateY(3px);box-shadow:0 2px 0 var(--gold-deep)}
+.continue b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.2rem;display:block}
+.continue small{opacity:.8}
+.continue .go{margin-left:auto;font-size:1.5rem}
+.group{margin:0 0 22px}
+.group > h2{font-size:1.1rem;margin:0 0 10px;font-weight:800}
+.modes{display:grid;gap:9px}
+@media (min-width:560px){.modes{grid-template-columns:1fr 1fr}}
+.mode{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:2px solid transparent;border-radius:16px;padding:12px;text-align:left;width:100%;box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+.mode[aria-checked="true"]{border-color:var(--c);transform:translateY(-2px)}
+.mode .ico{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:13px;font-size:1.45rem;background:var(--c);box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+.mode b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:1.06rem}
+.mode small{color:var(--muted);display:block;line-height:1.35;font-size:.9rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label.f{display:block;font-size:.9rem;color:var(--muted);margin-bottom:4px}
+select,input[type=text],textarea{width:100%;background:var(--field);border:2px solid var(--line);border-radius:12px;padding:11px 12px}
+select:focus,input:focus,textarea:focus{border-color:var(--violet);outline:none}
+.levels{display:flex;gap:6px;background:var(--card);padding:5px;border-radius:14px;box-shadow:var(--shadow)}
+.lv{flex:1;border:0;background:transparent;border-radius:10px;padding:9px 0;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;color:var(--muted)}
+.lv[aria-checked="true"]{background:var(--violet);color:#fff;box-shadow:inset 0 -3px 0 var(--violet-deep)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:.9rem}
+.chip.on{background:var(--sea-soft);border-color:var(--sea);font-weight:700}
+.toggle{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
+.toggle input{width:22px;height:22px;accent-color:var(--violet)}
+.toggle small{color:var(--muted);display:block}
+.primary{width:100%;background:var(--violet);color:#fff;border:0;border-radius:16px;padding:15px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.15rem;box-shadow:0 5px 0 var(--violet-deep);transition:transform .08s,box-shadow .08s}
+.primary:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 var(--violet-deep)}
+.primary:disabled{opacity:.55;cursor:default}
+.primary.sea{background:var(--sea);box-shadow:0 5px 0 #127890}
+.ghost{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:11px 14px;font-weight:700}
+.note{font-size:.92rem;color:var(--muted);margin-top:10px}
+.alert{background:var(--red-soft);color:var(--ink);border-left:4px solid var(--red);padding:12px 14px;border-radius:12px;margin:12px 0}
+
+/* ---------- HUD ---------- */
+.hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);box-shadow:0 6px 18px -12px rgba(28,26,51,.4)}
+.hud-in{max-width:640px;margin:0 auto;padding:10px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.badge{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.2rem;color:#fff;background:linear-gradient(140deg,#6A55F0,#3B2DA8);border-radius:12px;padding:5px 11px;min-width:50px;text-align:center;max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.badge.island{background:linear-gradient(140deg,#2BB7D4,#147A93);font-size:1rem}
+.hud-mid{min-width:0}
+.hud-mid .lbl{font-size:.82rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px;white-space:nowrap}
+.hud-mid .lbl span:first-child{overflow:hidden;text-overflow:ellipsis}
+.bar{height:12px;background:var(--violet-soft);border-radius:99px;overflow:hidden;margin-top:4px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#FFD45C);border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1);position:relative}
+.bar i::after{content:"";position:absolute;inset:2px 6px auto;height:3px;border-radius:9px;background:rgba(255,255,255,.55)}
+.hud-r{display:flex;align-items:center;gap:6px}
+.hearts{font-size:1.05rem;letter-spacing:1px}
+.streak{font-weight:800;font-size:.95rem;color:var(--gold-deep)}
+.iconbtn{background:transparent;border:0;font-size:1.3rem;padding:4px 6px;border-radius:8px}
+
+.listen{background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:700;color:var(--violet);white-space:nowrap}
+.lesson .strip .listen{margin-left:auto;border-color:currentColor;color:inherit}
+.ch-head .listen{color:var(--bg);border-color:rgba(255,255,255,.35)}
+.ch-head .listen{margin-left:8px}
+.ch-head .review[hidden] + .listen{margin-left:auto}
+.judge .ans .listen{margin-top:8px}
+button.word{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
+button.word .say{float:right;color:var(--muted);font-size:.85rem}
+#readBtn[aria-pressed="true"]{background:var(--violet-soft)}
+.stopbar{position:fixed;left:0;right:0;bottom:0;z-index:8;display:flex;justify-content:center;padding:0 16px calc(16px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.stopbar button{pointer-events:auto;background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:11px 20px;font-weight:800;box-shadow:0 10px 24px -8px rgba(0,0,0,.45)}
+.settings{max-width:640px;margin:0 auto;padding:2px 16px 12px;display:grid;gap:6px}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--field);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-weight:700}
+.srow input[type=checkbox]{width:22px;height:22px;accent-color:var(--violet);flex:none}
+.srow input[type=range]{flex:1;max-width:62%;accent-color:var(--violet)}
+#setBtn[aria-expanded="true"]{background:var(--violet-soft)}
+.chip.mus{font-weight:700}
+.toasts{position:fixed;top:0;left:0;right:0;z-index:9;display:flex;flex-direction:column;align-items:center;gap:6px;padding:calc(env(safe-area-inset-top,0px) + 74px) 16px 0;pointer-events:none}
+.toast{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.05rem;padding:7px 16px;border-radius:999px;background:var(--ink);color:var(--bg);box-shadow:0 10px 22px -10px rgba(0,0,0,.5);animation:tin .35s cubic-bezier(.2,1.5,.4,1);transition:opacity .4s,transform .4s}
+.toast.xp{background:linear-gradient(140deg,#FFD45C,#F2B01E);color:#1C1A33}
+.toast.combo{background:linear-gradient(140deg,#FF7A45,#E5384F);color:#fff;font-size:1.2rem}
+.toast.boss{background:linear-gradient(140deg,#B3122E,#5B0F3A);color:#fff}
+.toast.loot{background:linear-gradient(140deg,#2BB7D4,#5B4BD6);color:#fff}
+.toast.badge{background:linear-gradient(140deg,#1F8A5B,#2BB7D4);color:#fff}
+.toast.out{opacity:0;transform:translateY(-10px)}
+@keyframes tin{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:8}
+.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.challenge.boss{border-color:#B3122E;box-shadow:0 0 0 4px rgba(179,18,46,.18),var(--shadow)}
+.challenge.boss .ch-head{background:linear-gradient(90deg,#B3122E,#5B0F3A);color:#fff}
+.challenge.boss .ch-head .listen{color:#fff}
+.trophies{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.trophies li{display:flex;gap:10px;align-items:center;opacity:.5}
+.trophies li.got{opacity:1}
+.trophies .ti{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--violet-soft);font-size:1.2rem;flex:none}
+.trophies li.got .ti{background:var(--gold-soft)}
+.trophies small{display:block;color:var(--muted)}
+/* ---------- Game cards ---------- */
+.card{background:var(--card);border-radius:20px;padding:16px 18px;margin:14px 0;box-shadow:var(--shadow)}
+.card h3{margin:0 0 6px;font-size:1.15rem}
+.judge{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+.judge .stamp{grid-row:span 2;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:1.5rem;font-weight:800;color:#fff;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2)}
+.judge.ok{background:var(--green-soft)} .judge.ok .stamp{background:var(--green)}
+.judge.bad{background:var(--red-soft)} .judge.bad .stamp{background:var(--red)}
+.judge .verdict{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.25rem;line-height:1.2;margin:2px 0 4px}
+.judge .fb{grid-column:2}
+.judge .ans{grid-column:1/-1;margin-top:10px;padding:10px 12px;background:var(--card);border-radius:12px;font-size:.95rem}
+.judge .ans div+div{margin-top:3px}
+.judge strong{background:rgba(242,176,30,.28);border-radius:4px;padding:0 3px}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+.event{text-align:center;background:linear-gradient(140deg,#FFD45C,#F2B01E);color:#1C1A33;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+.event .trophy{font-size:2.4rem;line-height:1}
+.event .big{font-family:"Bricolage Grotesque",sans-serif;font-size:1.6rem;font-weight:800;margin:4px 0 0}
+.lesson{padding:0;overflow:hidden}
+.lesson .strip{display:flex;align-items:center;gap:8px;padding:9px 18px;background:var(--violet-soft);color:var(--violet);font-weight:800;font-size:.92rem}
+.lesson.isl .strip{background:var(--sea-soft);color:var(--sea)}
+.lesson .in{padding:12px 18px 16px}
+.words{display:grid;gap:6px;margin-top:12px}
+@media (min-width:480px){.words{grid-template-columns:1fr 1fr}}
+.word{display:flex;flex-direction:column;background:var(--field);border:1px solid var(--line);border-left:4px solid var(--violet);border-radius:10px;padding:7px 11px}
+.lesson.isl .word{border-left-color:var(--sea)}
+.word b{font-family:"Bricolage Grotesque",sans-serif;font-size:1.1rem}
+.word span{color:var(--muted);font-size:.92rem}
+.challenge{padding:0;overflow:hidden;border:3px solid var(--ink)}
+.ch-head{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--ink);color:var(--bg)}
+.ch-head .gico{font-size:1.25rem}
+.ch-head .game{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.05rem}
+.ch-head .review{margin-left:auto;background:var(--gold);color:#1C1A33;font-weight:800;font-size:.8rem;border-radius:999px;padding:2px 10px}
+.ch-body{padding:14px 16px 16px}
+.task{color:var(--muted);margin:0 0 10px}
+.screen{background:var(--violet-soft);border-radius:14px;padding:14px 16px;margin:0 0 12px;position:relative}
+.target{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(1.4rem,6vw,1.95rem);line-height:1.22;margin:0;overflow-wrap:anywhere}
+.speak{vertical-align:middle;margin-left:4px}
+.hint{margin:0 0 10px}
+.hint button{background:none;border:0;color:var(--violet);font-weight:800;padding:0}
+.hint p{margin:4px 0 0;color:var(--muted)}
+textarea{min-height:84px;resize:vertical;font-size:1.05rem}
+.actions{display:flex;gap:8px;margin-top:12px}
+.actions .primary{flex:1}
+.thinking{display:flex;align-items:center;gap:12px;color:var(--muted);font-weight:700}
+.dots{display:inline-flex;gap:5px}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--violet);animation:b 1.1s infinite ease-in-out}
+.dots i:nth-child(2){animation-delay:.15s;background:var(--gold)}.dots i:nth-child(3){animation-delay:.3s;background:var(--sea)}
+@keyframes b{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
+details.panel{background:var(--card);border-radius:18px;margin:12px 0;padding:0 16px;box-shadow:var(--shadow)}
+details.panel summary{cursor:pointer;padding:14px 0;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;font-size:1.05rem;list-style:none;display:flex;gap:8px;align-items:center}
+details.panel summary::-webkit-details-marker{display:none}
+details.panel summary::after{content:"+";margin-left:auto;color:var(--muted);font-size:1.3rem}
+details.panel[open] summary::after{content:"–"}
+.panel-body{padding:0 0 14px}
+.panel-body h4{margin:12px 0 6px;font-size:.95rem;color:var(--muted)}
+.vlist{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+.vlist li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding:5px 0}
+.vlist li span{color:var(--muted);text-align:right}
+.srs{display:flex;flex-wrap:wrap;gap:6px}
+.srs span{background:var(--violet-soft);border-radius:8px;padding:4px 9px;font-size:.9rem}
+.srs em{font-style:normal;color:var(--violet);font-weight:800;margin-left:4px}
+.syl{margin:0;padding-left:0;list-style:none;display:grid;gap:4px;font-size:.95rem}
+.syl li{display:flex;gap:10px;align-items:center}
+.syl li .n{flex:none;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;background:var(--violet-soft);color:var(--violet);font-weight:800;font-size:.8rem}
+.syl li.done{color:var(--muted)}
+.syl li.done .n{background:var(--green);color:#fff}
+.empty{color:var(--muted);font-size:.95rem;margin:0}
+.over{text-align:center;padding-top:30px}
+.over .emoji{font-size:4rem;line-height:1}
+.over .big{font-family:"Bricolage Grotesque",sans-serif;font-size:2.8rem;font-weight:800;margin:6px 0 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0}
+.stats .wide{grid-column:1/-1}
+.stats div{background:var(--card);border-radius:14px;padding:12px 8px;box-shadow:var(--shadow)}
+.stats b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:1.6rem}
+.stats small{color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ============ MENU ============ -->
+<main id="menu" class="wrap">
+  <div class="topbar"><button class="chip mus" id="menuMusicBtn"></button><label for="uiSel">🌐 <span data-i18n="appLang">App language</span></label><select id="uiSel"></select></div>
+  <p class="ui-status" id="uiStatus" hidden></p>
+  <header class="hero">
+    <h1 class="title display">Polyglot<span>Game Master</span></h1>
+    <p class="lede" data-i18n="lede">Mine sentences, build vocab and level up from A1 to C2. Your Game Master teaches, tests, and does not sugarcoat.</p>
+    <div class="glyphs" aria-hidden="true"><span>¡Hola!</span><span>Bonjour</span><span>Ciao</span><span>こんにちは</span><span>Olá</span><span>안녕</span></div>
+  </header>
+
+  <button id="continueBtn" class="continue" hidden>
+    <div><b data-i18n="continueRun">Continue run</b><small id="continueInfo"></small></div>
+    <span class="go" aria-hidden="true">▶</span>
+  </button>
+
+  <div id="noClaude" class="alert" data-i18n="noClaude" hidden>The Game Master needs Claude to run. Open this page inside Claude to play.</div>
+
+  <section class="group">
+    <h2 data-i18n="mode">Mode</h2>
+    <div class="modes" role="radiogroup" id="modes"></div>
+  </section>
+
+  <section class="group">
+    <h2 data-i18n="languages">Languages</h2>
+    <div class="row">
+      <div>
+        <label class="f" for="targetSel" data-i18n="learning">Learning</label>
+        <select id="targetSel"></select>
+      </div>
+      <div>
+        <label class="f" for="nativeSel" data-i18n="iSpeak">I speak</label>
+        <select id="nativeSel"></select>
+      </div>
+    </div>
+    <input type="text" id="targetOther" data-i18n-ph="typeLang" placeholder="Type the language you’re learning" style="margin-top:8px" hidden>
+  </section>
+
+  <section class="group" id="levelGroup">
+    <h2 id="levelTitle">Starting level</h2>
+    <div class="levels" role="radiogroup" id="levels"></div>
+    <p class="note" id="levelNote"></p>
+  </section>
+
+  <section class="group" id="islandGroup" hidden>
+    <h2 data-i18n="yourIsland">Your island</h2>
+    <label class="f" for="islandIn" data-i18n="islandLabel">Leave blank and the Game Master invents islands as you go, or name your own.</label>
+    <input type="text" id="islandIn" data-i18n-ph="surpriseMe" placeholder="Surprise me">
+    <div class="chips" id="islandChips"></div>
+  </section>
+
+  <section class="group">
+    <label class="toggle">
+      <input type="checkbox" id="fastToggle">
+      <div><b data-i18n="fast">Fast replies</b><small data-i18n="fastSub">Snappier turns, slightly less thorough grading.</small></div>
+    </label>
+  </section>
+
+  <button id="startBtn" class="primary" data-i18n="start">Start game</button>
+  <p class="note" id="startNote"></p>
+</main>
+
+<!-- ============ GAME ============ -->
+<div id="game" hidden>
+  <header class="hud">
+    <div class="hud-in">
+      <div class="badge" id="hudBadge">A1</div>
+      <div class="hud-mid">
+        <div class="lbl"><span id="hudMode">Practice</span><span id="hudProg">0/15</span></div>
+        <div class="bar"><i id="hudBar" style="width:0%"></i></div>
+      </div>
+      <div class="hud-r">
+        <span class="hearts" id="hudHearts" hidden></span>
+        <span class="streak" id="hudStreak" title="Correct streak"></span>
+        <button class="iconbtn" id="setBtn" aria-expanded="false" aria-controls="settingsPanel" data-i18n-aria="settings" aria-label="Sound settings">🎛️</button>
+        <button class="iconbtn" id="menuBtn" data-i18n-aria="backMenu" aria-label="Back to menu">☰</button>
+      </div>
+    </div>
+    <div class="settings" id="settingsPanel" hidden>
+      <label class="srow"><span>🎵 <span data-i18n="music">Music</span></span><input type="checkbox" id="musicChk"></label>
+      <label class="srow"><span data-i18n="volume">Volume</span><input type="range" id="musicVol" min="0" max="100"></label>
+      <label class="srow"><span>🔊 <span data-i18n="sfx">Sound effects</span></span><input type="checkbox" id="sfxChk"></label>
+      <label class="srow" id="readRow" hidden><span>🗣️ <span data-i18n="readOn">Read each turn aloud</span></span><input type="checkbox" id="readChk"></label>
+    </div>
+  </header>
+
+  <main class="wrap" id="feed">
+    <section id="eventCard" class="card event" hidden></section>
+    <section id="judgeCard" class="card judge" hidden></section>
+    <section id="lessonCard" class="card lesson" hidden></section>
+
+    <section id="challengeCard" class="card challenge" hidden>
+      <div class="ch-head"><span class="gico" id="chIco" aria-hidden="true"></span><span class="game" id="chGame"></span><span class="review" id="chReview" data-i18n="review" hidden>Review</span><button class="listen" data-say="challenge" hidden>🔊 <span data-i18n="listen">Listen</span></button></div>
+      <div class="ch-body">
+      <p class="task" id="chTask"></p>
+      <div class="screen"><div class="target" id="chTarget"></div></div>
+      <div class="hint" id="chHintWrap" hidden>
+        <button id="hintBtn" data-i18n="showHint">Show hint</button>
+        <p id="chHint" hidden></p>
+      </div>
+      <label class="f" for="answer" data-i18n="yourAnswer">Your answer</label>
+      <textarea id="answer" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+      <div class="actions">
+        <button class="primary" id="submitBtn" data-i18n="submit">Submit</button>
+        <button class="ghost" id="giveUpBtn">I don’t know</button>
+      </div>
+      </div>
+    </section>
+
+    <section id="thinkCard" class="card" hidden>
+      <div class="thinking"><span class="dots"><i></i><i></i><i></i></span><span id="thinkText">The Game Master is judging…</span></div>
+      <div class="actions"><button class="ghost" id="stopBtn" data-i18n="stop">Stop</button></div>
+    </section>
+
+    <div id="errBox" class="alert" hidden></div>
+    <div class="actions" id="retryRow" hidden><button class="primary" id="retryBtn" data-i18n="retry">Try again</button></div>
+
+    <details class="panel" id="cheatPanel">
+      <summary>📜 <span data-i18n="cheat">Cheat sheet</span></summary>
+      <div class="panel-body" id="cheatBody"></div>
+    </details>
+    <details class="panel">
+      <summary id="sylSummary">Syllabus</summary>
+      <div class="panel-body" id="sylBody"></div>
+    </details>
+    <details class="panel">
+      <summary>🔁 <span data-i18n="reviewQ">Review queue</span></summary>
+      <div class="panel-body" id="srsBody"></div>
+    </details>
+    <details class="panel">
+      <summary>🏅 <span data-i18n="trophies">Trophies</span> <small id="trophyCount" style="color:var(--muted);font-weight:700"></small></summary>
+      <div class="panel-body" id="trophyBody"></div>
+    </details>
+  </main>
+</div>
+
+<!-- ============ GAME OVER / CONQUERED ============ -->
+<main id="over" class="wrap over" hidden>
+  <div class="emoji" id="overEmoji" aria-hidden="true">💀</div>
+  <p class="big display" id="overTitle">Game over</p>
+  <p id="overText" class="lede" style="margin:8px auto 0"></p>
+  <div class="stats" id="overStats"></div>
+  <div id="overIsland" hidden style="text-align:left">
+    <button class="primary sea" id="sailBtn">⛵ <span data-i18n="sailNew">Sail to a new island</span></button>
+    <label class="f" for="nextIsland" style="margin-top:16px" data-i18n="pickNext">Or pick the next island yourself:</label>
+    <input type="text" id="nextIsland" data-i18n-ph="nextPh" placeholder="e.g. My favorite food">
+    <div style="height:10px"></div>
+    <button class="ghost" id="sailPickBtn" style="width:100%" data-i18n="sailThere">Sail there</button>
+  </div>
+  <div id="overRestart">
+    <button class="primary" id="restartBtn" data-i18n="playAgain">Play again</button>
+  </div>
+  <div style="height:10px"></div>
+  <button class="ghost" id="overMenuBtn" style="width:100%" data-i18n="mainMenu">Main menu</button>
+</main>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="stopbar" id="stopRead" hidden><button id="stopReadBtn">⏹ <span data-i18n="stopReading">Stop reading</span></button></div>
+<script>
+(() => {
+"use strict";
+
+/* ===================== Config ===================== */
+const MODES = [
+  {id:1, name:"Practice", ico:"🎯", color:"#B9AEFF", desc:"Work through a 15-concept syllabus per level and climb from A1 to C2."},
+  {id:2, name:"Level Select", ico:"📌", color:"#FFB4A8", desc:"Lock in one level and drill its syllabus on repeat."},
+  {id:3, name:"Survivor", ico:"💀", color:"#FF8A8F", desc:"Start at A1 with 3 hearts. No hints, nasty traps. Every miss costs a heart."},
+  {id:4, name:"Number Cruncher", ico:"🔢", color:"#9FE3BE", desc:"Numbers, dates, prices and math, all in your target language."},
+  {id:5, name:"Lexicon Onslaught", ico:"⚡", color:"#FFD45C", desc:"Rapid vocab: learn 50 words per level through spaced review."},
+  {id:6, name:"Island Hopper", ico:"🏝️", color:"#8EDDEE", desc:"Build fluency on one personal topic you actually talk about."}
+];
+const LEVELS = ["A1","A2","B1","B2","C1","C2"];
+const LANGS = ["English","Spanish","French","Italian","Portuguese","German","Japanese","Korean","Mandarin Chinese","Arabic","Russian","Dutch","Hindi","Other…"];
+const NATIVE = LANGS.filter(l => l !== "Other…").concat(["Other"]);
+const TTS_CODES = {Spanish:"es",French:"fr",Italian:"it",Portuguese:"pt-BR",German:"de",Japanese:"ja",Korean:"ko","Mandarin Chinese":"zh",Arabic:"ar",Russian:"ru",Dutch:"nl",Hindi:"hi"};
+const GAMES = {
+  "Classic Mine":"Give a sentence in the player's native language; they translate it into the target language.",
+  "Syntax Scramble":"Give a target-language sentence with its words scrambled (separate words with ' / '); they rewrite it in correct order.",
+  "Cloze Combat":"Give a target-language sentence with 1-2 key words replaced by ___ (put the base form in parentheses when a conjugation is needed); they type the missing words correctly conjugated/declined.",
+  "Odd One Out":"Give 4 target-language words; 3 share a category, 1 doesn't. They name the odd one and translate it.",
+  "Idiom Investigator":"Give a literal, word-for-word native-language rendering of a real target-language idiom (and what it means); they must produce the actual idiom in the target language.",
+  "Thematic Blitz":"Give a category; they reply with 3 distinct target-language words that fit, without using their native language.",
+  "Error Hunter":"Give a target-language sentence containing exactly ONE realistic learner mistake related to the concept being tested; they rewrite the whole sentence correctly.",
+  "Dialogue Duel":"Describe the situation briefly in the native language, then give one line someone says to the player in the target language; they reply with a natural, fitting target-language response. Accept any appropriate reply that uses the concept correctly.",
+  "Reverse Mine":"Give a target-language sentence; they translate it into their native language. Grade whether they understood the meaning, not word-for-word order.",
+  "Rephrase Raid":"Give a target-language sentence plus a required word or structure; they rewrite it so it means the same thing using that word/structure."
+};
+const NUM_GAMES = {
+  "Digit Dictation":"Show a number in digits; they write it out in words in the target language.",
+  "Linguistic Math":"Write a short math problem entirely in target-language words; they answer in target-language words.",
+  "Real-World Numbers":"Give a real-life date, time, price or quantity in digits; they write it out naturally in the target language.",
+  "Price Check":"Describe a small shopping moment in the target language with 2-3 prices; ask for the total or the change, which they write out in target-language words.",
+  "Clock Watcher":"Give a time, schedule or duration in digits (e.g. 14:45, a train in 20 minutes, a meeting from 9 to 11:30); they say it naturally in the target language or answer when something happens."
+};
+const ISLAND_SUGGESTIONS = ["isl1","isl2","isl3","isl4","isl5"];
+const I18N = {
+en: {
+  appLang:"App language", translating:"Translating the app…", trFail:"Couldn’t translate the app right now, so it’s showing English.", askUiLang:"Which language should the app use?",
+  lede:"Mine sentences, build vocab and level up from A1 to C2. Your Game Master teaches, tests, and does not sugarcoat.",
+  continueRun:"Continue run", noClaude:"The Game Master needs Claude to run. Open this page inside Claude to play.",
+  mode:"Mode", languages:"Languages", learning:"Learning", iSpeak:"I speak", typeLang:"Type the language you’re learning", other:"Other…",
+  askNative:"What’s your native language?", needLang:"Type the language you want to learn.",
+  lvStart:"Starting level", lvLocked:"Locked level", lvCurrent:"Your current level",
+  lvNoteIsland:"Sets how complex your island phrases get.", lvNoteLocked:"You’ll stay at this level and cycle its syllabus.",
+  yourIsland:"Your island", islandLabel:"Leave blank and the Game Master invents islands as you go, or name your own.", surpriseMe:"Surprise me",
+  isl1:"My job", isl2:"My weekend", isl3:"My hometown", isl4:"My hobbies", isl5:"Food I love",
+  fast:"Fast replies", fastSub:"Snappier turns, slightly less thorough grading.", start:"Start game",
+  m1n:"Practice", m1d:"Work through a 15-concept syllabus per level and climb from A1 to C2.",
+  m2n:"Level Select", m2d:"Lock in one level and drill its syllabus on repeat.",
+  m3n:"Survivor", m3d:"Start at A1 with 3 hearts. No hints, nasty traps. Every miss costs a heart.",
+  m4n:"Number Cruncher", m4d:"Numbers, dates, prices and math, all in your target language.",
+  m5n:"Lexicon Onslaught", m5d:"Rapid vocab: learn 50 words per level through spaced review.",
+  m6n:"Island Hopper", m6d:"Build fluency on one personal topic you actually talk about.",
+  "game.Classic Mine":"Classic Mine", "game.Syntax Scramble":"Syntax Scramble", "game.Cloze Combat":"Cloze Combat", "game.Odd One Out":"Odd One Out",
+  "game.Idiom Investigator":"Idiom Investigator", "game.Thematic Blitz":"Thematic Blitz", "game.Digit Dictation":"Digit Dictation",
+  "game.Linguistic Math":"Linguistic Math", "game.Real-World Numbers":"Real-World Numbers",
+  "game.Error Hunter":"Error Hunter", "game.Dialogue Duel":"Dialogue Duel", "game.Reverse Mine":"Reverse Mine", "game.Rephrase Raid":"Rephrase Raid",
+  "game.Price Check":"Price Check", "game.Clock Watcher":"Clock Watcher", scene:"Scene",
+  listen:"Listen", stopReading:"Stop reading", readOn:"Read each turn aloud", readOff:"Stop reading turns aloud",
+  settings:"Sound settings", music:"Music", volume:"Music volume", sfx:"Sound effects", boss:"Boss", bossFight:"BOSS BATTLE!", bossDown:"Boss defeated!",
+  combo:"Combo ×{m}!", loot:"Loot!", lootXp:"+{xp} bonus XP", lootHeart:"+1 heart", newBadge:"Achievement unlocked", trophies:"Trophies",
+  b_first:"First Blood", b_first_d:"Get your first answer right", b_combo5:"On Fire", b_combo5_d:"Reach a 5-answer combo",
+  b_combo10:"Unstoppable", b_combo10_d:"Reach a 10-answer combo", b_boss1:"Boss Slayer", b_boss1_d:"Defeat a boss",
+  b_boss5:"Boss Hunter", b_boss5_d:"Defeat 5 bosses", b_xp500:"Rising Star", b_xp500_d:"Earn 500 XP",
+  b_xp2000:"Superstar", b_xp2000_d:"Earn 2,000 XP", b_ans50:"Bookworm", b_ans50_d:"Answer 50 challenges",
+  b_ans200:"Scholar", b_ans200_d:"Answer 200 challenges", b_loot:"Treasure Hunter", b_loot_d:"Find a loot chest",
+  b_clutch:"Clutch", b_clutch_d:"Hit a 3-answer combo with 1 heart left in Survivor",
+  showHint:"Show hint", yourAnswer:"Your answer", submit:"Submit", idk:"I don’t know", idkHp:"I don’t know (−❤️)", review:"Review", hear:"Hear it",
+  judging:"The Game Master is judging…", dealing:"Dealing your challenge…", building:"Building your syllabus…", stop:"Stop", retry:"Try again",
+  cheat:"Cheat sheet", reviewQ:"Review queue", progress:"Progress", islandSyl:"Island syllabus", levelSyl:"{lvl} syllabus",
+  progSyl:"{n}/{d} syllabus", progIsl:"{n}/{d} island", progWords:"{n}/50 words", charting:"Charting…", newIsland:"New island",
+  hearts:"{hp} of 3 hearts", streak:"Correct streak", backMenu:"Back to menu", mute:"Mute sounds", unmute:"Turn sounds on",
+  you:"You:", best:"Best answer:",
+  kSwarm:"Vocab swarm", kVRef:"Vocab refresher", kRef:"Quick refresher", kIsland:"Island phrasebook", kSkill:"Skill unlock",
+  noCheat:"Survivor mode: no cheat sheet. You’re on your own.", struggled:"Words you’ve struggled with", nothingYet:"Nothing yet. Keep it that way.",
+  spotlight:"Grammar spotlight:", irregular:"Irregular alert:",
+  lexProg:"{n} of 50 words fully learned at {lvl}. A word counts once you get it right twice in review.", generating:"Generating…",
+  srsNote:"Get each one right twice to clear it.", srsEmpty:"Empty. Miss something and it shows up here for review.",
+  evLvl:"Level up: {lvl}", evWordsT:"50 words locked in. Welcome to {lvl}.", evC2W:"C2 vocab cleared", evC2WT:"50 more words down. The onslaught continues.",
+  evSyl:"Syllabus cleared", evSylT:"Full {lvl} lap done. Round {r} starts now.", evLvlT:"All 15 {prev} concepts cleared. New syllabus incoming.",
+  evC2:"C2 cleared", evC2T:"You beat the final level. Victory lap: the C2 syllabus restarts.",
+  gameOver:"Game over", conquered:"Island conquered", sailNew:"Sail to a new island", pickNext:"Or pick the next island yourself:", nextPh:"e.g. My favorite food",
+  sailThere:"Sail there", playAgain:"Play again", mainMenu:"Main menu", stCorrect:"correct", stAcc:"accuracy", stBest:"best streak",
+  fell:"You fell at {lvl} with {n}/15 concepts cleared.", answerWas:"The answer was:", canTalk:"You can now hold your own talking about “{island}”.",
+  eNeed:"The Game Master needs Claude to run. Open this page inside Claude.",
+  eGrant:"Claude isn’t allowed to run in this app right now. Allow it from the artifact’s Permissions menu, then try again.",
+  eRate:"You’ve hit a usage limit. Wait a bit, then try again.", eSession:"You’ve been signed out. Sign in to Claude again, then retry.",
+  eGarbled:"The Game Master’s reply came back garbled. Try again.", eRefused:"Claude declined that turn. Try again or rephrase your answer.",
+  eNet:"The connection dropped mid-turn. Try again.", eNoGrade:"The Game Master forgot to grade that one. Try again.",
+  eNoSyl:"The syllabus didn’t come through. Try again.", eNoCh:"No challenge came back. Try again."
+},
+es: {
+  appLang:"Idioma de la app", translating:"Traduciendo la app…", trFail:"No se pudo traducir la app ahora, así que se muestra en inglés.", askUiLang:"¿En qué idioma quieres usar la app?",
+  lede:"Practica con frases reales, amplía tu vocabulario y sube de nivel del A1 al C2. Tu Game Master enseña, pone a prueba y no endulza nada.",
+  continueRun:"Continuar partida", noClaude:"El Game Master necesita a Claude para funcionar. Abre esta página dentro de Claude para jugar.",
+  mode:"Modo", languages:"Idiomas", learning:"Aprendo", iSpeak:"Hablo", typeLang:"Escribe el idioma que estás aprendiendo", other:"Otro…",
+  askNative:"¿Cuál es tu idioma nativo?", needLang:"Escribe el idioma que quieres aprender.",
+  lvStart:"Nivel inicial", lvLocked:"Nivel fijo", lvCurrent:"Tu nivel actual",
+  lvNoteIsland:"Define qué tan complejas serán las frases de tu isla.", lvNoteLocked:"Te quedarás en este nivel repasando su temario una y otra vez.",
+  yourIsland:"Tu isla", islandLabel:"Déjalo en blanco y el Game Master inventará islas sobre la marcha, o elige tu propio tema.", surpriseMe:"Sorpréndeme",
+  isl1:"Mi trabajo", isl2:"Mi fin de semana", isl3:"Mi ciudad natal", isl4:"Mis pasatiempos", isl5:"Comida que me encanta",
+  fast:"Respuestas rápidas", fastSub:"Turnos más ágiles, corrección un poco menos detallada.", start:"Empezar juego",
+  m1n:"Práctica", m1d:"Avanza por un temario de 15 conceptos por nivel y sube del A1 al C2.",
+  m2n:"Elegir nivel", m2d:"Fija un nivel y repasa su temario una y otra vez.",
+  m3n:"Supervivencia", m3d:"Empiezas en A1 con 3 corazones. Sin pistas y con trampas. Cada error cuesta un corazón.",
+  m4n:"Números", m4d:"Números, fechas, precios y matemáticas, todo en el idioma que aprendes.",
+  m5n:"Avalancha de vocabulario", m5d:"Vocabulario a toda velocidad: aprende 50 palabras por nivel con repaso espaciado.",
+  m6n:"Salto de islas", m6d:"Gana fluidez en un tema personal del que realmente hablas.",
+  "game.Classic Mine":"Mina clásica", "game.Syntax Scramble":"Revoltijo de sintaxis", "game.Cloze Combat":"Combate de huecos", "game.Odd One Out":"El intruso",
+  "game.Idiom Investigator":"Detective de modismos", "game.Thematic Blitz":"Ráfaga temática", "game.Digit Dictation":"Dictado de dígitos",
+  "game.Linguistic Math":"Matemáticas en palabras", "game.Real-World Numbers":"Números de la vida real",
+  "game.Error Hunter":"Cazador de errores", "game.Dialogue Duel":"Duelo de diálogo", "game.Reverse Mine":"Mina inversa", "game.Rephrase Raid":"Dilo de otra forma",
+  "game.Price Check":"Cuenta de compras", "game.Clock Watcher":"Vigía del reloj", scene:"Escena",
+  listen:"Escuchar", stopReading:"Dejar de leer", readOn:"Leer cada turno en voz alta", readOff:"Dejar de leer los turnos",
+  settings:"Ajustes de sonido", music:"Música", volume:"Volumen de la música", sfx:"Efectos de sonido", boss:"Jefe", bossFight:"¡BATALLA CONTRA EL JEFE!", bossDown:"¡Jefe derrotado!",
+  combo:"¡Combo ×{m}!", loot:"¡Botín!", lootXp:"+{xp} XP extra", lootHeart:"+1 corazón", newBadge:"Logro desbloqueado", trophies:"Trofeos",
+  b_first:"Primera sangre", b_first_d:"Acierta tu primera respuesta", b_combo5:"En llamas", b_combo5_d:"Logra un combo de 5",
+  b_combo10:"Imparable", b_combo10_d:"Logra un combo de 10", b_boss1:"Matajefes", b_boss1_d:"Derrota a un jefe",
+  b_boss5:"Cazador de jefes", b_boss5_d:"Derrota a 5 jefes", b_xp500:"Estrella en ascenso", b_xp500_d:"Gana 500 XP",
+  b_xp2000:"Superestrella", b_xp2000_d:"Gana 2000 XP", b_ans50:"Ratón de biblioteca", b_ans50_d:"Responde 50 retos",
+  b_ans200:"Erudito", b_ans200_d:"Responde 200 retos", b_loot:"Cazatesoros", b_loot_d:"Encuentra un cofre de botín",
+  b_clutch:"Al límite", b_clutch_d:"Logra un combo de 3 con 1 corazón en Supervivencia",
+  showHint:"Ver pista", yourAnswer:"Tu respuesta", submit:"Enviar", idk:"No lo sé", idkHp:"No lo sé (−❤️)", review:"Repaso", hear:"Escuchar",
+  judging:"El Game Master está evaluando…", dealing:"Preparando tu reto…", building:"Creando tu temario…", stop:"Detener", retry:"Intentar de nuevo",
+  cheat:"Chuleta", reviewQ:"Cola de repaso", progress:"Progreso", islandSyl:"Temario de la isla", levelSyl:"Temario {lvl}",
+  progSyl:"{n}/{d} temario", progIsl:"{n}/{d} isla", progWords:"{n}/50 palabras", charting:"Trazando el mapa…", newIsland:"Isla nueva",
+  hearts:"{hp} de 3 corazones", streak:"Racha de aciertos", backMenu:"Volver al menú", mute:"Silenciar sonidos", unmute:"Activar sonidos",
+  you:"Tú:", best:"Mejor respuesta:",
+  kSwarm:"Enjambre de vocabulario", kVRef:"Repaso de vocabulario", kRef:"Repaso rápido", kIsland:"Frases de la isla", kSkill:"Habilidad desbloqueada",
+  noCheat:"Modo Supervivencia: sin chuleta. Estás por tu cuenta.", struggled:"Palabras que te costaron", nothingYet:"Nada todavía. Que siga así.",
+  spotlight:"Gramática en foco:", irregular:"Alerta de irregulares:",
+  lexProg:"{n} de 50 palabras aprendidas por completo en {lvl}. Una palabra cuenta cuando la aciertas dos veces en repaso.", generating:"Generando…",
+  srsNote:"Acierta cada una dos veces para eliminarla.", srsEmpty:"Vacía. Si fallas algo, aparecerá aquí para repasarlo.",
+  evLvl:"¡Subiste de nivel: {lvl}!", evWordsT:"50 palabras dominadas. Bienvenido a {lvl}.", evC2W:"Vocabulario C2 superado", evC2WT:"50 palabras más. La avalancha continúa.",
+  evSyl:"Temario completado", evSylT:"Vuelta completa al {lvl}. Empieza la ronda {r}.", evLvlT:"Los 15 conceptos de {prev} superados. Viene un temario nuevo.",
+  evC2:"C2 superado", evC2T:"Venciste el nivel final. Vuelta de honor: el temario C2 vuelve a empezar.",
+  gameOver:"Fin del juego", conquered:"Isla conquistada", sailNew:"Zarpar a una isla nueva", pickNext:"O elige tú la próxima isla:", nextPh:"p. ej. Mi comida favorita",
+  sailThere:"Zarpar", playAgain:"Jugar de nuevo", mainMenu:"Menú principal", stCorrect:"aciertos", stAcc:"precisión", stBest:"mejor racha",
+  fell:"Caíste en {lvl} con {n}/15 conceptos superados.", answerWas:"La respuesta era:", canTalk:"Ya puedes defenderte hablando de “{island}”.",
+  eNeed:"El Game Master necesita a Claude para funcionar. Abre esta página dentro de Claude.",
+  eGrant:"Claude no tiene permiso para funcionar en esta app ahora. Permítelo desde el menú de Permisos del artefacto y vuelve a intentarlo.",
+  eRate:"Alcanzaste un límite de uso. Espera un poco y vuelve a intentarlo.", eSession:"Se cerró tu sesión. Inicia sesión en Claude de nuevo y reintenta.",
+  eGarbled:"La respuesta del Game Master llegó desordenada. Inténtalo de nuevo.", eRefused:"Claude rechazó ese turno. Inténtalo de nuevo o reformula tu respuesta.",
+  eNet:"Se cortó la conexión a mitad del turno. Inténtalo de nuevo.", eNoGrade:"El Game Master olvidó evaluar esa respuesta. Inténtalo de nuevo.",
+  eNoSyl:"El temario no llegó. Inténtalo de nuevo.", eNoCh:"No llegó ningún reto. Inténtalo de nuevo."
+}
+};
+const UI_LANGS = [
+  {code:"en", name:"English", label:"English"}, {code:"es", name:"Spanish", label:"Español"}, {code:"fr", name:"French", label:"Français"},
+  {code:"pt", name:"Portuguese", label:"Português"}, {code:"de", name:"German", label:"Deutsch"}, {code:"it", name:"Italian", label:"Italiano"},
+  {code:"ja", name:"Japanese", label:"日本語"}, {code:"ko", name:"Korean", label:"한국어"}, {code:"zh", name:"Mandarin Chinese", label:"中文"},
+  {code:"ar", name:"Arabic", label:"العربية"}, {code:"ru", name:"Russian", label:"Русский"}, {code:"nl", name:"Dutch", label:"Nederlands"},
+  {code:"hi", name:"Hindi", label:"हिन्दी"}
+];
+const LANG_CODE = {English:"en",Spanish:"es",French:"fr",Italian:"it",Portuguese:"pt",German:"de",Japanese:"ja",Korean:"ko","Mandarin Chinese":"zh",Arabic:"ar",Russian:"ru",Dutch:"nl",Hindi:"hi"};
+
+/* ===================== i18n ===================== */
+let UI = {code:"en", name:"English", dict:I18N.en};
+function t(k, v){
+  let s = (UI.dict && UI.dict[k]) || I18N.en[k] || k;
+  if(v) s = s.replace(/\{(\w+)\}/g, (m, x) => v[x] !== undefined ? v[x] : m);
+  return s;
+}
+function langLabel(name){
+  const c = LANG_CODE[name];
+  if(c && /^[a-z]{2}$/.test(UI.code)){
+    try{ const dn = new Intl.DisplayNames([UI.code], {type:"language"}); const l = dn.of(c); if(l) return l.charAt(0).toLocaleUpperCase(UI.code) + l.slice(1); }catch(e){}
+  }
+  return name;
+}
+const gameLabel = g => t("game." + g) === "game." + g ? g : t("game." + g);
+const GAME_ICO = {"Classic Mine":"⛏️","Syntax Scramble":"🔀","Cloze Combat":"⚔️","Odd One Out":"🕵️","Idiom Investigator":"🔍","Thematic Blitz":"⚡","Digit Dictation":"🔢","Linguistic Math":"➗","Real-World Numbers":"💵","Error Hunter":"🐞","Dialogue Duel":"💬","Reverse Mine":"🔄","Rephrase Raid":"✏️","Price Check":"🧾","Clock Watcher":"⏰"};
+const SCENES = ["ordering at a café","a doctor's appointment","a job interview","texting a friend about weekend plans","checking into a hotel","grocery shopping","a break room at work","calling customer support","an airport security line","a first date","a family dinner","helping a neighbor fix their computer","a workout at the gym","a road trip","a birthday party","renting an apartment","watching a soccer match","a rainy day at home","a visit to the bank","a pharmacy counter","asking for directions in a new city","a video game night with friends","cooking a recipe together","a museum visit","a camping trip","a wedding reception","a barbershop or hair salon","a car breaking down","an outdoor concert","a day at the beach","the first day at a new job","a parent-teacher meeting","losing a wallet","a farmers' market","a train station","visiting a friend in the hospital","moving day","taking a pet to the vet","complaining at a restaurant","a neighborhood barbecue","returning something bought online","a movie night","studying for an exam","reading the morning news","a holiday tradition","a phone call with a grandparent","a hike in the mountains","a street food stall","an office meeting","a crowded bus ride","a thunderstorm","a gaming tournament","a volunteer event","an electronics store","a wedding toast","a flat tire on the highway","a library","a dentist visit","a karaoke night","planning a surprise party"];
+const ISLAND_SCENES = ["small talk with a new coworker","meeting someone at a party","a first date","a job interview","chatting with a neighbor","a video call with a pen pal","talking with a taxi driver","catching up with an old friend","explaining it to a curious kid","a language-exchange meetup","a family dinner","texting a friend","being interviewed on a podcast","chatting while waiting in line","telling a story at a barbecue","answering a stranger's question on a train","a group chat","a first day at a new job"];
+const STYLES = ["a plain statement","a question","a negative sentence","a casual text message","a polite request","a complaint","an excited exclamation","a line of dialogue between two people","a sentence with a time expression","a short opinion with a reason","a mildly funny situation","an instruction or command"];
+
+/* ===================== State ===================== */
+let S = null;               // game state
+let sample = null, tts = null;
+let store = {db:null, uid:null};
+let ctl = null;             // AbortController for current call
+let lastPayload = null;     // for retry
+const setup = {mode:1, level:"A1", target:"Spanish", native:"English", island:"", fast:false};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const md = s => esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/(^|[^*])\*(?!\s)([^*]+?)\*/g,"$1<em>$2</em>").replace(/\n/g,"<br>");
+const modeOf = id => MODES.find(m => m.id === id);
+const modeName = id => t("m" + id + "n");
+
+/* ===================== Persistence ===================== */
+async function initStore(){
+  try{
+    const [user, db] = await Promise.all([claude.use("user"), claude.use("db")]);
+    if(user && db){
+      const id = await user.id();
+      if(id){ store.db = db; store.uid = id; }
+    }
+  }catch(e){}
+}
+function saveRef(){ return store.db.collection("data/users/" + store.uid).doc("save"); }
+let saveTimer = null;
+function save(){
+  if(!S) return;
+  const json = JSON.stringify(S);
+  try{ localStorage.setItem("pgm-save", json); }catch(e){}
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    if(!store.db) return;
+    try{ await saveRef().set({json, at: Date.now()}); }catch(e){}
+  }, 400);
+}
+async function loadSave(){
+  let best = null;
+  try{ const raw = localStorage.getItem("pgm-save"); if(raw) best = JSON.parse(raw); }catch(e){}
+  if(store.db){
+    try{
+      const snap = await saveRef().get();
+      if(snap.exists){
+        const d = snap.data();
+        const remote = JSON.parse(d.json);
+        if(!best || (remote.savedAt||0) >= (best.savedAt||0)) best = remote;
+      }
+    }catch(e){}
+  }
+  return best && best.v === 1 ? best : null;
+}
+
+/* ===================== Menu ===================== */
+function renderMenu(){
+  $("modes").innerHTML = MODES.map(m => `
+    <button class="mode" role="radio" aria-checked="${setup.mode===m.id}" data-mode="${m.id}" style="--c:${m.color}">
+      <span class="ico" aria-hidden="true">${m.ico}</span>
+      <span><b>${esc(t("m"+m.id+"n"))}</b><small>${esc(t("m"+m.id+"d"))}</small></span>
+    </button>`).join("");
+  $("levels").innerHTML = LEVELS.map(l => `<button class="lv" role="radio" aria-checked="${setup.level===l}" data-lv="${l}">${l}</button>`).join("");
+  const m = setup.mode;
+  $("islandGroup").hidden = m !== 6;
+  $("levelGroup").hidden = m === 3;
+  $("levelTitle").textContent = m === 2 ? t("lvLocked") : m === 6 ? t("lvCurrent") : t("lvStart");
+  $("levelNote").textContent = m === 6 ? t("lvNoteIsland") : m === 2 ? t("lvNoteLocked") : "";
+}
+function initMenu(){
+  fillLangSelects();
+  $("uiSel").addEventListener("change", onUiChange);
+  $("modes").addEventListener("click", e => { const b = e.target.closest("[data-mode]"); if(b){ setup.mode = +b.dataset.mode; renderMenu(); }});
+  $("levels").addEventListener("click", e => { const b = e.target.closest("[data-lv]"); if(b){ setup.level = b.dataset.lv; renderMenu(); }});
+  $("islandChips").addEventListener("click", e => { const b = e.target.closest("[data-isl]"); if(b) $("islandIn").value = b.dataset.isl; });
+  $("targetSel").addEventListener("change", () => { $("targetOther").hidden = $("targetSel").value !== "Other…"; });
+  $("nativeSel").addEventListener("change", () => {
+    if($("nativeSel").value === "Other"){
+      const v = prompt(t("askNative"));
+      if(v && v.trim()){ const o = document.createElement("option"); o.textContent = v.trim(); o.selected = true; $("nativeSel").insertBefore(o, $("nativeSel").lastElementChild); }
+      else $("nativeSel").value = "English";
+    }
+  });
+  $("startBtn").addEventListener("click", startNew);
+  try{ if(window.matchMedia("(max-width: 700px)").matches) $("fastToggle").checked = true; }catch(e){}
+  $("continueBtn").addEventListener("click", () => { showGame(); if(!S.current) runTurn(null); });
+  renderMenu();
+}
+
+function fillLangSelects(){
+  const tv = $("targetSel").value || setup.target, nv = $("nativeSel").value || setup.native;
+  const extraNative = [...$("nativeSel").options].map(o => o.value).filter(v => v && !NATIVE.includes(v));
+  $("targetSel").innerHTML = LANGS.map(l => `<option value="${esc(l)}" ${l===tv?"selected":""}>${esc(l === "Other…" ? t("other") : langLabel(l))}</option>`).join("");
+  const natives = NATIVE.slice(0, -1).concat(extraNative, ["Other"]);
+  $("nativeSel").innerHTML = natives.map(l => `<option value="${esc(l)}" ${l===nv?"selected":""}>${esc(l === "Other" ? t("other") : langLabel(l))}</option>`).join("");
+  $("islandChips").innerHTML = ISLAND_SUGGESTIONS.map(k => `<button class="chip" data-isl="${esc(t(k))}">${esc(t(k))}</button>`).join("");
+  const cur = UI.code;
+  const opts = UI_LANGS.map(l => `<option value="${l.code}" ${l.code===cur?"selected":""}>${l.label}</option>`);
+  if(cur.startsWith("x-")) opts.push(`<option value="${esc(cur)}" selected>${esc(UI.name)}</option>`);
+  opts.push(`<option value="other">${esc(t("other"))}</option>`);
+  $("uiSel").innerHTML = opts.join("");
+}
+function setNative(name){
+  const sel = $("nativeSel");
+  if(![...sel.options].some(o => o.value === name)){ const o = document.createElement("option"); o.value = name; o.textContent = name; sel.insertBefore(o, sel.lastElementChild); }
+  sel.value = name;
+  if($("targetSel").value === name) $("targetSel").value = name === "English" ? "Spanish" : "English";
+}
+async function onUiChange(){
+  let code = $("uiSel").value, name;
+  if(code === "other"){
+    const v = prompt(t("askUiLang"));
+    if(!v || !v.trim()){ fillLangSelects(); return; }
+    name = v.trim(); code = "x-" + name.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-");
+  } else name = UI_LANGS.find(l => l.code === code).name;
+  await setUiLang(code, name);
+  setNative(name);
+}
+async function setUiLang(code, name){
+  try{ localStorage.setItem("pgm-ui", JSON.stringify({code, name})); }catch(e){}
+  let dict = I18N[code];
+  if(!dict){
+    try{ const c = localStorage.getItem("pgm-i18n-v4-" + code); if(c) dict = JSON.parse(c); }catch(e){}
+  }
+  if(!dict && sample){
+    $("uiStatus").hidden = false; $("uiStatus").textContent = "⏳ " + t("translating");
+    try{
+      const out = await sample.json(`Translate the VALUES of this JSON object from English into ${name}. It is the interface of a playful language-learning game. Keep every key exactly the same. Keep placeholders like {n}, {lvl}, {d}, {hp}, {r}, {prev}, {island} unchanged, keep emoji, keep "Game Master", "A1"…"C2" and "C2" as is. Use natural, short UI wording. Reply with only the JSON object.\n\n${JSON.stringify(I18N.en)}`, {modelTier:"quick", cache:false});
+      if(out && typeof out === "object" && Object.keys(out).length > 60){
+        dict = {}; for(const k in I18N.en) if(typeof out[k] === "string" && out[k].trim()) dict[k] = out[k];
+        try{ localStorage.setItem("pgm-i18n-v4-" + code, JSON.stringify(dict)); }catch(e){}
+      }
+    }catch(e){}
+    $("uiStatus").hidden = true;
+  }
+  if(!dict && !sample && !I18N[code]){ UI = {code, name, dict:null}; applyI18n(); return; }
+  if(!dict){ $("uiStatus").hidden = false; $("uiStatus").textContent = I18N.en.trFail; }
+  UI = {code, name, dict: dict || I18N.en};
+  applyI18n();
+}
+function applyI18n(){
+  const html = document.documentElement;
+  html.lang = /^[a-z]{2}$/.test(UI.code) ? UI.code : "";
+  html.dir = UI.code === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
+  fillLangSelects();
+  renderMenu();
+  refreshContinue();
+  if(typeof renderSoundBtn === "function") renderSoundBtn();
+  if(typeof renderReadUi === "function") renderReadUi();
+  if(S && !$("game").hidden) renderGame();
+  if(S && !$("over").hidden) showOver();
+}
+
+function startNew(){
+  const target = $("targetSel").value === "Other…" ? $("targetOther").value.trim() : $("targetSel").value;
+  if(!target){ $("startNote").textContent = t("needLang"); return; }
+  const island = $("islandIn").value.trim();
+  $("startNote").textContent = "";
+  S = freshState({mode:setup.mode, target, native:$("nativeSel").value, level: setup.mode===3 ? "A1" : setup.level, island, fast:$("fastToggle").checked});
+  save();
+  Sound.start();
+  showGame();
+  runTurn(null);
+}
+function freshState(o){
+  return {
+    v:1, savedAt:Date.now(),
+    mode:o.mode, target:o.target, native:o.native, level:o.level, island:o.island||"", fast:!!o.fast,
+    syllabus:null, done:[], hp:3, vocabCleared:0, cycles:0,
+    srs:[], cheat:[], spotlight:null, history:[], lastGame:"", pastIslands:o.pastIslands||[],
+    current:null, judgement:null, event:null, status:"playing",
+    stats:{answered:0, correct:0, streak:0, best:0}
+  };
+}
+
+/* ===================== Game logic (deterministic) ===================== */
+function gamesFor(st){ return st.mode === 4 ? Object.keys(NUM_GAMES) : Object.keys(GAMES); }
+function addSrs(st, k, type, m){
+  if(!k) return;
+  const ex = st.srs.find(x => x.k.toLowerCase() === k.toLowerCase());
+  if(ex){ ex.c = 0; return; }
+  st.srs.push({k, type, m: m || "", c:0});
+}
+function nextLevel(l){ const i = LEVELS.indexOf(l); return i < 0 || i >= LEVELS.length-1 ? null : LEVELS[i+1]; }
+
+// Apply the result of answering `plan`. Mutates st. Returns nothing.
+function applyResult(st, correct, plan){
+  st.event = null;
+  st.stats.answered++;
+  if(correct){ st.stats.correct++; st.stats.streak++; st.stats.best = Math.max(st.stats.best, st.stats.streak); }
+  else st.stats.streak = 0;
+
+  if(st.mode === 3 && !correct){
+    st.hp--;
+    if(st.hp <= 0){ st.status = "gameover"; return; }
+  }
+  if(!plan) return;
+
+  if(plan.kind === "syllabus"){
+    if(correct) st.done[plan.idx] = true;
+    else addSrs(st, st.syllabus[plan.idx], "concept");
+  } else if(plan.kind === "srs" || plan.kind === "vocab"){
+    const key = plan.key;
+    const it = key && st.srs.find(x => x.k.toLowerCase() === key.toLowerCase());
+    if(it){
+      if(correct){
+        it.c++;
+        if(it.c >= 2){
+          st.srs = st.srs.filter(x => x !== it);
+          if(st.mode === 5 && it.type === "word") st.vocabCleared++;
+        }
+      } else it.c = 0;
+    }
+  }
+
+  // Progression
+  if(st.mode === 5){
+    if(st.vocabCleared >= 50){
+      const n = nextLevel(st.level);
+      st.event = n ? {k:"evLvl", x:"evWordsT", v:{lvl:n}} : {k:"evC2W", x:"evC2WT", v:{}};
+      if(n) st.level = n;
+      st.vocabCleared = 0;
+    }
+    return;
+  }
+  if(st.syllabus && st.done.length === st.syllabus.length && st.done.every(Boolean)){
+    if(st.mode === 6){ st.status = "conquered"; return; }
+    if(st.mode === 2){
+      st.done = st.syllabus.map(() => false); st.cycles++;
+      st.event = {k:"evSyl", x:"evSylT", v:{lvl:st.level, r:st.cycles+1}};
+      return;
+    }
+    const n = nextLevel(st.level);
+    if(n){
+      st.event = {k:"evLvl", x:"evLvlT", v:{lvl:n, prev:st.level}};
+      st.level = n; st.syllabus = null; st.done = [];
+    } else {
+      st.done = st.syllabus.map(() => false); st.cycles++;
+      st.event = {k:"evC2", x:"evC2T", v:{}};
+    }
+  }
+}
+
+// Decide what the next challenge tests. `rolls` are pre-drawn randoms so both branches agree.
+function makePlan(st, rolls, exclude){
+  const p = makePlanCore(st, rolls, exclude);
+  if(p){
+    const all = st.mode === 6 ? ISLAND_SCENES : SCENES;
+    const recent = st.recentScenes || [];
+    const pool = all.filter(x => !recent.includes(x));
+    const list = pool.length ? pool : all;
+    p.scene = list[Math.floor(rolls.c * list.length)];
+    p.style = STYLES[Math.floor(rolls.y * STYLES.length)];
+    p.boss = st.stats.answered >= 4 && (st.stats.answered + 1) % 7 === 0;
+  }
+  return p;
+}
+function makePlanCore(st, rolls, exclude){
+  if(st.status !== "playing") return null;
+  const games = gamesFor(st);
+  let gi = Math.floor(rolls.g * games.length);
+  if(games[gi] === st.lastGame) gi = (gi + 1) % games.length;
+  const game = games[gi];
+  const exKey = exclude && exclude.key ? exclude.key.toLowerCase() : null;
+
+  if(st.mode === 5){
+    const words = st.srs.filter(x => x.type === "word" && x.k.toLowerCase() !== exKey);
+    if(words.length < 6) return {kind:"vocab", swarm:true, game};
+    words.sort((a,b) => a.c - b.c);
+    const pool = words.slice(0, Math.max(3, Math.ceil(words.length/2)));
+    const w = pool[Math.floor(rolls.s * pool.length)];
+    return {kind:"vocab", key:w.k, game};
+  }
+  if(!st.syllabus) return {kind:"syllabus", idx:0, newSyllabus:true, game};
+  const srsItems = st.srs.filter(x => x.k.toLowerCase() !== exKey);
+  if(srsItems.length && rolls.r < 0.3){
+    const it = srsItems[Math.floor(rolls.s * srsItems.length)];
+    return {kind:"srs", key:it.k, game};
+  }
+  const exIdx = exclude && exclude.kind === "syllabus" ? exclude.idx : -1;
+  let undone = st.syllabus.map((_,i) => i).filter(i => !st.done[i] && i !== exIdx);
+  if(!undone.length) undone = st.syllabus.map((_,i) => i).filter(i => !st.done[i]);
+  if(!undone.length) undone = [0];
+  // keep curriculum order, but start from the item after the one just tested
+  const after = undone.find(i => i > exIdx);
+  return {kind:"syllabus", idx: after !== undefined ? after : undone[0], game};
+}
+const rollDice = () => ({g:Math.random(), r:Math.random(), s:Math.random(), c:Math.random(), y:Math.random()});
+const clone = o => JSON.parse(JSON.stringify(o));
+
+/* ===================== Prompt building ===================== */
+const PERSONA = `You are "The Polyglot Game Master" (PGM): a sharp, witty, slightly sassy language-learning game master with gamer banter. You are strictly factual about linguistics and never invent grammar rules. If something is colloquial or regional, say it is slang/colloquial vs textbook. You correct mistakes directly and unapologetically: accuracy first, wrapped in banter. Keep banter short; teaching content is the priority.
+This is a VIDEO GAME, so make it fun: use video-game flavor (critical hits, combos, loot, side quests, save points, respawns), playful puns, and now and then an absurd or funny mini-scenario in a challenge sentence (a llama at a job interview, a pirate ordering coffee). Hype great answers, roast lazy ones gently, never cruelly. Fun never beats accuracy.`;
+
+function modeBrief(st){
+  const lvl = st.level;
+  switch(st.mode){
+    case 1: return `Mode: Practice (curriculum). Level ${lvl}. Hints allowed: always give a small hint (e.g. first letter of the toughest word).`;
+    case 2: return `Mode: Level Select, locked at ${lvl}. Keep all vocabulary and grammar strictly at ${lvl}. Hints allowed.`;
+    case 3: return `Mode: SURVIVOR (hardcore), level ${lvl}. Test deep comprehension, not pattern matching: use linguistic traps such as false friends, irregular exceptions and nuanced contrasts (e.g. por/para, ser/estar, subjunctive triggers, or the equivalents for this language). The lesson must teach the needed material WITHOUT giving away the trap. ZERO HINTS ANYWHERE, and this overrides every mini-game description: hint MUST be ""; spotlight MUST be null; the task and target must contain no clues of any kind: no first letters, no word counts, no base forms or infinitives in parentheses, no translation of the answer, no glosses, no 'remember that…' reminders, and no list of words to choose from (except where the mini-game itself is built on given words, like Syntax Scramble or Odd One Out). For Cloze Combat, the surrounding sentence alone must make the answer unambiguous. The lesson is only a brief, general rule refresher: never an example that mirrors the challenge, and lesson.words must never contain the answer or any word from it. Grade strictly: missing accents/diacritics or wrong gender agreement = incorrect.`;
+    case 4: return `Mode: Number Cruncher, level ${lvl}. Everything is about numbers: counting, ordinals, dates, times, prices, math. Hints allowed.`;
+    case 5: return `Mode: Lexicon Onslaught (vocab), level ${lvl}. Lessons are vocab-focused. Use high-frequency ${lvl} words. Hints allowed.`;
+    case 6: return `Mode: Island Hopper. The player's Language Island topic: ${st.island ? `"${st.island}"` : "not chosen yet (you will invent it below)"}. Player level ≈ ${lvl}. Every challenge sentence should be something the player would actually say about their island topic, in first person where natural. Lessons should often teach conversational navigation phrases (e.g. "speaking of…", "that reminds me…") that steer conversation back to the island. Hints allowed.`;
+  }
+}
+
+function syllabusAsk(st){
+  if(st.mode === 6){
+    const inv = st.island ? "" : `First invent a fresh Language Island: an everyday personal topic the player would genuinely talk about with native speakers (daily routine, a favorite meal, a recent trip, work, family, weekend plans, a hobby, where they live, and so on).${(st.pastIslands||[]).length ? ` Do not repeat these: ${st.pastIslands.join(", ")}.` : ""} Return its short, inviting name (≤ 5 words, in ${st.native}, written as "My …" where natural) as "island". `;
+    return `${inv}Create an "Island Syllabus": exactly 15 items — the most vital words, phrases and grammar structures needed to talk fluently about ${st.island ? `"${st.island}"` : "that island"} at about ${st.level}. Order them from foundational to advanced.`;
+  }
+  if(st.mode === 4) return `Create a numeracy syllabus: exactly 15 number-related concepts appropriate for ${st.level} (e.g. 0-20, tens, hundreds, ordinals, telling time, dates, prices, percentages, fractions — scaled to the level). Order them logically.`;
+  return `Create the ${st.level} Level Syllabus: exactly 15 core grammar concepts and vocabulary themes specific to CEFR ${st.level} in ${st.target}. Order them in a sensible teaching sequence.`;
+}
+
+function planText(st, p){
+  if(!p) return null;
+  const gameDesc = (st.mode === 4 ? NUM_GAMES : GAMES)[p.game];
+  let what = "";
+  if(p.newSyllabus){
+    what = `${syllabusAsk(st)} Return it as "syllabus" (array of 15 short strings, each ≤ 8 words). Then teach and test syllabus item 1.`;
+  } else if(p.kind === "syllabus"){
+    what = `Teach, then test, syllabus item ${p.idx+1}: "${st.syllabus[p.idx]}".`;
+  } else if(p.kind === "srs"){
+    what = `SPACED-REPETITION REVIEW of "${p.key}" (the player missed this before). The lesson is a quick refresher; the challenge must test exactly this with a NEW sentence.`;
+  } else if(p.kind === "vocab" && p.swarm){
+    const known = st.srs.filter(x => x.type === "word").map(x => x.k).concat(st.cheat.map(x => x.w)).slice(0, 40);
+    what = `VOCAB SWARM: introduce exactly 3 new ${st.level} ${st.target} words on one theme (theme title in lesson.title). Put them in lesson.words (w = target word with article if a noun, m = native meaning). ${known.length ? `Do not reuse: ${known.join(", ")}.` : ""} The challenge must test ONE of them; set challenge.tests to that word exactly as written in lesson.words.`;
+  } else if(p.kind === "vocab"){
+    const it = st.srs.find(x => x.k === p.key);
+    what = `VOCAB REVIEW of "${p.key}"${it && it.m ? ` (${it.m})` : ""}. Quick refresher in the lesson (lesson.words may repeat it). The challenge must test this word; set challenge.tests to "${p.key}".`;
+  }
+  const flavor = p.scene ? `\nScene for variety: set the challenge in "${p.scene}"${st.mode === 6 ? " (the player is talking about their island topic in this situation)" : ""}. Where the mini-game uses a sentence, make it ${p.style}. Only use the scene and style if they fit the concept and the player's level; never let them pull in vocabulary or grammar the player hasn't been taught. If the scene doesn't fit, pick a different, fresh everyday setting instead of a generic one.` : "";
+  const boss = p.boss ? `\nBOSS BATTLE! Make this challenge noticeably harder than usual but still fair and within taught material (combine the concept with something learned earlier, or add a twist). Invent a funny video-game boss name tied to the scene (e.g. "The Grammar Goblin of the Café") and put it in challenge.boss; hype the fight in one short line of the task.` : "";
+  return `${what}\nMini-game for the challenge: ${p.game} — ${gameDesc}${flavor}${boss}`;
+}
+
+function buildPrompt(st, prev, answer, aText, bText, gameName){
+  const lines = [];
+  lines.push(PERSONA);
+  lines.push(`\nPlayer learns ${st.target}; native language ${st.native}. Write ALL explanations, feedback, tasks and hints in ${st.native}; only target-language material in ${st.target}.`);
+  lines.push(modeBrief(st));
+  lines.push(`Teach before testing: never test anything the lesson (or earlier lessons) didn't cover or the player couldn't reasonably know at this level.`);
+  if(st.syllabus) lines.push(`Current syllabus: ${st.syllabus.map((s,i) => `${i+1}. ${s}${st.done[i] ? " ✓" : ""}`).join(" | ")}`);
+  if(st.history.length) lines.push(`Recent challenge targets (do not repeat them): ${st.history.slice(-15).map(h => `"${h}"`).join("; ")}`);
+  if(st.cheat.length) lines.push(`Words the player struggled with recently: ${st.cheat.map(x => x.w).join(", ")}`);
+
+  if(prev){
+    lines.push(`\n=== GRADE THE PLAYER'S LAST ANSWER ===`);
+    lines.push(`Mini-game: ${prev.game}\nTask: ${prev.task}\nTarget: ${prev.target}\nYour answer key: ${prev.answerKey}`);
+    lines.push(`Player's answer: ${answer === null ? "(no answer — the player gave up)" : `"${answer}"`}`);
+    lines.push(`Player's combo before this answer: ${st.stats.streak}${st.mode === 3 ? `; hearts left: ${st.hp}/3` : ""}${prev.boss ? `; this was a BOSS BATTLE against ${prev.boss}, so make the verdict epic either way` : ""}.`);
+    lines.push(`Judge it fairly: accept any natural, grammatical answer with the right meaning, not only the key. ${st.mode === 3 ? "" : "A single missing accent with everything else perfect may be marked correct, but bold the fix."} A give-up is incorrect. In feedback, bold each correction with **double asterisks** and explain WHY (the rule), in 2-4 sentences, with a touch of sass scaled to performance. "struggled" lists target-language words the player got wrong or clearly didn't know (0-3 items).`);
+  }
+
+  lines.push(`\n=== NEXT TURN ===`);
+  const WIN = "The run/island is complete. Set lesson and challenge to null and make the headline a victory line.";
+  const LOSE = "The player is out of hearts: GAME OVER. Set lesson and challenge to null and make the headline a dramatic game-over line.";
+  if(prev && bText !== undefined){
+    lines.push(`Grade first. The next turn depends on your verdict:`);
+    lines.push(`IF CORRECT → ${aText || WIN}`);
+    lines.push(`IF INCORRECT → ${bText || LOSE}`);
+  } else {
+    lines.push(aText || WIN);
+  }
+  lines.push(`\nReply with ONLY one JSON object, no other text:
+{
+  ${prev ? `"judgement": {"correct": true|false, "headline": "one punchy verdict line", "feedback": "explanation", "answer": "the best correct answer in ${st.target}", "struggled": [{"w":"word","m":"meaning"}]},` : `"judgement": null,`}
+  "syllabus": [15 strings] ONLY if asked to create one, else omit,
+  "island": "island name" ONLY if asked to invent one, else omit,
+  "lesson": {"title": "short title", "body": "2-3 punchy sentences teaching exactly what the challenge needs", "words": [{"w":"target word","m":"meaning"}]},
+  "challenge": {"game": "${gameName || ""}", "task": "clear instruction in ${st.native}", "target": "the sentence/scramble/cloze/words/category", "hint": "tiny clue or \\"\\"", "answerKey": "expected answer(s)", "tests": "the exact concept or word tested", "speak": "target-language text worth hearing aloud, or \\"\\"", "boss": "boss name ONLY for a BOSS BATTLE, else \\"\\""},
+  "spotlight": ${st.mode === 3 ? "null" : `{"tense": "tense/structure in focus", "endings": "regular endings or pattern, compact", "irregular": "relevant irregular forms or \\"\\""} or null if not a verb topic`}
+}`);
+  return lines.join("\n");
+}
+
+/* ===================== Turn runner ===================== */
+async function runTurn(answer){
+  if(!sample){ showError(t("eNeed")); return; }
+  const prev = S.current ? S.current.challenge : null;
+  const prevPlan = S.current ? S.current.plan : null;
+  const rolls = rollDice();
+  lastPayload = {answer};
+  if(prev && prevPlan){
+    const sa = clone(S); applyResult(sa, true, prevPlan); const planA = makePlan(sa, rolls, prevPlan);
+    const sb = clone(S); applyResult(sb, false, prevPlan); const planB = makePlan(sb, rolls, prevPlan);
+    const aText = planText(sa, planA);
+    let bText = planText(sb, planB);
+    if(aText === bText) bText = undefined;
+    const gameName = (planA || planB || {}).game;
+    await call(buildPrompt(S, prev, answer, aText, bText, gameName), answer, rolls, prevPlan);
+  } else {
+    const plan = makePlan(S, rolls, null);
+    await call(buildPrompt(S, null, null, planText(S, plan), undefined, plan.game), null, rolls, null);
+  }
+}
+
+async function call(prompt, answer, rolls, prevPlan){
+  hideError();
+  setThinking(true, prevPlan ? t("judging") : (S.syllabus || S.mode === 5 ? t("dealing") : t("building")));
+  ctl = new AbortController();
+  let res;
+  try{
+    res = await sample.json(prompt, {signal: ctl.signal, cache:false, modelTier: S.fast ? "quick" : "default"});
+  }catch(e){
+    setThinking(false);
+    if(e && e.code === "cancelled"){ renderGame(); return; }
+    showError(errCopy(e && e.code), true);
+    return;
+  }
+  setThinking(false);
+  if(!res || typeof res !== "object"){ showError(t("eGarbled"), true); return; }
+  absorb(res, answer, rolls, prevPlan);
+}
+
+function absorb(res, answer, rolls, prevPlan){
+  const backup = clone(S);
+  const fail = msg => { S = backup; showError(msg, true); };
+  const prevCh = S.current ? S.current.challenge : null;
+  // 1. Grade
+  if(prevPlan && res.judgement && typeof res.judgement.correct === "boolean"){
+    const j = res.judgement;
+    applyResult(S, j.correct, prevPlan);
+    S.judgement = {correct:j.correct, headline:String(j.headline||""), feedback:String(j.feedback||""), answer:String(j.answer||""), yours: answer, gaveUp: answer === null};
+    if(Array.isArray(j.struggled)){
+      for(const w of j.struggled){
+        if(!w || !w.w) continue;
+        S.cheat = S.cheat.filter(x => x.w.toLowerCase() !== String(w.w).toLowerCase());
+        S.cheat.unshift({w:String(w.w), m:String(w.m||"")});
+      }
+      S.cheat = S.cheat.slice(0, 10);
+    }
+    if(prevCh && prevCh.target){ S.history.push(prevCh.target); S.history = S.history.slice(-30); }
+  } else if(prevPlan){
+    fail(t("eNoGrade")); return;
+  } else {
+    S.judgement = null;
+  }
+
+  const fx = prevPlan && S.judgement ? grantRewards(prevPlan, S.judgement.correct) : null;
+  playOutcome(prevPlan);
+  if(S.status !== "playing"){ S.current = null; S.savedAt = Date.now(); save(); showOver(); runJuice(fx); return; }
+
+  // 2. Syllabus
+  let madeSyllabus = false;
+  if(!S.syllabus && S.mode !== 5){
+    madeSyllabus = true;
+    if(S.mode === 6 && !S.island) S.island = String(res.island || "Mystery Island").slice(0, 60);
+    if(Array.isArray(res.syllabus) && res.syllabus.length >= 10){
+      S.syllabus = res.syllabus.slice(0, 15).map(String);
+      S.done = S.syllabus.map(() => false);
+    } else { fail(t("eNoSyl")); return; }
+  }
+
+  // 3. Next plan (recomputed with the same dice so it matches what Claude was told)
+  let plan = makePlan(S, rolls, prevPlan);
+  if(madeSyllabus && plan) plan = {kind:"syllabus", idx:0, game:plan.game};
+  const ch = res.challenge;
+  if(!ch || !ch.target){ fail(t("eNoCh")); return; }
+  const lesson = res.lesson || {title:"", body:"", words:[]};
+  if(plan && plan.kind === "vocab" && plan.swarm){
+    for(const w of (lesson.words || [])) if(w && w.w) addSrs(S, String(w.w), "word", String(w.m||""));
+    const tested = String(ch.tests || (lesson.words && lesson.words[0] && lesson.words[0].w) || "");
+    const hit = S.srs.find(x => x.k.toLowerCase() === tested.toLowerCase()) || S.srs.find(x => tested.toLowerCase().includes(x.k.toLowerCase()));
+    plan.key = hit ? hit.k : (lesson.words && lesson.words[0] ? String(lesson.words[0].w) : tested);
+  }
+  if(S.mode !== 3 && res.spotlight && res.spotlight.tense) S.spotlight = res.spotlight;
+  if(S.mode === 3) S.spotlight = null;
+
+  S.current = {
+    plan,
+    lesson:{title:String(lesson.title||""), body:String(lesson.body||""), words:Array.isArray(lesson.words) ? lesson.words.filter(w => w && w.w).slice(0,6) : []},
+    challenge:{game:String(ch.game || (plan && plan.game) || ""), boss: plan && plan.boss ? String(ch.boss || "") : "", task:String(ch.task||""), target:String(ch.target), hint: S.mode === 3 ? "" : String(ch.hint||""), answerKey:String(ch.answerKey||""), speak:String(ch.speak||"")}
+  };
+  S.lastGame = S.current.challenge.game;
+  if(plan && plan.scene) S.recentScenes = (S.recentScenes || []).concat(plan.scene).slice(-20);
+  S.savedAt = Date.now();
+  save();
+  renderGame(true);
+  runJuice(fx);
+  if(autoRead) Narrator.say(turnLines());
+}
+
+function errCopy(code){
+  switch(code){
+    case "not_granted": case "sampling_disabled": case "not_declared": case "capability_disabled":
+      return t("eGrant");
+    case "rate_limited": return t("eRate");
+    case "session_expired": return t("eSession");
+    case "invalid_json": return t("eGarbled");
+    case "refused": return t("eRefused");
+    default: return t("eNet");
+  }
+}
+
+/* ===================== Rendering ===================== */
+function showGame(){ $("menu").hidden = true; $("over").hidden = true; $("game").hidden = false; renderGame(); window.scrollTo(0,0); }
+function showMenu(){
+  $("game").hidden = true; $("over").hidden = true; $("menu").hidden = false;
+  syncMood();
+  refreshContinue(); window.scrollTo(0,0);
+}
+function refreshContinue(){
+  const can = S && S.status === "playing";
+  $("continueBtn").hidden = !can;
+  if(can) $("continueInfo").textContent = `${modeName(S.mode)} · ${langLabel(S.target)} · ${S.mode===6 ? (S.island || t("newIsland")) : S.level}`;
+}
+
+function progress(){
+  if(S.mode === 5) return {n:S.vocabCleared, d:50, label:t("progWords", {n:S.vocabCleared})};
+  const d = S.syllabus ? S.syllabus.length : 15;
+  const n = S.done.filter(Boolean).length;
+  return {n, d, label:t(S.mode===6 ? "progIsl" : "progSyl", {n, d})};
+}
+
+function renderHud(){
+  $("hudBadge").textContent = S.mode === 6 ? "🏝️ " + (S.island || t("charting")) : S.level;
+  $("hudBadge").classList.toggle("island", S.mode === 6);
+  $("hudBadge").title = S.mode === 6 ? S.island : S.level;
+  $("hudMode").textContent = `⭐ ${S.xp || 0} · ${modeName(S.mode)} · ${langLabel(S.target)}`;
+  syncMood();
+  const p = progress();
+  $("hudProg").textContent = p.label;
+  $("hudBar").style.width = Math.round(100 * p.n / p.d) + "%";
+  $("hudHearts").hidden = S.mode !== 3;
+  $("hudHearts").textContent = "❤️".repeat(Math.max(0,S.hp)) + "🖤".repeat(Math.max(0, 3 - S.hp));
+  $("hudHearts").setAttribute("aria-label", t("hearts", {hp:S.hp}));
+  $("hudStreak").title = t("streak");
+  $("hudStreak").textContent = S.stats.streak > 1 ? `🔥${S.stats.streak}` : "";
+}
+
+function renderGame(fresh){
+  if(!S) return;
+  renderHud();
+  // Event
+  if(S.event){ $("eventCard").hidden = false; $("eventCard").innerHTML = `<div class="trophy" aria-hidden="true">🏆</div><p class="big">${esc(S.event.title || t(S.event.k, S.event.v))}</p><p style="margin:4px 0 0">${esc(S.event.text || t(S.event.x, S.event.v))}</p>`; }
+  else $("eventCard").hidden = true;
+  // Judgement
+  const j = S.judgement;
+  if(j){
+    const jc = $("judgeCard");
+    jc.hidden = false;
+    jc.className = "card judge " + (j.correct ? "ok" : "bad");
+    jc.innerHTML = `<div class="stamp" aria-hidden="true">${j.correct ? "✓" : "✕"}</div><p class="verdict">${esc(j.headline)}</p>
+      <div class="fb">${md(j.feedback)}</div>
+      <div class="ans">${j.gaveUp ? "" : `<div><b>${esc(t("you"))}</b> ${esc(j.yours)}</div>`}<div><b>${esc(t("best"))}</b> ${esc(j.answer)}</div>${Narrator.available() ? `<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</button>` : ""}</div>`;
+  } else $("judgeCard").hidden = true;
+
+  const c = S.current;
+  // Lesson
+  if(c && (c.lesson.body || c.lesson.words.length)){
+    const kind = esc(t(S.mode === 5 ? (c.plan && c.plan.swarm ? "kSwarm" : "kVRef") : c.plan && c.plan.kind === "srs" ? "kRef" : S.mode === 6 ? "kIsland" : "kSkill"));
+    const kico = S.mode === 6 ? "🏝️" : S.mode === 5 ? "⚡" : c.plan && c.plan.kind === "srs" ? "🔁" : "🔓";
+    $("lessonCard").hidden = false;
+    $("lessonCard").className = "card lesson" + (S.mode === 6 ? " isl" : "");
+    $("lessonCard").innerHTML = `<div class="strip"><span aria-hidden="true">${kico}</span>${kind}${Narrator.available() ? `<button class="listen" data-say="lesson">🔊 ${esc(t("listen"))}</button>` : ""}</div><div class="in"><h3>${esc(c.lesson.title)}</h3><div>${md(c.lesson.body)}</div>` +
+      (c.lesson.words.length ? `<div class="words">${c.lesson.words.map((w, i) => Narrator.available() ? `<button class="word" data-say="word:${i}"><span class="say" aria-hidden="true">🔊</span><b>${esc(w.w)}</b><span>${esc(w.m)}</span></button>` : `<div class="word"><b>${esc(w.w)}</b><span>${esc(w.m)}</span></div>`).join("")}</div>` : "") + `</div>`;
+  } else $("lessonCard").hidden = true;
+
+  // Challenge
+  if(c){
+    $("challengeCard").hidden = false;
+    const isBoss = !!(c.plan && c.plan.boss);
+    $("challengeCard").classList.toggle("boss", isBoss);
+    $("chGame").textContent = isBoss ? `${t("boss")}: ${c.challenge.boss || "???"} · ${gameLabel(c.challenge.game)}` : gameLabel(c.challenge.game);
+    $("chIco").textContent = isBoss ? "👹" : (GAME_ICO[c.challenge.game] || "🎮");
+    $("chReview").hidden = !(c.plan && (c.plan.kind === "srs" || (c.plan.kind === "vocab" && !c.plan.swarm)));
+    $("chTask").textContent = c.challenge.task;
+    $("chTarget").innerHTML = esc(c.challenge.target) + (Narrator.available() ? ` <button class="iconbtn speak" data-say="target" aria-label="${esc(t("hear"))}">🔊</button>` : "");
+    document.querySelector('[data-say="challenge"]').hidden = !Narrator.available();
+    const hasHint = S.mode !== 3 && c.challenge.hint;
+    $("chHintWrap").hidden = !hasHint;
+    $("chHint").hidden = true; $("hintBtn").hidden = false;
+    $("chHint").textContent = c.challenge.hint;
+    if(fresh) $("answer").value = "";
+    $("giveUpBtn").textContent = S.mode === 3 ? t("idkHp") : t("idk");
+  } else $("challengeCard").hidden = true;
+
+  renderPanels();
+  if(fresh){
+    const first = S.event ? $("eventCard") : j ? $("judgeCard") : $("lessonCard");
+    if(first && !first.hidden) first.scrollIntoView({block:"start"});
+    else window.scrollTo(0,0);
+  }
+}
+
+function renderPanels(){
+  // Cheat sheet
+  let h = "";
+  if(S.mode === 3){
+    h += `<p class="empty">${esc(t("noCheat"))}</p>`;
+  } else {
+    h += `<h4>${esc(t("struggled"))}</h4>`;
+    h += S.cheat.length ? `<ul class="vlist">${S.cheat.map(w => `<li><b>${esc(w.w)}</b><span>${esc(w.m)}</span></li>`).join("")}</ul>` : `<p class="empty">${esc(t("nothingYet"))}</p>`;
+    if(S.spotlight){
+      h += `<h4>${esc(t("spotlight"))} ${esc(S.spotlight.tense)}</h4><div>${md(S.spotlight.endings)}</div>`;
+      if(S.spotlight.irregular) h += `<div style="margin-top:6px"><b>${esc(t("irregular"))}</b> ${md(S.spotlight.irregular)}</div>`;
+    }
+  }
+  $("cheatBody").innerHTML = h;
+  // Syllabus
+  if(S.mode === 5){
+    $("sylSummary").textContent = "📈 " + t("progress");
+    $("sylBody").innerHTML = `<p class="empty">${esc(t("lexProg", {n:S.vocabCleared, lvl:S.level}))}</p>`;
+  } else {
+    $("sylSummary").textContent = "🗺️ " + (S.mode === 6 ? t("islandSyl") : t("levelSyl", {lvl:S.level}));
+    $("sylBody").innerHTML = S.syllabus ? `<ol class="syl">${S.syllabus.map((s,i) => `<li class="${S.done[i] ? "done" : ""}"><span class="n">${S.done[i] ? "✓" : i+1}</span><span>${esc(s)}</span></li>`).join("")}</ol>` : `<p class="empty">${esc(t("generating"))}</p>`;
+  }
+  // SRS
+  $("srsBody").innerHTML = S.srs.length ? `<div class="srs">${S.srs.map(x => `<span>${esc(x.k)}<em>${x.c}/2</em></span>`).join("")}</div><p class="note">${esc(t("srsNote"))}</p>` : `<p class="empty">${esc(t("srsEmpty"))}</p>`;
+  renderTrophies();
+}
+
+function setThinking(on, text){
+  $("thinkCard").hidden = !on;
+  if(text) $("thinkText").textContent = text;
+  $("submitBtn").disabled = on; $("giveUpBtn").disabled = on;
+  $("challengeCard").hidden = on || !(S && S.current);
+  if(on){ $("retryRow").hidden = true; $("thinkCard").scrollIntoView({block:"center"}); }
+}
+function showError(msg, retry){
+  $("errBox").hidden = false; $("errBox").textContent = msg;
+  $("retryRow").hidden = !retry;
+  if(S && S.current) $("challengeCard").hidden = false;
+}
+function hideError(){ $("errBox").hidden = true; $("retryRow").hidden = true; }
+
+function showOver(){
+  $("game").hidden = true; $("menu").hidden = true; $("over").hidden = false;
+  const conquered = S.status === "conquered";
+  $("overTitle").textContent = conquered ? t("conquered") : t("gameOver");
+  $("overEmoji").textContent = conquered ? "🏝️" : "💀";
+  const j = S.judgement;
+  $("overText").innerHTML = (j && j.headline ? `<b>${esc(j.headline)}</b><br>` : "") +
+    (conquered ? esc(t("canTalk", {island:S.island})) :
+     esc(t("fell", {lvl:S.level, n:S.done.filter(Boolean).length})) +
+     (j && j.answer ? `<br>${esc(t("answerWas"))} <b>${esc(j.answer)}</b>` : ""));
+  const acc = S.stats.answered ? Math.round(100*S.stats.correct/S.stats.answered) : 0;
+  $("overStats").innerHTML = `<div><b>${S.stats.correct}</b><small>${esc(t("stCorrect"))}</small></div><div><b>${acc}%</b><small>${esc(t("stAcc"))}</small></div><div><b>${S.stats.best}</b><small>${esc(t("stBest"))}</small></div>` +
+    `<div class="wide"><b>⭐ ${S.xp || 0} XP</b><small>${(S.badges || []).map(id => { const b = BADGES.find(x => x.id === id); return b ? b.ico : ""; }).join(" ") || "🏅 0"}</small></div>`;
+  syncMood();
+  $("overIsland").hidden = !conquered;
+  $("overRestart").hidden = conquered;
+  window.scrollTo(0,0);
+}
+
+/* ===================== Sound effects ===================== */
+const Sound = (() => {
+  let ctx = null, on = true;
+  try{ on = localStorage.getItem("pgm-sound") !== "off"; }catch(e){}
+  function unlock(){
+    if(!ctx){ const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return; ctx = new AC(); }
+    if(ctx.state === "suspended") ctx.resume();
+  }
+  function tone(freq, start, dur, o){
+    o = o || {};
+    const t = ctx.currentTime + start;
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = o.type || "sine";
+    osc.frequency.setValueAtTime(freq, t);
+    if(o.slide) osc.frequency.exponentialRampToValueAtTime(freq * o.slide, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(o.vol || 0.18, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(t); osc.stop(t + dur + 0.05);
+  }
+  const play = fn => { if(!on) return; unlock(); if(!ctx) return; try{ fn(); }catch(e){} };
+  const api = {
+    unlock,
+    isOn: () => on,
+    toggle(){ on = !on; try{ localStorage.setItem("pgm-sound", on ? "on" : "off"); }catch(e){} if(on) api.tap(); return on; },
+    tap(){ play(() => tone(660, 0, 0.06, {type:"triangle", vol:0.08})); },
+    start(){ play(() => { tone(523, 0, 0.1, {type:"triangle", vol:0.12}); tone(784, 0.08, 0.2, {type:"triangle", vol:0.12}); }); },
+    correct(){ play(() => { tone(784, 0, 0.12, {type:"triangle"}); tone(1175, 0.09, 0.25, {type:"triangle"}); tone(1568, 0.09, 0.25, {vol:0.06}); }); },
+    wrong(){ play(() => { tone(220, 0, 0.16, {type:"square", vol:0.07, slide:0.85}); tone(175, 0.13, 0.28, {type:"square", vol:0.07, slide:0.8}); }); try{ navigator.vibrate && navigator.vibrate(120); }catch(e){} },
+    streak(){ play(() => [523,659,784,1047,1319].forEach((f,i) => tone(f, i*0.07, 0.16, {type:"triangle", vol:0.12}))); },
+    levelUp(){ play(() => { const n=[523,659,784,1047,784,1047], ts=[0,.12,.24,.36,.52,.62]; n.forEach((f,i) => { tone(f, ts[i], i===5?0.55:0.14, {type:"square", vol:0.06}); tone(f/2, ts[i], i===5?0.55:0.14, {type:"triangle", vol:0.09}); }); }); },
+    gameOver(){ play(() => [392,370,349,330].forEach((f,i) => tone(f, i*0.22, i===3?0.75:0.2, {type:"square", vol:0.07, slide: i===3?0.7:1}))); }
+  };
+  api.loot = () => play(() => [1319,1568,2093,2637].forEach((f,i) => tone(f, i*0.05, 0.18, {vol:0.08})));
+  api.badge = () => play(() => [784,988,1175,1568].forEach((f,i) => tone(f, i*0.08, 0.2, {type:"triangle", vol:0.12})));
+  api.bossIntro = () => play(() => { tone(110, 0, 0.5, {type:"square", vol:0.08, slide:0.7}); tone(104, 0.02, 0.5, {type:"square", vol:0.06, slide:0.7}); tone(82, 0.45, 0.6, {type:"sawtooth", vol:0.06}); });
+  return api;
+})();
+function playOutcome(prevPlan){
+  if(!prevPlan || !S.judgement) return;
+  if(S.status === "gameover") return Sound.gameOver();
+  if(S.status === "conquered" || S.event) return Sound.levelUp();
+  if(S.judgement.correct && prevPlan.boss) return Sound.levelUp();
+  if(S.judgement.correct){
+    if(S.stats.streak > 0 && S.stats.streak % 5 === 0) Sound.streak(); else Sound.correct();
+  } else Sound.wrong();
+}
+/* ===================== Background music ===================== */
+const Music = (() => {
+  let ctx = null, master = null, duckG = null, noise = null, timer = null, on = true, vol = 0.5, mood = "main", next = 0, step = 0, bar = 0;
+  try{ on = localStorage.getItem("pgm-music") !== "off"; const v = parseFloat(localStorage.getItem("pgm-music-vol")); if(!isNaN(v)) vol = v; }catch(e){}
+  const mf = m => 440 * Math.pow(2, (m - 69) / 12);
+  const TR = {
+    main:{bpm:104, wave:"square", cut:2200, arpVol:.04, chords:[[60,64,67],[57,60,64],[53,57,60],[55,59,62]], arp:[0,1,2,3,2,1,0,1,0,1,2,3,2,1,2,1], bass:{0:0,6:12,8:0,10:7,14:12}, kick:[0,8,10], snare:[4,12], hat:[2,6,10,14], hatVol:.04},
+    survivor:{bpm:120, wave:"sawtooth", cut:1400, arpVol:.035, chords:[[57,60,64],[53,57,60],[55,59,62],[52,56,59]], arp:[0,1,2,1,0,1,2,3,0,1,2,1,3,2,1,0], bass:{0:0,2:0,4:0,6:12,8:0,10:0,12:0,14:12}, kick:[0,3,8,11], snare:[4,12], hat:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], hatVol:.02},
+    island:{bpm:100, wave:"sine", cut:5000, arpVol:.09, pluck:true, chords:[[65,69,72],[58,62,65],[60,64,67],[58,62,65]], arp:[0,null,2,1,null,3,2,null,1,null,2,3,null,2,1,null], bass:{0:0,3:7,8:0,11:7}, kick:[0,8], snare:[], rim:[4,12], hat:[2,3,6,7,10,11,14,15], hatVol:.025},
+    boss:{bpm:146, wave:"square", cut:1800, arpVol:.035, chords:[[62,65,69],[58,62,65],[55,58,62],[57,61,64]], arp:[0,1,2,3,0,1,2,3,3,2,1,0,3,2,1,0], bass:{0:0,2:12,4:0,6:12,8:0,10:12,12:0,14:12}, kick:[0,4,8,12], snare:[4,12], hat:[2,6,10,14], hatVol:.045}
+  };
+  function ensure(){
+    if(ctx) return true;
+    const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return false;
+    ctx = new AC(); master = ctx.createGain(); duckG = ctx.createGain();
+    master.gain.value = vol * 0.35; master.connect(duckG).connect(ctx.destination);
+    const len = Math.floor(ctx.sampleRate * 0.5); noise = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = noise.getChannelData(0); for(let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    return true;
+  }
+  function tone(f, t, dur, type, v, cut){
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
+    let node = o; if(cut){ const fl = ctx.createBiquadFilter(); fl.type = "lowpass"; fl.frequency.value = cut; o.connect(fl); node = fl; }
+    node.connect(g); g.connect(master);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function hit(t, v, type, freq, dur){
+    const s = ctx.createBufferSource(); s.buffer = noise; const f = ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq;
+    const g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f).connect(g).connect(master); s.start(t); s.stop(t + dur + 0.02);
+  }
+  function kick(t){
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12);
+    g.gain.setValueAtTime(0.4, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+    o.connect(g).connect(master); o.start(t); o.stop(t + 0.2);
+  }
+  function schedule(){
+    const tr = TR[mood], sd = 60 / tr.bpm / 4;
+    while(next < ctx.currentTime + 0.15){
+      const ch = tr.chords[bar % tr.chords.length], tones = ch.concat([ch[0] + 12]), s = step % 16, t = next;
+      const ai = tr.arp[s];
+      if(ai !== null && ai !== undefined) tone(mf(tones[ai] + 12), t, tr.pluck ? 0.32 : sd * 0.9, tr.wave, tr.arpVol, tr.cut);
+      if(tr.bass[s] !== undefined) tone(mf(ch[0] - 24 + tr.bass[s]), t, sd * 1.8, "triangle", 0.15, 0);
+      if(tr.kick.includes(s)) kick(t);
+      if(tr.snare.includes(s)) hit(t, 0.16, "bandpass", 1800, 0.12);
+      if(tr.rim && tr.rim.includes(s)) tone(1200, t, 0.04, "square", 0.025, 3000);
+      if(tr.hat.includes(s)) hit(t, tr.hatVol, "highpass", 7000, 0.04);
+      next += sd; step++; if(step % 16 === 0) bar++;
+    }
+  }
+  function start(){
+    if(!on || !ensure()) return;
+    if(ctx.state === "suspended") ctx.resume();
+    if(timer) return;
+    next = ctx.currentTime + 0.1; step = 0; bar = 0; timer = setInterval(schedule, 25);
+  }
+  function stop(){ if(timer){ clearInterval(timer); timer = null; } }
+  document.addEventListener("visibilitychange", () => { if(!ctx) return; if(document.hidden) ctx.suspend(); else if(on && timer) ctx.resume(); });
+  return {
+    start, isOn: () => on, getVol: () => vol,
+    toggle(){ on = !on; try{ localStorage.setItem("pgm-music", on ? "on" : "off"); }catch(e){} if(on) start(); else stop(); return on; },
+    setVol(v){ vol = v; try{ localStorage.setItem("pgm-music-vol", String(v)); }catch(e){} if(master) master.gain.setTargetAtTime(v * 0.35, ctx.currentTime, 0.05); },
+    setMood(m){ if(TR[m] && m !== mood){ mood = m; step = 0; bar = 0; } },
+    duck(d){ if(ctx && duckG) duckG.gain.setTargetAtTime(d ? 0.25 : 1, ctx.currentTime, 0.15); }
+  };
+})();
+function syncMood(){
+  let m = "main";
+  if(S && !$("game").hidden){
+    if(S.current && S.current.plan && S.current.plan.boss) m = "boss";
+    else if(S.mode === 3) m = "survivor";
+    else if(S.mode === 6) m = "island";
+  }
+  Music.setMood(m);
+}
+["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, () => { if(Music.isOn()) Music.start(); }, {passive:true}));
+
+/* ===================== Settings panel ===================== */
+function renderSoundBtn(){
+  $("sfxChk").checked = Sound.isOn();
+  $("musicChk").checked = Music.isOn();
+  $("musicVol").value = Math.round(Music.getVol() * 100);
+  $("musicVol").setAttribute("aria-label", t("volume"));
+  const mb = $("menuMusicBtn");
+  mb.textContent = `${Music.isOn() ? "🎵" : "🔇"} ${t("music")}`;
+  mb.classList.toggle("on", Music.isOn());
+  mb.setAttribute("aria-pressed", String(Music.isOn()));
+}
+$("sfxChk").addEventListener("change", () => { if($("sfxChk").checked !== Sound.isOn()) Sound.toggle(); });
+$("musicChk").addEventListener("change", () => { if($("musicChk").checked !== Music.isOn()) Music.toggle(); renderSoundBtn(); });
+$("musicVol").addEventListener("input", () => Music.setVol($("musicVol").value / 100));
+$("menuMusicBtn").addEventListener("click", () => { Music.toggle(); renderSoundBtn(); });
+function setPanel(open){ $("settingsPanel").hidden = !open; $("setBtn").setAttribute("aria-expanded", String(open)); }
+$("setBtn").addEventListener("click", () => setPanel($("settingsPanel").hidden));
+document.addEventListener("pointerdown", e => { if(!$("settingsPanel").hidden && !e.target.closest("#settingsPanel, #setBtn")) setPanel(false); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("settingsPanel").hidden){ e.preventDefault(); setPanel(false); $("setBtn").focus(); } });
+renderSoundBtn();
+
+/* ===================== Fun layer ===================== */
+const BADGES = [
+  {id:"first", ico:"🩸", test: s => s.stats.correct >= 1},
+  {id:"combo5", ico:"🔥", test: s => s.stats.best >= 5},
+  {id:"combo10", ico:"☄️", test: s => s.stats.best >= 10},
+  {id:"boss1", ico:"⚔️", test: s => (s.bosses || 0) >= 1},
+  {id:"boss5", ico:"👑", test: s => (s.bosses || 0) >= 5},
+  {id:"xp500", ico:"⭐", test: s => (s.xp || 0) >= 500},
+  {id:"xp2000", ico:"🌟", test: s => (s.xp || 0) >= 2000},
+  {id:"ans50", ico:"📚", test: s => s.stats.answered >= 50},
+  {id:"ans200", ico:"🏛️", test: s => s.stats.answered >= 200},
+  {id:"loot", ico:"🎁", test: s => (s.lootCount || 0) >= 1},
+  {id:"clutch", ico:"🫀", test: s => s.mode === 3 && s.hp === 1 && s.stats.streak >= 3}
+];
+function grantRewards(plan, correct){
+  const fx = {xp:0, mult:1, boss:false, loot:null, badges:[]};
+  S.xp = S.xp || 0; S.badges = S.badges || []; S.bosses = S.bosses || 0; S.lootCount = S.lootCount || 0;
+  if(correct){
+    const st = S.stats.streak;
+    fx.mult = st >= 10 ? 3 : st >= 5 ? 2 : st >= 3 ? 1.5 : 1;
+    fx.xp = Math.round(10 * fx.mult);
+    if(plan.boss){ fx.boss = true; fx.xp += 50; S.bosses++; }
+    if(Math.random() < 0.12){
+      S.lootCount++;
+      if(S.mode === 3 && S.hp < 3 && Math.random() < 0.5){ S.hp++; fx.loot = "heart"; }
+      else { fx.loot = "xp"; fx.xp += 25; }
+    }
+    S.xp += fx.xp;
+  }
+  for(const b of BADGES) if(!S.badges.includes(b.id) && b.test(S)){ S.badges.push(b.id); fx.badges.push(b); }
+  return fx;
+}
+function toast(text, kind){
+  const el = document.createElement("div");
+  el.className = "toast " + (kind || ""); el.textContent = text;
+  $("toasts").appendChild(el);
+  setTimeout(() => el.classList.add("out"), 2000);
+  setTimeout(() => el.remove(), 2500);
+}
+function shake(){ const f = $("feed"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake"); }
+const reduceMotion = (() => { try{ return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){ return false; } })();
+let parts = [], fxRunning = false;
+function confetti(n){
+  if(reduceMotion) return;
+  const c = $("fx"); if(!c || !c.getContext) return;
+  const dpr = window.devicePixelRatio || 1, w = window.innerWidth, h = window.innerHeight;
+  c.width = w * dpr; c.height = h * dpr;
+  const cols = ["#F2B01E","#5B4BD6","#2BB7D4","#E5384F","#4FD195","#FFD45C"];
+  for(let i = 0; i < n; i++) parts.push({x: w/2 + (Math.random()-0.5) * w * 0.6, y: h * 0.35, vx: (Math.random()-0.5) * 9, vy: -Math.random() * 11 - 3, r: Math.random() * 6, s: 5 + Math.random() * 6, c: cols[i % cols.length], life: 0});
+  if(fxRunning) return;
+  fxRunning = true;
+  const g = c.getContext("2d");
+  (function frame(){
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+    parts.forEach(p => { p.vy += 0.35; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += 0.15; p.life++;
+      g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.fillStyle = p.c; g.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); g.restore(); });
+    parts = parts.filter(p => p.y < h + 20 && p.life < 160);
+    if(parts.length) requestAnimationFrame(frame); else { g.clearRect(0, 0, w, h); fxRunning = false; }
+  })();
+}
+function bossIntro(){
+  if(S && S.status === "playing" && S.current && S.current.plan && S.current.plan.boss)
+    setTimeout(() => { Sound.bossIntro(); toast("👹 " + t("bossFight"), "boss"); }, 1100);
+}
+function runJuice(fx){
+  if(fx && S.judgement){
+    if(S.judgement.correct){
+      confetti(fx.boss ? 150 : 40);
+      toast(`+${fx.xp} XP`, "xp");
+      if(fx.mult > 1) toast(t("combo", {m: fx.mult}), "combo");
+      if(fx.boss) toast("👹 " + t("bossDown"), "boss");
+    } else shake();
+    if(S.event || S.status === "conquered") confetti(180);
+    if(fx.loot) setTimeout(() => { Sound.loot(); toast(`🎁 ${t("loot")} ${fx.loot === "heart" ? t("lootHeart") : t("lootXp", {xp:25})}`, "loot"); }, 600);
+    fx.badges.forEach((b, i) => setTimeout(() => { Sound.badge(); toast(`${b.ico} ${t("newBadge")}: ${t("b_" + b.id)}`, "badge"); }, 1000 + i * 800));
+  }
+  bossIntro();
+}
+function renderTrophies(){
+  const got = S.badges || [];
+  $("trophyCount").textContent = `${got.length}/${BADGES.length}`;
+  $("trophyBody").innerHTML = `<ul class="trophies">${BADGES.map(b => `<li class="${got.includes(b.id) ? "got" : ""}"><span class="ti">${got.includes(b.id) ? b.ico : "🔒"}</span><span><b>${esc(t("b_" + b.id))}</b><small>${esc(t("b_" + b.id + "_d"))}</small></span></li>`).join("")}</ul>`;
+}
+
+/* ===================== Actions ===================== */
+function submit(giveUp){
+  if(!S || !S.current) return;
+  const val = $("answer").value.trim();
+  if(!giveUp && !val){ $("answer").focus(); return; }
+  Sound.unlock(); Sound.tap(); Narrator.stop();
+  runTurn(giveUp ? null : val);
+}
+/* ===================== Read aloud ===================== */
+const Narrator = (() => {
+  let mode = "none", token = 0;
+  const clean = s => String(s || "").replace(/\*+/g, "").replace(/_{2,}/g, " … ").replace(/\s+/g, " ").trim();
+  function setReading(v){ $("stopRead").hidden = !v; Music.duck(v); }
+  function init(){
+    if(tts) mode = "claude";
+    else if(window.speechSynthesis && window.SpeechSynthesisUtterance) mode = "browser";
+    else mode = "none";
+  }
+  async function say(lines){
+    lines = lines.map(l => ({text: clean(l.text).slice(0, 1990), lang: l.lang})).filter(l => l.text).slice(0, 100);
+    if(!lines.length || mode === "none") return;
+    const my = ++token;
+    setReading(true);
+    if(mode === "claude"){
+      try{ await tts.speak(lines.map(l => l.lang ? {text:l.text, language:l.lang} : {text:l.text})); }
+      catch(e){
+        if(e && (e.code === "not_granted" || e.code === "unavailable")){ mode = "none"; autoRead = false; renderReadUi(); if(S && !$("game").hidden) renderGame(); }
+      }
+      if(my === token) setReading(false);
+      return;
+    }
+    try{
+      const ss = window.speechSynthesis; ss.cancel();
+      const voices = ss.getVoices() || [];
+      lines.forEach((l, i) => {
+        const u = new SpeechSynthesisUtterance(l.text);
+        if(l.lang){
+          u.lang = l.lang;
+          const v = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(l.lang.toLowerCase().slice(0, 2)));
+          if(v) u.voice = v;
+        }
+        if(i === lines.length - 1) u.onend = u.onerror = () => { if(my === token) setReading(false); };
+        ss.speak(u);
+      });
+    }catch(e){ setReading(false); }
+  }
+  function stop(){
+    token++; setReading(false);
+    try{ if(mode === "claude") tts.stop(); else if(mode === "browser") window.speechSynthesis.cancel(); }catch(e){}
+  }
+  return {init, say, stop, available: () => mode !== "none"};
+})();
+let autoRead = false;
+try{ autoRead = localStorage.getItem("pgm-read") === "on"; }catch(e){}
+const NATIVE_TARGET_GAMES = new Set(["Classic Mine","Idiom Investigator","Thematic Blitz","Digit Dictation","Real-World Numbers","Clock Watcher"]);
+function codes(){ return {nat: LANG_CODE[S.native], tgt: LANG_CODE[S.target]}; }
+function judgeLines(){
+  const j = S.judgement, {nat, tgt} = codes(), L = [];
+  if(!j) return L;
+  L.push({text: `${j.headline}. ${j.feedback}`, lang: nat});
+  if(j.answer){ L.push({text: t("best"), lang: nat}); L.push({text: j.answer, lang: tgt}); }
+  return L;
+}
+function lessonLines(){
+  const c = S.current, {nat, tgt} = codes(), L = [];
+  if(!c) return L;
+  if(c.lesson.title || c.lesson.body) L.push({text: `${c.lesson.title}. ${c.lesson.body}`, lang: nat});
+  for(const w of c.lesson.words){ L.push({text: w.w, lang: tgt}); if(w.m) L.push({text: w.m, lang: nat}); }
+  return L;
+}
+function targetLine(){
+  const c = S.current, {nat, tgt} = codes();
+  return {text: c.challenge.target, lang: NATIVE_TARGET_GAMES.has(c.challenge.game) ? nat : tgt};
+}
+function challengeLines(){
+  const c = S.current, {nat} = codes();
+  if(!c) return [];
+  return [{text: `${gameLabel(c.challenge.game)}. ${c.challenge.task}`, lang: nat}, targetLine()];
+}
+function turnLines(){ return judgeLines().concat(lessonLines(), challengeLines()); }
+function renderReadUi(){
+  $("readRow").hidden = !Narrator.available();
+  $("readChk").checked = autoRead;
+}
+$("readChk").addEventListener("change", () => {
+  autoRead = $("readChk").checked;
+  try{ localStorage.setItem("pgm-read", autoRead ? "on" : "off"); }catch(e){}
+  renderReadUi();
+  if(autoRead && S && S.current) Narrator.say(turnLines()); else Narrator.stop();
+});
+$("stopReadBtn").addEventListener("click", () => Narrator.stop());
+$("feed").addEventListener("click", e => {
+  const b = e.target.closest("[data-say]");
+  if(!b || !S) return;
+  const k = b.dataset.say;
+  if(k === "judge") Narrator.say(judgeLines());
+  else if(k === "lesson") Narrator.say(lessonLines());
+  else if(k === "challenge") Narrator.say(challengeLines());
+  else if(k === "target" && S.current) Narrator.say([targetLine()]);
+  else if(k.startsWith("word:") && S.current){
+    const w = S.current.lesson.words[+k.slice(5)]; const {nat, tgt} = codes();
+    if(w) Narrator.say([{text: w.w, lang: tgt}].concat(w.m ? [{text: w.m, lang: nat}] : []));
+  }
+});
+
+$("submitBtn").addEventListener("click", () => submit(false));
+$("giveUpBtn").addEventListener("click", () => submit(true));
+$("answer").addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); submit(false); }});
+$("hintBtn").addEventListener("click", () => { $("chHint").hidden = false; $("hintBtn").hidden = true; });
+$("stopBtn").addEventListener("click", () => { if(ctl) ctl.abort(); });
+$("retryBtn").addEventListener("click", () => { hideError(); runTurn(S.current ? (lastPayload ? lastPayload.answer : null) : null); });
+$("menuBtn").addEventListener("click", () => { if(ctl) ctl.abort(); Narrator.stop(); showMenu(); });
+$("overMenuBtn").addEventListener("click", showMenu);
+$("restartBtn").addEventListener("click", () => {
+  S = freshState({mode:S.mode, target:S.target, native:S.native, level: S.mode===3 ? "A1" : S.level, island:S.island, fast:S.fast, pastIslands:S.pastIslands});
+  save(); showGame(); runTurn(null);
+});
+function sail(topic){
+  const old = S;
+  const past = (old.pastIslands || []).concat(old.island ? [old.island] : []).slice(-20);
+  S = freshState({mode:6, target:old.target, native:old.native, level:old.level, island:topic, fast:old.fast, pastIslands:past});
+  S.cheat = old.cheat; S.srs = old.srs; S.stats = old.stats;
+  $("nextIsland").value = "";
+  save(); showGame(); runTurn(null);
+}
+$("sailBtn").addEventListener("click", () => sail(""));
+$("sailPickBtn").addEventListener("click", () => { const t = $("nextIsland").value.trim(); if(!t){ $("nextIsland").focus(); return; } sail(t); });
+
+/* ===================== Boot ===================== */
+initMenu();
+(async () => {
+  let pref = null;
+  try{ pref = JSON.parse(localStorage.getItem("pgm-ui") || "null"); }catch(e){}
+  if(!pref){
+    const nav = (navigator.language || "en").slice(0,2).toLowerCase();
+    const hit = UI_LANGS.find(l => l.code === nav) || UI_LANGS[0];
+    pref = {code:hit.code, name:hit.name};
+  }
+  setNative(pref.name);
+  const needsClaude = !I18N[pref.code] && !(() => { try{ return localStorage.getItem("pgm-i18n-v4-" + pref.code); }catch(e){ return null; } })();
+  if(!needsClaude) await setUiLang(pref.code, pref.name); else applyI18n();
+  if(!window.claude || !claude.use){ $("noClaude").hidden = false; $("startBtn").disabled = true; return; }
+  const [s, tt] = await Promise.all([claude.use("sample").catch(() => null), claude.use("tts").catch(() => null), initStore()]);
+  sample = s; tts = tt;
+  Narrator.init(); renderReadUi();
+  if(needsClaude && sample) await setUiLang(pref.code, pref.name);
+  if(!sample){ $("noClaude").hidden = false; $("startBtn").disabled = true; }
+  const saved = await loadSave();
+  if(saved){ S = saved; refreshContinue(); }
+})();
+})();
+</script>
+</body>
+</html>

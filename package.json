@@ -1,0 +1,22 @@
+{
+  "name": "polyglot-game-master",
+  "version": "1.0.0",
+  "description": "Learn Spanish or English with games, stories, a learning path and daily quests. Offline, no account, no ads.",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "python3 tools/build.py",
+    "test": "node test/test.js && node test/test4.js",
+    "android": "npx cap sync android && npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor-community/text-to-speech": "^8.0.2",
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/core": "^8.6.2"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.2",
+    "jsdom": "^31.0.1"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "appId": "io.github.doonoo.polyglot",
+  "appName": "Polyglot Game Master",
+  "webDir": "www",
+  "android": { "backgroundColor": "#F3F0FF" }
+}
