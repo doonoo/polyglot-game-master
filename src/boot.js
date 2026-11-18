@@ -184,6 +184,8 @@ Object.assign(I18N.en, {
   cefrMastery:"{lvl} mastery: {p}%", cefrHow:"Each lesson is taught once, then you must recall it correctly twice in later rounds. ●●● = mastered.",
   dotsTip:"Taught · recalled once · mastered", mixT:"Mixed review", mixB:"A quick drill from another part of this level.",
   mix_7:"verb forms", mix_8:"tricky pairs", mix_4:"numbers", mixIn:"Every few rounds, a mixed drill: {x}.",
+  m3d:"Survive every CEFR level from A1 to B2 on 3 hearts: grammar, topics, communication, verbs, tricky pairs and numbers. No hints, strict accents. Every miss costs a heart.",
+  fell:"You fell at {lvl} with {n} lessons cleared.", cefrCleared:"{lvl}: {d}/{n} lessons cleared ({p}%)", cefrSurv:"One correct answer clears a lesson. Mixed drills cost a heart too if you miss.",
 });
 Object.assign(I18N.es, {
   m1d:"Domina un nivel completo del MCER: gramática, temas cotidianos y comunicación real, con repaso espaciado. Luego sube al siguiente nivel.",
@@ -193,6 +195,8 @@ Object.assign(I18N.es, {
   cefrMastery:"Dominio del {lvl}: {p}%", cefrHow:"Cada lección se enseña una vez y luego debes recordarla bien dos veces en rondas posteriores. ●●● = dominada.",
   dotsTip:"Enseñada · recordada una vez · dominada", mixT:"Repaso mixto", mixB:"Un ejercicio rápido de otra parte de este nivel.",
   mix_7:"formas verbales", mix_8:"pares engañosos", mix_4:"números", mixIn:"Cada pocas rondas, un ejercicio mixto: {x}.",
+  m3d:"Sobrevive a todos los niveles del MCER, de A1 a B2, con 3 corazones: gramática, temas, comunicación, verbos, pares engañosos y números. Sin pistas y con tildes estrictas. Cada error cuesta un corazón.",
+  fell:"Caíste en {lvl} con {n} lecciones superadas.", cefrCleared:"{lvl}: {d}/{n} lecciones superadas ({p}%)", cefrSurv:"Una respuesta correcta supera una lección. Los ejercicios mixtos también cuestan un corazón si fallas.",
 });
 Object.assign(GAME_ICO, {"Word Duel":"⚖️", "Echo Chamber":"🎧", "Match Madness":"🧩", "Verb Forge":"⚒️", "Time Machine":"⏳", "Slip Fixer":"🩹"});
 BADGES.push(

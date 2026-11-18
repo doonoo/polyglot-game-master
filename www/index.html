@@ -7933,7 +7933,8 @@ function cefrOrder(tgt, lv){
   while(s < side.length) out.push(side[s++]);
   return CEFR_ORDER[key] = out;
 }
-const isCefr = st => st && st.cefr && (st.mode === 1 || st.mode === 2);
+const isCefr = st => st && st.cefr && (st.mode === 1 || st.mode === 2 || st.mode === 3);
+const isMastery = st => isCefr(st) && st.mode !== 3;   // Survivor is a gauntlet: one correct answer clears a lesson
 syllabusFor = (orig => function(st){
   if(!isCefr(st)) return orig(st);
   const tgt = LANG_CODE[st.target], lv = COURSE[tgt][st.level] ? st.level : "A1";
@@ -7956,11 +7957,16 @@ function mixSources(st){
 const mixState = (st, src) => { const m = Object.assign({}, st, {mode:src, cefr:0}); m.syllabus = syllabusFor(m); m.done = m.syllabus.map(() => false); return m; };
 
 generate = (orig => function(st, plan){
-  if((st.mode === 1 || st.mode === 2) && !st.syllabus && typeof S !== "undefined" && S && S.mode === st.mode && !S.syllabus){ S.cefr = 1; st.cefr = 1; }
+  if((st.mode === 1 || st.mode === 2 || st.mode === 3) && !st.syllabus && typeof S !== "undefined" && S && S.mode === st.mode && !S.syllabus){ S.cefr = 1; st.cefr = 1; }
   if(plan && plan.kind === "mix"){
     const m = mixState(st, plan.src);
     const res = orig(m, {kind:"syllabus", idx:Math.min(plan.idx, m.syllabus.length - 1), game:plan.game, boss:false, scene:plan.scene, style:plan.style});
     if(res && res.lesson) res.lesson = Object.assign({}, res.lesson, {title:"🔀 " + t("mixT") + " · " + (res.lesson.title || ""), body:t("mixB")});
+    if(res && st.mode === 3){   // keep Survivor rules: no hints, no word lists, no spotlight
+      if(res.lesson) res.lesson.words = [];
+      if(res.challenge) res.challenge.hint = "";
+      res.spotlight = null;
+    }
     return res;
   }
   return orig(st, plan);
@@ -7974,10 +7980,11 @@ makePlanCore = (orig => function(st, rolls, exclude){
     const srcs = mixSources(st);
     if(srcs.length){
       const src = srcs[Math.floor(rolls.s * srcs.length)], m = mixState(st, src);
-      const games = gamesFor(m).filter(g => g !== "Echo Chamber" && g !== "Match Madness");
+      const games = gamesFor(m).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && !(st.mode === 3 && (g === "Cloze Combat" || g === "Word Duel")));
       return {kind:"mix", src, idx:Math.floor(rolls.c * m.syllabus.length), game:games[Math.floor(rolls.g * games.length)]};
     }
   }
+  if(!isMastery(st)) return p;
   const low = k => String(k || "").toLowerCase(), inSrs = k => st.srs.some(x => low(x.k) === low(k));
   const exKey = exclude ? low(exclude.kind === "syllabus" ? st.syllabus[exclude.idx] : exclude.key) : "";
   const exIdx = exclude && exclude.kind === "syllabus" ? exclude.idx : -1;
@@ -7997,6 +8004,7 @@ makePlanCore = (orig => function(st, rolls, exclude){
 applyResult = (orig => function(st, correct, plan){
   if(!isCefr(st) || !plan || !st.syllabus) return orig(st, correct, plan);
   if(plan.kind === "mix") return orig(st, correct, {kind:"mix"});
+  if(!isMastery(st)) return orig(st, correct, plan);
   if(plan.kind === "syllabus"){
     const key = st.syllabus[plan.idx];
     orig(st, correct, {kind:"teach"});
@@ -8028,14 +8036,14 @@ function sylHtml(){
   S.syllabus.forEach((s, i) => {
     const c = conceptAt(S, i), k = STRAND(c || {});
     const sr = S.srs.find(x => x.k.toLowerCase() === s.toLowerCase());
-    const st = S.done[i] ? 3 : sr ? 1 + sr.c : 0;
+    const st = S.done[i] ? 3 : sr && isMastery(S) ? 1 + sr.c : 0;
     (groups[k] || groups.g).push({s, st});
   });
   const done = S.done.filter(Boolean).length, pct = Math.round(100 * done / S.syllabus.length);
   const dots = n => "●".repeat(n) + "○".repeat(3 - n);
-  const sec = (k, ico) => groups[k].length ? `<h4 class="sylh">${ico} ${esc(t("strand_" + k))} <small>${groups[k].filter(x => x.st === 3).length}/${groups[k].length}</small></h4><ol class="syl">${groups[k].map(x => `<li class="${x.st === 3 ? "done" : ""}"><span class="n">${x.st === 3 ? "✓" : ""}</span><span>${esc(x.s)}</span><em class="dots" title="${esc(t("dotsTip"))}">${dots(x.st)}</em></li>`).join("")}</ol>` : "";
+  const sec = (k, ico) => groups[k].length ? `<h4 class="sylh">${ico} ${esc(t("strand_" + k))} <small>${groups[k].filter(x => x.st === 3).length}/${groups[k].length}</small></h4><ol class="syl">${groups[k].map(x => `<li class="${x.st === 3 ? "done" : ""}"><span class="n">${x.st === 3 ? "✓" : ""}</span><span>${esc(x.s)}</span>${isMastery(S) ? `<em class="dots" title="${esc(t("dotsTip"))}">${dots(x.st)}</em>` : ""}</li>`).join("")}</ol>` : "";
   const mix = mixSources(S).map(m => t("mix_" + m)).join(" · ");
-  return `<p class="note"><b>${esc(t("cefrMastery", {lvl:S.level, p:pct}))}</b><br>${esc(t("cefrHow"))}</p>` + sec("g", "📐") + sec("t", "🏷️") + sec("f", "💬") + (mix ? `<p class="note">🔀 ${esc(t("mixIn", {x:mix}))}</p>` : "");
+  return `<p class="note"><b>${esc(t(isMastery(S) ? "cefrMastery" : "cefrCleared", {lvl:S.level, p:pct, d:done, n:S.syllabus.length}))}</b><br>${esc(t(isMastery(S) ? "cefrHow" : "cefrSurv"))}</p>` + sec("g", "📐") + sec("t", "🏷️") + sec("f", "💬") + (mix ? `<p class="note">🔀 ${esc(t("mixIn", {x:mix}))}</p>` : "");
 }
 
 function absorb(res, answer, rolls, prevPlan){
@@ -8806,6 +8814,8 @@ Object.assign(I18N.en, {
   cefrMastery:"{lvl} mastery: {p}%", cefrHow:"Each lesson is taught once, then you must recall it correctly twice in later rounds. ●●● = mastered.",
   dotsTip:"Taught · recalled once · mastered", mixT:"Mixed review", mixB:"A quick drill from another part of this level.",
   mix_7:"verb forms", mix_8:"tricky pairs", mix_4:"numbers", mixIn:"Every few rounds, a mixed drill: {x}.",
+  m3d:"Survive every CEFR level from A1 to B2 on 3 hearts: grammar, topics, communication, verbs, tricky pairs and numbers. No hints, strict accents. Every miss costs a heart.",
+  fell:"You fell at {lvl} with {n} lessons cleared.", cefrCleared:"{lvl}: {d}/{n} lessons cleared ({p}%)", cefrSurv:"One correct answer clears a lesson. Mixed drills cost a heart too if you miss.",
 });
 Object.assign(I18N.es, {
   m1d:"Domina un nivel completo del MCER: gramática, temas cotidianos y comunicación real, con repaso espaciado. Luego sube al siguiente nivel.",
@@ -8815,6 +8825,8 @@ Object.assign(I18N.es, {
   cefrMastery:"Dominio del {lvl}: {p}%", cefrHow:"Cada lección se enseña una vez y luego debes recordarla bien dos veces en rondas posteriores. ●●● = dominada.",
   dotsTip:"Enseñada · recordada una vez · dominada", mixT:"Repaso mixto", mixB:"Un ejercicio rápido de otra parte de este nivel.",
   mix_7:"formas verbales", mix_8:"pares engañosos", mix_4:"números", mixIn:"Cada pocas rondas, un ejercicio mixto: {x}.",
+  m3d:"Sobrevive a todos los niveles del MCER, de A1 a B2, con 3 corazones: gramática, temas, comunicación, verbos, pares engañosos y números. Sin pistas y con tildes estrictas. Cada error cuesta un corazón.",
+  fell:"Caíste en {lvl} con {n} lecciones superadas.", cefrCleared:"{lvl}: {d}/{n} lecciones superadas ({p}%)", cefrSurv:"Una respuesta correcta supera una lección. Los ejercicios mixtos también cuestan un corazón si fallas.",
 });
 Object.assign(GAME_ICO, {"Word Duel":"⚖️", "Echo Chamber":"🎧", "Match Madness":"🧩", "Verb Forge":"⚒️", "Time Machine":"⏳", "Slip Fixer":"🩹"});
 BADGES.push(

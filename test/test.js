@@ -162,8 +162,8 @@ function play(lang, mode, level, turns, wrongRate, opts){
     if(mode === 6 && c.plan.kind === "srs" && c.lesson.words.length) fail(tag, "review shows phrase");
     if(d.getElementById("challengeCard").hidden) fail(tag, "challenge card hidden");
     if(mode === 3 && (ch.hint || c.lesson.words.length || ch.game === "Cloze Combat")) fail(tag, "survivor leak", ch.game, ch.hint);
-    if((mode === 1 || mode === 2) && !S.cefr) fail(tag, "practice game without CEFR flag");
-    if((mode === 1 || mode === 2) && S.syllabus){
+    if((mode === 1 || mode === 2 || mode === 3) && !S.cefr) fail(tag, "game without CEFR flag");
+    if((mode === 1 || mode === 2 || mode === 3) && S.syllabus){
       const tl = lang === "en" ? "es" : "en";
       if(S.syllabus.length !== P.COURSE[tl][S.level].length) fail(tag, "syllabus does not cover the level", S.syllabus.length, P.COURSE[tl][S.level].length);
       if(c.plan.kind === "syllabus") cefrTeach = {idx:c.plan.idx, level:S.level};
@@ -219,7 +219,7 @@ function play(lang, mode, level, turns, wrongRate, opts){
     if(S.stats.answered !== before + 1){ fail(tag, "turn did not advance", ch.game, ch.target); break; }
     const j = S.judgement;
     if(!j){ fail(tag, "no judgement"); break; }
-    if(cefrTeach && S.level === cefrTeach.level && S.done[cefrTeach.idx]) fail(tag, "taught lesson counted as mastered at once");
+    if(mode !== 3 && cefrTeach && S.level === cefrTeach.level && S.done[cefrTeach.idx]) fail(tag, "taught lesson counted as mastered at once");
     cefrTeach = null;
     if(!wrong && !j.gaveUp && !j.correct) fail(tag, "valid answer rejected:", ch.game, "|", ch.target, "|", d.getElementById("answer").value, "| acc", JSON.stringify(ch.acc));
     if(wrong && j.correct) fail(tag, "garbage accepted", ch.target);

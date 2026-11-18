@@ -21,7 +21,8 @@ function cefrOrder(tgt, lv){
   while(s < side.length) out.push(side[s++]);
   return CEFR_ORDER[key] = out;
 }
-const isCefr = st => st && st.cefr && (st.mode === 1 || st.mode === 2);
+const isCefr = st => st && st.cefr && (st.mode === 1 || st.mode === 2 || st.mode === 3);
+const isMastery = st => isCefr(st) && st.mode !== 3;   // Survivor is a gauntlet: one correct answer clears a lesson
 syllabusFor = (orig => function(st){
   if(!isCefr(st)) return orig(st);
   const tgt = LANG_CODE[st.target], lv = COURSE[tgt][st.level] ? st.level : "A1";
@@ -44,11 +45,16 @@ function mixSources(st){
 const mixState = (st, src) => { const m = Object.assign({}, st, {mode:src, cefr:0}); m.syllabus = syllabusFor(m); m.done = m.syllabus.map(() => false); return m; };
 
 generate = (orig => function(st, plan){
-  if((st.mode === 1 || st.mode === 2) && !st.syllabus && typeof S !== "undefined" && S && S.mode === st.mode && !S.syllabus){ S.cefr = 1; st.cefr = 1; }
+  if((st.mode === 1 || st.mode === 2 || st.mode === 3) && !st.syllabus && typeof S !== "undefined" && S && S.mode === st.mode && !S.syllabus){ S.cefr = 1; st.cefr = 1; }
   if(plan && plan.kind === "mix"){
     const m = mixState(st, plan.src);
     const res = orig(m, {kind:"syllabus", idx:Math.min(plan.idx, m.syllabus.length - 1), game:plan.game, boss:false, scene:plan.scene, style:plan.style});
     if(res && res.lesson) res.lesson = Object.assign({}, res.lesson, {title:"🔀 " + t("mixT") + " · " + (res.lesson.title || ""), body:t("mixB")});
+    if(res && st.mode === 3){   // keep Survivor rules: no hints, no word lists, no spotlight
+      if(res.lesson) res.lesson.words = [];
+      if(res.challenge) res.challenge.hint = "";
+      res.spotlight = null;
+    }
     return res;
   }
   return orig(st, plan);
@@ -62,10 +68,11 @@ makePlanCore = (orig => function(st, rolls, exclude){
     const srcs = mixSources(st);
     if(srcs.length){
       const src = srcs[Math.floor(rolls.s * srcs.length)], m = mixState(st, src);
-      const games = gamesFor(m).filter(g => g !== "Echo Chamber" && g !== "Match Madness");
+      const games = gamesFor(m).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && !(st.mode === 3 && (g === "Cloze Combat" || g === "Word Duel")));
       return {kind:"mix", src, idx:Math.floor(rolls.c * m.syllabus.length), game:games[Math.floor(rolls.g * games.length)]};
     }
   }
+  if(!isMastery(st)) return p;
   const low = k => String(k || "").toLowerCase(), inSrs = k => st.srs.some(x => low(x.k) === low(k));
   const exKey = exclude ? low(exclude.kind === "syllabus" ? st.syllabus[exclude.idx] : exclude.key) : "";
   const exIdx = exclude && exclude.kind === "syllabus" ? exclude.idx : -1;
@@ -85,6 +92,7 @@ makePlanCore = (orig => function(st, rolls, exclude){
 applyResult = (orig => function(st, correct, plan){
   if(!isCefr(st) || !plan || !st.syllabus) return orig(st, correct, plan);
   if(plan.kind === "mix") return orig(st, correct, {kind:"mix"});
+  if(!isMastery(st)) return orig(st, correct, plan);
   if(plan.kind === "syllabus"){
     const key = st.syllabus[plan.idx];
     orig(st, correct, {kind:"teach"});
@@ -116,12 +124,12 @@ function sylHtml(){
   S.syllabus.forEach((s, i) => {
     const c = conceptAt(S, i), k = STRAND(c || {});
     const sr = S.srs.find(x => x.k.toLowerCase() === s.toLowerCase());
-    const st = S.done[i] ? 3 : sr ? 1 + sr.c : 0;
+    const st = S.done[i] ? 3 : sr && isMastery(S) ? 1 + sr.c : 0;
     (groups[k] || groups.g).push({s, st});
   });
   const done = S.done.filter(Boolean).length, pct = Math.round(100 * done / S.syllabus.length);
   const dots = n => "●".repeat(n) + "○".repeat(3 - n);
-  const sec = (k, ico) => groups[k].length ? `<h4 class="sylh">${ico} ${esc(t("strand_" + k))} <small>${groups[k].filter(x => x.st === 3).length}/${groups[k].length}</small></h4><ol class="syl">${groups[k].map(x => `<li class="${x.st === 3 ? "done" : ""}"><span class="n">${x.st === 3 ? "✓" : ""}</span><span>${esc(x.s)}</span><em class="dots" title="${esc(t("dotsTip"))}">${dots(x.st)}</em></li>`).join("")}</ol>` : "";
+  const sec = (k, ico) => groups[k].length ? `<h4 class="sylh">${ico} ${esc(t("strand_" + k))} <small>${groups[k].filter(x => x.st === 3).length}/${groups[k].length}</small></h4><ol class="syl">${groups[k].map(x => `<li class="${x.st === 3 ? "done" : ""}"><span class="n">${x.st === 3 ? "✓" : ""}</span><span>${esc(x.s)}</span>${isMastery(S) ? `<em class="dots" title="${esc(t("dotsTip"))}">${dots(x.st)}</em>` : ""}</li>`).join("")}</ol>` : "";
   const mix = mixSources(S).map(m => t("mix_" + m)).join(" · ");
-  return `<p class="note"><b>${esc(t("cefrMastery", {lvl:S.level, p:pct}))}</b><br>${esc(t("cefrHow"))}</p>` + sec("g", "📐") + sec("t", "🏷️") + sec("f", "💬") + (mix ? `<p class="note">🔀 ${esc(t("mixIn", {x:mix}))}</p>` : "");
+  return `<p class="note"><b>${esc(t(isMastery(S) ? "cefrMastery" : "cefrCleared", {lvl:S.level, p:pct, d:done, n:S.syllabus.length}))}</b><br>${esc(t(isMastery(S) ? "cefrHow" : "cefrSurv"))}</p>` + sec("g", "📐") + sec("t", "🏷️") + sec("f", "💬") + (mix ? `<p class="note">🔀 ${esc(t("mixIn", {x:mix}))}</p>` : "");
 }
