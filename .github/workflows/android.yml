@@ -47,7 +47,11 @@ jobs:
         run: |
           if [ -n "$KEYSTORE_B64" ]; then
             # signed release build with the private key kept in the repo secrets
-            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            # tolerate spaces or line breaks picked up while pasting the secret
+            printf '%s' "$KEYSTORE_B64" | tr -d ' \t\r\n' | base64 -d > "$RUNNER_TEMP/release.keystore" \
+              || { echo "::error::PGM_KEYSTORE_BASE64 is not valid base64. Paste only the long line from the secrets file."; exit 1; }
+            keytool -list -keystore "$RUNNER_TEMP/release.keystore" -storetype PKCS12 -storepass "$PGM_KEYSTORE_PASSWORD" -alias "$PGM_KEY_ALIAS" > /dev/null \
+              || { echo "::error::The keystore did not open. Check PGM_KEYSTORE_PASSWORD and PGM_KEY_ALIAS."; exit 1; }
             export PGM_KEYSTORE="$RUNNER_TEMP/release.keystore"
             cd android && ./gradlew assembleRelease --no-daemon
             cp app/build/outputs/apk/release/app-release.apk ../PolyglotGameMaster.apk
