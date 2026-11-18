@@ -1,0 +1,1 @@
+Recordatorios: aviso diario a la hora que elijas, aviso para salvar la racha, misiones por la mañana, resumen semanal y avisos de regreso. Funcionan aunque la app esté cerrada.

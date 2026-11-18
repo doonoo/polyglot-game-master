@@ -6,14 +6,15 @@
   "private": true,
   "scripts": {
     "build": "python3 tools/build.py",
-    "test": "node test/test.js && node test/test4.js",
+    "test": "node test/test.js && node test/test4.js && node test/test5.js",
     "android": "npx cap sync android && npx cap open android"
   },
   "dependencies": {
     "@capacitor-community/text-to-speech": "^8.0.2",
     "@capacitor/android": "^8.6.2",
     "@capacitor/cli": "^8.6.2",
-    "@capacitor/core": "^8.6.2"
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/local-notifications": "^8.3.1"
   },
   "devDependencies": {
     "@capacitor/assets": "^4.0.0",

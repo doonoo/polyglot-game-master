@@ -122,6 +122,60 @@ Object.assign(I18N.es, {
   q_tricky:"Acierta {g} pares engañosos", q_vocab:"Acierta {g} palabras en Avalancha de vocabulario", q_listen:"Acierta {g} rondas de escucha",
   islHide:"Escóndela y ponme a prueba", islHideNote:"Primero estudia la frase. Cuando se esconda, respondes de memoria.", b_path10:"Pionero", b_path10_d:"Completa 10 pasos de la ruta", b_story3:"Ratón de biblioteca", b_story3_d:"Termina 3 historias", b_quest10:"Cazador de misiones", b_quest10_d:"Completa 10 misiones diarias",
 });
+Object.assign(I18N.en, {
+  n_btn:"Reminders", n_master:"Practice reminders", n_masterD:"A nudge each day to keep learning.", n_time:"Reminder time", n_timeD:"When the daily reminder arrives.",
+  n_streak:"Streak saver", n_streakD:"An evening warning if your streak is about to end.", n_quests:"Morning quests", n_questsD:"At 8:30 AM, the day's daily quests.",
+  n_recap:"Weekly recap", n_recapD:"Sunday at 6 PM: how your week went.", n_comeback:"Come-back nudges", n_comebackD:"A few friendly messages if you take a break.",
+  n_test:"Send a test notification", n_testt:"🔔 Reminders are working!", n_testb:"This is how your {lang} reminders will look.", n_testSoon:"Test notification in 5 seconds.",
+  n_denied:"Notifications are blocked. Allow them in your phone or browser settings.", n_blocked:"This browser is blocking notifications for this site. Allow them in the site settings (the icon left of the address).",
+  n_noSupport:"This browser cannot show notifications.",
+  n_whereApp:"Reminders arrive even when the app is closed. Practicing early cancels that day's reminder.",
+  n_whereWeb:"On a computer, reminders appear while the app is open or minimized. Installed in Chrome or Edge, they can also arrive when it is closed. On a phone, the Android app is the most reliable.",
+  n_next:"Next: {w} · {x}", n_channel:"Practice reminders", n_channelD:"Daily practice, streak and quest reminders",
+  n_banner:"Want a daily reminder so you don't lose your streak?", n_bannerYes:"Remind me", n_bannerNo:"Not now", n_onToast:"Reminders on. See you at {x}!",
+  n_r1t:"⏰ Time for {lang}!", n_r1b:"Your 5-minute lesson is waiting. Next up: {x}.", n_r1b0:"Your 5-minute lesson is waiting.",
+  n_r2t:"🎮 Your Game Master is waiting", n_r2b:"Five minutes of {lang} is all it takes today.",
+  n_r3b:"One quick lesson keeps your {lang} growing.",
+  n_r4t:"🎯 Today's quests", n_r4b:"{a}, {b} and {c}. +30 XP each.",
+  n_r5t:"📅 New daily challenge", n_r5b:"10 questions, same for everyone today. Can you get 10/10?",
+  n_r6t:"📚 Story time", n_r6b:"Read “{x}” in {lang} and answer a few questions.",
+  n_r7t:"🧠 Use it or lose it", n_r7b:"A little practice every day beats a lot once a week.",
+  n_s1t:"🔥 Keep your {n}-day streak going", n_s2t:"🔥 Make it {n} days in a row",
+  n_savet:"🔥 Your {n}-day streak ends at midnight!", n_saveb:"One quick lesson saves it. You've got this.",
+  n_lostt:"💔 Your streak ended", n_lostb:"You had {n} days in a row. Start a new streak today!",
+  n_qt:"🎯 New quests are ready", n_qb:"Today: {a}, {b} and {c}.",
+  n_c1t:"👋 We miss you!", n_c1b:"Your {lang} is still in there. A 5-minute lesson brings it back.",
+  n_c2t:"🌱 Words fade without practice", n_c2b:"Jump back in with one short {lang} lesson.",
+  n_c3t:"🗺️ Your path is waiting", n_c3b:"Pick up your {lang} right where you left off.",
+  n_wkt:"📊 Your week in review", n_wkb:"{d} days of practice and {c} right answers. Keep it up!", n_wkb0:"No practice this week. Start fresh tomorrow!",
+});
+Object.assign(I18N.es, {
+  n_btn:"Recordatorios", n_master:"Recordatorios de práctica", n_masterD:"Un aviso cada día para seguir aprendiendo.", n_time:"Hora del recordatorio", n_timeD:"Cuándo llega el recordatorio diario.",
+  n_streak:"Salvar la racha", n_streakD:"Un aviso por la noche si tu racha está por terminar.", n_quests:"Misiones por la mañana", n_questsD:"A las 8:30, las misiones del día.",
+  n_recap:"Resumen semanal", n_recapD:"Domingo a las 6 PM: cómo te fue la semana.", n_comeback:"Avisos de regreso", n_comebackD:"Unos mensajes amables si te tomas un descanso.",
+  n_test:"Enviar una notificación de prueba", n_testt:"🔔 ¡Los recordatorios funcionan!", n_testb:"Así se verán tus recordatorios de {lang}.", n_testSoon:"Notificación de prueba en 5 segundos.",
+  n_denied:"Las notificaciones están bloqueadas. Permítelas en los ajustes del teléfono o del navegador.", n_blocked:"Este navegador bloquea las notificaciones de este sitio. Permítelas en la configuración del sitio (el icono a la izquierda de la dirección).",
+  n_noSupport:"Este navegador no puede mostrar notificaciones.",
+  n_whereApp:"Los recordatorios llegan aunque la app esté cerrada. Si practicas temprano, se cancela el recordatorio de ese día.",
+  n_whereWeb:"En la computadora, los recordatorios aparecen mientras la app está abierta o minimizada. Instalada en Chrome o Edge, también pueden llegar con la app cerrada. En el teléfono, la app de Android es la más fiable.",
+  n_next:"Próximo: {w} · {x}", n_channel:"Recordatorios de práctica", n_channelD:"Recordatorios de práctica diaria, racha y misiones",
+  n_banner:"¿Quieres un recordatorio diario para no perder tu racha?", n_bannerYes:"Recuérdame", n_bannerNo:"Ahora no", n_onToast:"Recordatorios activados. ¡Nos vemos a las {x}!",
+  n_r1t:"⏰ ¡Hora de {lang}!", n_r1b:"Tu lección de 5 minutos te espera. Siguiente: {x}.", n_r1b0:"Tu lección de 5 minutos te espera.",
+  n_r2t:"🎮 Tu Game Master te espera", n_r2b:"Hoy bastan cinco minutos de {lang}.",
+  n_r3b:"Una lección rápida hace crecer tu {lang}.",
+  n_r4t:"🎯 Misiones de hoy", n_r4b:"{a}, {b} y {c}. +30 XP cada una.",
+  n_r5t:"📅 Nuevo reto diario", n_r5b:"10 preguntas, las mismas para todos hoy. ¿Sacarás 10/10?",
+  n_r6t:"📚 Hora del cuento", n_r6b:"Lee “{x}” en {lang} y responde unas preguntas.",
+  n_r7t:"🧠 Lo que no se usa, se olvida", n_r7b:"Un poco cada día vale más que mucho una vez por semana.",
+  n_s1t:"🔥 Mantén tu racha de {n} días", n_s2t:"🔥 Que sean {n} días seguidos",
+  n_savet:"🔥 ¡Tu racha de {n} días termina a medianoche!", n_saveb:"Una lección rápida la salva. ¡Tú puedes!",
+  n_lostt:"💔 Tu racha terminó", n_lostb:"Llevabas {n} días seguidos. ¡Empieza una nueva racha hoy!",
+  n_qt:"🎯 Nuevas misiones listas", n_qb:"Hoy: {a}, {b} y {c}.",
+  n_c1t:"👋 ¡Te extrañamos!", n_c1b:"Tu {lang} sigue ahí. Una lección de 5 minutos lo despierta.",
+  n_c2t:"🌱 Las palabras se olvidan sin práctica", n_c2b:"Vuelve con una lección corta de {lang}.",
+  n_c3t:"🗺️ Tu ruta te espera", n_c3b:"Retoma tu {lang} justo donde lo dejaste.",
+  n_wkt:"📊 Tu semana en resumen", n_wkb:"{d} días de práctica y {c} respuestas correctas. ¡Sigue así!", n_wkb0:"Esta semana no practicaste. ¡Empieza de nuevo mañana!",
+});
 Object.assign(GAME_ICO, {"Word Duel":"⚖️", "Echo Chamber":"🎧", "Match Madness":"🧩", "Verb Forge":"⚒️", "Time Machine":"⏳", "Slip Fixer":"🩹"});
 BADGES.push(
   {id:"day3", ico:"📅", test: () => profile.streak >= 3 && profile.last === profile.today},
@@ -139,7 +193,7 @@ BADGES.push(
 );
 
 /* ===================== Boot ===================== */
-if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, pathUnits, pathState, pathFlat, lessonItems, startPathNode, openPath, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ};
+if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, pathUnits, pathState, pathFlat, lessonItems, startPathNode, openPath, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick};
 loadProfile();
 initMenu();
 (() => {

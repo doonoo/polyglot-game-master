@@ -169,11 +169,25 @@ A = rep(A, "</style>", """.pairs{display:grid;grid-template-columns:1fr 1fr;gap:
 .sopt.wrong{border-color:var(--red);color:var(--red)}
 .sdone{text-align:center}
 #storyCtl .primary{width:100%}
+.nbanner{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--card);border:2px solid var(--violet);border-radius:16px;padding:12px 14px;margin:0 0 12px;box-shadow:var(--shadow)}
+.nbanner[hidden]{display:none}
+.nbanner span{flex:1 1 100%;font-weight:700}
+.nbanner button{flex:1}
+.ncard{background:var(--card);border-radius:18px;padding:6px 16px 14px;box-shadow:var(--shadow);margin-top:12px}
+.nrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.nrow span{flex:1}.nrow small{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+.nrow input[type=checkbox]{width:24px;height:24px;accent-color:var(--violet)}
+.nrow input[type=time]{font:inherit;padding:6px 8px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:inherit}
+.nrow.big b{font-size:1.05rem}
+.ngroup[data-off]{opacity:.45;pointer-events:none}
+.ncard .ghost{width:100%;margin-top:12px}
+.ncard .note{margin:12px 0 0;font-size:.85rem}
+.ncard .note.warn{color:var(--red);font-weight:700}
 .islgate{margin-top:14px}.islgate .primary{width:100%}.islgate .note{text-align:center;margin:8px 0 0}
 @keyframes sin{from{opacity:0;transform:translateY(8px)}}
 </style>""")
 A = rep(A, '<div class="tiles" id="tiles" hidden></div>', '<div class="tiles" id="tiles" hidden></div>\n      <div class="pairs" id="pairs" hidden></div>')
-A = rep(A, '<div id="dailyCard" class="daily"></div>', '<div id="dailyCard" class="daily"></div>\n  <div class="menu-row"><button class="pathbtn" id="pathBtn">🗺️ <span><b data-i18n="path">Learning path</b><small id="pathBtnSub"></small></span></button><button class="ghost" id="dailyBtn">📅 Daily challenge</button><button class="ghost" id="mistakesBtn">🩹 Fix my mistakes</button><button class="ghost" id="storiesBtn">📚 <span data-i18n="stories">Stories</span></button><button class="ghost" id="bookBtn">📖 <span data-i18n="phrasebook">Phrasebook</span></button><button class="ghost" id="statsBtn" style="grid-column:1/-1">📊 <span data-i18n="stats">Stats</span></button></div>\n  <div id="questCard" class="daily quests"></div>')
+A = rep(A, '<div id="dailyCard" class="daily"></div>', '<div id="dailyCard" class="daily"></div>\n  <div id="notifyBanner" class="nbanner" hidden></div>\n  <div class="menu-row"><button class="pathbtn" id="pathBtn">🗺️ <span><b data-i18n="path">Learning path</b><small id="pathBtnSub"></small></span></button><button class="ghost" id="dailyBtn">📅 Daily challenge</button><button class="ghost" id="mistakesBtn">🩹 Fix my mistakes</button><button class="ghost" id="storiesBtn">📚 <span data-i18n="stories">Stories</span></button><button class="ghost" id="bookBtn">📖 <span data-i18n="phrasebook">Phrasebook</span></button><button class="ghost" id="statsBtn">📊 <span data-i18n="stats">Stats</span></button><button class="ghost" id="notifyBtn">🔔 <span data-i18n="n_btn">Reminders</span></button></div>\n  <div id="questCard" class="daily quests"></div>')
 A = rep(A, '<label class="srow" id="readRow" hidden>', '<label class="srow" id="echoRow" hidden><span>🎧 <span data-i18n="echoOn">Listening games</span></span><input type="checkbox" id="echoChk"></label>\n      <div class="vrow" id="voiceRow" hidden><b>🗣️ <span data-i18n="voices">Voices</span></b><label class="vl" for="voice-es" data-i18n="voiceEs">Spanish voice</label><div class="vsel"><select id="voice-es"></select><button class="chip" type="button" data-vtest="es">▶ <span data-i18n="voiceTest">Test</span></button></div><label class="vl" for="voice-en" data-i18n="voiceEn">English voice</label><div class="vsel"><select id="voice-en"></select><button class="chip" type="button" data-vtest="en">▶ <span data-i18n="voiceTest">Test</span></button></div><p class="note" data-i18n="voiceTip"></p></div>\n      <label class="srow" id="readRow" hidden>')
 A = rep(A, '<p class="note" data-i18n="prebuiltTag" style="text-align:center"></p>', """<p class="note" data-i18n="prebuiltTag" style="text-align:center"></p>
   <details class="panel" id="backupPanel" style="margin-top:18px">
@@ -248,6 +262,12 @@ A = rep(A, '<!-- ============ GAME ============ -->', """<main id="book" class="
   <div id="pathSheet" class="sheet" hidden></div>
 </main>
 
+<main id="notifyPage" class="wrap" hidden>
+  <div class="topbar" style="justify-content:flex-start"><button class="chip" id="notifyBack">← <span data-i18n="back">Back</span></button></div>
+  <h1 class="display book-title">🔔 <span data-i18n="n_btn">Reminders</span></h1>
+  <div id="notifyBody" class="ncard"></div>
+</main>
+
 <main id="storiesPage" class="wrap" hidden>
   <div class="topbar" style="justify-content:flex-start"><button class="chip" id="storiesBack">← <span data-i18n="back">Back</span></button></div>
   <h1 class="display book-title">📚 <span data-i18n="stories">Stories</span></h1>
@@ -282,7 +302,7 @@ E = rep(E, 'lesson.words.filter(w => w && w.w).slice(0,6)', 'lesson.words.filter
 E = rep(E, 'const v = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(l.lang.toLowerCase().slice(0, 2)));', 'const v = bestVoice(l.lang);')
 E = rep(E, "  renderPanels();\n  if(fresh){", "  renderPanels();\n  renderExtras(fresh);\n  if(fresh){")
 E = rep(E, "if(Array.isArray(res.syllabus) && res.syllabus.length >= 10){\n      S.syllabus = res.syllabus.slice(0, 15).map(String);", "if(Array.isArray(res.syllabus) && res.syllabus.length >= 1){\n      S.syllabus = res.syllabus.slice(0, 40).map(String);")
-E = rep(E, '$("game").hidden = true; $("over").hidden = true; $("menu").hidden = false;', '$("game").hidden = true; $("over").hidden = true; $("book").hidden = true; $("quiz").hidden = true; $("statsPage").hidden = true; ["pathPage","storiesPage","storyPage"].forEach(x => $(x).hidden = true); $("menu").hidden = false;')
+E = rep(E, '$("game").hidden = true; $("over").hidden = true; $("menu").hidden = false;', '$("game").hidden = true; $("over").hidden = true; $("book").hidden = true; $("quiz").hidden = true; $("statsPage").hidden = true; ["pathPage","storiesPage","storyPage","notifyPage"].forEach(x => $(x).hidden = true); $("menu").hidden = false;')
 E = rep(E, "refreshContinue(); window.scrollTo(0,0);", "refreshContinue(); renderDaily(); window.scrollTo(0,0);")
 E = rep(E, 'yours: answer, gaveUp: answer === null};', 'yours: answer, gaveUp: answer === null, al: j.al || ""};')
 E = rep(E, 'L.push({text: j.answer, lang: tgt});', 'L.push({text: j.answer, lang: LANG_CODE[S.native] === j.al ? nat : tgt});')
@@ -290,7 +310,7 @@ E = rep(E, '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</bu
         '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</button>` : ""}${canOverride() ? `<button class="listen" data-act="override">✋ ${esc(t("override"))}</button>` : ""}</div>`;')
 E = rep(E, '$("overIsland").hidden = !conquered;', '$("overIsland").hidden = !conquered;\n  if(conquered) renderNextChips();')
 
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("features4.js"), "", rd("island.js"), "", E, rd("boot.js"), F]) + "\n"
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----

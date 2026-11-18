@@ -359,6 +359,20 @@ button.word .say{position:absolute;right:10px;top:8px;float:none}
 .sopt.wrong{border-color:var(--red);color:var(--red)}
 .sdone{text-align:center}
 #storyCtl .primary{width:100%}
+.nbanner{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--card);border:2px solid var(--violet);border-radius:16px;padding:12px 14px;margin:0 0 12px;box-shadow:var(--shadow)}
+.nbanner[hidden]{display:none}
+.nbanner span{flex:1 1 100%;font-weight:700}
+.nbanner button{flex:1}
+.ncard{background:var(--card);border-radius:18px;padding:6px 16px 14px;box-shadow:var(--shadow);margin-top:12px}
+.nrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.nrow span{flex:1}.nrow small{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+.nrow input[type=checkbox]{width:24px;height:24px;accent-color:var(--violet)}
+.nrow input[type=time]{font:inherit;padding:6px 8px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:inherit}
+.nrow.big b{font-size:1.05rem}
+.ngroup[data-off]{opacity:.45;pointer-events:none}
+.ncard .ghost{width:100%;margin-top:12px}
+.ncard .note{margin:12px 0 0;font-size:.85rem}
+.ncard .note.warn{color:var(--red);font-weight:700}
 .islgate{margin-top:14px}.islgate .primary{width:100%}.islgate .note{text-align:center;margin:8px 0 0}
 @keyframes sin{from{opacity:0;transform:translateY(8px)}}
 </style>
@@ -376,7 +390,8 @@ button.word .say{position:absolute;right:10px;top:8px;float:none}
   </header>
 
   <div id="dailyCard" class="daily"></div>
-  <div class="menu-row"><button class="pathbtn" id="pathBtn">🗺️ <span><b data-i18n="path">Learning path</b><small id="pathBtnSub"></small></span></button><button class="ghost" id="dailyBtn">📅 Daily challenge</button><button class="ghost" id="mistakesBtn">🩹 Fix my mistakes</button><button class="ghost" id="storiesBtn">📚 <span data-i18n="stories">Stories</span></button><button class="ghost" id="bookBtn">📖 <span data-i18n="phrasebook">Phrasebook</span></button><button class="ghost" id="statsBtn" style="grid-column:1/-1">📊 <span data-i18n="stats">Stats</span></button></div>
+  <div id="notifyBanner" class="nbanner" hidden></div>
+  <div class="menu-row"><button class="pathbtn" id="pathBtn">🗺️ <span><b data-i18n="path">Learning path</b><small id="pathBtnSub"></small></span></button><button class="ghost" id="dailyBtn">📅 Daily challenge</button><button class="ghost" id="mistakesBtn">🩹 Fix my mistakes</button><button class="ghost" id="storiesBtn">📚 <span data-i18n="stories">Stories</span></button><button class="ghost" id="bookBtn">📖 <span data-i18n="phrasebook">Phrasebook</span></button><button class="ghost" id="statsBtn">📊 <span data-i18n="stats">Stats</span></button><button class="ghost" id="notifyBtn">🔔 <span data-i18n="n_btn">Reminders</span></button></div>
   <div id="questCard" class="daily quests"></div>
 
   <button id="continueBtn" class="continue" hidden>
@@ -501,6 +516,12 @@ button.word .say{position:absolute;right:10px;top:8px;float:none}
   <p class="note" id="pathSub"></p>
   <div id="pathUnits" class="path"></div>
   <div id="pathSheet" class="sheet" hidden></div>
+</main>
+
+<main id="notifyPage" class="wrap" hidden>
+  <div class="topbar" style="justify-content:flex-start"><button class="chip" id="notifyBack">← <span data-i18n="back">Back</span></button></div>
+  <h1 class="display book-title">🔔 <span data-i18n="n_btn">Reminders</span></h1>
+  <div id="notifyBody" class="ncard"></div>
 </main>
 
 <main id="storiesPage" class="wrap" hidden>
@@ -5687,7 +5708,7 @@ function buildDaily(){
 /* ---------- Quiz runner (daily and mistakes) ---------- */
 let Q = null;
 function showOnly(id){
-  for(const x of ["menu","game","over","book","quiz","statsPage","pathPage","storiesPage","storyPage"]) if($(x)) $(x).hidden = x !== id;
+  for(const x of ["menu","game","over","book","quiz","statsPage","pathPage","storiesPage","storyPage","notifyPage"]) if($(x)) $(x).hidden = x !== id;
   window.scrollTo(0, 0);
 }
 function openQuiz(kind, items, title, meta, intro){
@@ -6384,6 +6405,246 @@ $("lessonCard").addEventListener("click", e => {
   try{ $("answer").focus({preventScroll:true}); }catch(err){}
 });
 
+/* ===================== Reminders and notifications =====================
+   Android/iOS app: real scheduled notifications through @capacitor/local-notifications
+   (they fire even when the app is closed, and survive a reboot).
+   Browser / installed PC app: notifications while the app is open or minimized, plus a
+   background check where the browser supports Periodic Background Sync (installed Chrome/Edge).
+   Every time progress changes the whole schedule for the next two weeks is rebuilt, so a
+   reminder never nags about something already done. */
+profile.notify = {on:false, asked:false, time:"19:00", streak:true, quests:false, recap:true, comeback:true};
+
+const NCap = () => { const C = window.Capacitor; return C && C.isNativePlatform && C.isNativePlatform() ? C : null; };
+const NPlug = () => { const C = NCap(); return C && ((C.Plugins && C.Plugins.LocalNotifications) || (C.registerPlugin && C.registerPlugin("LocalNotifications"))); };
+const NID0 = 1000, NID1 = 1999, NSTATE = "pgm-state", NSTATE_URL = "./__reminders.json";
+const webNotifyOk = () => !NCap() && "Notification" in window;
+
+function hm(s){ const m = /^(\d{1,2}):(\d{2})$/.exec(s || ""); return m ? [Math.min(23, +m[1]), Math.min(59, +m[2])] : [19, 0]; }
+function atDay(base, d, h, m){ const x = new Date(base); x.setDate(x.getDate() + d); x.setHours(h, m, 0, 0); return x; }
+function questsForDay(day){
+  const orig = Math.random;
+  Math.random = seeded(hashStr(day + "|quests"));
+  try{
+    const core = pick(QUESTS.filter(q => q.core));
+    return [core].concat(shuffle(QUESTS.filter(q => !q.core && (!q.ear || canEcho()))).slice(0, 2));
+  } finally { Math.random = orig; }
+}
+function pickBy(arr, key){ return arr.length ? arr[hashStr(key) % arr.length] : null; }
+
+// Build every notification for the next 14 days from the current progress.
+function buildSchedule(now){
+  now = now || new Date();
+  const N = profile.notify, list = [];
+  if(!N.on) return list;
+  rollDay();
+  const [h, m] = hm(N.time);
+  const did = profile.last === profile.today;
+  const streak = liveStreak();
+  const lang = langLabel(setup.target);
+  let next = null, story = null;
+  try{
+    const tl = TL(), cur = pathState(tl).find(n => n.cur);
+    next = cur ? cur.title : null;
+    const lv = cur ? cur.lv : "A1";
+    const s = STORIES.find(x => !profile.stories[x.id] && x.lv === lv) || STORIES.find(x => !profile.stories[x.id]);
+    story = s ? s.t[tl] : null;
+  }catch(e){}
+  const add = (d, hh, mm, kind, title, body) => {
+    const at = atDay(now, d, hh, mm);
+    if(at.getTime() <= now.getTime() + 60000) return;
+    list.push({id:NID0 + d * 10 + kind, at:at.getTime(), title, body, tag:dayStr(at) + ":" + kind});
+  };
+  // 1) daily practice reminder: today (if not done yet) and the next 3 days
+  for(let d = did ? 1 : 0; d <= 3; d++){
+    const day = dayStr(atDay(now, d, 12, 0));
+    const alive = streak > 0 && (d === 0 || (d === 1 && did));
+    const qs = questsForDay(day).map(q => { const x = t("q_" + q.id, {g:q.g}); return x.charAt(0).toLowerCase() + x.slice(1); });
+    const opts = [
+      [t("n_r1t", {lang}), next ? t("n_r1b", {x:next}) : t("n_r1b0")],
+      [t("n_r2t"), t("n_r2b", {lang})],
+      [t("n_r4t"), t("n_r4b", {a:qs[0], b:qs[1], c:qs[2]})],
+      [t("n_r5t"), t("n_r5b")],
+      [t("n_r7t"), t("n_r7b")]
+    ];
+    if(next) opts.push(["📘 " + next, t("n_r3b", {lang})]);
+    if(story) opts.push([t("n_r6t"), t("n_r6b", {x:story, lang})]);
+    let o = pickBy(opts, day + "|r");
+    if(alive) o = d === 0 ? [t("n_s1t", {n:streak}), o[1]] : [t("n_s2t", {n:streak + 1}), o[1]];
+    else if(streak > 0 && d >= 2 && d === (did ? 2 : 1)) o = [t("n_lostt"), t("n_lostb", {n:streak})];
+    add(d, h, m, 0, o[0], o[1]);
+    // 2) streak saver later the same evening
+    if(N.streak && alive){
+      const sh = Math.min(22, Math.max(h + 3, 20)), sm = sh === 22 ? 0 : 30;
+      add(d, sh, sm, 1, t("n_savet", {n:d === 0 ? streak : streak + 1}), t("n_saveb"));
+    }
+    // 3) morning heads-up about the day's quests
+    if(N.quests && d >= 1) add(d, 8, 30, 2, t("n_qt"), t("n_qb", {a:qs[0], b:qs[1], c:qs[2]}));
+  }
+  // 4) come-back nudges if the app is not opened for a while
+  if(N.comeback){
+    const base = did ? 0 : -1;
+    [[5, "n_c1"], [8, "n_c2"], [15, "n_c3"]].forEach(([d, k], i) => add(d + base, h, m, 3 + i, t(k + "t"), t(k + "b", {lang})));
+  }
+  // 5) weekly recap, Sunday evening
+  if(N.recap){
+    for(let d = 0; d <= 7; d++){
+      const at = atDay(now, d, 18, 0);
+      if(at.getDay() !== 0) continue;
+      const keys = Object.keys(profile.days).sort().slice(-7), wk = keys.filter(k => profile.days[k].c > 0);
+      add(d, 18, 0, 7, t("n_wkt"), wk.length ? t("n_wkb", {d:wk.length, c:wk.reduce((s, k) => s + profile.days[k].c, 0)}) : t("n_wkb0"));
+      break;
+    }
+  }
+  return list.sort((a, b) => a.at - b.at);
+}
+
+let nTimer = null;
+function rescheduleSoon(){ clearTimeout(nTimer); nTimer = setTimeout(reschedule, 1500); }
+async function reschedule(){
+  const list = buildSchedule();
+  const P = NPlug();
+  if(P){
+    try{
+      const pend = await P.getPending();
+      const mine = ((pend && pend.notifications) || []).filter(n => n.id >= NID0 && n.id <= NID1).map(n => ({id:n.id}));
+      if(mine.length) await P.cancel({notifications:mine});
+      if(list.length) await P.schedule({notifications:list.map(n => ({id:n.id, title:n.title, body:n.body, schedule:{at:new Date(n.at), allowWhileIdle:true}, channelId:"reminders", smallIcon:"ic_stat_notify", iconColor:"#5B3FD9", extra:{tag:n.tag}}))});
+    }catch(e){}
+    return;
+  }
+  // browser: keep the list where the service worker can read it
+  try{
+    if("caches" in window){
+      const c = await caches.open(NSTATE);
+      const old = await c.match(NSTATE_URL).then(r => r ? r.json() : null).catch(() => null);
+      await c.put(NSTATE_URL, new Response(JSON.stringify({list, shown:(old && old.shown) || []}), {headers:{"Content-Type":"application/json"}}));
+    }
+  }catch(e){}
+}
+// browser: show whatever is due while the page is open (also catches up after the PC wakes up)
+async function webTick(){
+  if(!webNotifyOk() || !profile.notify.on || Notification.permission !== "granted") return;
+  try{
+    const c = await caches.open(NSTATE);
+    const st = await c.match(NSTATE_URL).then(r => r ? r.json() : null);
+    if(!st) return;
+    const now = Date.now(), due = st.list.filter(n => n.at <= now && now - n.at < 6 * 3600e3 && !st.shown.includes(n.tag));
+    if(!due.length) return;
+    const n = due[due.length - 1];
+    st.shown = st.shown.concat(due.map(x => x.tag)).slice(-60);
+    await c.put(NSTATE_URL, new Response(JSON.stringify(st), {headers:{"Content-Type":"application/json"}}));
+    const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+    if(reg) reg.showNotification(n.title, {body:n.body, tag:n.tag, icon:"icons/icon-192.png", badge:"icons/icon-192.png"});
+    else new Notification(n.title, {body:n.body, tag:n.tag, icon:"icons/icon-192.png"});
+  }catch(e){}
+}
+async function askPermission(){
+  const P = NPlug();
+  if(P){
+    try{
+      await P.createChannel({id:"reminders", name:t("n_channel"), description:t("n_channelD"), importance:4, visibility:1}).catch(() => {});
+      const r = await P.requestPermissions();
+      return r && r.display === "granted";
+    }catch(e){ return false; }
+  }
+  if(!webNotifyOk()) return false;
+  if(Notification.permission === "granted") return true;
+  try{ return (await Notification.requestPermission()) === "granted"; }catch(e){ return false; }
+}
+async function registerBackgroundCheck(){
+  try{
+    const reg = navigator.serviceWorker && await navigator.serviceWorker.ready;
+    if(reg && "periodicSync" in reg){
+      const st = await navigator.permissions.query({name:"periodic-background-sync"}).catch(() => ({state:"denied"}));
+      if(st.state === "granted") await reg.periodicSync.register("pgm-reminders", {minInterval:3 * 3600e3});
+    }
+  }catch(e){}
+}
+async function setNotify(on){
+  profile.notify.asked = true;
+  if(on){
+    const ok = await askPermission();
+    if(!ok){ profile.notify.on = false; saveProfile(); renderNotify(); toast("🔕 " + t("n_denied")); return false; }
+    profile.notify.on = true;
+    if(!NCap()) registerBackgroundCheck();
+  } else profile.notify.on = false;
+  saveProfile(); await reschedule(); renderNotify(); updateNotifyBanner();
+  return true;
+}
+async function testNotify(){
+  const title = t("n_testt"), body = t("n_testb", {lang:langLabel(setup.target)});
+  const P = NPlug();
+  if(P){
+    if(!(await askPermission())) return toast("🔕 " + t("n_denied"));
+    await P.schedule({notifications:[{id:NID1, title, body, schedule:{at:new Date(Date.now() + 5000), allowWhileIdle:true}, channelId:"reminders", smallIcon:"ic_stat_notify", iconColor:"#5B3FD9"}]}).catch(() => {});
+    toast("🔔 " + t("n_testSoon"), "badge");
+    return;
+  }
+  if(!(await askPermission())) return toast("🔕 " + t("n_denied"));
+  const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration().catch(() => null);
+  if(reg) reg.showNotification(title, {body, icon:"icons/icon-192.png"}); else new Notification(title, {body, icon:"icons/icon-192.png"});
+}
+
+/* ---------- Reminders screen ---------- */
+function openNotify(){ showOnly("notifyPage"); renderNotify(); }
+function renderNotify(){
+  const N = profile.notify, el = $("notifyBody"); if(!el) return;
+  const where = NCap() ? t("n_whereApp") : t("n_whereWeb");
+  const perm = NCap() ? "" : !webNotifyOk() ? t("n_noSupport") : Notification.permission === "denied" ? t("n_blocked") : "";
+  el.innerHTML = `
+    <label class="nrow big"><span><b>🔔 ${esc(t("n_master"))}</b><small>${esc(t("n_masterD"))}</small></span><input type="checkbox" id="nOn" ${N.on ? "checked" : ""}></label>
+    <div class="ngroup" ${N.on ? "" : "data-off"}>
+      <label class="nrow"><span><b>⏰ ${esc(t("n_time"))}</b><small>${esc(t("n_timeD"))}</small></span><input type="time" id="nTime" value="${esc(N.time)}"></label>
+      <label class="nrow"><span><b>🔥 ${esc(t("n_streak"))}</b><small>${esc(t("n_streakD"))}</small></span><input type="checkbox" data-nk="streak" ${N.streak ? "checked" : ""}></label>
+      <label class="nrow"><span><b>🎯 ${esc(t("n_quests"))}</b><small>${esc(t("n_questsD"))}</small></span><input type="checkbox" data-nk="quests" ${N.quests ? "checked" : ""}></label>
+      <label class="nrow"><span><b>📊 ${esc(t("n_recap"))}</b><small>${esc(t("n_recapD"))}</small></span><input type="checkbox" data-nk="recap" ${N.recap ? "checked" : ""}></label>
+      <label class="nrow"><span><b>👋 ${esc(t("n_comeback"))}</b><small>${esc(t("n_comebackD"))}</small></span><input type="checkbox" data-nk="comeback" ${N.comeback ? "checked" : ""}></label>
+      <button class="ghost" id="nTest">🔔 ${esc(t("n_test"))}</button>
+    </div>
+    ${perm ? `<p class="note warn">${esc(perm)}</p>` : ""}
+    <p class="note">${esc(where)}</p>
+    ${N.on ? `<p class="note">${esc(nextLine())}</p>` : ""}`;
+}
+function nextLine(){
+  const l = buildSchedule(); if(!l.length) return "";
+  const d = new Date(l[0].at), loc = UI.code || "en";
+  return t("n_next", {w:d.toLocaleString(loc, {weekday:"long", hour:"numeric", minute:"2-digit"}), x:l[0].title});
+}
+$("notifyBody").addEventListener("change", async e => {
+  const N = profile.notify;
+  if(e.target.id === "nOn"){ await setNotify(e.target.checked); return; }
+  if(e.target.id === "nTime"){ N.time = e.target.value || "19:00"; }
+  else if(e.target.dataset.nk) N[e.target.dataset.nk] = e.target.checked;
+  saveProfile(); await reschedule(); renderNotify();
+});
+$("notifyBody").addEventListener("click", e => { if(e.target.closest("#nTest")){ Sound.unlock(); testNotify(); } });
+$("notifyBtn").addEventListener("click", openNotify);
+$("notifyBack").addEventListener("click", () => showMenu());
+
+/* ---------- Gentle opt-in after the first few answers ---------- */
+function updateNotifyBanner(){
+  const b = $("notifyBanner"); if(!b) return;
+  const show = !profile.notify.asked && !profile.notify.on && profile.answered >= 6 && (NCap() || webNotifyOk());
+  b.hidden = !show;
+  if(show) b.innerHTML = `<span>🔔 ${esc(t("n_banner"))}</span><button class="primary" id="nBannerYes">${esc(t("n_bannerYes"))}</button><button class="ghost" id="nBannerNo">${esc(t("n_bannerNo"))}</button>`;
+}
+$("notifyBanner").addEventListener("click", async e => {
+  if(e.target.closest("#nBannerYes")){ Sound.unlock(); const ok = await setNotify(true); if(ok) toast("🔔 " + t("n_onToast", {x:profile.notify.time}), "badge"); }
+  else if(e.target.closest("#nBannerNo")){ profile.notify.asked = true; saveProfile(); updateNotifyBanner(); }
+});
+
+/* ---------- Hooks ---------- */
+recordAnswer = (orig => function(correct, xp, forced){ const was = profile.last; orig(correct, xp, forced); if(profile.notify.on && (profile.last !== was || correct)) rescheduleSoon(); })(recordAnswer);
+renderDaily = (orig => function(){ orig(); try{ updateNotifyBanner(); }catch(e){} })(renderDaily);
+document.addEventListener("visibilitychange", () => { if(profile.notify.on){ if(document.hidden) reschedule(); else { rescheduleSoon(); webTick(); } } });
+setInterval(webTick, 60000);
+setTimeout(() => {
+  if(profile.notify.on){ reschedule().then(webTick); if(!NCap()) registerBackgroundCheck(); }
+  const P = NPlug();
+  if(P && P.addListener) try{ P.addListener("localNotificationActionPerformed", () => { try{ showMenu(); }catch(e){} }); }catch(e){}
+}, 800);
+$("uiSel").addEventListener("change", () => { if(profile.notify.on) rescheduleSoon(); });
+
 function absorb(res, answer, rolls, prevPlan){
   const backup = clone(S);
   const fail = msg => { S = backup; showError(msg, true); };
@@ -6467,7 +6728,7 @@ function errCopy(code){
 /* ===================== Rendering ===================== */
 function showGame(){ $("menu").hidden = true; $("over").hidden = true; $("game").hidden = false; renderGame(); window.scrollTo(0,0); }
 function showMenu(){
-  $("game").hidden = true; $("over").hidden = true; $("book").hidden = true; $("quiz").hidden = true; $("statsPage").hidden = true; ["pathPage","storiesPage","storyPage"].forEach(x => $(x).hidden = true); $("menu").hidden = false;
+  $("game").hidden = true; $("over").hidden = true; $("book").hidden = true; $("quiz").hidden = true; $("statsPage").hidden = true; ["pathPage","storiesPage","storyPage","notifyPage"].forEach(x => $(x).hidden = true); $("menu").hidden = false;
   syncMood();
   refreshContinue(); renderDaily(); window.scrollTo(0,0);
 }
@@ -7090,6 +7351,60 @@ Object.assign(I18N.es, {
   q_tricky:"Acierta {g} pares engañosos", q_vocab:"Acierta {g} palabras en Avalancha de vocabulario", q_listen:"Acierta {g} rondas de escucha",
   islHide:"Escóndela y ponme a prueba", islHideNote:"Primero estudia la frase. Cuando se esconda, respondes de memoria.", b_path10:"Pionero", b_path10_d:"Completa 10 pasos de la ruta", b_story3:"Ratón de biblioteca", b_story3_d:"Termina 3 historias", b_quest10:"Cazador de misiones", b_quest10_d:"Completa 10 misiones diarias",
 });
+Object.assign(I18N.en, {
+  n_btn:"Reminders", n_master:"Practice reminders", n_masterD:"A nudge each day to keep learning.", n_time:"Reminder time", n_timeD:"When the daily reminder arrives.",
+  n_streak:"Streak saver", n_streakD:"An evening warning if your streak is about to end.", n_quests:"Morning quests", n_questsD:"At 8:30 AM, the day's daily quests.",
+  n_recap:"Weekly recap", n_recapD:"Sunday at 6 PM: how your week went.", n_comeback:"Come-back nudges", n_comebackD:"A few friendly messages if you take a break.",
+  n_test:"Send a test notification", n_testt:"🔔 Reminders are working!", n_testb:"This is how your {lang} reminders will look.", n_testSoon:"Test notification in 5 seconds.",
+  n_denied:"Notifications are blocked. Allow them in your phone or browser settings.", n_blocked:"This browser is blocking notifications for this site. Allow them in the site settings (the icon left of the address).",
+  n_noSupport:"This browser cannot show notifications.",
+  n_whereApp:"Reminders arrive even when the app is closed. Practicing early cancels that day's reminder.",
+  n_whereWeb:"On a computer, reminders appear while the app is open or minimized. Installed in Chrome or Edge, they can also arrive when it is closed. On a phone, the Android app is the most reliable.",
+  n_next:"Next: {w} · {x}", n_channel:"Practice reminders", n_channelD:"Daily practice, streak and quest reminders",
+  n_banner:"Want a daily reminder so you don't lose your streak?", n_bannerYes:"Remind me", n_bannerNo:"Not now", n_onToast:"Reminders on. See you at {x}!",
+  n_r1t:"⏰ Time for {lang}!", n_r1b:"Your 5-minute lesson is waiting. Next up: {x}.", n_r1b0:"Your 5-minute lesson is waiting.",
+  n_r2t:"🎮 Your Game Master is waiting", n_r2b:"Five minutes of {lang} is all it takes today.",
+  n_r3b:"One quick lesson keeps your {lang} growing.",
+  n_r4t:"🎯 Today's quests", n_r4b:"{a}, {b} and {c}. +30 XP each.",
+  n_r5t:"📅 New daily challenge", n_r5b:"10 questions, same for everyone today. Can you get 10/10?",
+  n_r6t:"📚 Story time", n_r6b:"Read “{x}” in {lang} and answer a few questions.",
+  n_r7t:"🧠 Use it or lose it", n_r7b:"A little practice every day beats a lot once a week.",
+  n_s1t:"🔥 Keep your {n}-day streak going", n_s2t:"🔥 Make it {n} days in a row",
+  n_savet:"🔥 Your {n}-day streak ends at midnight!", n_saveb:"One quick lesson saves it. You've got this.",
+  n_lostt:"💔 Your streak ended", n_lostb:"You had {n} days in a row. Start a new streak today!",
+  n_qt:"🎯 New quests are ready", n_qb:"Today: {a}, {b} and {c}.",
+  n_c1t:"👋 We miss you!", n_c1b:"Your {lang} is still in there. A 5-minute lesson brings it back.",
+  n_c2t:"🌱 Words fade without practice", n_c2b:"Jump back in with one short {lang} lesson.",
+  n_c3t:"🗺️ Your path is waiting", n_c3b:"Pick up your {lang} right where you left off.",
+  n_wkt:"📊 Your week in review", n_wkb:"{d} days of practice and {c} right answers. Keep it up!", n_wkb0:"No practice this week. Start fresh tomorrow!",
+});
+Object.assign(I18N.es, {
+  n_btn:"Recordatorios", n_master:"Recordatorios de práctica", n_masterD:"Un aviso cada día para seguir aprendiendo.", n_time:"Hora del recordatorio", n_timeD:"Cuándo llega el recordatorio diario.",
+  n_streak:"Salvar la racha", n_streakD:"Un aviso por la noche si tu racha está por terminar.", n_quests:"Misiones por la mañana", n_questsD:"A las 8:30, las misiones del día.",
+  n_recap:"Resumen semanal", n_recapD:"Domingo a las 6 PM: cómo te fue la semana.", n_comeback:"Avisos de regreso", n_comebackD:"Unos mensajes amables si te tomas un descanso.",
+  n_test:"Enviar una notificación de prueba", n_testt:"🔔 ¡Los recordatorios funcionan!", n_testb:"Así se verán tus recordatorios de {lang}.", n_testSoon:"Notificación de prueba en 5 segundos.",
+  n_denied:"Las notificaciones están bloqueadas. Permítelas en los ajustes del teléfono o del navegador.", n_blocked:"Este navegador bloquea las notificaciones de este sitio. Permítelas en la configuración del sitio (el icono a la izquierda de la dirección).",
+  n_noSupport:"Este navegador no puede mostrar notificaciones.",
+  n_whereApp:"Los recordatorios llegan aunque la app esté cerrada. Si practicas temprano, se cancela el recordatorio de ese día.",
+  n_whereWeb:"En la computadora, los recordatorios aparecen mientras la app está abierta o minimizada. Instalada en Chrome o Edge, también pueden llegar con la app cerrada. En el teléfono, la app de Android es la más fiable.",
+  n_next:"Próximo: {w} · {x}", n_channel:"Recordatorios de práctica", n_channelD:"Recordatorios de práctica diaria, racha y misiones",
+  n_banner:"¿Quieres un recordatorio diario para no perder tu racha?", n_bannerYes:"Recuérdame", n_bannerNo:"Ahora no", n_onToast:"Recordatorios activados. ¡Nos vemos a las {x}!",
+  n_r1t:"⏰ ¡Hora de {lang}!", n_r1b:"Tu lección de 5 minutos te espera. Siguiente: {x}.", n_r1b0:"Tu lección de 5 minutos te espera.",
+  n_r2t:"🎮 Tu Game Master te espera", n_r2b:"Hoy bastan cinco minutos de {lang}.",
+  n_r3b:"Una lección rápida hace crecer tu {lang}.",
+  n_r4t:"🎯 Misiones de hoy", n_r4b:"{a}, {b} y {c}. +30 XP cada una.",
+  n_r5t:"📅 Nuevo reto diario", n_r5b:"10 preguntas, las mismas para todos hoy. ¿Sacarás 10/10?",
+  n_r6t:"📚 Hora del cuento", n_r6b:"Lee “{x}” en {lang} y responde unas preguntas.",
+  n_r7t:"🧠 Lo que no se usa, se olvida", n_r7b:"Un poco cada día vale más que mucho una vez por semana.",
+  n_s1t:"🔥 Mantén tu racha de {n} días", n_s2t:"🔥 Que sean {n} días seguidos",
+  n_savet:"🔥 ¡Tu racha de {n} días termina a medianoche!", n_saveb:"Una lección rápida la salva. ¡Tú puedes!",
+  n_lostt:"💔 Tu racha terminó", n_lostb:"Llevabas {n} días seguidos. ¡Empieza una nueva racha hoy!",
+  n_qt:"🎯 Nuevas misiones listas", n_qb:"Hoy: {a}, {b} y {c}.",
+  n_c1t:"👋 ¡Te extrañamos!", n_c1b:"Tu {lang} sigue ahí. Una lección de 5 minutos lo despierta.",
+  n_c2t:"🌱 Las palabras se olvidan sin práctica", n_c2b:"Vuelve con una lección corta de {lang}.",
+  n_c3t:"🗺️ Tu ruta te espera", n_c3b:"Retoma tu {lang} justo donde lo dejaste.",
+  n_wkt:"📊 Tu semana en resumen", n_wkb:"{d} días de práctica y {c} respuestas correctas. ¡Sigue así!", n_wkb0:"Esta semana no practicaste. ¡Empieza de nuevo mañana!",
+});
 Object.assign(GAME_ICO, {"Word Duel":"⚖️", "Echo Chamber":"🎧", "Match Madness":"🧩", "Verb Forge":"⚒️", "Time Machine":"⏳", "Slip Fixer":"🩹"});
 BADGES.push(
   {id:"day3", ico:"📅", test: () => profile.streak >= 3 && profile.last === profile.today},
@@ -7107,7 +7422,7 @@ BADGES.push(
 );
 
 /* ===================== Boot ===================== */
-if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, pathUnits, pathState, pathFlat, lessonItems, startPathNode, openPath, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ};
+if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, pathUnits, pathState, pathFlat, lessonItems, startPathNode, openPath, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick};
 loadProfile();
 initMenu();
 (() => {

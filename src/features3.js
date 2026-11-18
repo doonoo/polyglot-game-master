@@ -70,7 +70,7 @@ function buildDaily(){
 /* ---------- Quiz runner (daily and mistakes) ---------- */
 let Q = null;
 function showOnly(id){
-  for(const x of ["menu","game","over","book","quiz","statsPage","pathPage","storiesPage","storyPage"]) if($(x)) $(x).hidden = x !== id;
+  for(const x of ["menu","game","over","book","quiz","statsPage","pathPage","storiesPage","storyPage","notifyPage"]) if($(x)) $(x).hidden = x !== id;
   window.scrollTo(0, 0);
 }
 function openQuiz(kind, items, title, meta, intro){
