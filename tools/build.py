@@ -162,6 +162,7 @@ A = rep(A, "</style>", """.pairs{display:grid;grid-template-columns:1fr 1fr;gap:
 A = rep(A, '<div class="tiles" id="tiles" hidden></div>', '<div class="tiles" id="tiles" hidden></div>\n      <div class="pairs" id="pairs" hidden></div>')
 A = rep(A, '<div id="dailyCard" class="daily"></div>', '<div id="dailyCard" class="daily"></div>\n  <div id="notifyBanner" class="nbanner" hidden></div>\n  <div class="menu-row"><button class="ghost" id="dailyBtn">📅 Daily challenge</button><button class="ghost" id="mistakesBtn">🩹 Fix my mistakes</button><button class="ghost" id="storiesBtn">📚 <span data-i18n="stories">Stories</span></button><button class="ghost" id="bookBtn">📖 <span data-i18n="phrasebook">Phrasebook</span></button><button class="ghost" id="statsBtn">📊 <span data-i18n="stats">Stats</span></button><button class="ghost" id="notifyBtn">🔔 <span data-i18n="n_btn">Reminders</span></button></div>\n  <div id="questCard" class="daily quests"></div>')
 A = rep(A, '<label class="srow" id="readRow" hidden>', '<label class="srow" id="echoRow" hidden><span>🎧 <span data-i18n="echoOn">Listening games</span></span><input type="checkbox" id="echoChk"></label>\n      <div class="vrow" id="voiceRow" hidden><b>🗣️ <span data-i18n="voices">Voices</span></b><label class="vl" for="voice-es" data-i18n="voiceEs">Spanish voice</label><div class="vsel"><select id="voice-es"></select><button class="chip" type="button" data-vtest="es">▶ <span data-i18n="voiceTest">Test</span></button></div><label class="vl" for="voice-en" data-i18n="voiceEn">English voice</label><div class="vsel"><select id="voice-en"></select><button class="chip" type="button" data-vtest="en">▶ <span data-i18n="voiceTest">Test</span></button></div><p class="note" data-i18n="voiceTip"></p></div>\n      <label class="srow" id="readRow" hidden>')
+A = rep(A, '  <div id="noClaude" class="alert" data-i18n="noClaude" hidden>The Game Master needs Claude to run. Open this page inside Claude to play.</div>\n', '')
 A = rep(A, '<p class="note" data-i18n="prebuiltTag" style="text-align:center"></p>', """<p class="note" data-i18n="prebuiltTag" style="text-align:center"></p>
   <details class="panel" id="backupPanel" style="margin-top:18px">
     <summary>💾 <span data-i18n="backup">Move progress to another device</span></summary>
@@ -173,6 +174,7 @@ A = rep(A, '<p class="note" data-i18n="prebuiltTag" style="text-align:center"></
       <p class="note" id="backupMsg" aria-live="polite"></p>
     </div>
   </details>""")
+A = rep(A, '<p class="note" data-i18n="prebuiltTag" style="text-align:center"></p>\n  <details class="panel" id="backupPanel"', '<details class="panel" id="backupPanel"')
 A = rep(A, '<!-- ============ GAME ============ -->', """<main id="book" class="wrap" hidden>
   <div class="topbar" style="justify-content:flex-start"><button class="chip" id="bookBack">← <span data-i18n="back">Back</span></button></div>
   <h1 class="display book-title">📖 <span data-i18n="phrasebook">Phrasebook</span></h1>
