@@ -4,6 +4,7 @@ Polyglot Game Master teaches <b>Spanish to English speakers</b> and <b>English t
 <ul>
 <li>Learning path with four units (A1 to B2): short lessons, stories and unit tests. Already know a level? Pass its test to jump ahead.</li>
 <li>Every lesson starts with a clear explanation of the rule and its key words.</li>
+<li>Each level covers what the CEFR expects: grammar, everyday topics and real communication (ordering, directions, opinions, complaints, formal emails and more).</li>
 <li>Bilingual stories with comprehension questions. Tap any line to see the translation or hear it.</li>
 </ul>
 

@@ -176,6 +176,24 @@ Object.assign(I18N.es, {
   n_c3t:"🗺️ Tu ruta te espera", n_c3b:"Retoma tu {lang} justo donde lo dejaste.",
   n_wkt:"📊 Tu semana en resumen", n_wkb:"{d} días de práctica y {c} respuestas correctas. ¡Sigue así!", n_wkb0:"Esta semana no practicaste. ¡Empieza de nuevo mañana!",
 });
+Object.assign(I18N.en, {
+  m1d:"Master a full CEFR level: grammar, everyday topics and real-life communication, with spaced review. Then climb to the next level.",
+  m2d:"Stay on one CEFR level and keep practising all of it: grammar, topics and communication.",
+  evLvlT:"You mastered all of {prev}. The next level starts now.",
+  strand_g:"Grammar", strand_t:"Topics and vocabulary", strand_f:"Communication",
+  cefrMastery:"{lvl} mastery: {p}%", cefrHow:"Each lesson is taught once, then you must recall it correctly twice in later rounds. ●●● = mastered.",
+  dotsTip:"Taught · recalled once · mastered", mixT:"Mixed review", mixB:"A quick drill from another part of this level.",
+  mix_7:"verb forms", mix_8:"tricky pairs", mix_4:"numbers", mixIn:"Every few rounds, a mixed drill: {x}.",
+});
+Object.assign(I18N.es, {
+  m1d:"Domina un nivel completo del MCER: gramática, temas cotidianos y comunicación real, con repaso espaciado. Luego sube al siguiente nivel.",
+  m2d:"Quédate en un nivel del MCER y practícalo entero: gramática, temas y comunicación.",
+  evLvlT:"Dominaste todo el {prev}. Empieza el siguiente nivel.",
+  strand_g:"Gramática", strand_t:"Temas y vocabulario", strand_f:"Comunicación",
+  cefrMastery:"Dominio del {lvl}: {p}%", cefrHow:"Cada lección se enseña una vez y luego debes recordarla bien dos veces en rondas posteriores. ●●● = dominada.",
+  dotsTip:"Enseñada · recordada una vez · dominada", mixT:"Repaso mixto", mixB:"Un ejercicio rápido de otra parte de este nivel.",
+  mix_7:"formas verbales", mix_8:"pares engañosos", mix_4:"números", mixIn:"Cada pocas rondas, un ejercicio mixto: {x}.",
+});
 Object.assign(GAME_ICO, {"Word Duel":"⚖️", "Echo Chamber":"🎧", "Match Madness":"🧩", "Verb Forge":"⚒️", "Time Machine":"⏳", "Slip Fixer":"🩹"});
 BADGES.push(
   {id:"day3", ico:"📅", test: () => profile.streak >= 3 && profile.last === profile.today},
@@ -193,7 +211,7 @@ BADGES.push(
 );
 
 /* ===================== Boot ===================== */
-if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, pathUnits, pathState, pathFlat, lessonItems, startPathNode, openPath, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick};
+if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, pathUnits, pathState, pathFlat, lessonItems, startPathNode, openPath, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick, sylHtml, cefrOrder};
 loadProfile();
 initMenu();
 (() => {

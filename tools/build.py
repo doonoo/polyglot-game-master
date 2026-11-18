@@ -183,6 +183,8 @@ A = rep(A, "</style>", """.pairs{display:grid;grid-template-columns:1fr 1fr;gap:
 .ncard .ghost{width:100%;margin-top:12px}
 .ncard .note{margin:12px 0 0;font-size:.85rem}
 .ncard .note.warn{color:var(--red);font-weight:700}
+.sylh{margin:12px 0 6px;font-size:.9rem;display:flex;gap:6px;align-items:baseline}.sylh small{color:var(--muted);font-weight:700}
+.syl li .dots{margin-left:auto;font-style:normal;color:var(--violet);letter-spacing:1px;font-size:.75rem;white-space:nowrap}
 .islgate{margin-top:14px}.islgate .primary{width:100%}.islgate .note{text-align:center;margin:8px 0 0}
 @keyframes sin{from{opacity:0;transform:translateY(8px)}}
 </style>""")
@@ -310,7 +312,9 @@ E = rep(E, '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</bu
         '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</button>` : ""}${canOverride() ? `<button class="listen" data-act="override">✋ ${esc(t("override"))}</button>` : ""}</div>`;')
 E = rep(E, '$("overIsland").hidden = !conquered;', '$("overIsland").hidden = !conquered;\n  if(conquered) renderNextChips();')
 
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", E, rd("boot.js"), F]) + "\n"
+CEFR = ["cefr_es1.js", "cefr_es2.js", "cefr_en1.js", "cefr_en2.js"]
+E = rep(E, '$("sylBody").innerHTML = S.syllabus ? `<ol class="syl">${S.syllabus.map((s,i) => `<li class="${S.done[i] ? "done" : ""}"><span class="n">${S.done[i] ? "✓" : i+1}</span><span>${esc(s)}</span></li>`).join("")}</ol>` : `<p class="empty">${esc(t("generating"))}</p>`;', '$("sylBody").innerHTML = sylHtml();')
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----

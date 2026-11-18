@@ -14,6 +14,7 @@ Free, open source, works offline. No account, no ads, no tracking.
 
 ## What's inside
 
+- **Full CEFR levels (A1 to B2):** every level covers grammar, everyday topics (food, home, travel, work, health, media, society...) and communication (introducing yourself, ordering, directions, invitations, opinions, complaints, formal emails...). Practice mode teaches each lesson, then brings it back until you recall it twice, and mixes in verb, tricky-pair and number drills.
 - **Learning path:** four units (A1 to B2) of short lessons, stories and unit tests, with jump-ahead tests.
 - **Stories:** short bilingual stories with comprehension questions and audio.
 - **Daily quests and a daily challenge**, streaks, XP and trophies.
