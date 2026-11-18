@@ -2,7 +2,7 @@ Polyglot Game Master enseña <b>inglés a hispanohablantes</b> y <b>español a a
 
 <b>Aprende paso a paso</b>
 <ul>
-<li>Ruta de aprendizaje con cuatro unidades (A1 a B2): lecciones cortas, historias y exámenes. ¿Ya dominas un nivel? Aprueba su examen y salta adelante.</li>
+<li>La Práctica enseña cada lección y la repite hasta que la recuerdas, para que se quede.</li>
 <li>Cada lección empieza con una explicación clara de la regla y sus palabras clave.</li>
 <li>Cada nivel cubre lo que pide el MCER: gramática, temas cotidianos y comunicación real (pedir, indicaciones, opiniones, quejas, correos formales y más).</li>
 <li>Historias bilingües con preguntas de comprensión. Toca cualquier línea para ver la traducción o escucharla.</li>

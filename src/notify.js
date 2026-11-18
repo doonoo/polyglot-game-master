@@ -36,9 +36,9 @@ function buildSchedule(now){
   const lang = langLabel(setup.target);
   let next = null, story = null;
   try{
-    const tl = TL(), cur = pathState(tl).find(n => n.cur);
-    next = cur ? cur.title : null;
-    const lv = cur ? cur.lv : "A1";
+    const tl = TL(), live = typeof S !== "undefined" && S && S.cefr && S.syllabus && S.target === setup.target ? S : null;
+    if(live){ const i = live.done.findIndex(d => !d); next = i >= 0 ? live.syllabus[i] : null; }
+    const lv = live ? live.level : (setup.level || "A1");
     const s = STORIES.find(x => !profile.stories[x.id] && x.lv === lv) || STORIES.find(x => !profile.stories[x.id]);
     story = s ? s.t[tl] : null;
   }catch(e){}

@@ -1,7 +1,7 @@
 {
   "name": "Polyglot Game Master",
   "short_name": "Polyglot",
-  "description": "Learn Spanish or English with games, stories, a learning path and daily quests. Works offline.",
+  "description": "Learn Spanish or English with games, stories, full CEFR levels and daily quests. Works offline.",
   "lang": "en",
   "start_url": "./",
   "scope": "./",

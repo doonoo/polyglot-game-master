@@ -70,7 +70,7 @@ function buildDaily(){
 /* ---------- Quiz runner (daily and mistakes) ---------- */
 let Q = null;
 function showOnly(id){
-  for(const x of ["menu","game","over","book","quiz","statsPage","pathPage","storiesPage","storyPage","notifyPage"]) if($(x)) $(x).hidden = x !== id;
+  for(const x of ["menu","game","over","book","quiz","statsPage","storiesPage","storyPage","notifyPage"]) if($(x)) $(x).hidden = x !== id;
   window.scrollTo(0, 0);
 }
 function openQuiz(kind, items, title, meta, intro){
@@ -78,7 +78,7 @@ function openQuiz(kind, items, title, meta, intro){
   $("quizTitle").textContent = title;
   showOnly("quiz");
   $("quizDone").hidden = true;
-  $("quizHome").textContent = t(Q.meta.path ? "backPath" : "backMenu");
+  $("quizHome").textContent = t("backMenu");
   if(!items.length){ finishQ(); return; }
   if(intro){
     $("quizCard").hidden = true; $("quizFeedback").hidden = true;
@@ -166,8 +166,6 @@ function finishQ(){
     renderDailyResult(r);
     if(typeof questAdd === "function") questAdd("daily");
     if(score === n){ Sound.levelUp(); confetti(160); }
-  } else if(Q.meta && Q.meta.path){
-    pathFinish(score, n);
   } else {
     $("quizScore").textContent = `${score}/${n}`;
     $("quizMarks").textContent = Q.marks.map(m => m ? "🟩" : "🟥").join("");
@@ -227,7 +225,7 @@ $("quizKeys").addEventListener("click", e => {
   a.value = a.value.slice(0, s) + b.dataset.k + a.value.slice(en); a.focus();
   try{ a.setSelectionRange(s + 1, s + 1); }catch(err){}
 });
-const quizExit = () => { const p = Q && Q.meta && Q.meta.path; Q = null; if(p) openPath(); else showMenu(); };
+const quizExit = () => { Q = null; showMenu(); };
 $("quizBack").addEventListener("click", quizExit);
 $("quizHome").addEventListener("click", quizExit);
 $("quizIntro").addEventListener("click", e => { if(e.target.closest("#introGo")){ Sound.unlock(); Sound.tap(); $("quizIntro").hidden = true; Q.start = Date.now(); renderQ(); } });

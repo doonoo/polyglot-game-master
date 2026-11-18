@@ -112,10 +112,6 @@ A = rep(A, "</style>", """.pairs{display:grid;grid-template-columns:1fr 1fr;gap:
 .vsel{display:flex;gap:8px;align-items:center}
 .vsel select{flex:1;min-width:0}
 .vrow .note{margin:8px 0 0;font-size:.8rem}
-.pathbtn{grid-column:1/-1;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#58CC02,#2BB7D4);color:#fff;border:0;border-radius:16px;padding:14px 16px;font-size:1.6rem;text-align:left;box-shadow:0 4px 0 rgba(0,0,0,.2)}
-.pathbtn b{display:block;font-size:1.1rem;font-family:"Bricolage Grotesque",sans-serif}
-.pathbtn small{display:block;font-size:.8rem;color:rgba(255,255,255,.9)!important;font-weight:600}
-.pathbtn:active{transform:translateY(3px);box-shadow:none}
 .quests .qtitle{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
 .quests .qtitle small{color:var(--muted);font-size:.75rem}
 .quest{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
@@ -124,31 +120,6 @@ A = rep(A, "</style>", """.pairs{display:grid;grid-template-columns:1fr 1fr;gap:
 .quest .bar{margin-top:5px;height:8px}
 .quest.done{opacity:.65}
 .quest b{font-size:.85rem;color:var(--muted)}
-.path{display:flex;flex-direction:column;align-items:center;padding:10px 0 40px}
-.punit{width:100%;border-radius:16px;padding:12px 16px;margin:22px 0 14px;color:#fff;background:#58CC02;display:grid;grid-template-columns:1fr auto;box-shadow:0 4px 0 rgba(0,0,0,.18)}
-.punit small{grid-column:1/-1;opacity:.9;font-weight:700;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase}
-.punit b{font-size:1.2rem;font-family:"Bricolage Grotesque",sans-serif}
-.punit span{font-weight:800;align-self:center}
-.punit.lv-A2{background:#2BB7D4}.punit.lv-B1{background:#CE82FF}.punit.lv-B2{background:#FF9600}
-.pnode{display:flex;flex-direction:column;align-items:center;margin:8px 0;transform:translateX(var(--x));position:relative;max-width:150px}
-.pnode .pc{width:68px;height:62px;border-radius:50%;border:0;font-size:1.7rem;background:#58CC02;box-shadow:0 6px 0 #46A302;color:#fff}
-.pnode .pc:active{transform:translateY(4px);box-shadow:0 2px 0 #46A302}
-.pnode.story .pc{background:#CE82FF;box-shadow:0 6px 0 #A568CC}
-.pnode.test .pc{background:#FFC800;box-shadow:0 6px 0 #E0A800;width:76px;height:70px}
-.pnode.gold .pc{background:#FFC800;box-shadow:0 6px 0 #E0A800}
-.pnode.lock .pc{background:var(--line);box-shadow:0 6px 0 rgba(0,0,0,.15);filter:grayscale(1)}
-.pnode.test.lock .pc{filter:grayscale(.6);opacity:.8}
-.pnode small{font-size:.72rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.2}
-.pnode.cur .pc{animation:ppulse 1.6s infinite}
-@keyframes ppulse{0%,100%{outline:0 solid rgba(88,204,2,.35)}50%{outline:10px solid rgba(88,204,2,.18)}}
-.pnode.cur{margin-top:36px}
-.pstart{position:absolute;top:-30px;left:0;right:0;margin:0 auto;width:max-content;z-index:2;background:var(--card);color:#58CC02;border:2px solid var(--line);border-radius:10px;padding:2px 10px;font-weight:800;font-size:.8rem;animation:pbob 1.4s infinite;white-space:nowrap}
-@keyframes pbob{50%{transform:translateY(-4px)}}
-.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50}
-.sheet[hidden]{display:none}
-.sheetbox{background:var(--card);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:20px 20px 28px;display:flex;flex-direction:column;gap:10px}
-.sheetbox h2{margin:0;font-size:1.3rem}.sheetbox small{color:var(--muted);font-weight:700}
-.sheetbox .note{margin:0}
 .qcard.intro h2{margin:0 0 8px}
 .iwords{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 14px}
 .iwords span{background:var(--violet-soft);border-radius:10px;padding:5px 10px;font-size:.9rem}
@@ -189,7 +160,7 @@ A = rep(A, "</style>", """.pairs{display:grid;grid-template-columns:1fr 1fr;gap:
 @keyframes sin{from{opacity:0;transform:translateY(8px)}}
 </style>""")
 A = rep(A, '<div class="tiles" id="tiles" hidden></div>', '<div class="tiles" id="tiles" hidden></div>\n      <div class="pairs" id="pairs" hidden></div>')
-A = rep(A, '<div id="dailyCard" class="daily"></div>', '<div id="dailyCard" class="daily"></div>\n  <div id="notifyBanner" class="nbanner" hidden></div>\n  <div class="menu-row"><button class="pathbtn" id="pathBtn">🗺️ <span><b data-i18n="path">Learning path</b><small id="pathBtnSub"></small></span></button><button class="ghost" id="dailyBtn">📅 Daily challenge</button><button class="ghost" id="mistakesBtn">🩹 Fix my mistakes</button><button class="ghost" id="storiesBtn">📚 <span data-i18n="stories">Stories</span></button><button class="ghost" id="bookBtn">📖 <span data-i18n="phrasebook">Phrasebook</span></button><button class="ghost" id="statsBtn">📊 <span data-i18n="stats">Stats</span></button><button class="ghost" id="notifyBtn">🔔 <span data-i18n="n_btn">Reminders</span></button></div>\n  <div id="questCard" class="daily quests"></div>')
+A = rep(A, '<div id="dailyCard" class="daily"></div>', '<div id="dailyCard" class="daily"></div>\n  <div id="notifyBanner" class="nbanner" hidden></div>\n  <div class="menu-row"><button class="ghost" id="dailyBtn">📅 Daily challenge</button><button class="ghost" id="mistakesBtn">🩹 Fix my mistakes</button><button class="ghost" id="storiesBtn">📚 <span data-i18n="stories">Stories</span></button><button class="ghost" id="bookBtn">📖 <span data-i18n="phrasebook">Phrasebook</span></button><button class="ghost" id="statsBtn">📊 <span data-i18n="stats">Stats</span></button><button class="ghost" id="notifyBtn">🔔 <span data-i18n="n_btn">Reminders</span></button></div>\n  <div id="questCard" class="daily quests"></div>')
 A = rep(A, '<label class="srow" id="readRow" hidden>', '<label class="srow" id="echoRow" hidden><span>🎧 <span data-i18n="echoOn">Listening games</span></span><input type="checkbox" id="echoChk"></label>\n      <div class="vrow" id="voiceRow" hidden><b>🗣️ <span data-i18n="voices">Voices</span></b><label class="vl" for="voice-es" data-i18n="voiceEs">Spanish voice</label><div class="vsel"><select id="voice-es"></select><button class="chip" type="button" data-vtest="es">▶ <span data-i18n="voiceTest">Test</span></button></div><label class="vl" for="voice-en" data-i18n="voiceEn">English voice</label><div class="vsel"><select id="voice-en"></select><button class="chip" type="button" data-vtest="en">▶ <span data-i18n="voiceTest">Test</span></button></div><p class="note" data-i18n="voiceTip"></p></div>\n      <label class="srow" id="readRow" hidden>')
 A = rep(A, '<p class="note" data-i18n="prebuiltTag" style="text-align:center"></p>', """<p class="note" data-i18n="prebuiltTag" style="text-align:center"></p>
   <details class="panel" id="backupPanel" style="margin-top:18px">
@@ -256,14 +227,6 @@ A = rep(A, '<!-- ============ GAME ============ -->', """<main id="book" class="
   <section class="stcard"><h2 data-i18n="stDailyH">Daily challenges</h2><p id="stDaily"></p><h2 data-i18n="stMistH">Mistakes</h2><p id="stMist"></p></section>
 </main>
 
-<main id="pathPage" class="wrap" hidden>
-  <div class="topbar" style="justify-content:flex-start"><button class="chip" id="pathBack">← <span data-i18n="back">Back</span></button></div>
-  <h1 class="display book-title">🗺️ <span data-i18n="path">Learning path</span></h1>
-  <p class="note" id="pathSub"></p>
-  <div id="pathUnits" class="path"></div>
-  <div id="pathSheet" class="sheet" hidden></div>
-</main>
-
 <main id="notifyPage" class="wrap" hidden>
   <div class="topbar" style="justify-content:flex-start"><button class="chip" id="notifyBack">← <span data-i18n="back">Back</span></button></div>
   <h1 class="display book-title">🔔 <span data-i18n="n_btn">Reminders</span></h1>
@@ -304,7 +267,7 @@ E = rep(E, 'lesson.words.filter(w => w && w.w).slice(0,6)', 'lesson.words.filter
 E = rep(E, 'const v = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(l.lang.toLowerCase().slice(0, 2)));', 'const v = bestVoice(l.lang);')
 E = rep(E, "  renderPanels();\n  if(fresh){", "  renderPanels();\n  renderExtras(fresh);\n  if(fresh){")
 E = rep(E, "if(Array.isArray(res.syllabus) && res.syllabus.length >= 10){\n      S.syllabus = res.syllabus.slice(0, 15).map(String);", "if(Array.isArray(res.syllabus) && res.syllabus.length >= 1){\n      S.syllabus = res.syllabus.slice(0, 40).map(String);")
-E = rep(E, '$("game").hidden = true; $("over").hidden = true; $("menu").hidden = false;', '$("game").hidden = true; $("over").hidden = true; $("book").hidden = true; $("quiz").hidden = true; $("statsPage").hidden = true; ["pathPage","storiesPage","storyPage","notifyPage"].forEach(x => $(x).hidden = true); $("menu").hidden = false;')
+E = rep(E, '$("game").hidden = true; $("over").hidden = true; $("menu").hidden = false;', '$("game").hidden = true; $("over").hidden = true; $("book").hidden = true; $("quiz").hidden = true; $("statsPage").hidden = true; ["storiesPage","storyPage","notifyPage"].forEach(x => $(x).hidden = true); $("menu").hidden = false;')
 E = rep(E, "refreshContinue(); window.scrollTo(0,0);", "refreshContinue(); renderDaily(); window.scrollTo(0,0);")
 E = rep(E, 'yours: answer, gaveUp: answer === null};', 'yours: answer, gaveUp: answer === null, al: j.al || ""};')
 E = rep(E, 'L.push({text: j.answer, lang: tgt});', 'L.push({text: j.answer, lang: LANG_CODE[S.native] === j.al ? nat : tgt});')

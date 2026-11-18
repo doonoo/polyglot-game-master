@@ -27,88 +27,44 @@ const right = (P, it) => P.canon(it.ch.acc[0]);
   }
   console.log("stories data ok");
 }
-/* every lesson builds 6 gradeable items */
-for(const lang of ["en", "es"]){
-  const w = boot(lang).window, P = w.__pgm, tgt = lang === "en" ? "es" : "en";
-  let n = 0;
-  for(const lv of P.LEVELS) P.COURSE[tgt][lv].forEach((c, i) => {
-    const items = P.lessonItems(tgt, lv, [i], 6);
-    if(items.length < 5) fail("lesson items", tgt, lv, i, c.t, items.length);
-    for(const it of items){ n++;
-      const j = P.gradeLocal({native:it.native, mode:1}, it.ch, right(P, it), false);
-      if(!j.correct) fail("canonical rejected", tgt, lv, c.t, it.ch.game, it.ch.target, right(P, it));
-    }
-  });
-  console.log("lesson items", tgt, n);
-}
-/* path play-through: lesson, jump test, story, quests */
+/* path removed; stories, quests and mastery tracking */
 {
   const dom = boot("en"), w = dom.window, d = w.document, P = w.__pgm, $ = id => d.getElementById(id);
-  const units = P.pathUnits("es");
-  if(units.length !== 4) fail("units", units.length);
-  let st = P.pathState("es");
-  if(!st[0].open || !st[0].cur || st[1].open) fail("initial state");
-  d.getElementById("pathBtn").click();
-  if($("pathPage").hidden) fail("path page hidden");
-  if(d.querySelectorAll(".pnode").length !== st.length) fail("node count");
-  d.querySelector(`[data-pk="${st[0].key}"]`).click();
-  if($("pathSheet").hidden) fail("sheet");
-  d.querySelector('[data-pa="lesson"]').click();
-  if($("quizIntro").hidden) fail("intro hidden");
-  d.getElementById("introGo").click();
-  const playAll = ok => { for(let k = 0; k < 20 && !P.Q.done; k++){
-    const it = P.Q.items[P.Q.i];
-    if(it.ch.game === "Syntax Scramble" && $("quizBuild").hidden) fail("scramble tiles hidden");
-    $("quizAnswer").value = ok ? right(P, it) : "zzz"; $("quizSubmit").click(); $("quizNext").click(); } };
-  const xp0 = P.profile.xp;
-  playAll(true);
-  if($("quizDone").hidden) fail("lesson not finished");
-  if(P.profile.path.es[st[0].key] !== 2) fail("lesson not gold", JSON.stringify(P.profile.path));
-  st = P.pathState("es");
-  if(!st[1].open || !st[1].cur) fail("next not unlocked");
-  $("quizHome").click();
-  if($("pathPage").hidden) fail("did not return to path");
-  // failing a lesson does not mark it
-  P.startPathNode(st[1].key); d.getElementById("introGo").click(); playAll(false);
-  if(P.profile.path.es[st[1].key]) fail("failed lesson marked");
-  // jump test to B1
-  P.startPathNode("B1:T");
-  if(P.Q.items.length !== 10) fail("test size", P.Q.items.length);
-  playAll(true);
-  st = P.pathState("es");
-  const firstB2 = st.findIndex(n => n.lv === "B2");
-  if(!st.slice(0, firstB2).every(n => n.done)) fail("jump did not unlock");
-  if(!st[firstB2].cur) fail("cursor not at B2");
-  // story
-  P.openStory("cafe", true);
+  if($("pathBtn") || $("pathPage")) fail("learning path still present");
+  $("storiesBtn").click();
+  if($("storiesPage").hidden) fail("stories page hidden");
+  P.openStory("cafe");
   for(let k = 0; k < 80 && !$("storyDoneBtn"); k++){
     const nx = $("storyNext"); if(nx){ nx.click(); continue; }
     const opts = [...d.querySelectorAll(".sq:last-child .sopt:not([disabled])")]; if(opts.length) opts[0].click(); else break;
   }
   if(!P.profile.stories.cafe) fail("story not done");
-  if(!P.profile.path.es["A1:S:cafe"]) fail("story path node");
   d.querySelector(".sline").click();
   $("storyDoneBtn").click();
-  if($("pathPage").hidden) fail("story back to path");
-  // quests
+  if($("menu").hidden) fail("story did not return to menu");
   P.ensureQuests();
   const q = P.profile.quests.list;
   if(q.length !== 3 || new Set(q.map(x => x.id)).size !== 3) fail("quests", JSON.stringify(q));
+  if(q.some(x => x.id === "lesson" || x.id === "perfect")) fail("old path quest");
   const before = P.profile.xp, open = q.filter(x => !x.done).length;
   for(const x of q) if(!x.done) P.questAdd(x.id, x.g);
   if(!q.every(x => x.done) || !P.profile.quests.bonus) fail("quests not completed");
   if(P.profile.xp < before + open * 30 + 50) fail("quest xp", P.profile.xp - before);
-  if(P.profile.xp <= xp0) fail("no xp");
-  P.questAdd(q[0].id, 5);
   if(!d.querySelectorAll("#questCard .quest").length) fail("quest card empty");
+  // old saved quests with removed ids are replaced
+  P.profile.quests = {d:P.profile.today, list:[{id:"perfect", g:1, n:0, done:false}], bonus:false}; P.ensureQuests();
+  if(P.profile.quests.list.some(x => x.id === "perfect")) fail("stale quest kept");
+  // mastering lessons in Practice counts
+  P.setup.mode = 1; P.setup.level = "A1"; $("startBtn").click();
+  for(let i = 0; i < 60 && P.S.status === "playing"; i++){ const c = P.S.current; $("answer").value = P.variantsOf(c.challenge)[0]; $("submitBtn").click(); }
+  if(!(P.profile.mastered > 0)) fail("mastered not counted", P.profile.mastered);
   if(dom.errors.length) fail("errors", dom.errors);
-  console.log("path/story/quests ok");
+  console.log("stories/quests/mastery ok, mastered", P.profile.mastered);
 }
 /* English learner side + persistence */
 {
   const dom = boot("es"), w = dom.window, d = w.document, P = w.__pgm;
-  if(P.pathUnits("en")[0].nodes.length < 5) fail("en path");
-  P.openStory("flight", false);
+  P.openStory("flight");
   if(!/✈️/.test(d.getElementById("storyTitle").textContent)) fail("en story title");
   const s = JSON.parse(w.localStorage.getItem("pgm-pb-profile") || "{}");
   if(dom.errors.length) fail("errors es", dom.errors);

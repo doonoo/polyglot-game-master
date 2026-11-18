@@ -2,7 +2,7 @@
    Each level gets the rest of what the CEFR expects at that level: missing grammar,
    everyday topics (vocabulary in context) and communicative functions (doing things
    with the language). k: "g" grammar · "t" topic · "f" function. Appended so the
-   learning path keeps its earlier step numbers. */
+   original lesson order of each level stays the same. */
 ES_A1.push(
 {t:"Querer, poder and necesitar + verb", k:"g",
  b:"To say what you want, can or need to do, conjugate the first verb and keep the second in the infinitive: **quiero comer**, **puedo ir**, **necesito trabajar**. Querer and poder change their stem: **quiero / queremos**, **puedo / podemos**.",

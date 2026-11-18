@@ -1,0 +1,1 @@
+Removed the learning path: Practice now covers each full CEFR level, so the path was redundant. Stories keep their own page. New quest and trophy for mastering lessons in Practice.

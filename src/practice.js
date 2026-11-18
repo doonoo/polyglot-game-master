@@ -106,6 +106,7 @@ applyResult = (orig => function(st, correct, plan){
       const i = st.syllabus.findIndex(x => x.toLowerCase() === key);
       if(i >= 0 && !st.done[i]){
         st.done[i] = true;
+        if(typeof S !== "undefined" && st === S){ profile.mastered = (profile.mastered || 0) + 1; try{ saveProfile(); questAdd("master"); }catch(e){} }
         const keep = JSON.stringify(st.stats), ev = st.event;
         orig(st, true, {kind:"none"});   // runs the level-complete check only
         st.stats = JSON.parse(keep); if(!st.event) st.event = ev;

@@ -101,10 +101,10 @@ Object.assign(I18N.en, {
   backPath:"Back to the path", stories:"Stories", storiesSub:"Short stories in the language you are learning, with questions along the way.",
   storyDone:"Story complete!", storyScore:"{r} of {n} questions right · +{x} XP", continue:"Continue", finish:"Finish", tapTranslate:"Tip: tap a line to see the translation, or 🔊 to hear it.",
   questsTitle:"Daily quests", questsReset:"New quests every day", questDone:"Quest complete! +{x} XP", questsAll:"All quests done! +{x} bonus XP",
-  q_correct:"Get {g} answers right", q_xp:"Earn {g} XP", q_combo:"Get {g} right in a row", q_lesson:"Finish {g} path lessons", q_perfect:"Get a perfect lesson",
+  q_correct:"Get {g} answers right", q_xp:"Earn {g} XP", q_combo:"Get {g} right in a row", q_lesson:"Finish {g} path lessons", q_master:"Master {g} lessons in Practice", q_perfect:"Get a perfect lesson",
   q_story:"Read a story", q_daily:"Play the daily challenge", q_fix:"Fix {g} of your mistakes", q_conj:"Conjugate {g} verbs correctly",
   q_tricky:"Get {g} tricky pairs right", q_vocab:"Get {g} words right in Lexicon Onslaught", q_listen:"Get {g} listening rounds right",
-  islHide:"Hide it and test me", islHideNote:"Study the phrase first. Once it is hidden you answer from memory.", b_path10:"Trailblazer", b_path10_d:"Complete 10 steps on the learning path", b_story3:"Bookworm", b_story3_d:"Finish 3 stories", b_quest10:"Quest hunter", b_quest10_d:"Complete 10 daily quests",
+  islHide:"Hide it and test me", islHideNote:"Study the phrase first. Once it is hidden you answer from memory.", b_master25:"Trailblazer", b_master25_d:"Master 25 lessons in Practice", b_path10:"Trailblazer", b_path10_d:"Complete 10 steps on the learning path", b_story3:"Bookworm", b_story3_d:"Finish 3 stories", b_quest10:"Quest hunter", b_quest10_d:"Complete 10 daily quests",
 });
 Object.assign(I18N.es, {
   path:"Ruta de aprendizaje", pathSub:"{lang}: {d} de {n} pasos hechos. Toca el círculo brillante para seguir.", pathBtn:"Siguiente: {x}", pathAllDone:"¡Ruta completa!",
@@ -117,10 +117,10 @@ Object.assign(I18N.es, {
   backPath:"Volver a la ruta", stories:"Historias", storiesSub:"Historias cortas en el idioma que aprendes, con preguntas por el camino.",
   storyDone:"¡Historia completa!", storyScore:"{r} de {n} preguntas correctas · +{x} XP", continue:"Continuar", finish:"Terminar", tapTranslate:"Consejo: toca una línea para ver la traducción, o 🔊 para escucharla.",
   questsTitle:"Misiones diarias", questsReset:"Misiones nuevas cada día", questDone:"¡Misión cumplida! +{x} XP", questsAll:"¡Todas las misiones hechas! +{x} XP extra",
-  q_correct:"Acierta {g} respuestas", q_xp:"Gana {g} XP", q_combo:"Acierta {g} seguidas", q_lesson:"Termina {g} lecciones de la ruta", q_perfect:"Haz una lección perfecta",
+  q_correct:"Acierta {g} respuestas", q_xp:"Gana {g} XP", q_combo:"Acierta {g} seguidas", q_lesson:"Termina {g} lecciones de la ruta", q_master:"Domina {g} lecciones en Práctica", q_perfect:"Haz una lección perfecta",
   q_story:"Lee una historia", q_daily:"Juega el reto diario", q_fix:"Corrige {g} de tus errores", q_conj:"Conjuga {g} verbos bien",
   q_tricky:"Acierta {g} pares engañosos", q_vocab:"Acierta {g} palabras en Avalancha de vocabulario", q_listen:"Acierta {g} rondas de escucha",
-  islHide:"Escóndela y ponme a prueba", islHideNote:"Primero estudia la frase. Cuando se esconda, respondes de memoria.", b_path10:"Pionero", b_path10_d:"Completa 10 pasos de la ruta", b_story3:"Ratón de biblioteca", b_story3_d:"Termina 3 historias", b_quest10:"Cazador de misiones", b_quest10_d:"Completa 10 misiones diarias",
+  islHide:"Escóndela y ponme a prueba", islHideNote:"Primero estudia la frase. Cuando se esconda, respondes de memoria.", b_master25:"Pionero", b_master25_d:"Domina 25 lecciones en Práctica", b_path10:"Pionero", b_path10_d:"Completa 10 pasos de la ruta", b_story3:"Ratón de biblioteca", b_story3_d:"Termina 3 historias", b_quest10:"Cazador de misiones", b_quest10_d:"Completa 10 misiones diarias",
 });
 Object.assign(I18N.en, {
   n_btn:"Reminders", n_master:"Practice reminders", n_masterD:"A nudge each day to keep learning.", n_time:"Reminder time", n_timeD:"When the daily reminder arrives.",
@@ -146,7 +146,7 @@ Object.assign(I18N.en, {
   n_qt:"🎯 New quests are ready", n_qb:"Today: {a}, {b} and {c}.",
   n_c1t:"👋 We miss you!", n_c1b:"Your {lang} is still in there. A 5-minute lesson brings it back.",
   n_c2t:"🌱 Words fade without practice", n_c2b:"Jump back in with one short {lang} lesson.",
-  n_c3t:"🗺️ Your path is waiting", n_c3b:"Pick up your {lang} right where you left off.",
+  n_c3t:"🧠 Your lessons are waiting", n_c3b:"Pick up your {lang} right where you left off.",
   n_wkt:"📊 Your week in review", n_wkb:"{d} days of practice and {c} right answers. Keep it up!", n_wkb0:"No practice this week. Start fresh tomorrow!",
 });
 Object.assign(I18N.es, {
@@ -173,7 +173,7 @@ Object.assign(I18N.es, {
   n_qt:"🎯 Nuevas misiones listas", n_qb:"Hoy: {a}, {b} y {c}.",
   n_c1t:"👋 ¡Te extrañamos!", n_c1b:"Tu {lang} sigue ahí. Una lección de 5 minutos lo despierta.",
   n_c2t:"🌱 Las palabras se olvidan sin práctica", n_c2b:"Vuelve con una lección corta de {lang}.",
-  n_c3t:"🗺️ Tu ruta te espera", n_c3b:"Retoma tu {lang} justo donde lo dejaste.",
+  n_c3t:"🧠 Tus lecciones te esperan", n_c3b:"Retoma tu {lang} justo donde lo dejaste.",
   n_wkt:"📊 Tu semana en resumen", n_wkb:"{d} días de práctica y {c} respuestas correctas. ¡Sigue así!", n_wkb0:"Esta semana no practicaste. ¡Empieza de nuevo mañana!",
 });
 Object.assign(I18N.en, {
@@ -209,13 +209,13 @@ BADGES.push(
   {id:"daily1", ico:"📅", test: () => profile.dailyCount >= 1},
   {id:"daily10", ico:"💯", test: () => profile.dailyBest >= 10},
   {id:"fixer25", ico:"🩹", test: () => profile.fixed >= 25},
-  {id:"path10", ico:"🗺️", test: () => Object.values(profile.path).reduce((n, P) => n + Object.keys(P).length, 0) >= 10},
+  {id:"master25", ico:"🧠", test: () => (profile.mastered || 0) >= 25},
   {id:"story3", ico:"📚", test: () => Object.keys(profile.stories).length >= 3},
   {id:"quest10", ico:"🎁", test: () => profile.questsDone >= 10}
 );
 
 /* ===================== Boot ===================== */
-if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, pathUnits, pathState, pathFlat, lessonItems, startPathNode, openPath, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick, sylHtml, cefrOrder};
+if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick, sylHtml, cefrOrder};
 loadProfile();
 initMenu();
 (() => {
