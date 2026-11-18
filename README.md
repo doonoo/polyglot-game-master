@@ -33,14 +33,16 @@ npm run build      # writes www/index.html from src/
 npm test           # plays thousands of rounds in both directions
 ```
 
-Android app (needs Android Studio or the Android SDK and JDK 21):
+Android app (needs the Android SDK and JDK 21). The `android/` project is checked in:
 
 ```bash
-npx cap add android
-npx @capacitor/assets generate --android
 npx cap sync android
-cd android && ./gradlew assembleDebug
+cd android && ./gradlew assembleRelease
 ```
+
+To regenerate the app icon and splash screens from `assets/`, run `npx @capacitor/assets generate --android`.
+
+Store listing text and screenshots for F-Droid live in `fastlane/metadata/android/`.
 
 GitHub Actions does all of this on every push to `main`:
 `android.yml` builds the APK and attaches it to the **latest** release, `pages.yml` publishes the web app, and `test.yml` runs the tests.

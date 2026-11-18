@@ -30,14 +30,12 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Create the Android project
+      - name: Sync the web app into the Android project
         run: |
-          npx cap add android
-          npx @capacitor/assets generate --android
           npx cap sync android
           # every build gets a higher version number so installs update in place
-          sed -i "s/versionCode 1/versionCode ${GITHUB_RUN_NUMBER}/" android/app/build.gradle
-          sed -i "s/versionName \"1.0\"/versionName \"1.0.${GITHUB_RUN_NUMBER}\"/" android/app/build.gradle
+          sed -i "s/versionCode [0-9]*/versionCode ${GITHUB_RUN_NUMBER}/" android/app/build.gradle
+          sed -i "s/versionName \"[0-9.]*\"/versionName \"1.0.${GITHUB_RUN_NUMBER}-ci\"/" android/app/build.gradle
 
       - name: Build the APK
         run: |
