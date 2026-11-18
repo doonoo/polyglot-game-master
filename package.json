@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "build": "python3 tools/build.py",
-    "test": "node test/test.js && node test/test4.js && node test/test5.js",
+    "test": "node test/test.js && node test/test4.js && node test/test5.js && node test/test6.js",
     "android": "npx cap sync android && npx cap open android"
   },
   "dependencies": {

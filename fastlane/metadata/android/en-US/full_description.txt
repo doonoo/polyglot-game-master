@@ -16,6 +16,7 @@ Polyglot Game Master teaches <b>Spanish to English speakers</b> and <b>English t
 <li>Lexicon Onslaught: fast vocabulary and Match Madness.</li>
 <li>Island Hopper: memorize useful phrases and recall them later.</li>
 <li>Conjugation Gym: the most common verbs in all the main tenses.</li>
+<li>Custom Game: pick the content, levels and mini-games, then set hearts, rounds, a timer and strict accents.</li>
 <li>Tricky Pairs: ser/estar, por/para, este/esto/aquel, make/do, since/for and more.</li>
 </ul>
 

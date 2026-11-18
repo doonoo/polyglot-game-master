@@ -16,6 +16,7 @@ Polyglot Game Master enseña <b>inglés a hispanohablantes</b> y <b>español a a
 <li>Avalancha de vocabulario y Pares locos.</li>
 <li>Saltador de islas: memoriza frases útiles y recuérdalas después.</li>
 <li>Gimnasio de conjugación: los verbos más usados en todos los tiempos principales.</li>
+<li>Juego personalizado: elige contenido, niveles y minijuegos, y ajusta corazones, rondas, tiempo y tildes.</li>
 <li>Pares engañosos: make/do, since/for, say/tell, ser/estar, por/para y más.</li>
 </ul>
 

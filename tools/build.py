@@ -154,6 +154,21 @@ A = rep(A, "</style>", """.pairs{display:grid;grid-template-columns:1fr 1fr;gap:
 .ncard .ghost{width:100%;margin-top:12px}
 .ncard .note{margin:12px 0 0;font-size:.85rem}
 .ncard .note.warn{color:var(--red);font-weight:700}
+.cbody h3{font-size:.85rem;margin:14px 0 6px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;display:flex;gap:8px;align-items:baseline}
+.cbody h3 small{text-transform:none;letter-spacing:0;font-weight:600}
+.cbody .chips{display:flex;flex-wrap:wrap;gap:6px}
+.cbody .chip[disabled]{opacity:.35}
+.cbody .chip.on{background:var(--violet);color:#fff;border-color:var(--violet)}
+.cpre{display:inline-flex;align-items:center}.cdel{background:none;border:0;color:var(--muted);font-size:.8rem;padding:0 4px}
+.linkbtn{background:none;border:0;color:var(--violet);font:inherit;padding:0;text-decoration:underline;cursor:pointer}
+.crules{display:grid;grid-template-columns:1fr;gap:8px}
+.crules label{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:.9rem;font-weight:600}
+.crules select{min-width:130px;font:inherit;padding:4px 6px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:inherit}
+.crules .ctog{justify-content:flex-start}.crules .ctog input{width:20px;height:20px;accent-color:var(--violet)}
+.cbody .note.warn{color:var(--red);font-weight:700}
+.csave{display:flex;gap:8px;margin-top:8px}.csave input{flex:1;min-width:0;font:inherit;padding:8px 10px;border:2px solid var(--line);border-radius:12px;background:var(--bg);color:inherit}
+.ctimer{font-weight:800;font-variant-numeric:tabular-nums}.ctimer.low{color:var(--red);animation:pbob2 .5s infinite}
+@keyframes pbob2{50%{transform:scale(1.15)}}
 .sylh{margin:12px 0 6px;font-size:.9rem;display:flex;gap:6px;align-items:baseline}.sylh small{color:var(--muted);font-weight:700}
 .syl li .dots{margin-left:auto;font-style:normal;color:var(--violet);letter-spacing:1px;font-size:.75rem;white-space:nowrap}
 .islgate{margin-top:14px}.islgate .primary{width:100%}.islgate .note{text-align:center;margin:8px 0 0}
@@ -163,6 +178,12 @@ A = rep(A, '<div class="tiles" id="tiles" hidden></div>', '<div class="tiles" id
 A = rep(A, '<div id="dailyCard" class="daily"></div>', '<div id="dailyCard" class="daily"></div>\n  <div id="notifyBanner" class="nbanner" hidden></div>\n  <div class="menu-row"><button class="ghost" id="dailyBtn">📅 Daily challenge</button><button class="ghost" id="mistakesBtn">🩹 Fix my mistakes</button><button class="ghost" id="storiesBtn">📚 <span data-i18n="stories">Stories</span></button><button class="ghost" id="bookBtn">📖 <span data-i18n="phrasebook">Phrasebook</span></button><button class="ghost" id="statsBtn">📊 <span data-i18n="stats">Stats</span></button><button class="ghost" id="notifyBtn">🔔 <span data-i18n="n_btn">Reminders</span></button></div>\n  <div id="questCard" class="daily quests"></div>')
 A = rep(A, '<label class="srow" id="readRow" hidden>', '<label class="srow" id="echoRow" hidden><span>🎧 <span data-i18n="echoOn">Listening games</span></span><input type="checkbox" id="echoChk"></label>\n      <div class="vrow" id="voiceRow" hidden><b>🗣️ <span data-i18n="voices">Voices</span></b><label class="vl" for="voice-es" data-i18n="voiceEs">Spanish voice</label><div class="vsel"><select id="voice-es"></select><button class="chip" type="button" data-vtest="es">▶ <span data-i18n="voiceTest">Test</span></button></div><label class="vl" for="voice-en" data-i18n="voiceEn">English voice</label><div class="vsel"><select id="voice-en"></select><button class="chip" type="button" data-vtest="en">▶ <span data-i18n="voiceTest">Test</span></button></div><p class="note" data-i18n="voiceTip"></p></div>\n      <label class="srow" id="readRow" hidden>')
 A = rep(A, '  <div id="noClaude" class="alert" data-i18n="noClaude" hidden>The Game Master needs Claude to run. Open this page inside Claude to play.</div>\n', '')
+A = rep(A, '  <section class="group" id="islandGroup" hidden>', '''  <section class="group" id="customGroup" hidden>
+    <h2 data-i18n="cTitle">Build your game</h2>
+    <div id="customBody" class="cbody"></div>
+  </section>
+
+  <section class="group" id="islandGroup" hidden>''')
 A = rep(A, '<p class="note" data-i18n="prebuiltTag" style="text-align:center"></p>', """<p class="note" data-i18n="prebuiltTag" style="text-align:center"></p>
   <details class="panel" id="backupPanel" style="margin-top:18px">
     <summary>💾 <span data-i18n="backup">Move progress to another device</span></summary>
@@ -279,7 +300,7 @@ E = rep(E, '$("overIsland").hidden = !conquered;', '$("overIsland").hidden = !co
 
 CEFR = ["cefr_es1.js", "cefr_es2.js", "cefr_en1.js", "cefr_en2.js"]
 E = rep(E, '$("sylBody").innerHTML = S.syllabus ? `<ol class="syl">${S.syllabus.map((s,i) => `<li class="${S.done[i] ? "done" : ""}"><span class="n">${S.done[i] ? "✓" : i+1}</span><span>${esc(s)}</span></li>`).join("")}</ol>` : `<p class="empty">${esc(t("generating"))}</p>`;', '$("sylBody").innerHTML = sylHtml();')
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", E, rd("boot.js"), F]) + "\n"
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----

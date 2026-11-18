@@ -20,6 +20,7 @@ Free, open source, works offline. No account, no ads, no tracking.
 - **Daily quests and a daily challenge**, streaks, XP and trophies.
 - **Game modes:** Practice, Level Select, Survivor, Number Cruncher, Lexicon Onslaught, Island Hopper (memorize phrases about your own life), Conjugation Gym and Tricky Pairs (ser/estar, por/para, este/esto/aquel…).
 - **Listening:** Echo Chamber and read-aloud use the device's own text-to-speech voices.
+- **Custom Game:** build your own run. Pick content (grammar, topics, communication, verbs, tricky pairs, numbers, vocabulary), levels and mini-games, then set hearts, rounds, a per-question timer, strict accents, hints and re-asking misses. Quick picks and saved presets included.
 - **Fix my mistakes, phrasebook, stats** and a backup code to move progress between devices.
 
 Progress is saved on the device only.

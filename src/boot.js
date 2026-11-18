@@ -196,6 +196,32 @@ Object.assign(I18N.es, {
   m3d:"Sobrevive a todos los niveles del MCER, de A1 a B2, con 3 corazones: gramática, temas, comunicación, verbos, pares engañosos y números. Sin pistas y con tildes estrictas. Cada error cuesta un corazón.",
   fell:"Caíste en {lvl} con {n} lecciones superadas.", cefrCleared:"{lvl}: {d}/{n} lecciones superadas ({p}%)", cefrSurv:"Una respuesta correcta supera una lección. Los ejercicios mixtos también cuestan un corazón si fallas.",
 });
+Object.assign(I18N.en, {
+  m9n:"Custom Game", m9d:"Build your own run: pick the content, levels, mini-games and rules.",
+  cTitle:"Build your game", cIntro:"Tap to turn things on or off. Your setup is remembered.",
+  cPresets:"Quick picks", cp_all:"Everything", cp_verbs:"Verbs only", cp_talk:"Real-life talk", cp_tricky:"Tricky pairs sprint", cp_ear:"Listening only", cp_speed:"Speed round", cp_hard:"Hardcore",
+  cWhat:"What to practise", cs_g:"Grammar", cs_t:"Topics", cs_f:"Communication", cs_verbs:"Verb forms", cs_tricky:"Tricky pairs", cs_numbers:"Numbers", cs_vocab:"Vocabulary",
+  cLevels:"Levels", cGames:"Mini-games", cAll:"all", cNone:"none", cRules:"Rules",
+  cHeartsL:"Hearts", cRoundsL:"Rounds", cTimerL:"Timer", cUnlimited:"Unlimited", cEndless:"Endless", cOff:"Off", cSecs:"{n} s",
+  cStrict:"Strict accents", cHints:"Hints and word lists", cReview:"Re-ask my misses",
+  cSummary:"{g} mini-games · {s} content types · {l}", cEmpty:"Nothing to play with this setup. Turn on at least one content type and a mini-game that fits it.",
+  cSave:"Save as my preset", cName:"Name this preset", cMine:"My game {n}", cSaved:"Preset saved", cDelete:"Delete preset",
+  cBest:"Best finished run: {n} correct", cRound:"Round {n} of {d}", cScore:"{c} of {n} correct", cHearts:"{hp} of {max} hearts",
+  cNoHints:"No hints in this game.", cDoneT:"Run complete", cDoneB:"{c} of {n} correct ({p}%).", cOverB:"Out of hearts after {n} rounds: {c} correct ({p}%).",
+});
+Object.assign(I18N.es, {
+  m9n:"Juego personalizado", m9d:"Arma tu propia partida: elige contenido, niveles, minijuegos y reglas.",
+  cTitle:"Arma tu juego", cIntro:"Toca para activar o desactivar. Tu configuración se recuerda.",
+  cPresets:"Opciones rápidas", cp_all:"Todo", cp_verbs:"Solo verbos", cp_talk:"Conversación real", cp_tricky:"Sprint de pares engañosos", cp_ear:"Solo escucha", cp_speed:"Ronda rápida", cp_hard:"Modo extremo",
+  cWhat:"Qué practicar", cs_g:"Gramática", cs_t:"Temas", cs_f:"Comunicación", cs_verbs:"Formas verbales", cs_tricky:"Pares engañosos", cs_numbers:"Números", cs_vocab:"Vocabulario",
+  cLevels:"Niveles", cGames:"Minijuegos", cAll:"todos", cNone:"ninguno", cRules:"Reglas",
+  cHeartsL:"Corazones", cRoundsL:"Rondas", cTimerL:"Tiempo", cUnlimited:"Ilimitados", cEndless:"Sin fin", cOff:"No", cSecs:"{n} s",
+  cStrict:"Tildes estrictas", cHints:"Pistas y listas de palabras", cReview:"Repetir mis fallos",
+  cSummary:"{g} minijuegos · {s} tipos de contenido · {l}", cEmpty:"Con esta configuración no hay nada que jugar. Activa al menos un tipo de contenido y un minijuego que le corresponda.",
+  cSave:"Guardar como mi preajuste", cName:"Nombre del preajuste", cMine:"Mi juego {n}", cSaved:"Preajuste guardado", cDelete:"Borrar preajuste",
+  cBest:"Mejor partida terminada: {n} correctas", cRound:"Ronda {n} de {d}", cScore:"{c} de {n} correctas", cHearts:"{hp} de {max} corazones",
+  cNoHints:"Sin pistas en este juego.", cDoneT:"Partida completa", cDoneB:"{c} de {n} correctas ({p}%).", cOverB:"Sin corazones tras {n} rondas: {c} correctas ({p}%).",
+});
 Object.assign(GAME_ICO, {"Word Duel":"⚖️", "Echo Chamber":"🎧", "Match Madness":"🧩", "Verb Forge":"⚒️", "Time Machine":"⏳", "Slip Fixer":"🩹"});
 BADGES.push(
   {id:"day3", ico:"📅", test: () => profile.streak >= 3 && profile.last === profile.today},
@@ -213,7 +239,7 @@ BADGES.push(
 );
 
 /* ===================== Boot ===================== */
-if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick, sylHtml, cefrOrder};
+if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick, sylHtml, cefrOrder, customCombos, applyPreset, curCfg, CPRESETS};
 loadProfile();
 initMenu();
 (() => {
