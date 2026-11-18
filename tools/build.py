@@ -6,7 +6,7 @@ src = open(sys.argv[1] if len(sys.argv) > 1 else os.path.join(base, "src", "base
 def seg(a, b):
     return "\n".join(src[a - 1:b])
 
-MORE = [f for f in ["more_es1.js","more_es2.js","more_en1.js","more_en2.js","more_bank.js"] if os.path.exists(os.path.join(base, "src", f))]
+MORE = [f for f in ["more_es1.js","more_es2.js","more_en1.js","more_en2.js","more_bank.js","more_bank2.js"] if os.path.exists(os.path.join(base, "src", f))]
 
 def rd(n):
     return open(os.path.join(base, "src", n), encoding="utf-8").read().rstrip("\n")
@@ -300,7 +300,7 @@ E = rep(E, '$("overIsland").hidden = !conquered;', '$("overIsland").hidden = !co
 
 CEFR = ["cefr_es1.js", "cefr_es2.js", "cefr_en1.js", "cefr_en2.js"]
 E = rep(E, '$("sylBody").innerHTML = S.syllabus ? `<ol class="syl">${S.syllabus.map((s,i) => `<li class="${S.done[i] ? "done" : ""}"><span class="n">${S.done[i] ? "✓" : i+1}</span><span>${esc(s)}</span></li>`).join("")}</ol>` : `<p class="empty">${esc(t("generating"))}</p>`;', '$("sylBody").innerHTML = sylHtml();')
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", E, rd("boot.js"), F]) + "\n"
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----
