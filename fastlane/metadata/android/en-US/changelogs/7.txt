@@ -1,0 +1,1 @@
+Signed with the app's own release key. If you installed an earlier test build, make a backup code first, then uninstall and reinstall once. Also removes the old pre-built edition note.

@@ -1,0 +1,1 @@
+Firmada con la clave propia de la app. Si instalaste una versión de prueba anterior, haz primero un código de respaldo y luego desinstala y vuelve a instalar una vez. También quita la nota de edición prearmada.
