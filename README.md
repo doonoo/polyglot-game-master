@@ -8,6 +8,7 @@ Free, open source, works offline. No account, no ads, no tracking.
 ## Get it
 
 - **Android:** download [`PolyglotGameMaster.apk`](https://github.com/doonoo/polyglot-game-master/releases/download/latest/PolyglotGameMaster.apk) from the [latest build](../../releases/tag/latest) and open it on your phone. (Android asks you to allow installs from your browser or file manager the first time.) New versions install over the old one and keep your progress.
+- **Android with automatic updates:** install [Obtainium](https://github.com/ImranR98/Obtainium) (free and open source), then [tap here to add Polyglot](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/doonoo/polyglot-game-master) or add `https://github.com/doonoo/polyglot-game-master` by hand. Obtainium checks this repo's releases and installs each new version.
 - **iPhone:** open the [web app](https://doonoo.github.io/polyglot-game-master/) in Safari, then **Share → Add to Home Screen**.
 - **PC / Mac:** open the [web app](https://doonoo.github.io/polyglot-game-master/) in Chrome, Edge or Brave and click the install icon in the address bar to get it as a desktop app. Edge has the most natural voices.
 - Everything works offline after the first visit.
@@ -61,7 +62,7 @@ GitHub Actions does all of this on every push to `main`:
 
 ### Signing
 
-`tools/debug.keystore` is a public debug key (password `android`). It only keeps APK updates consistent for sideloading. To publish on Google Play, create your own private release key and never commit it.
+Release APKs are signed in GitHub Actions with a private key kept in the repository secrets (`PGM_KEYSTORE_BASE64`, `PGM_KEYSTORE_PASSWORD`, `PGM_KEY_ALIAS`, `PGM_KEY_PASSWORD`). Without those secrets the workflow falls back to `tools/debug.keystore`, a public debug key. F-Droid builds the app from source and signs it with its own key.
 
 ## Content
 

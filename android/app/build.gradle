@@ -16,8 +16,28 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Release signing comes from environment variables (set by GitHub Actions from repo
+    // secrets). Without them a release build stays unsigned, which is what F-Droid wants.
+    signingConfigs {
+        release {
+            def ks = System.getenv("PGM_KEYSTORE")
+            if (ks && new File(ks).exists()) {
+                storeFile file(ks)
+                storePassword System.getenv("PGM_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("PGM_KEY_ALIAS")
+                keyPassword System.getenv("PGM_KEY_PASSWORD")
+            }
+        }
+    }
+    // No Google-encrypted dependency block in the APK (IzzyOnDroid and F-Droid flag it)
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
     buildTypes {
         release {
+            def ks = System.getenv("PGM_KEYSTORE")
+            if (ks && new File(ks).exists()) signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
