@@ -22,6 +22,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+          cache: gradle
       # the runner image already includes the Android SDK (ANDROID_HOME)
 
       - name: Build the web app
