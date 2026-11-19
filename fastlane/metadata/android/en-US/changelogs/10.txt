@@ -1,0 +1,1 @@
+Keyboard play: play everything with just the keyboard. The answer box stays ready, Enter submits and continues, Shift+Enter twice means I don't know, 1-9 picks tiles and options, number and letter keys match pairs, Alt+A/E/I/O/U/N types accents, and ? shows every shortcut. Turn it on or off in the sound panel or with the keyboard button on the menu.

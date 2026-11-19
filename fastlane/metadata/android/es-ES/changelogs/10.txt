@@ -1,0 +1,1 @@
+Jugar con teclado: juega a todo solo con el teclado. El cuadro de respuesta queda listo, Intro envía y continúa, Mayús+Intro dos veces es No lo sé, 1-9 elige fichas y opciones, números y letras unen parejas, Alt+A/E/I/O/U/N escribe acentos y ? muestra todos los atajos. Actívalo o desactívalo en el panel de sonido o con el botón de teclado del menú.

@@ -300,7 +300,17 @@ E = rep(E, '$("overIsland").hidden = !conquered;', '$("overIsland").hidden = !co
 
 CEFR = ["cefr_es1.js", "cefr_es2.js", "cefr_en1.js", "cefr_en2.js"]
 E = rep(E, '$("sylBody").innerHTML = S.syllabus ? `<ol class="syl">${S.syllabus.map((s,i) => `<li class="${S.done[i] ? "done" : ""}"><span class="n">${S.done[i] ? "✓" : i+1}</span><span>${esc(s)}</span></li>`).join("")}</ol>` : `<p class="empty">${esc(t("generating"))}</p>`;', '$("sylBody").innerHTML = sylHtml();')
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", E, rd("boot.js"), F]) + "\n"
+A = rep(A, "</style>", """/* keyboard play */
+body.kb .tile[data-kb]::before,body.kb .pr[data-kb]::before{content:attr(data-kb);display:inline-block;min-width:1.25em;margin-right:6px;padding:0 4px;border-radius:6px;background:var(--field);border:1px solid var(--line);font-size:.75rem;color:var(--muted);vertical-align:middle}
+body.kb .sq{counter-reset:kbo}body.kb .sq .sopt::before,body.kb #quizOpts .tile::before,body.kb #quizBuild .tile[data-bi]::before{counter-increment:kbo;content:counter(kbo);display:inline-block;min-width:1.25em;margin-right:6px;padding:0 4px;border-radius:6px;background:var(--field);border:1px solid var(--line);font-size:.75rem;color:var(--muted)}
+body.kb #quizOpts,body.kb #quizBuild{counter-reset:kbo}
+.kbov{position:fixed;inset:0;z-index:60;background:rgba(10,8,30,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.kbbox{background:var(--card);color:var(--ink);border-radius:20px;padding:20px;max-width:520px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--shadow)}
+.kbbox h2{margin:0 0 12px}.kbt{width:100%;border-collapse:collapse;margin:12px 0}.kbt td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:top}.kbt td:first-child{white-space:nowrap;padding-right:12px}
+kbd{font-family:ui-monospace,monospace;font-size:.8rem;background:var(--field);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px}
+.srowbtn{width:100%;margin-top:4px}
+</style>""")
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("keyboard.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----
