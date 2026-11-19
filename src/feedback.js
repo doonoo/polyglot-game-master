@@ -1,20 +1,22 @@
 /* ===================== Clearer feedback: the question, your mistakes marked, what went wrong ===================== */
 Object.assign(I18N.en, {
-  fbQ:"Question:", fbWhat:"What went wrong",
+  fbQ:"Question:", fbWhat:"What went wrong", fbTip:"Grammar tip",
   fbLook:"“{y}” is not “{b}”. They look alike, but they are different words.",
   fbLookM:"“{y}” ({ym}) is not “{b}” ({bm}). They look alike, but they mean different things.",
   fbSwap:"You wrote “{y}” where the answer has “{b}”.",
   fbMissing:"Missing: {w}.", fbExtra:"Not needed: {w}.", fbOrder:"Right words, wrong order.",
   fbAcc:"Check the accents: {w}.",
+  fbEnd:"“{y}” should be “{b}”: same word, different ending. Check that it matches who is doing it (verbs) or the gender and number of the noun (adjectives, articles).",
   fbSerEstar:"Ser or estar: use estar for states and conditions (tired, sick, happy right now, where something is) and ser for what something is (identity, origin, job, time)."
 });
 Object.assign(I18N.es, {
-  fbQ:"Pregunta:", fbWhat:"Qué falló",
+  fbQ:"Pregunta:", fbWhat:"Qué falló", fbTip:"Consejo de gramática",
   fbLook:"«{y}» no es «{b}». Se parecen, pero son palabras distintas.",
   fbLookM:"«{y}» ({ym}) no es «{b}» ({bm}). Se parecen, pero significan cosas distintas.",
   fbSwap:"Escribiste «{y}» donde la respuesta tiene «{b}».",
   fbMissing:"Falta: {w}.", fbExtra:"Sobra: {w}.", fbOrder:"Las palabras están bien, pero el orden no.",
   fbAcc:"Revisa los acentos: {w}.",
+  fbEnd:"«{y}» debería ser «{b}»: misma palabra, otra terminación. Comprueba la persona del verbo o el género y número del sustantivo.",
   fbSerEstar:"Ser o estar: estar para estados y condiciones (cansado, enfermo, contento ahora, dónde está algo) y ser para lo que algo es (identidad, origen, profesión, hora)."
 });
 
@@ -70,6 +72,8 @@ function fbNotes(al, segs, sameBag){
       const ky = fbKey(y), kb = fbKey(b);
       if((FB_SER.has(ky) && FB_ESTAR.has(kb)) || (FB_ESTAR.has(ky) && FB_SER.has(kb))){ serEstar = true; continue; }
       const d = fbCharLev(ky, kb);
+      let pre = 0; while(pre < ky.length && pre < kb.length && ky[pre] === kb[pre]) pre++;
+      if(d > 0 && pre >= 3 && pre >= Math.min(ky.length, kb.length) - 3){ notes.push(t("fbEnd", {y, b})); continue; }
       if(d > 0 && d <= 2 && Math.min(ky.length, kb.length) >= 4){
         const ym = fbMeaning(y, al), bm = fbMeaning(b, al);
         notes.push(ym && bm && ym !== bm ? t("fbLookM", {y, b, ym, bm}) : t("fbLook", {y, b}));
@@ -89,12 +93,22 @@ function renderFeedback(){
   box.dataset.fb = "1";
   const q = j.question && j.qgame !== "Match Madness" ? `<div class="fbq"><b>${esc(t("fbQ"))}</b> ${esc(j.question)}</div>` : "";
   let you = j.gaveUp ? "" : `<div><b>${esc(t("you"))}</b> ${esc(j.yours)}</div>`, best = `<div><b>${esc(t("best"))}</b> ${esc(j.answer)}</div>`, notes = "";
+  const lang = j.qal || (S.target === "English" ? "en" : "es");
+  let segs = [], skip = new Set();
   if(!j.correct && !j.gaveUp && j.qgame !== "Match Madness" && j.yours){
     const al = fbAlign(j.yours, j.answer);
+    segs = al.segs;
     you = `<div><b>${esc(t("you"))}</b> ${fbHtml(al.ya)}</div>`;
     best = `<div><b>${esc(t("best"))}</b> ${fbHtml(al.ba)}</div>`;
-    const ns = fbNotes(j.qal || (S.target === "English" ? "en" : "es"), al.segs, al.sameBag);
+    const ns = fbNotes(lang, al.segs, al.sameBag);
+    if(ns.includes(t("fbSerEstar"))){ skip.add("ser"); skip.add("estar"); }
     if(ns.length) notes = `<div class="fbnotes"><b>${esc(t("fbWhat"))}</b><ul>${ns.map(n => `<li>${esc(n)}</li>`).join("")}</ul></div>`;
+  }
+  if(!j.correct && j.qgame !== "Match Madness" && j.answer){
+    // a tip about the grammar this sentence uses, preferring the part you got wrong
+    const already = String(j.feedback || "");
+    const tips = tipsFor(j.answer, j.gaveUp ? "" : j.yours, lang, segs, skip).filter(x => !already.includes(x.slice(0, 40)));
+    if(tips.length) notes += `<div class="fbnotes fbtips"><b>💡 ${esc(t("fbTip"))}</b><ul>${tips.map(n => `<li>${esc(n)}</li>`).join("")}</ul></div>`;
   }
   const btns = [...box.querySelectorAll("button")];
   box.innerHTML = q + you + best + notes;

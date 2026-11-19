@@ -33,6 +33,17 @@ fb = playWhy({game:"Classic Mine", target:"I live in Texas.", acc:["Vivo en Texa
 if(/me llamo/.test(fb)) fail("irrelevant tip shown for 'Vivo en Texas'", fb);
 fb = playWhy({game:"Classic Mine", target:"Where are you from?", acc:["¿De dónde eres?"], k:"s", al:"es", answerKey:"¿De dónde eres?"}, "Donde eres de");
 if(!/me llamo/.test(fb)) fail("relevant tip hidden for '¿De dónde eres?'", fb);
+// grammar tips: every miss gets one that matches the sentence
+jc = play({game:"Classic Mine", target:"I'm married.", acc:["Estoy casado.|Soy casado."], k:"s", al:"es", answerKey:"Estoy casado."}, "Tengo cansado");
+if(!jc.querySelector(".fbtips")) fail("no grammar tip on a miss");
+jc = play({game:"Classic Mine", target:"I want you to speak.", acc:["Quiero que hables."], k:"s", al:"es", answerKey:"Quiero que hables."}, "Quiero que hablas");
+if(!/subjunctive/i.test(jc.querySelector(".fbtips") ? jc.querySelector(".fbtips").textContent : "")) fail("subjunctive tip missing", jc.textContent.slice(-300));
+if(!/same word, different ending/.test(jc.querySelector(".fbnotes").textContent)) fail("ending note missing");
+P.S.current.plan.boss = false; Object.assign(P.S.current.challenge, {game:"Classic Mine", target:"She works here.", acc:["She works here."], k:"s", al:"en", answerKey:"She works here.", why:"", cw:[]}); $("giveUpBtn").click();
+if(!/he\/she\/it/.test($("judgeCard").textContent)) fail("tip missing after I don't know");
+const cov = {es:[0,0], en:[0,0]};
+for(const l of ["es","en"]) for(const lv in P.COURSE[l]) for(const c of P.COURSE[l][lv]) for(const it of c.it){ cov[l][1]++; if(P.tipsFor(P.first(it[1]), "", l, []).length) cov[l][0]++; }
+for(const l of ["es","en"]) if(cov[l][0] / cov[l][1] < 0.95) fail("tip coverage too low", l, cov[l]);
 // content regression: soy casado is accepted
 const item = P.COURSE.es.A1.flatMap(c => c.it).find(it => it[0] === "I'm married.");
 if(!item || !P.expand(item[1]).includes("Soy casado.")) fail("'Soy casado' not accepted");

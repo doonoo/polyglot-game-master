@@ -1,0 +1,1 @@
+Cada fallo trae ahora un consejo de gramática sobre la frase que fallaste (98 % de las frases): ser o estar, gustar, subjuntivo, indefinido o imperfecto, pronombres, do/does, la -s de he/she/it y más. Primero salen los que tocan las palabras que fallaste, y una nota nueva explica las terminaciones de verbos y adjetivos.

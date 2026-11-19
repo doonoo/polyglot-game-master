@@ -239,7 +239,7 @@ BADGES.push(
 );
 
 /* ===================== Boot ===================== */
-if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick, sylHtml, cefrOrder, customCombos, applyPreset, curCfg, CPRESETS};
+if(window.__PGM_TEST) window.__pgm = {get Q(){ return Q; }, get S(){ return S; }, set S(v){ S = v; }, setup, expand, canon, first, blank, variantsOf, gradeLocal, numChallenge, enNum, esNum, COURSE, VOCAB, VLIST, VMAP, ISLANDS, NUMSYL, runTurn, startNew, sail, norm, canOverride, profile, exportCode, importCode, bankCount, LEVELS, bestVoice, esForm, enForm, CONJ, ESV, ENV, TRICKY, buildDaily, openDaily, openMistakes, STORIES, openStory, advanceStory, ensureQuests, questAdd, renderQuests, openQuiz, checkQ, nextQ, buildSchedule, reschedule, setNotify, questsForDay, updateNotifyBanner, webTick, sylHtml, cefrOrder, customCombos, applyPreset, curCfg, CPRESETS, tipsFor, TIP_ES, TIP_EN};
 loadProfile();
 initMenu();
 (() => {
