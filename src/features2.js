@@ -298,7 +298,7 @@ function skipEcho(){
   if(!ch || !ch.target) return;
   c.challenge = {game:String(ch.game), boss: plan.boss ? String(ch.boss || "") : "", task:String(ch.task || ""), target:String(ch.target),
     hint: S.mode === 3 ? "" : String(ch.hint || ""), answerKey:String(ch.answerKey || ""), speak:"", acc:ch.acc || [], al:ch.al || "", k:ch.k || "s",
-    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double};
+    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double, parts:Array.isArray(ch.parts) ? ch.parts : null};
   S.lastGame = c.challenge.game;
   save();
   $("answer").value = "";

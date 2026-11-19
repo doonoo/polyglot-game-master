@@ -96,7 +96,10 @@ function ckTick(){
   const now = Date.now(), dt = Math.min(1000, now - CK.last); CK.last = now;
   const on = S && S.status === "playing" && S.current && !$("game").hidden && ((S.clock && S.clock !== "off") || ckBossNow());
   const {chip, bar} = ckEls();
-  if(!on){ chip.hidden = true; bar.hidden = true; CK.cur = null; return; }
+  if(!on){
+    if(CK.cur && S && S.status === "playing") save();   // keep the time left when leaving the game
+    chip.hidden = true; bar.hidden = true; CK.cur = null; return;
+  }
   const paused = ckPaused();
   let left, full;
   if(ckMode() === "attack"){
@@ -106,8 +109,13 @@ function ckTick(){
     if(CK.cur !== S.current){ CK.cur = S.current; CK.budget = 0; }
     if(left <= 0){ chip.hidden = true; bar.hidden = true; ckEnd(); return; }
   } else {
-    if(CK.cur !== S.current){ CK.cur = S.current; CK.budget = ckBudget(S.current.challenge); CK.left = CK.budget; CK.lastSec = -1; }
+    if(CK.cur !== S.current){
+      CK.cur = S.current; CK.budget = ckBudget(S.current.challenge); CK.lastSec = -1;
+      const kept = +S.current.ckLeft;
+      CK.left = kept > 0 && kept <= CK.budget ? kept : CK.budget;
+    }
     if(!paused) CK.left -= dt;
+    S.current.ckLeft = Math.max(1, Math.round(CK.left));
     left = CK.left; full = CK.budget;
     if(left <= 0){
       CK.cur = null; CK.run = 0;

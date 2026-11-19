@@ -1,0 +1,1 @@
+Correcciones: la pantalla ya no se desliza hacia los lados al fallar; la barra superior ya no se superpone en teléfonos pequeños; salir al menú y volver ya no recarga el reloj; y cualquier forma válida cuenta en el golpe final del jefe.

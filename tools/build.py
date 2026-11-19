@@ -285,7 +285,7 @@ D = rep(D, "function nextLevel(l){ const i = LEVELS.indexOf(l); return i < 0 || 
 D = rep(D, "nextLevel(st.level)", "nextLevel(st.level, st)", 2)
 
 # ---- absorb / rendering ----
-E = rep(E, 'speak:String(ch.speak||"")}', 'speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double}')
+E = rep(E, 'speak:String(ch.speak||"")}', 'speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double, parts:Array.isArray(ch.parts) ? ch.parts : null}')
 E = rep(E, 'lesson.words.filter(w => w && w.w).slice(0,6)', 'lesson.words.filter(w => w && w.w).slice(0,12)')
 E = rep(E, 'const v = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(l.lang.toLowerCase().slice(0, 2)));', 'const v = bestVoice(l.lang);')
 E = rep(E, "  renderPanels();\n  if(fresh){", "  renderPanels();\n  renderExtras(fresh);\n  if(fresh){")
@@ -374,6 +374,20 @@ A = rep(A, "</style>", """/* the clock */
 .ckfloat{position:absolute;left:50%;top:100%;font-size:.85rem;font-weight:800;pointer-events:none;animation:ckFl 1s ease-out forwards}
 .ckfloat.up{color:#1E9E6E}.ckfloat.down{color:#E94B4B}
 @keyframes ckFl{from{opacity:1;transform:translate(-50%,0) scale(1.2)}to{opacity:0;transform:translate(-50%,18px) scale(1)}}
+</style>""")
+A = rep(A, "</style>", """/* bug fixes */
+html{overflow-x:hidden;overflow-x:clip}
+#game,#menu,#over,#quiz,#storyPage{overflow-x:clip}
+.hud-mid{overflow:hidden}
+.hud-r{white-space:nowrap;flex-wrap:nowrap}
+.hearts,.streak,.ckchip{white-space:nowrap}
+@media (max-width:420px){
+  .hud-in{grid-template-columns:auto 1fr;row-gap:6px;padding:8px 12px}
+  .hud-r{justify-self:end;gap:4px}
+  .hud-mid{grid-column:1/-1;grid-row:2}
+  .hearts{font-size:.95rem;letter-spacing:0}
+  .iconbtn{padding:3px 4px}
+}
 </style>""")
 A = rep(A, "</style>", """/* boss bar */
 .bossbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 16px;background:linear-gradient(90deg,#2A0A1A,#4A0F2E);color:#fff;font-weight:800}

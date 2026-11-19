@@ -435,6 +435,19 @@ body.noanim *,body.noanim *::before,body.noanim *::after{animation:none!importan
 .ckfloat{position:absolute;left:50%;top:100%;font-size:.85rem;font-weight:800;pointer-events:none;animation:ckFl 1s ease-out forwards}
 .ckfloat.up{color:#1E9E6E}.ckfloat.down{color:#E94B4B}
 @keyframes ckFl{from{opacity:1;transform:translate(-50%,0) scale(1.2)}to{opacity:0;transform:translate(-50%,18px) scale(1)}}
+/* bug fixes */
+html{overflow-x:hidden;overflow-x:clip}
+#game,#menu,#over,#quiz,#storyPage{overflow-x:clip}
+.hud-mid{overflow:hidden}
+.hud-r{white-space:nowrap;flex-wrap:nowrap}
+.hearts,.streak,.ckchip{white-space:nowrap}
+@media (max-width:420px){
+  .hud-in{grid-template-columns:auto 1fr;row-gap:6px;padding:8px 12px}
+  .hud-r{justify-self:end;gap:4px}
+  .hud-mid{grid-column:1/-1;grid-row:2}
+  .hearts{font-size:.95rem;letter-spacing:0}
+  .iconbtn{padding:3px 4px}
+}
 /* boss bar */
 .bossbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 16px;background:linear-gradient(90deg,#2A0A1A,#4A0F2E);color:#fff;font-weight:800}
 .bb-hp{display:flex;align-items:center;gap:5px}
@@ -10329,7 +10342,7 @@ function skipEcho(){
   if(!ch || !ch.target) return;
   c.challenge = {game:String(ch.game), boss: plan.boss ? String(ch.boss || "") : "", task:String(ch.task || ""), target:String(ch.target),
     hint: S.mode === 3 ? "" : String(ch.hint || ""), answerKey:String(ch.answerKey || ""), speak:"", acc:ch.acc || [], al:ch.al || "", k:ch.k || "s",
-    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double};
+    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double, parts:Array.isArray(ch.parts) ? ch.parts : null};
   S.lastGame = c.challenge.game;
   save();
   $("answer").value = "";
@@ -12037,7 +12050,10 @@ function ckTick(){
   const now = Date.now(), dt = Math.min(1000, now - CK.last); CK.last = now;
   const on = S && S.status === "playing" && S.current && !$("game").hidden && ((S.clock && S.clock !== "off") || ckBossNow());
   const {chip, bar} = ckEls();
-  if(!on){ chip.hidden = true; bar.hidden = true; CK.cur = null; return; }
+  if(!on){
+    if(CK.cur && S && S.status === "playing") save();   // keep the time left when leaving the game
+    chip.hidden = true; bar.hidden = true; CK.cur = null; return;
+  }
   const paused = ckPaused();
   let left, full;
   if(ckMode() === "attack"){
@@ -12047,8 +12063,13 @@ function ckTick(){
     if(CK.cur !== S.current){ CK.cur = S.current; CK.budget = 0; }
     if(left <= 0){ chip.hidden = true; bar.hidden = true; ckEnd(); return; }
   } else {
-    if(CK.cur !== S.current){ CK.cur = S.current; CK.budget = ckBudget(S.current.challenge); CK.left = CK.budget; CK.lastSec = -1; }
+    if(CK.cur !== S.current){
+      CK.cur = S.current; CK.budget = ckBudget(S.current.challenge); CK.lastSec = -1;
+      const kept = +S.current.ckLeft;
+      CK.left = kept > 0 && kept <= CK.budget ? kept : CK.budget;
+    }
     if(!paused) CK.left -= dt;
+    S.current.ckLeft = Math.max(1, Math.round(CK.left));
     left = CK.left; full = CK.budget;
     if(left <= 0){
       CK.cur = null; CK.run = 0;
@@ -12193,6 +12214,7 @@ generate = (orig => function(st, plan){
     for(let i = 0; i < 8; i++){ const r = orig(st, Object.assign({}, plan, {key:plan.bossAlt})); if(r && r.challenge && r.challenge.game === "Classic Mine" && r.challenge.target !== a.target){ b = r.challenge; break; } }
     if(a.game === "Classic Mine" && b){
       ch = Object.assign({}, a, {target:a.target + "  ➕  " + b.target, acc:bossCombine(a, b), answerKey:a.answerKey + " " + b.answerKey, double:true,
+        parts:[{acc:a.acc, key:a.answerKey}, {acc:b.acc, key:b.answerKey}],
         why:(a.why || "") + "\n\n" + (b.why || ""), cw:[]});
       ch.task = `👹 ${name}: ${t("bfFinal")}`;
     }
@@ -12210,8 +12232,20 @@ generate = (orig => function(st, plan){
 })(generate);
 
 gradeLocal = (orig => function(st, ch, answer, force){
-  if(ch && ch.strict && st && st.mode !== 3) return orig(Object.assign({}, st, {mode:3}), ch, answer, force);
-  return orig(st, ch, answer, force);
+  const g = ch && ch.strict && st && st.mode !== 3 ? Object.assign({}, st, {mode:3}) : st;
+  // Final blow: try every split point and grade each sentence against its own answers,
+  // so any valid wording of either sentence counts (the combined list is only a sample)
+  if(ch && ch.double && Array.isArray(ch.parts) && ch.parts.length === 2 && typeof answer === "string" && answer.trim()){
+    const ws = answer.replace(/[➕+]/g, " ").replace(/\s+/g, " ").trim().split(" ");
+    for(let i = 1; i < ws.length; i++){
+      const one = (k, txt) => orig(g, Object.assign({}, ch, {acc:ch.parts[k].acc, answerKey:ch.parts[k].key, double:false, parts:null}), txt, false);
+      if(one(0, ws.slice(0, i).join(" ")).correct && one(1, ws.slice(i).join(" ")).correct){
+        const clean = ws.join(" ");
+        return orig(g, Object.assign({}, ch, {acc:[clean], double:false, parts:null}), clean, force);
+      }
+    }
+  }
+  return orig(g, ch, answer, force);
 })(gradeLocal);
 
 /* ---------- Rewards and feedback ---------- */
@@ -12654,7 +12688,7 @@ function absorb(res, answer, rolls, prevPlan){
   S.current = {
     plan,
     lesson:{title:String(lesson.title||""), body:String(lesson.body||""), words:Array.isArray(lesson.words) ? lesson.words.filter(w => w && w.w).slice(0,12) : []},
-    challenge:{game:String(ch.game || (plan && plan.game) || ""), boss: plan && plan.boss ? String(ch.boss || "") : "", task:String(ch.task||""), target:String(ch.target), hint: S.mode === 3 ? "" : String(ch.hint||""), answerKey:String(ch.answerKey||""), speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double}
+    challenge:{game:String(ch.game || (plan && plan.game) || ""), boss: plan && plan.boss ? String(ch.boss || "") : "", task:String(ch.task||""), target:String(ch.target), hint: S.mode === 3 ? "" : String(ch.hint||""), answerKey:String(ch.answerKey||""), speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double, parts:Array.isArray(ch.parts) ? ch.parts : null}
   };
   S.lastGame = S.current.challenge.game;
   if(plan && plan.scene) S.recentScenes = (S.recentScenes || []).concat(plan.scene).slice(-20);

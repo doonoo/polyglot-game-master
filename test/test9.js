@@ -32,7 +32,18 @@ for(const lang of ["en", "es"]){
         if(c.lesson.words.length) fail(lang, mode, "boss shows word list");
         if(!$("bossBar") || $("bossBar").hidden) fail(lang, mode, "no boss bar");
         if(!ch.strict) fail(lang, mode, "boss not strict");
-        if(ch.double) stat.doubles++;
+        if(ch.double){
+          stat.doubles++;
+          // any valid wording of each sentence must count, not just the sampled combinations
+          if(!Array.isArray(ch.parts) || ch.parts.length !== 2) fail(lang, mode, "double has no parts");
+          else {
+            const va = ch.parts[0].acc.flatMap(P.expand), vb = ch.parts[1].acc.flatMap(P.expand);
+            const late = va[va.length - 1] + " " + vb[vb.length - 1];
+            if(!P.gradeLocal(S, ch, late, false).correct) fail(lang, mode, "valid final-blow wording rejected", late);
+            if(!P.gradeLocal(S, ch, va[0] + " + " + vb[0], false).correct) fail(lang, mode, "final blow with a plus sign rejected");
+            if(P.gradeLocal(S, ch, va[0], false).correct) fail(lang, mode, "half a final blow accepted");
+          }
+        }
         const good = P.variantsOf(ch)[0];
         // strict accents: the accent-less answer must fail
         if(!stat.strictTested && ch.k === "s" && deacc(good) !== good){

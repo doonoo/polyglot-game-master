@@ -1,0 +1,1 @@
+Bug fixes: the screen no longer slides sideways when you get an answer wrong; the top bar no longer overlaps on small phones; leaving to the menu and coming back no longer refills the timer; and every valid wording now counts in a boss's final blow.

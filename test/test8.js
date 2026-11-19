@@ -41,6 +41,12 @@ function boot(lang){
     warp += 0; await sleep(500);
     if($("clockBar").firstChild.style.width !== w0) fail(lang, "clock ran while paused", w0, $("clockBar").firstChild.style.width);
     $("setBtn").click();
+    // leaving to the menu keeps the time left for this question
+    await sleep(300);
+    const keep = P.S.current.ckLeft;
+    $("menuBtn").click(); await sleep(250);
+    $("continueBtn").click(); await sleep(250);
+    if(!(P.S.current.ckLeft <= keep)) fail(lang, "timer refilled after menu", keep, P.S.current.ckLeft);
     // run out of time: counts as I don't know
     const n0 = P.S.stats.answered, cur = P.S.current;
     const fast = setInterval(() => warp += 1000, 100);

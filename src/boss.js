@@ -84,6 +84,7 @@ generate = (orig => function(st, plan){
     for(let i = 0; i < 8; i++){ const r = orig(st, Object.assign({}, plan, {key:plan.bossAlt})); if(r && r.challenge && r.challenge.game === "Classic Mine" && r.challenge.target !== a.target){ b = r.challenge; break; } }
     if(a.game === "Classic Mine" && b){
       ch = Object.assign({}, a, {target:a.target + "  ➕  " + b.target, acc:bossCombine(a, b), answerKey:a.answerKey + " " + b.answerKey, double:true,
+        parts:[{acc:a.acc, key:a.answerKey}, {acc:b.acc, key:b.answerKey}],
         why:(a.why || "") + "\n\n" + (b.why || ""), cw:[]});
       ch.task = `👹 ${name}: ${t("bfFinal")}`;
     }
@@ -101,8 +102,20 @@ generate = (orig => function(st, plan){
 })(generate);
 
 gradeLocal = (orig => function(st, ch, answer, force){
-  if(ch && ch.strict && st && st.mode !== 3) return orig(Object.assign({}, st, {mode:3}), ch, answer, force);
-  return orig(st, ch, answer, force);
+  const g = ch && ch.strict && st && st.mode !== 3 ? Object.assign({}, st, {mode:3}) : st;
+  // Final blow: try every split point and grade each sentence against its own answers,
+  // so any valid wording of either sentence counts (the combined list is only a sample)
+  if(ch && ch.double && Array.isArray(ch.parts) && ch.parts.length === 2 && typeof answer === "string" && answer.trim()){
+    const ws = answer.replace(/[➕+]/g, " ").replace(/\s+/g, " ").trim().split(" ");
+    for(let i = 1; i < ws.length; i++){
+      const one = (k, txt) => orig(g, Object.assign({}, ch, {acc:ch.parts[k].acc, answerKey:ch.parts[k].key, double:false, parts:null}), txt, false);
+      if(one(0, ws.slice(0, i).join(" ")).correct && one(1, ws.slice(i).join(" ")).correct){
+        const clean = ws.join(" ");
+        return orig(g, Object.assign({}, ch, {acc:[clean], double:false, parts:null}), clean, force);
+      }
+    }
+  }
+  return orig(g, ch, answer, force);
 })(gradeLocal);
 
 /* ---------- Rewards and feedback ---------- */
