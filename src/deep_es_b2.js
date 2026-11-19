@@ -10,7 +10,7 @@ deep("es", "B2", {
  ["We hoped that they would win.","Esperábamos que ganaran.|Esperábamos que ganasen.","ganaran","Esperábamos que ganaban."],
  ["It surprised me that she said that.","Me sorprendió que dijera eso.|Me sorprendió que dijese eso.","dijera","Me sorprendió que decía eso."],
  ["I left before he arrived.","Me fui antes de que llegara.|Me fui antes de que llegase.","llegara","Me fui antes de que llegaba."],
- ["They asked me to bring wine.","Me pidieron que trajera vino.|Me pidieron que trajese vino.","trajera","Me pidieron que traiga vino ayer."]
+ ["They asked me to bring wine.","Me pidieron que trajera vino.|Me pidieron que trajese vino.","trajera","Me pidieron que traje vino."]
 ],
 "Unreal conditions: si tuviera, haría":[
  ["If I had money, I would travel.","Si tuviera dinero, viajaría.|Si tuviese dinero, viajaría.","tuviera","Si tendría dinero, viajaría."],
@@ -100,7 +100,7 @@ deep("es", "B2", {
  ["Although it's raining, we'll go out.","Aunque llueve, saldremos.|Aunque está lloviendo, saldremos.","llueve","Aunque llueve, salimos ayer."],
  ["Even if it rains, we'll go out.","Aunque llueva, saldremos.","llueva","Aunque lloverá, saldremos."],
  ["Despite the cold, we went for a walk.","A pesar del frío, fuimos a pasear.|A pesar del frío, salimos a caminar.","pesar","A pesar de el frío, fuimos a pasear."],
- ["Although he's rich, he's not happy.","Aunque es rico, no es feliz.","rico","Aunque está rico, no es feliz."],
+ ["Although he's rich, he's not happy.","Aunque es rico, no es feliz.","rico","Aunque está ricos, no es feliz."],
  ["Even if you don't believe me, it's true.","Aunque no me creas, es verdad.","creas","Aunque no me crees, es verdad mañana."],
  ["Despite being tired, she kept working.","A pesar de estar cansada, siguió trabajando.","cansada","A pesar de que estar cansada, siguió trabajando."],
  ["Although I studied, I failed.","Aunque estudié, suspendí.|Aunque estudié, reprobé.","estudié","Aunque estudiara, suspendí."],
@@ -122,11 +122,11 @@ deep("es", "B2", {
 ],
 "Verbs of becoming: ponerse, volverse, hacerse":[
  ["She got nervous.","Se puso nerviosa.","nerviosa","Se hizo nerviosa."],
- ["He became rich.","Se hizo rico.","rico","Se puso rico."],
+ ["He became rich.","Se hizo rico.","rico","Se hizo ricos."],
  ["He went crazy.","Se volvió loco.","loco","Se puso loco para siempre."],
  ["I turned red.","Me puse rojo.|Me puse roja.","rojo","Me hice rojo."],
  ["They became friends.","Se hicieron amigos.","amigos","Se pusieron amigos."],
- ["The sky turned dark.","El cielo se puso oscuro.|El cielo se oscureció.","cielo","El cielo se hizo oscuro de repente sí."],
+ ["The sky turned dark.","El cielo se puso oscuro.|El cielo se oscureció.","cielo","El cielo se puso oscura."],
  ["She became a lawyer.","Se hizo abogada.|Llegó a ser abogada.","abogada","Se puso abogada."],
  ["He has become very selfish.","Se ha vuelto muy egoísta.","egoísta","Se ha puesto muy egoísta para siempre."],
  ["Don't get angry.","No te enfades.|No te enojes.","enfades","No te enfadas."],

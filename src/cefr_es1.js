@@ -109,7 +109,7 @@ ES_A1.push(
  ["Is the airport far?","¿Está lejos el aeropuerto?|¿El aeropuerto está lejos?","lejos","¿Es lejos el aeropuerto?"]
  ]},
 {t:"Introducing yourself", k:"f",
- b:"Give your name with **me llamo** or **soy**, your origin with **soy de**, your age with **tengo ... años** and your job with **soy** + job (no article). Ask the same: **¿Cómo te llamas?**, **¿De dónde eres?**, **¿Cuántos años tienes?**, **¿A qué te dedicas?**",
+ b:"Give your name with **me llamo** or **soy**, your origin with **soy de**, your age with **tengo ... años**, your job with **soy** + job (no article), and your marital status with **estoy casado/a** (in Latin America **soy casado/a** is common too). Ask the same: **¿Cómo te llamas?**, **¿De dónde eres?**, **¿Cuántos años tienes?**, **¿A qué te dedicas?**",
  w:[["me llamo","my name is"],["¿cómo te llamas?","what's your name?"],["¿de dónde eres?","where are you from?"],["tengo 30 años","I'm 30"],["¿a qué te dedicas?","what do you do?"],["mucho gusto / encantado","nice to meet you"]],
  it:[
  ["My name is Ana.","Me llamo Ana.|Soy Ana.|Mi nombre es Ana.","llamo","Mi llamo Ana."],

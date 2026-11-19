@@ -20,7 +20,7 @@ deep("es", "A2", {
  ["They always lose.","{Ellos} siempre pierden.","pierden","Ellos siempre perden."],
  ["Do you remember my name?","¿Recuerdas mi nombre?|¿Te acuerdas de mi nombre?","nombre","¿Recordas mi nombre?"],
  ["He returns at six.","{Él} vuelve a las seis.|{Él} regresa a las seis.","vuelve","Él volve a las seis."],
- ["I ask for the bill.","Pido la cuenta.","Pido","Pedo la cuenta."],
+ ["I ask for the bill.","Pido la cuenta.","Pido","Pedio la cuenta."],
  ["How much does it cost?","¿Cuánto cuesta?","cuesta","¿Cuánto costa?"],
  ["We think it's a good idea.","Pensamos que es una buena idea.|Creemos que es una buena idea.","Pensamos","Piensamos que es una buena idea."]
 ],
@@ -46,7 +46,7 @@ deep("es", "A2", {
  ["He's working right now.","{Él} está trabajando ahora mismo.","trabajando","Él es trabajando ahora mismo."],
  ["The children are playing.","Los niños están jugando.","jugando","Los niños están juegando."],
  ["Are you listening to me?","¿Me estás escuchando?|¿Estás escuchándome?","escuchando","¿Me estás escuchado?"],
- ["We are waiting for the bus.","Estamos esperando el autobús.","esperando","Estamos esperando por el autobús."]
+ ["We are waiting for the bus.","Estamos esperando el autobús.","esperando","Estamos esperado el autobús."]
 ],
 "Direct object pronouns: lo, la, los, las":[
  ["Do you have the keys? Yes, I have them.","¿Tienes las llaves? Sí, las tengo.","las","¿Tienes las llaves? Sí, los tengo."],
@@ -97,16 +97,16 @@ deep("es", "A2", {
  ["It was very hot.","Hizo mucho calor.","calor","Hizo muy calor."]
 ],
 "Imperfect: how things used to be":[
- ["When I was a child, I played a lot.","Cuando era niño, jugaba mucho.|Cuando era niña, jugaba mucho.","jugaba","Cuando fui niño, jugué mucho siempre."],
- ["We used to go to the beach every summer.","Íbamos a la playa todos los veranos.|Íbamos a la playa cada verano.","Íbamos","Fuimos a la playa todos los veranos."],
- ["My grandmother cooked very well.","Mi abuela cocinaba muy bien.","cocinaba","Mi abuela cocinó muy bien siempre."],
- ["It was raining.","Llovía.|Estaba lloviendo.","Llovía","Llovió siempre."],
- ["She had long hair.","{Ella} tenía el pelo largo.","tenía","Ella tuvo el pelo largo antes siempre."],
- ["They lived in a small house.","{Ellos} vivían en una casa pequeña.","vivían","Ellos vivieron en una casa pequeña siempre."],
- ["I used to read every night.","Leía todas las noches.|Leía cada noche.","Leía","Leí todas las noches siempre."],
+ ["When I was a child, I played a lot.","Cuando era niño, jugaba mucho.|Cuando era niña, jugaba mucho.","jugaba","Cuando era niño, jugabo mucho."],
+ ["We used to go to the beach every summer.","Íbamos a la playa todos los veranos.|Íbamos a la playa cada verano.","Íbamos","Íbamos en la playa todos los veranos."],
+ ["My grandmother cooked very well.","Mi abuela cocinaba muy bien.","cocinaba","Mi abuela cocinaba mucho bien."],
+ ["It was raining.","Llovía.|Estaba lloviendo.","Llovía","Estaba llovido."],
+ ["She had long hair.","{Ella} tenía el pelo largo.","tenía","Ella tenía el pelo larga."],
+ ["They lived in a small house.","{Ellos} vivían en una casa pequeña.","vivían","Ellos vivían en una casa pequeño."],
+ ["I used to read every night.","Leía todas las noches.|Leía cada noche.","Leía","Leía todas las noche."],
  ["There were many trees here.","Aquí había muchos árboles.|Había muchos árboles aquí.","había","Aquí habían muchos árboles."],
- ["We were happy.","Éramos felices.|Estábamos contentos.","felices","Fuimos felices siempre."],
- ["What did you want to be?","¿Qué querías ser?","querías","¿Qué quisiste ser siempre?"]
+ ["We were happy.","Éramos felices.|Estábamos contentos.","felices","Éramos feliz."],
+ ["What did you want to be?","¿Qué querías ser?","querías","¿Qué quieras ser?"]
 ],
 "Por vs para":[
  ["This gift is for my mother.","Este regalo es para mi madre.|Este regalo es para mi mamá.","para","Este regalo es por mi madre."],
@@ -127,7 +127,7 @@ deep("es", "A2", {
  ["It's better than before.","Es mejor que antes.|Está mejor que antes.","mejor","Es más bueno que antes."],
  ["My sister is older than me.","Mi hermana es mayor que yo.","mayor","Mi hermana es mayor que mí."],
  ["I have as many books as you.","Tengo tantos libros como tú.","tantos","Tengo tan libros como tú."],
- ["The weather today is worse.","Hoy el tiempo está peor.|El tiempo de hoy es peor.","peor","Hoy el tiempo está más malo."],
+ ["The weather today is worse.","Hoy el tiempo está peor.|El tiempo de hoy es peor.","peor","Hoy el tiempo está más peor."],
  ["He earns more than a thousand euros.","{Él} gana más de mil euros.","más","Él gana más que mil euros."],
  ["Spanish is easier than German.","El español es más fácil que el alemán.","fácil","El español es más fácil de el alemán."],
  ["She works as much as I do.","{Ella} trabaja tanto como yo.","tanto","Ella trabaja tan como yo."]
@@ -201,7 +201,7 @@ deep("es", "A2", {
  ["He bought his mother flowers.","{Él} le compró flores a su madre.|{Él} le compró flores a su mamá.","flores","Él la compró flores a su madre."],
  ["Can you lend me money?","¿Me puedes prestar dinero?|¿Puedes prestarme dinero?|¿Me presta dinero?","dinero","¿Me puedes prestas dinero?"],
  ["We show them the city.","Les enseñamos la ciudad.|Les mostramos la ciudad.","ciudad","Los enseñamos la ciudad."],
- ["The teacher asks me a question.","El profesor me hace una pregunta.|La profesora me hace una pregunta.","pregunta","El profesor me pregunta una pregunta."],
+ ["The teacher asks me a question.","El profesor me hace una pregunta.|La profesora me hace una pregunta.","pregunta","El profesor me hace un pregunta."],
  ["I'm going to give you a present.","Te voy a dar un regalo.|Voy a darte un regalo.","regalo","Te voy dar un regalo."]
 ],
 "Possessive pronouns: mío, tuyo, suyo":[
@@ -280,7 +280,7 @@ deep("es", "A2", {
  ["Do you want to come to my birthday party?","¿Quieres venir a mi fiesta de cumpleaños?","cumpleaños","¿Quieres venir en mi fiesta de cumpleaños?"],
  ["Great, see you there!","¡Genial, nos vemos allí!|¡Genial, nos vemos allá!","vemos","¡Genial, vemos allí!"],
  ["I can't, I have plans.","No puedo, tengo planes.|No puedo, ya tengo planes.","planes","No podo, tengo planes."],
- ["What a shame!","¡Qué pena!|¡Qué lástima!","pena","¡Qué penoso!"],
+ ["What a shame!","¡Qué pena!|¡Qué lástima!","pena","¡Qué penas!"],
  ["Shall we meet at eight?","¿Quedamos a las ocho?|¿Nos vemos a las ocho?","ocho","¿Quedamos en las ocho?"],
  ["Thanks for the invitation.","Gracias por la invitación.","invitación","Gracias para la invitación."],
  ["Another time, OK?","Otro día, ¿vale?|Otro día, ¿de acuerdo?|En otra ocasión, ¿vale?","día","Otra día, ¿vale?"],
@@ -308,8 +308,8 @@ deep("es", "A2", {
  ["It rained all weekend.","Llovió todo el fin de semana.","Llovió","Llovía todo el fin de semana una vez."],
  ["We had dinner with friends.","Cenamos con unos amigos.|Cenamos con amigos.","Cenamos","Cenábamos con amigos una vez."],
  ["I slept a lot.","Dormí mucho.","Dormí","Dormé mucho."],
- ["What a pity!","¡Qué pena!|¡Qué lástima!","pena","¡Qué penoso!"],
+ ["What a pity!","¡Qué pena!|¡Qué lástima!","pena","¡Qué penas!"],
  ["Saturday I worked.","El sábado trabajé.","trabajé","El sábado trabajo ayer."],
- ["How was your weekend?","¿Qué tal tu fin de semana?|¿Cómo fue tu fin de semana?|¿Cómo estuvo tu fin de semana?","semana","¿Cómo era tu fin de semana?"]
+ ["How was your weekend?","¿Qué tal tu fin de semana?|¿Cómo fue tu fin de semana?|¿Cómo estuvo tu fin de semana?","semana","¿Cómo fuiste tu fin de semana?"]
 ]
 });

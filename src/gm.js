@@ -143,7 +143,7 @@ function lev(a, b){
 }
 function boldDiff(best, answer, ch, strict){
   const have = new Set(nrm(answer || "", ch, strict).split(" "));
-  return best.split(" ").map(w => { const k = nrm(w, ch, strict); return k && !k.split(" ").every(x => have.has(x)) ? "**" + w + "**" : w; }).join(" ");
+  return best.split(" ").map(w => { const k = nrm(w, ch, strict); return k && !k.split(" ").every(x => have.has(x)) ? "**" + w + "**" : w; }).join(" ").replace(/\*\* \*\*/g, " ");
 }
 function gradeLocal(st, ch, answer, force){
   const L = GMT[LANG_CODE[st.native]] || GMT.en;
@@ -191,7 +191,14 @@ function gradeLocal(st, ch, answer, force){
     }
   }
   const boss = !!ch.boss;
-  const headline = correct ? pick(boss ? L.bossWin : L.ok) : answer === null ? pick(L.idk) : pick(boss ? L.bossLose : L.bad);
+  // "Missed by a pixel" only when it really was close; otherwise a plain miss line
+  let badPool = L.bad;
+  if(!correct && answer !== null && !boss){
+    const a = nrm(answer, ch, false), b = nrm(best || "", ch, false), mx = Math.max(a.length, b.length) || 1;
+    const near = 1 - lev([...a], [...b]) / mx >= 0.8;
+    badPool = L.bad.filter((x, i) => near ? (i === 3 || i === 4) : (i !== 3 && i !== 4));
+  }
+  const headline = correct ? pick(boss ? L.bossWin : L.ok) : answer === null ? pick(L.idk) : pick(boss ? L.bossLose : badPool);
   return {correct, headline, feedback, answer:shown, struggled: forced ? [] : struggled, al:ch.al};
 }
 

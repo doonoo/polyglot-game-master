@@ -292,7 +292,7 @@ E = rep(E, "  renderPanels();\n  if(fresh){", "  renderPanels();\n  renderExtras
 E = rep(E, "if(Array.isArray(res.syllabus) && res.syllabus.length >= 10){\n      S.syllabus = res.syllabus.slice(0, 15).map(String);", "if(Array.isArray(res.syllabus) && res.syllabus.length >= 1){\n      S.syllabus = res.syllabus.slice(0, 40).map(String);")
 E = rep(E, '$("game").hidden = true; $("over").hidden = true; $("menu").hidden = false;', '$("game").hidden = true; $("over").hidden = true; $("book").hidden = true; $("quiz").hidden = true; $("statsPage").hidden = true; ["storiesPage","storyPage","notifyPage"].forEach(x => $(x).hidden = true); $("menu").hidden = false;')
 E = rep(E, "refreshContinue(); window.scrollTo(0,0);", "refreshContinue(); renderDaily(); window.scrollTo(0,0);")
-E = rep(E, 'yours: answer, gaveUp: answer === null};', 'yours: answer, gaveUp: answer === null, al: j.al || ""};')
+E = rep(E, 'yours: answer, gaveUp: answer === null};', 'yours: answer, gaveUp: answer === null, al: j.al || "", question: prevCh ? String(prevCh.target || "") : "", qgame: prevCh ? String(prevCh.game || "") : "", qal: prevCh ? String(prevCh.al || "") : ""};')
 E = rep(E, 'L.push({text: j.answer, lang: tgt});', 'L.push({text: j.answer, lang: LANG_CODE[S.native] === j.al ? nat : tgt});')
 E = rep(E, '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</button>` : ""}</div>`;',
         '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</button>` : ""}${canOverride() ? `<button class="listen" data-act="override">✋ ${esc(t("override"))}</button>` : ""}</div>`;')
@@ -377,6 +377,13 @@ A = rep(A, "</style>", """/* the clock */
 </style>""")
 A = rep(A, "</style>", """/* bug fixes */
 html{overflow-x:hidden;overflow-x:clip}
+.fbq{padding-bottom:6px;margin-bottom:6px;border-bottom:1px dashed var(--line)}
+.dx{border-radius:5px;padding:0 3px}
+.dx-del{background:rgba(233,75,75,.16);color:#E94B4B;text-decoration:line-through;text-decoration-thickness:2px}
+.dx-add{background:rgba(46,196,140,.18);color:#1E9E6E;font-weight:800}
+.dx-acc{background:rgba(255,193,59,.22);border-bottom:2px dashed #E8A317}
+.fbnotes{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);font-size:.92em}
+.fbnotes ul{margin:4px 0 0;padding-left:18px}.fbnotes li{margin:2px 0}
 #game,#menu,#over,#quiz,#storyPage{overflow-x:clip}
 .hud-mid{overflow:hidden}
 .hud-r{white-space:nowrap;flex-wrap:nowrap}
@@ -399,7 +406,7 @@ A = rep(A, "</style>", """/* boss bar */
 .challenge.boss{animation:bossShake .5s ease-out}
 @keyframes bossShake{0%{transform:scale(.96) rotate(-1deg)}30%{transform:scale(1.02) rotate(1deg)}60%{transform:rotate(-.5deg)}100%{transform:none}}
 </style>""")
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", rd("content_islands3.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("stories3.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("timer.js"), "", rd("boss.js"), "", rd("keyboard.js"), "", rd("anim.js"), "", E, rd("boot.js"), F]) + "\n"
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", rd("content_islands3.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("stories3.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("timer.js"), "", rd("boss.js"), "", rd("feedback.js"), "", rd("keyboard.js"), "", rd("anim.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----

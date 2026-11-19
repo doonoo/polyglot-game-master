@@ -42,7 +42,7 @@ deep("en", "B2", {
  ["Ojalá estuvieras aquí.","I wish you were here.","were","I wish you are here."],
  ["Ojalá supiera hablar francés.","I wish I could speak French.|I wish I spoke French.","French","I wish I can speak French."],
  ["Si tan solo tuviera más dinero.","If only I had more money.","only","If only I have more money."],
- ["Ojalá dejara de llover.","I wish it would stop raining.","stop","I wish it stops raining."],
+ ["Ojalá dejara de llover.","I wish it would stop raining.","stop","I wish it stopping raining."],
  ["Ojalá hubiera estudiado más.","I wish I had studied more.|If only I had studied more.","studied","I wish I studied more back then before."],
  ["Ojalá no tuviera que trabajar mañana.","I wish I did not have to work tomorrow.","work","I wish I do not have to work tomorrow."],
  ["Ojalá me escucharas.","I wish you would listen to me.","listen","I wish you listen to me."],

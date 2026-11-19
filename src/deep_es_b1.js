@@ -38,9 +38,9 @@ deep("es", "B1", {
 ],
 "Conditional: would":[
  ["I would buy a house.","Compraría una casa.","Compraría","Compraré una casa si."],
- ["Would you help me?","¿Me ayudarías?|¿Me ayudaría (usted)?","ayudarías","¿Me ayudarás tú?"],
+ ["Would you help me?","¿Me ayudarías?|¿Me ayudaría (usted)?","ayudarías","¿Me ayudaría tú?"],
  ["It would be better to wait.","Sería mejor esperar.","Sería","Será mejor esperar si."],
- ["We would like to see the menu.","Nos gustaría ver la carta.|Quisiéramos ver la carta.|Nos gustaría ver el menú.","gustaría","Nos gustará ver la carta."],
+ ["We would like to see the menu.","Nos gustaría ver la carta.|Quisiéramos ver la carta.|Nos gustaría ver el menú.","gustaría","Nos gustaría ver el carta."],
  ["I wouldn't do that.","Yo no haría eso.|No haría eso.","haría","Yo no haceria eso."],
  ["Could you speak more slowly?","¿Podrías hablar más despacio?|¿Podría hablar más despacio?","despacio","¿Puedrías hablar más despacio?"],
  ["She said she would come.","{Ella} dijo que vendría.","vendría","Ella dijo que venirá."],
@@ -76,13 +76,13 @@ deep("es", "B1", {
  ["Don't eat that.","No comas eso.|No coma eso.","comas","No comes eso."],
  ["Please, come in.","Pase, por favor.|Pasa, por favor.|Adelante, por favor.","favor","Pasas, por favor tú."],
  ["Don't say anything.","No digas nada.|No diga nada.","digas","No dices nada."],
- ["Wait a moment, please.","Espere un momento, por favor.|Espera un momento, por favor.","momento","Esperas un momento, por favor."],
+ ["Wait a moment, please.","Espere un momento, por favor.|Espera un momento, por favor.","momento","Esperes un momento, por favor."],
  ["Don't go out.","No salgas.|No salga.","salgas","No sales tú."],
- ["Fill in this form.","Rellene este formulario.|Llene este formulario.|Rellena este formulario.","formulario","Rellenas este formulario."],
+ ["Fill in this form.","Rellene este formulario.|Llene este formulario.|Rellena este formulario.","formulario","Rellenes este formulario."],
  ["Don't be late.","No llegues tarde.|No llegue tarde.","llegues","No llegas tarde."],
  ["Sign here, please.","Firme aquí, por favor.|Firma aquí, por favor.","aquí","Firmas aquí, por favor tú."],
  ["Don't forget your passport.","No olvides tu pasaporte.|No olvide su pasaporte.|No te olvides del pasaporte.","pasaporte","No olvidas tu pasaporte."],
- ["Turn off your phones.","Apaguen sus teléfonos.|Apaguen los móviles.|Apaguen sus celulares.","Apaguen","Apagan sus teléfonos ustedes."]
+ ["Turn off your phones.","Apaguen sus teléfonos.|Apaguen los móviles.|Apaguen sus celulares.","Apaguen","Apaguen sus teléfono."]
 ],
 "Double object pronouns: me lo, se la":[
  ["I'll give it to you.","Te lo doy.|Te la doy.","doy","Lo te doy."],
@@ -193,15 +193,15 @@ deep("es", "B1", {
  ["It's already late.","Ya es tarde.","tarde","Ya está tarde."]
 ],
 "Superlatives and -ísimo":[
- ["This is the cheapest hotel in town.","Este es el hotel más barato de la ciudad.","barato","Este es el hotel más barato en la ciudad."],
+ ["This is the cheapest hotel in town.","Este es el hotel más barato de la ciudad.","barato","Este es el hotel más barato que la ciudad."],
  ["The film was very very good.","La película fue buenísima.|La película estuvo buenísima.","película","La película fue muy buenísima."],
  ["She is the youngest in the family.","{Ella} es la menor de la familia.|{Ella} es la más joven de la familia.","familia","Ella es la más menor de la familia."],
  ["It's extremely easy.","Es facilísimo.|Es muy fácil.","Es","Es facilisimo muy."],
  ["He's the best player on the team.","Es el mejor jugador del equipo.","mejor","Es el más bueno jugador del equipo."],
  ["It was really hot.","Hacía muchísimo calor.|Hizo muchísimo calor.","calor","Hacía muy muchísimo calor."],
  ["This is the most difficult exam.","Este es el examen más difícil.","difícil","Este es el más examen difícil."],
- ["The soup is very tasty.","La sopa está riquísima.|La sopa está muy rica.","sopa","La sopa es riquísima."],
- ["It's the oldest building in the city.","Es el edificio más antiguo de la ciudad.|Es el edificio más viejo de la ciudad.","edificio","Es el edificio más antiguo en la ciudad."],
+ ["The soup is very tasty.","La sopa está riquísima.|La sopa está muy rica.","sopa","La sopa está riquísimo."],
+ ["It's the oldest building in the city.","Es el edificio más antiguo de la ciudad.|Es el edificio más viejo de la ciudad.","edificio","Es el edificio más antiguo que la ciudad."],
  ["The worst part was the trip.","Lo peor fue el viaje.","peor","El más malo fue el viaje."]
 ],
 "Lo + adjective: lo bueno, lo mejor":[
@@ -219,7 +219,7 @@ deep("es", "B1", {
 "Past continuous: estaba + -ando":[
  ["We were watching a film.","Estábamos viendo una película.|Veíamos una película.","viendo","Estuvimos viendo una película cuando."],
  ["What were you thinking?","¿En qué estabas pensando?|¿Qué estabas pensando?","pensando","¿En qué estabas pensado?"],
- ["She was crying when I arrived.","{Ella} estaba llorando cuando llegué.|{Ella} lloraba cuando llegué.","llorando","Ella estaba llorando cuando llegaba."],
+ ["She was crying when I arrived.","{Ella} estaba llorando cuando llegué.|{Ella} lloraba cuando llegué.","llorando","Ella estaba llorado cuando llegué."],
  ["They were playing in the street.","Estaban jugando en la calle.|Jugaban en la calle.","jugando","Estaban juegando en la calle."],
  ["I was studying all night.","Estuve estudiando toda la noche.|Estaba estudiando toda la noche.","estudiando","Estuve estudiado toda la noche."],
  ["It was snowing in the mountains.","Estaba nevando en la montaña.|Nevaba en la montaña.","nevando","Estaba nievando en la montaña."],

@@ -156,9 +156,9 @@ deepTricky("es", {
  ["I gave him the book.","Le di el libro.","le","Lo di el libro.",["lo","le"]],
  ["I bought it yesterday.","Lo compré ayer.","lo","Le compré ayer.",["lo","le"]],
  ["Tell him the truth.","Dile la verdad.","dile","Dilo la verdad.",["dile","dilo"]],
- ["I know him well.","Lo conozco bien.","lo",null,["lo","le"]],
+ ["I know her well.","La conozco bien.","la","Le conozco bien a ella.",["la","le"]],
  ["I wrote her a letter.","Le escribí una carta.","le","La escribí una carta.",["le","la"]],
- ["Call her tomorrow.","Llámala mañana.","llámala","Llámale mañana a ella sí.",["llámala","llámale"]]
+ ["I'm buying it (the car).","Lo compro.","lo","Le compro el coche.",["lo","le"]]
 ],
 "Saber, poder, conocer":[
  ["Do you know Madrid?","¿Conoces Madrid?","conoces","¿Sabes Madrid?",["conoces","sabes"]],

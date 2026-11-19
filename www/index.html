@@ -437,6 +437,13 @@ body.noanim *,body.noanim *::before,body.noanim *::after{animation:none!importan
 @keyframes ckFl{from{opacity:1;transform:translate(-50%,0) scale(1.2)}to{opacity:0;transform:translate(-50%,18px) scale(1)}}
 /* bug fixes */
 html{overflow-x:hidden;overflow-x:clip}
+.fbq{padding-bottom:6px;margin-bottom:6px;border-bottom:1px dashed var(--line)}
+.dx{border-radius:5px;padding:0 3px}
+.dx-del{background:rgba(233,75,75,.16);color:#E94B4B;text-decoration:line-through;text-decoration-thickness:2px}
+.dx-add{background:rgba(46,196,140,.18);color:#1E9E6E;font-weight:800}
+.dx-acc{background:rgba(255,193,59,.22);border-bottom:2px dashed #E8A317}
+.fbnotes{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);font-size:.92em}
+.fbnotes ul{margin:4px 0 0;padding-left:18px}.fbnotes li{margin:2px 0}
 #game,#menu,#over,#quiz,#storyPage{overflow-x:clip}
 .hud-mid{overflow:hidden}
 .hud-r{white-space:nowrap;flex-wrap:nowrap}
@@ -4109,7 +4116,7 @@ function lev(a, b){
 }
 function boldDiff(best, answer, ch, strict){
   const have = new Set(nrm(answer || "", ch, strict).split(" "));
-  return best.split(" ").map(w => { const k = nrm(w, ch, strict); return k && !k.split(" ").every(x => have.has(x)) ? "**" + w + "**" : w; }).join(" ");
+  return best.split(" ").map(w => { const k = nrm(w, ch, strict); return k && !k.split(" ").every(x => have.has(x)) ? "**" + w + "**" : w; }).join(" ").replace(/\*\* \*\*/g, " ");
 }
 function gradeLocal(st, ch, answer, force){
   const L = GMT[LANG_CODE[st.native]] || GMT.en;
@@ -4157,7 +4164,14 @@ function gradeLocal(st, ch, answer, force){
     }
   }
   const boss = !!ch.boss;
-  const headline = correct ? pick(boss ? L.bossWin : L.ok) : answer === null ? pick(L.idk) : pick(boss ? L.bossLose : L.bad);
+  // "Missed by a pixel" only when it really was close; otherwise a plain miss line
+  let badPool = L.bad;
+  if(!correct && answer !== null && !boss){
+    const a = nrm(answer, ch, false), b = nrm(best || "", ch, false), mx = Math.max(a.length, b.length) || 1;
+    const near = 1 - lev([...a], [...b]) / mx >= 0.8;
+    badPool = L.bad.filter((x, i) => near ? (i === 3 || i === 4) : (i !== 3 && i !== 4));
+  }
+  const headline = correct ? pick(boss ? L.bossWin : L.ok) : answer === null ? pick(L.idk) : pick(boss ? L.bossLose : badPool);
   return {correct, headline, feedback, answer:shown, struggled: forced ? [] : struggled, al:ch.al};
 }
 
@@ -5737,7 +5751,7 @@ ES_A1.push(
  ["Is the airport far?","¿Está lejos el aeropuerto?|¿El aeropuerto está lejos?","lejos","¿Es lejos el aeropuerto?"]
  ]},
 {t:"Introducing yourself", k:"f",
- b:"Give your name with **me llamo** or **soy**, your origin with **soy de**, your age with **tengo ... años** and your job with **soy** + job (no article). Ask the same: **¿Cómo te llamas?**, **¿De dónde eres?**, **¿Cuántos años tienes?**, **¿A qué te dedicas?**",
+ b:"Give your name with **me llamo** or **soy**, your origin with **soy de**, your age with **tengo ... años**, your job with **soy** + job (no article), and your marital status with **estoy casado/a** (in Latin America **soy casado/a** is common too). Ask the same: **¿Cómo te llamas?**, **¿De dónde eres?**, **¿Cuántos años tienes?**, **¿A qué te dedicas?**",
  w:[["me llamo","my name is"],["¿cómo te llamas?","what's your name?"],["¿de dónde eres?","where are you from?"],["tengo 30 años","I'm 30"],["¿a qué te dedicas?","what do you do?"],["mucho gusto / encantado","nice to meet you"]],
  it:[
  ["My name is Ana.","Me llamo Ana.|Soy Ana.|Mi nombre es Ana.","llamo","Mi llamo Ana."],
@@ -7927,7 +7941,7 @@ deep("en", "B2", {
  ["Ojalá estuvieras aquí.","I wish you were here.","were","I wish you are here."],
  ["Ojalá supiera hablar francés.","I wish I could speak French.|I wish I spoke French.","French","I wish I can speak French."],
  ["Si tan solo tuviera más dinero.","If only I had more money.","only","If only I have more money."],
- ["Ojalá dejara de llover.","I wish it would stop raining.","stop","I wish it stops raining."],
+ ["Ojalá dejara de llover.","I wish it would stop raining.","stop","I wish it stopping raining."],
  ["Ojalá hubiera estudiado más.","I wish I had studied more.|If only I had studied more.","studied","I wish I studied more back then before."],
  ["Ojalá no tuviera que trabajar mañana.","I wish I did not have to work tomorrow.","work","I wish I do not have to work tomorrow."],
  ["Ojalá me escucharas.","I wish you would listen to me.","listen","I wish you listen to me."],
@@ -8388,7 +8402,7 @@ deep("es", "A1", {
  ["There's a problem.","Hay un problema.","problema","Hay una problema."],
  ["How many students are there?","¿Cuántos estudiantes hay?","Cuántos","¿Cuántos estudiantes están hay?"],
  ["There is a cat in the garden.","Hay un gato en el jardín.","gato","Está un gato en el jardín."],
- ["There are no buses today.","Hoy no hay autobuses.|No hay autobuses hoy.","autobuses","Hoy no hay autobús."],
+ ["There are no buses today.","Hoy no hay autobuses.|No hay autobuses hoy.","autobuses","Hoy no están autobuses."],
  ["There's a lot of traffic.","Hay mucho tráfico.","tráfico","Hay mucha tráfico."],
  ["What is there to eat?","¿Qué hay de comer?|¿Qué hay para comer?","comer","¿Qué está de comer?"]
 ],
@@ -8474,7 +8488,7 @@ deep("es", "A1", {
  ["On Wednesday I have class.","El miércoles tengo clase.","miércoles","En miércoles tengo clase."],
  ["It's a beautiful day.","Hace un día precioso.|Hace un día bonito.|Es un día bonito.","día","Hace una día bonito."],
  ["In spring there are many flowers.","En primavera hay muchas flores.","primavera","En primavera están muchas flores."],
- ["Today is the fifth of March.","Hoy es el cinco de marzo.","marzo","Hoy es cinco de Marzo."]
+ ["Today is the fifth of March.","Hoy es el cinco de marzo.","marzo","Hoy es el cinco en marzo."]
 ],
 "Home and rooms":[
  ["The living room is very big.","La sala es muy grande.|El salón es muy grande.","grande","La sala es mucho grande."],
@@ -8504,7 +8518,7 @@ deep("es", "A1", {
  ["I live in Texas.","Vivo en Texas.","Vivo","Vivo a Texas."],
  ["I'm thirty years old.","Tengo treinta años.","treinta","Soy treinta años."],
  ["I speak English and a little Spanish.","Hablo inglés y un poco de español.","poco","Hablo inglés y un poco español."],
- ["I'm married.","Estoy casado.|Estoy casada.","casado","Soy casado."],
+ ["I'm married.","Estoy casado.|Estoy casada.|Soy casado.|Soy casada.","casado","Tengo casado."],
  ["I have two children.","Tengo dos hijos.","hijos","Tengo dos hijo."],
  ["I work in a hospital.","Trabajo en un hospital.","hospital","Trabajo a un hospital."],
  ["I'm a student.","Soy estudiante.","estudiante","Estoy estudiante."],
@@ -8521,12 +8535,12 @@ deep("es", "A1", {
  ["Is the water free?","¿El agua es gratis?|¿El agua es gratuita?","gratis","¿La agua es gratis?"],
  ["Here you are.","Aquí tiene.|Aquí tienes.","Aquí","Aquí está tiene."],
  ["Can I pay by card?","¿Puedo pagar con tarjeta?","tarjeta","¿Puedo pagar en tarjeta?"],
- ["It's delicious.","Está delicioso.|Está muy rico.|Está riquísimo.","delicioso","Es delicioso."],
+ ["It's delicious.","Está delicioso.|Está muy rico.|Está riquísimo.|Es delicioso.","delicioso","Está deliciosos."],
  ["Keep the change.","Quédese con el cambio.|Quédate con el cambio.|Quédese con la vuelta.","cambio","Quede con el cambio."]
 ],
 "Shopping: prices and sizes":[
  ["I'm just looking, thanks.","Solo estoy mirando, gracias.|Solo miro, gracias.","mirando","Solo estoy mirar, gracias."],
- ["Do you have it in black?","¿Lo tiene en negro?|¿La tiene en negro?|¿Lo tienen en negro?","negro","¿Lo tiene de negro?"],
+ ["Do you have it in black?","¿Lo tiene en negro?|¿La tiene en negro?|¿Lo tienen en negro?","negro","¿Lo tiene a negro?"],
  ["It's cheap.","Es barato.|Es barata.|Está barato.","barato","Es baratos."],
  ["Where are the fitting rooms?","¿Dónde están los probadores?","probadores","¿Dónde son los probadores?"],
  ["It fits me well.","Me queda bien.","queda","Me queda bueno."],
@@ -8571,7 +8585,7 @@ deep("es", "A2", {
  ["They always lose.","{Ellos} siempre pierden.","pierden","Ellos siempre perden."],
  ["Do you remember my name?","¿Recuerdas mi nombre?|¿Te acuerdas de mi nombre?","nombre","¿Recordas mi nombre?"],
  ["He returns at six.","{Él} vuelve a las seis.|{Él} regresa a las seis.","vuelve","Él volve a las seis."],
- ["I ask for the bill.","Pido la cuenta.","Pido","Pedo la cuenta."],
+ ["I ask for the bill.","Pido la cuenta.","Pido","Pedio la cuenta."],
  ["How much does it cost?","¿Cuánto cuesta?","cuesta","¿Cuánto costa?"],
  ["We think it's a good idea.","Pensamos que es una buena idea.|Creemos que es una buena idea.","Pensamos","Piensamos que es una buena idea."]
 ],
@@ -8597,7 +8611,7 @@ deep("es", "A2", {
  ["He's working right now.","{Él} está trabajando ahora mismo.","trabajando","Él es trabajando ahora mismo."],
  ["The children are playing.","Los niños están jugando.","jugando","Los niños están juegando."],
  ["Are you listening to me?","¿Me estás escuchando?|¿Estás escuchándome?","escuchando","¿Me estás escuchado?"],
- ["We are waiting for the bus.","Estamos esperando el autobús.","esperando","Estamos esperando por el autobús."]
+ ["We are waiting for the bus.","Estamos esperando el autobús.","esperando","Estamos esperado el autobús."]
 ],
 "Direct object pronouns: lo, la, los, las":[
  ["Do you have the keys? Yes, I have them.","¿Tienes las llaves? Sí, las tengo.","las","¿Tienes las llaves? Sí, los tengo."],
@@ -8648,16 +8662,16 @@ deep("es", "A2", {
  ["It was very hot.","Hizo mucho calor.","calor","Hizo muy calor."]
 ],
 "Imperfect: how things used to be":[
- ["When I was a child, I played a lot.","Cuando era niño, jugaba mucho.|Cuando era niña, jugaba mucho.","jugaba","Cuando fui niño, jugué mucho siempre."],
- ["We used to go to the beach every summer.","Íbamos a la playa todos los veranos.|Íbamos a la playa cada verano.","Íbamos","Fuimos a la playa todos los veranos."],
- ["My grandmother cooked very well.","Mi abuela cocinaba muy bien.","cocinaba","Mi abuela cocinó muy bien siempre."],
- ["It was raining.","Llovía.|Estaba lloviendo.","Llovía","Llovió siempre."],
- ["She had long hair.","{Ella} tenía el pelo largo.","tenía","Ella tuvo el pelo largo antes siempre."],
- ["They lived in a small house.","{Ellos} vivían en una casa pequeña.","vivían","Ellos vivieron en una casa pequeña siempre."],
- ["I used to read every night.","Leía todas las noches.|Leía cada noche.","Leía","Leí todas las noches siempre."],
+ ["When I was a child, I played a lot.","Cuando era niño, jugaba mucho.|Cuando era niña, jugaba mucho.","jugaba","Cuando era niño, jugabo mucho."],
+ ["We used to go to the beach every summer.","Íbamos a la playa todos los veranos.|Íbamos a la playa cada verano.","Íbamos","Íbamos en la playa todos los veranos."],
+ ["My grandmother cooked very well.","Mi abuela cocinaba muy bien.","cocinaba","Mi abuela cocinaba mucho bien."],
+ ["It was raining.","Llovía.|Estaba lloviendo.","Llovía","Estaba llovido."],
+ ["She had long hair.","{Ella} tenía el pelo largo.","tenía","Ella tenía el pelo larga."],
+ ["They lived in a small house.","{Ellos} vivían en una casa pequeña.","vivían","Ellos vivían en una casa pequeño."],
+ ["I used to read every night.","Leía todas las noches.|Leía cada noche.","Leía","Leía todas las noche."],
  ["There were many trees here.","Aquí había muchos árboles.|Había muchos árboles aquí.","había","Aquí habían muchos árboles."],
- ["We were happy.","Éramos felices.|Estábamos contentos.","felices","Fuimos felices siempre."],
- ["What did you want to be?","¿Qué querías ser?","querías","¿Qué quisiste ser siempre?"]
+ ["We were happy.","Éramos felices.|Estábamos contentos.","felices","Éramos feliz."],
+ ["What did you want to be?","¿Qué querías ser?","querías","¿Qué quieras ser?"]
 ],
 "Por vs para":[
  ["This gift is for my mother.","Este regalo es para mi madre.|Este regalo es para mi mamá.","para","Este regalo es por mi madre."],
@@ -8678,7 +8692,7 @@ deep("es", "A2", {
  ["It's better than before.","Es mejor que antes.|Está mejor que antes.","mejor","Es más bueno que antes."],
  ["My sister is older than me.","Mi hermana es mayor que yo.","mayor","Mi hermana es mayor que mí."],
  ["I have as many books as you.","Tengo tantos libros como tú.","tantos","Tengo tan libros como tú."],
- ["The weather today is worse.","Hoy el tiempo está peor.|El tiempo de hoy es peor.","peor","Hoy el tiempo está más malo."],
+ ["The weather today is worse.","Hoy el tiempo está peor.|El tiempo de hoy es peor.","peor","Hoy el tiempo está más peor."],
  ["He earns more than a thousand euros.","{Él} gana más de mil euros.","más","Él gana más que mil euros."],
  ["Spanish is easier than German.","El español es más fácil que el alemán.","fácil","El español es más fácil de el alemán."],
  ["She works as much as I do.","{Ella} trabaja tanto como yo.","tanto","Ella trabaja tan como yo."]
@@ -8752,7 +8766,7 @@ deep("es", "A2", {
  ["He bought his mother flowers.","{Él} le compró flores a su madre.|{Él} le compró flores a su mamá.","flores","Él la compró flores a su madre."],
  ["Can you lend me money?","¿Me puedes prestar dinero?|¿Puedes prestarme dinero?|¿Me presta dinero?","dinero","¿Me puedes prestas dinero?"],
  ["We show them the city.","Les enseñamos la ciudad.|Les mostramos la ciudad.","ciudad","Los enseñamos la ciudad."],
- ["The teacher asks me a question.","El profesor me hace una pregunta.|La profesora me hace una pregunta.","pregunta","El profesor me pregunta una pregunta."],
+ ["The teacher asks me a question.","El profesor me hace una pregunta.|La profesora me hace una pregunta.","pregunta","El profesor me hace un pregunta."],
  ["I'm going to give you a present.","Te voy a dar un regalo.|Voy a darte un regalo.","regalo","Te voy dar un regalo."]
 ],
 "Possessive pronouns: mío, tuyo, suyo":[
@@ -8831,7 +8845,7 @@ deep("es", "A2", {
  ["Do you want to come to my birthday party?","¿Quieres venir a mi fiesta de cumpleaños?","cumpleaños","¿Quieres venir en mi fiesta de cumpleaños?"],
  ["Great, see you there!","¡Genial, nos vemos allí!|¡Genial, nos vemos allá!","vemos","¡Genial, vemos allí!"],
  ["I can't, I have plans.","No puedo, tengo planes.|No puedo, ya tengo planes.","planes","No podo, tengo planes."],
- ["What a shame!","¡Qué pena!|¡Qué lástima!","pena","¡Qué penoso!"],
+ ["What a shame!","¡Qué pena!|¡Qué lástima!","pena","¡Qué penas!"],
  ["Shall we meet at eight?","¿Quedamos a las ocho?|¿Nos vemos a las ocho?","ocho","¿Quedamos en las ocho?"],
  ["Thanks for the invitation.","Gracias por la invitación.","invitación","Gracias para la invitación."],
  ["Another time, OK?","Otro día, ¿vale?|Otro día, ¿de acuerdo?|En otra ocasión, ¿vale?","día","Otra día, ¿vale?"],
@@ -8859,9 +8873,9 @@ deep("es", "A2", {
  ["It rained all weekend.","Llovió todo el fin de semana.","Llovió","Llovía todo el fin de semana una vez."],
  ["We had dinner with friends.","Cenamos con unos amigos.|Cenamos con amigos.","Cenamos","Cenábamos con amigos una vez."],
  ["I slept a lot.","Dormí mucho.","Dormí","Dormé mucho."],
- ["What a pity!","¡Qué pena!|¡Qué lástima!","pena","¡Qué penoso!"],
+ ["What a pity!","¡Qué pena!|¡Qué lástima!","pena","¡Qué penas!"],
  ["Saturday I worked.","El sábado trabajé.","trabajé","El sábado trabajo ayer."],
- ["How was your weekend?","¿Qué tal tu fin de semana?|¿Cómo fue tu fin de semana?|¿Cómo estuvo tu fin de semana?","semana","¿Cómo era tu fin de semana?"]
+ ["How was your weekend?","¿Qué tal tu fin de semana?|¿Cómo fue tu fin de semana?|¿Cómo estuvo tu fin de semana?","semana","¿Cómo fuiste tu fin de semana?"]
 ]
 });
 /* Deeper bank: Spanish B1 (for English speakers) */
@@ -8904,9 +8918,9 @@ deep("es", "B1", {
 ],
 "Conditional: would":[
  ["I would buy a house.","Compraría una casa.","Compraría","Compraré una casa si."],
- ["Would you help me?","¿Me ayudarías?|¿Me ayudaría (usted)?","ayudarías","¿Me ayudarás tú?"],
+ ["Would you help me?","¿Me ayudarías?|¿Me ayudaría (usted)?","ayudarías","¿Me ayudaría tú?"],
  ["It would be better to wait.","Sería mejor esperar.","Sería","Será mejor esperar si."],
- ["We would like to see the menu.","Nos gustaría ver la carta.|Quisiéramos ver la carta.|Nos gustaría ver el menú.","gustaría","Nos gustará ver la carta."],
+ ["We would like to see the menu.","Nos gustaría ver la carta.|Quisiéramos ver la carta.|Nos gustaría ver el menú.","gustaría","Nos gustaría ver el carta."],
  ["I wouldn't do that.","Yo no haría eso.|No haría eso.","haría","Yo no haceria eso."],
  ["Could you speak more slowly?","¿Podrías hablar más despacio?|¿Podría hablar más despacio?","despacio","¿Puedrías hablar más despacio?"],
  ["She said she would come.","{Ella} dijo que vendría.","vendría","Ella dijo que venirá."],
@@ -8942,13 +8956,13 @@ deep("es", "B1", {
  ["Don't eat that.","No comas eso.|No coma eso.","comas","No comes eso."],
  ["Please, come in.","Pase, por favor.|Pasa, por favor.|Adelante, por favor.","favor","Pasas, por favor tú."],
  ["Don't say anything.","No digas nada.|No diga nada.","digas","No dices nada."],
- ["Wait a moment, please.","Espere un momento, por favor.|Espera un momento, por favor.","momento","Esperas un momento, por favor."],
+ ["Wait a moment, please.","Espere un momento, por favor.|Espera un momento, por favor.","momento","Esperes un momento, por favor."],
  ["Don't go out.","No salgas.|No salga.","salgas","No sales tú."],
- ["Fill in this form.","Rellene este formulario.|Llene este formulario.|Rellena este formulario.","formulario","Rellenas este formulario."],
+ ["Fill in this form.","Rellene este formulario.|Llene este formulario.|Rellena este formulario.","formulario","Rellenes este formulario."],
  ["Don't be late.","No llegues tarde.|No llegue tarde.","llegues","No llegas tarde."],
  ["Sign here, please.","Firme aquí, por favor.|Firma aquí, por favor.","aquí","Firmas aquí, por favor tú."],
  ["Don't forget your passport.","No olvides tu pasaporte.|No olvide su pasaporte.|No te olvides del pasaporte.","pasaporte","No olvidas tu pasaporte."],
- ["Turn off your phones.","Apaguen sus teléfonos.|Apaguen los móviles.|Apaguen sus celulares.","Apaguen","Apagan sus teléfonos ustedes."]
+ ["Turn off your phones.","Apaguen sus teléfonos.|Apaguen los móviles.|Apaguen sus celulares.","Apaguen","Apaguen sus teléfono."]
 ],
 "Double object pronouns: me lo, se la":[
  ["I'll give it to you.","Te lo doy.|Te la doy.","doy","Lo te doy."],
@@ -9059,15 +9073,15 @@ deep("es", "B1", {
  ["It's already late.","Ya es tarde.","tarde","Ya está tarde."]
 ],
 "Superlatives and -ísimo":[
- ["This is the cheapest hotel in town.","Este es el hotel más barato de la ciudad.","barato","Este es el hotel más barato en la ciudad."],
+ ["This is the cheapest hotel in town.","Este es el hotel más barato de la ciudad.","barato","Este es el hotel más barato que la ciudad."],
  ["The film was very very good.","La película fue buenísima.|La película estuvo buenísima.","película","La película fue muy buenísima."],
  ["She is the youngest in the family.","{Ella} es la menor de la familia.|{Ella} es la más joven de la familia.","familia","Ella es la más menor de la familia."],
  ["It's extremely easy.","Es facilísimo.|Es muy fácil.","Es","Es facilisimo muy."],
  ["He's the best player on the team.","Es el mejor jugador del equipo.","mejor","Es el más bueno jugador del equipo."],
  ["It was really hot.","Hacía muchísimo calor.|Hizo muchísimo calor.","calor","Hacía muy muchísimo calor."],
  ["This is the most difficult exam.","Este es el examen más difícil.","difícil","Este es el más examen difícil."],
- ["The soup is very tasty.","La sopa está riquísima.|La sopa está muy rica.","sopa","La sopa es riquísima."],
- ["It's the oldest building in the city.","Es el edificio más antiguo de la ciudad.|Es el edificio más viejo de la ciudad.","edificio","Es el edificio más antiguo en la ciudad."],
+ ["The soup is very tasty.","La sopa está riquísima.|La sopa está muy rica.","sopa","La sopa está riquísimo."],
+ ["It's the oldest building in the city.","Es el edificio más antiguo de la ciudad.|Es el edificio más viejo de la ciudad.","edificio","Es el edificio más antiguo que la ciudad."],
  ["The worst part was the trip.","Lo peor fue el viaje.","peor","El más malo fue el viaje."]
 ],
 "Lo + adjective: lo bueno, lo mejor":[
@@ -9085,7 +9099,7 @@ deep("es", "B1", {
 "Past continuous: estaba + -ando":[
  ["We were watching a film.","Estábamos viendo una película.|Veíamos una película.","viendo","Estuvimos viendo una película cuando."],
  ["What were you thinking?","¿En qué estabas pensando?|¿Qué estabas pensando?","pensando","¿En qué estabas pensado?"],
- ["She was crying when I arrived.","{Ella} estaba llorando cuando llegué.|{Ella} lloraba cuando llegué.","llorando","Ella estaba llorando cuando llegaba."],
+ ["She was crying when I arrived.","{Ella} estaba llorando cuando llegué.|{Ella} lloraba cuando llegué.","llorando","Ella estaba llorado cuando llegué."],
  ["They were playing in the street.","Estaban jugando en la calle.|Jugaban en la calle.","jugando","Estaban juegando en la calle."],
  ["I was studying all night.","Estuve estudiando toda la noche.|Estaba estudiando toda la noche.","estudiando","Estuve estudiado toda la noche."],
  ["It was snowing in the mountains.","Estaba nevando en la montaña.|Nevaba en la montaña.","nevando","Estaba nievando en la montaña."],
@@ -9215,7 +9229,7 @@ deep("es", "B2", {
  ["We hoped that they would win.","Esperábamos que ganaran.|Esperábamos que ganasen.","ganaran","Esperábamos que ganaban."],
  ["It surprised me that she said that.","Me sorprendió que dijera eso.|Me sorprendió que dijese eso.","dijera","Me sorprendió que decía eso."],
  ["I left before he arrived.","Me fui antes de que llegara.|Me fui antes de que llegase.","llegara","Me fui antes de que llegaba."],
- ["They asked me to bring wine.","Me pidieron que trajera vino.|Me pidieron que trajese vino.","trajera","Me pidieron que traiga vino ayer."]
+ ["They asked me to bring wine.","Me pidieron que trajera vino.|Me pidieron que trajese vino.","trajera","Me pidieron que traje vino."]
 ],
 "Unreal conditions: si tuviera, haría":[
  ["If I had money, I would travel.","Si tuviera dinero, viajaría.|Si tuviese dinero, viajaría.","tuviera","Si tendría dinero, viajaría."],
@@ -9305,7 +9319,7 @@ deep("es", "B2", {
  ["Although it's raining, we'll go out.","Aunque llueve, saldremos.|Aunque está lloviendo, saldremos.","llueve","Aunque llueve, salimos ayer."],
  ["Even if it rains, we'll go out.","Aunque llueva, saldremos.","llueva","Aunque lloverá, saldremos."],
  ["Despite the cold, we went for a walk.","A pesar del frío, fuimos a pasear.|A pesar del frío, salimos a caminar.","pesar","A pesar de el frío, fuimos a pasear."],
- ["Although he's rich, he's not happy.","Aunque es rico, no es feliz.","rico","Aunque está rico, no es feliz."],
+ ["Although he's rich, he's not happy.","Aunque es rico, no es feliz.","rico","Aunque está ricos, no es feliz."],
  ["Even if you don't believe me, it's true.","Aunque no me creas, es verdad.","creas","Aunque no me crees, es verdad mañana."],
  ["Despite being tired, she kept working.","A pesar de estar cansada, siguió trabajando.","cansada","A pesar de que estar cansada, siguió trabajando."],
  ["Although I studied, I failed.","Aunque estudié, suspendí.|Aunque estudié, reprobé.","estudié","Aunque estudiara, suspendí."],
@@ -9327,11 +9341,11 @@ deep("es", "B2", {
 ],
 "Verbs of becoming: ponerse, volverse, hacerse":[
  ["She got nervous.","Se puso nerviosa.","nerviosa","Se hizo nerviosa."],
- ["He became rich.","Se hizo rico.","rico","Se puso rico."],
+ ["He became rich.","Se hizo rico.","rico","Se hizo ricos."],
  ["He went crazy.","Se volvió loco.","loco","Se puso loco para siempre."],
  ["I turned red.","Me puse rojo.|Me puse roja.","rojo","Me hice rojo."],
  ["They became friends.","Se hicieron amigos.","amigos","Se pusieron amigos."],
- ["The sky turned dark.","El cielo se puso oscuro.|El cielo se oscureció.","cielo","El cielo se hizo oscuro de repente sí."],
+ ["The sky turned dark.","El cielo se puso oscuro.|El cielo se oscureció.","cielo","El cielo se puso oscura."],
  ["She became a lawyer.","Se hizo abogada.|Llegó a ser abogada.","abogada","Se puso abogada."],
  ["He has become very selfish.","Se ha vuelto muy egoísta.","egoísta","Se ha puesto muy egoísta para siempre."],
  ["Don't get angry.","No te enfades.|No te enojes.","enfades","No te enfadas."],
@@ -9883,9 +9897,9 @@ deepTricky("es", {
  ["I gave him the book.","Le di el libro.","le","Lo di el libro.",["lo","le"]],
  ["I bought it yesterday.","Lo compré ayer.","lo","Le compré ayer.",["lo","le"]],
  ["Tell him the truth.","Dile la verdad.","dile","Dilo la verdad.",["dile","dilo"]],
- ["I know him well.","Lo conozco bien.","lo",null,["lo","le"]],
+ ["I know her well.","La conozco bien.","la","Le conozco bien a ella.",["la","le"]],
  ["I wrote her a letter.","Le escribí una carta.","le","La escribí una carta.",["le","la"]],
- ["Call her tomorrow.","Llámala mañana.","llámala","Llámale mañana a ella sí.",["llámala","llámale"]]
+ ["I'm buying it (the car).","Lo compro.","lo","Le compro el coche.",["lo","le"]]
 ],
 "Saber, poder, conocer":[
  ["Do you know Madrid?","¿Conoces Madrid?","conoces","¿Sabes Madrid?",["conoces","sabes"]],
@@ -12286,6 +12300,110 @@ bossIntro = (orig => function(){
   orig();
 })(bossIntro);
 
+/* ===================== Clearer feedback: the question, your mistakes marked, what went wrong ===================== */
+Object.assign(I18N.en, {
+  fbQ:"Question:", fbWhat:"What went wrong",
+  fbLook:"“{y}” is not “{b}”. They look alike, but they are different words.",
+  fbLookM:"“{y}” ({ym}) is not “{b}” ({bm}). They look alike, but they mean different things.",
+  fbSwap:"You wrote “{y}” where the answer has “{b}”.",
+  fbMissing:"Missing: {w}.", fbExtra:"Not needed: {w}.", fbOrder:"Right words, wrong order.",
+  fbAcc:"Check the accents: {w}.",
+  fbSerEstar:"Ser or estar: use estar for states and conditions (tired, sick, happy right now, where something is) and ser for what something is (identity, origin, job, time)."
+});
+Object.assign(I18N.es, {
+  fbQ:"Pregunta:", fbWhat:"Qué falló",
+  fbLook:"«{y}» no es «{b}». Se parecen, pero son palabras distintas.",
+  fbLookM:"«{y}» ({ym}) no es «{b}» ({bm}). Se parecen, pero significan cosas distintas.",
+  fbSwap:"Escribiste «{y}» donde la respuesta tiene «{b}».",
+  fbMissing:"Falta: {w}.", fbExtra:"Sobra: {w}.", fbOrder:"Las palabras están bien, pero el orden no.",
+  fbAcc:"Revisa los acentos: {w}.",
+  fbSerEstar:"Ser o estar: estar para estados y condiciones (cansado, enfermo, contento ahora, dónde está algo) y ser para lo que algo es (identidad, origen, profesión, hora)."
+});
+
+const fbKey = w => w.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\p{L}\p{N}']/gu, "");
+const fbRaw = w => w.toLowerCase().replace(/[^\p{L}\p{N}']/gu, "");
+const fbToks = s => String(s || "").replace(/\*\*/g, "").split(/\s+/).filter(Boolean);
+const FB_SER = new Set(["soy","eres","es","somos","sois","son","era","eras","éramos","eran","fui","fue","fueron","sea","seas"]);
+const FB_ESTAR = new Set(["estoy","estas","estás","esta","está","estamos","estais","estáis","estan","están","estaba","estabas","estaban","estuve","estuvo","este","esté"]);
+function fbCharLev(a, b){
+  const d = Array.from({length:a.length + 1}, (_, i) => [i]);
+  for(let j = 1; j <= b.length; j++) d[0][j] = j;
+  for(let i = 1; i <= a.length; i++) for(let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+function fbMeaning(w, lang){
+  const m = VMAP[lang] || {}, k = w.toLowerCase().replace(/[^\p{L}' ]/gu, "");
+  const e = m[k] || m["el " + k] || m["la " + k] || m["to " + k] || m[k.replace(/a$/, "o")];
+  if(!e) return "";
+  return first(lang === "es" ? e.en : e.es);
+}
+
+/* Align your words with the best answer (longest common subsequence on letters only) */
+function fbAlign(you, best){
+  const A = fbToks(you), B = fbToks(best), a = A.map(fbKey), b = B.map(fbKey);
+  const n = a.length, m = b.length, L = Array.from({length:n + 1}, () => new Array(m + 1).fill(0));
+  for(let i = n - 1; i >= 0; i--) for(let j = m - 1; j >= 0; j--) L[i][j] = a[i] && a[i] === b[j] ? L[i+1][j+1] + 1 : Math.max(L[i+1][j], L[i][j+1]);
+  const ya = [], ba = [], segs = []; let i = 0, j = 0, seg = {y:[], b:[]};
+  const flush = () => { if(seg.y.length || seg.b.length) segs.push(seg); seg = {y:[], b:[]}; };
+  while(i < n || j < m){
+    if(i < n && j < m && a[i] && a[i] === b[j]){
+      flush();
+      const acc = fbRaw(A[i]) !== fbRaw(B[j]);
+      ya.push({w:A[i], c:acc ? "acc" : "ok"}); ba.push({w:B[j], c:acc ? "acc" : "ok"});
+      if(acc) segs.push({acc:B[j]});
+      i++; j++;
+    } else if(j < m && (i >= n || L[i][j+1] >= L[i+1][j])){ ba.push({w:B[j], c:"add"}); seg.b.push(B[j]); j++; }
+    else { ya.push({w:A[i], c:"del"}); seg.y.push(A[i]); i++; }
+  }
+  flush();
+  return {ya, ba, segs, sameBag: a.slice().sort().join(" ") === b.slice().sort().join(" ") && a.join(" ") !== b.join(" ")};
+}
+const fbHtml = list => list.map(x => x.c === "ok" ? esc(x.w) : `<span class="dx dx-${x.c}">${esc(x.w)}</span>`).join(" ");
+
+function fbNotes(al, segs, sameBag){
+  const notes = [], acc = [];
+  if(sameBag) return [t("fbOrder")];
+  let serEstar = false;
+  for(const s of segs){
+    if(s.acc){ acc.push(s.acc.replace(/[^\p{L}' ]/gu, "")); continue; }
+    const k = Math.min(s.y.length, s.b.length);
+    for(let q = 0; q < k; q++){
+      const y = s.y[q].replace(/[^\p{L}\p{N}' ]/gu, ""), b = s.b[q].replace(/[^\p{L}\p{N}' ]/gu, "");
+      const ky = fbKey(y), kb = fbKey(b);
+      if((FB_SER.has(ky) && FB_ESTAR.has(kb)) || (FB_ESTAR.has(ky) && FB_SER.has(kb))){ serEstar = true; continue; }
+      const d = fbCharLev(ky, kb);
+      if(d > 0 && d <= 2 && Math.min(ky.length, kb.length) >= 4){
+        const ym = fbMeaning(y, al), bm = fbMeaning(b, al);
+        notes.push(ym && bm && ym !== bm ? t("fbLookM", {y, b, ym, bm}) : t("fbLook", {y, b}));
+      } else notes.push(t("fbSwap", {y, b}));
+    }
+    if(s.b.length > k) notes.push(t("fbMissing", {w:s.b.slice(k).join(" ")}));
+    if(s.y.length > k) notes.push(t("fbExtra", {w:s.y.slice(k).join(" ")}));
+  }
+  if(acc.length) notes.push(t("fbAcc", {w:acc.join(", ")}));
+  if(serEstar && al === "es") notes.unshift(t("fbSerEstar"));
+  return notes.slice(0, 4);
+}
+
+function renderFeedback(){
+  const j = S && S.judgement, box = $("judgeCard").querySelector(".ans");
+  if(!j || !box || box.dataset.fb === "1") return;
+  box.dataset.fb = "1";
+  const q = j.question && j.qgame !== "Match Madness" ? `<div class="fbq"><b>${esc(t("fbQ"))}</b> ${esc(j.question)}</div>` : "";
+  let you = j.gaveUp ? "" : `<div><b>${esc(t("you"))}</b> ${esc(j.yours)}</div>`, best = `<div><b>${esc(t("best"))}</b> ${esc(j.answer)}</div>`, notes = "";
+  if(!j.correct && !j.gaveUp && j.qgame !== "Match Madness" && j.yours){
+    const al = fbAlign(j.yours, j.answer);
+    you = `<div><b>${esc(t("you"))}</b> ${fbHtml(al.ya)}</div>`;
+    best = `<div><b>${esc(t("best"))}</b> ${fbHtml(al.ba)}</div>`;
+    const ns = fbNotes(j.qal || (S.target === "English" ? "en" : "es"), al.segs, al.sameBag);
+    if(ns.length) notes = `<div class="fbnotes"><b>${esc(t("fbWhat"))}</b><ul>${ns.map(n => `<li>${esc(n)}</li>`).join("")}</ul></div>`;
+  }
+  const btns = [...box.querySelectorAll("button")];
+  box.innerHTML = q + you + best + notes;
+  btns.forEach(b => box.appendChild(b));
+}
+renderExtras = (orig => function(fresh){ orig(fresh); renderFeedback(); })(renderExtras);
+
 /* ===================== Keyboard play: everything without a mouse ===================== */
 Object.assign(I18N.en, {
   kbTitle:"Keyboard play", kbToggle:"Keyboard play", kbToggleSub:"Keep the answer box ready so you can just type.", kbHelpBtn:"Keyboard shortcuts",
@@ -12639,7 +12757,7 @@ function absorb(res, answer, rolls, prevPlan){
   if(prevPlan && res.judgement && typeof res.judgement.correct === "boolean"){
     const j = res.judgement;
     applyResult(S, j.correct, prevPlan);
-    S.judgement = {correct:j.correct, headline:String(j.headline||""), feedback:String(j.feedback||""), answer:String(j.answer||""), yours: answer, gaveUp: answer === null, al: j.al || ""};
+    S.judgement = {correct:j.correct, headline:String(j.headline||""), feedback:String(j.feedback||""), answer:String(j.answer||""), yours: answer, gaveUp: answer === null, al: j.al || "", question: prevCh ? String(prevCh.target || "") : "", qgame: prevCh ? String(prevCh.game || "") : "", qal: prevCh ? String(prevCh.al || "") : ""};
     if(Array.isArray(j.struggled)){
       for(const w of j.struggled){
         if(!w || !w.w) continue;

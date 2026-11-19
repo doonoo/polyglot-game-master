@@ -176,7 +176,7 @@ deep("es", "A1", {
  ["There's a problem.","Hay un problema.","problema","Hay una problema."],
  ["How many students are there?","¿Cuántos estudiantes hay?","Cuántos","¿Cuántos estudiantes están hay?"],
  ["There is a cat in the garden.","Hay un gato en el jardín.","gato","Está un gato en el jardín."],
- ["There are no buses today.","Hoy no hay autobuses.|No hay autobuses hoy.","autobuses","Hoy no hay autobús."],
+ ["There are no buses today.","Hoy no hay autobuses.|No hay autobuses hoy.","autobuses","Hoy no están autobuses."],
  ["There's a lot of traffic.","Hay mucho tráfico.","tráfico","Hay mucha tráfico."],
  ["What is there to eat?","¿Qué hay de comer?|¿Qué hay para comer?","comer","¿Qué está de comer?"]
 ],
@@ -262,7 +262,7 @@ deep("es", "A1", {
  ["On Wednesday I have class.","El miércoles tengo clase.","miércoles","En miércoles tengo clase."],
  ["It's a beautiful day.","Hace un día precioso.|Hace un día bonito.|Es un día bonito.","día","Hace una día bonito."],
  ["In spring there are many flowers.","En primavera hay muchas flores.","primavera","En primavera están muchas flores."],
- ["Today is the fifth of March.","Hoy es el cinco de marzo.","marzo","Hoy es cinco de Marzo."]
+ ["Today is the fifth of March.","Hoy es el cinco de marzo.","marzo","Hoy es el cinco en marzo."]
 ],
 "Home and rooms":[
  ["The living room is very big.","La sala es muy grande.|El salón es muy grande.","grande","La sala es mucho grande."],
@@ -292,7 +292,7 @@ deep("es", "A1", {
  ["I live in Texas.","Vivo en Texas.","Vivo","Vivo a Texas."],
  ["I'm thirty years old.","Tengo treinta años.","treinta","Soy treinta años."],
  ["I speak English and a little Spanish.","Hablo inglés y un poco de español.","poco","Hablo inglés y un poco español."],
- ["I'm married.","Estoy casado.|Estoy casada.","casado","Soy casado."],
+ ["I'm married.","Estoy casado.|Estoy casada.|Soy casado.|Soy casada.","casado","Tengo casado."],
  ["I have two children.","Tengo dos hijos.","hijos","Tengo dos hijo."],
  ["I work in a hospital.","Trabajo en un hospital.","hospital","Trabajo a un hospital."],
  ["I'm a student.","Soy estudiante.","estudiante","Estoy estudiante."],
@@ -309,12 +309,12 @@ deep("es", "A1", {
  ["Is the water free?","¿El agua es gratis?|¿El agua es gratuita?","gratis","¿La agua es gratis?"],
  ["Here you are.","Aquí tiene.|Aquí tienes.","Aquí","Aquí está tiene."],
  ["Can I pay by card?","¿Puedo pagar con tarjeta?","tarjeta","¿Puedo pagar en tarjeta?"],
- ["It's delicious.","Está delicioso.|Está muy rico.|Está riquísimo.","delicioso","Es delicioso."],
+ ["It's delicious.","Está delicioso.|Está muy rico.|Está riquísimo.|Es delicioso.","delicioso","Está deliciosos."],
  ["Keep the change.","Quédese con el cambio.|Quédate con el cambio.|Quédese con la vuelta.","cambio","Quede con el cambio."]
 ],
 "Shopping: prices and sizes":[
  ["I'm just looking, thanks.","Solo estoy mirando, gracias.|Solo miro, gracias.","mirando","Solo estoy mirar, gracias."],
- ["Do you have it in black?","¿Lo tiene en negro?|¿La tiene en negro?|¿Lo tienen en negro?","negro","¿Lo tiene de negro?"],
+ ["Do you have it in black?","¿Lo tiene en negro?|¿La tiene en negro?|¿Lo tienen en negro?","negro","¿Lo tiene a negro?"],
  ["It's cheap.","Es barato.|Es barata.|Está barato.","barato","Es baratos."],
  ["Where are the fitting rooms?","¿Dónde están los probadores?","probadores","¿Dónde son los probadores?"],
  ["It fits me well.","Me queda bien.","queda","Me queda bueno."],
