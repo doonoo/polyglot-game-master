@@ -420,6 +420,21 @@ textarea,input[type=text]{transition:border-color .2s,box-shadow .2s}
 .toast{animation-duration:.35s}
 body.noanim *,body.noanim *::before,body.noanim *::after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion: reduce){.glyphs span,.primary,.pr.sel{animation:none!important}}
+/* the clock */
+.levels.clocks{flex-wrap:wrap;gap:4px}
+.lv.ck{flex:1 1 30%;padding:9px 6px;font-size:.95rem}
+.clockbar{height:7px;border-radius:9px;background:var(--violet-soft);overflow:hidden;margin:0 0 12px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+.clockbar i{display:block;height:100%;width:100%;border-radius:9px;background:linear-gradient(90deg,#2EC48C,#7BE0B5);transition:width .12s linear,background .3s}
+.clockbar.warn i{background:linear-gradient(90deg,var(--gold),#FFD45C)}
+.clockbar.low i{background:linear-gradient(90deg,#E94B4B,#FF8A7A)}
+.clockbar.low{animation:ckPulse .5s ease-in-out infinite alternate}
+@keyframes ckPulse{from{opacity:1}to{opacity:.55}}
+.ckchip{position:relative;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ckchip.low{color:var(--red,#E94B4B);display:inline-block;animation:ckBeat .5s ease-in-out infinite}
+@keyframes ckBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.ckfloat{position:absolute;left:50%;top:100%;font-size:.85rem;font-weight:800;pointer-events:none;animation:ckFl 1s ease-out forwards}
+.ckfloat.up{color:#1E9E6E}.ckfloat.down{color:#E94B4B}
+@keyframes ckFl{from{opacity:1;transform:translate(-50%,0) scale(1.2)}to{opacity:0;transform:translate(-50%,18px) scale(1)}}
 </style>
 </head>
 <body>
@@ -2646,6 +2661,248 @@ ISLANDS.push(
  ["It is not a big deal.|It is no big deal.|It is not that serious.|No big deal.","No es para tanto.|No es gran cosa.|No pasa nada.","tanto","deal"],
  ["To kill two birds with one stone.|Kill two birds with one stone.","Matar dos pájaros de un tiro.","pájaros","birds"],
  ["Out of sight, out of mind.","Ojos que no ven, corazón que no siente.","corazón","sight"]
+]}
+);
+
+/* ===================== Even more islands (each: 8 statements, 2 conversation movers at 8–9, 5 extras) ===================== */
+ISLANDS.push(
+{id:"home", en:"My home", es:"Mi casa", nav:[8,9], it:[
+ ["I live in an apartment.|I live in a flat.","(Yo) vivo en un [apartamento|departamento|piso].","vivo","live"],
+ ["My apartment has two bedrooms.|My flat has two bedrooms.","Mi [apartamento|departamento|piso] tiene dos [habitaciones|dormitorios|cuartos].","tiene","has"],
+ ["The kitchen is small but nice.|The kitchen is small but pretty.","La cocina es pequeña pero bonita.|La cocina es chica pero bonita.","cocina","kitchen"],
+ ["My favorite place is the living room.|My favourite place is the living room.","Mi lugar favorito es la sala.|Mi lugar favorito es el salón.","favorito","favorite"],
+ ["I live on the third floor.","(Yo) vivo en el tercer piso.","tercer","third"],
+ ["I have a lot of plants.|I have many plants.","(Yo) tengo muchas plantas.","plantas","plants"],
+ ["My neighbors are very quiet.|My neighbours are very quiet.","Mis vecinos son muy tranquilos.|Mis vecinos son muy callados.","vecinos","neighbors"],
+ ["I clean the house on Saturdays.","(Yo) limpio la casa los sábados.","limpio","clean"],
+ ["Speaking of homes, I want to paint my room.|Speaking of houses, I want to paint my room.","Hablando de casas, quiero pintar mi cuarto.|Hablando de casas, quiero pintar mi habitación.","pintar","paint"],
+ ["And you, do you live in a house or an apartment?|What about you, do you live in a house or an apartment?","Y tú, ¿vives en una casa o en un [apartamento|departamento|piso]?|Y usted, ¿vive en una casa o en un [apartamento|departamento|piso]?","vives","live"],
+ ["The rent is very expensive.","El alquiler es muy caro.|La renta es muy cara.","caro","expensive"],
+ ["I want a house with a garden.|I want a house with a yard.","(Yo) quiero una casa con jardín.|(Yo) quiero una casa con patio.","jardín","garden"],
+ ["My bedroom has a big window.","Mi [habitación|cuarto|dormitorio] tiene una ventana grande.","ventana","window"],
+ ["I moved here two years ago.","(Yo) me mudé aquí hace dos años.","mudé","moved"],
+ ["I feel comfortable at home.|I feel good at home.","(Yo) me siento cómodo en casa.|(Yo) me siento cómoda en casa.|(Yo) me siento bien en casa.","siento","feel"]
+]},
+{id:"pets", en:"My pets", es:"Mis mascotas", nav:[8,9], it:[
+ ["I have a dog and a cat.","(Yo) tengo un perro y un gato.","perro","dog"],
+ ["My dog is called Rocky.|My dog's name is Rocky.","Mi perro se llama Rocky.","llama","called"],
+ ["He is three years old.","Tiene tres años.","años","years"],
+ ["My cat sleeps all day.|My cat sleeps the whole day.","Mi gato duerme todo el día.","duerme","sleeps"],
+ ["I walk the dog every morning.|I take the dog for a walk every morning.","(Yo) paseo al perro todas las mañanas.|(Yo) saco al perro a pasear todas las mañanas.","perro","dog"],
+ ["He loves to play in the park.|He loves playing in the park.","Le encanta jugar en el parque.","parque","park"],
+ ["My cat is very independent.","Mi gato es muy independiente.","independiente","independent"],
+ ["I give them food twice a day.|I feed them twice a day.","Les doy de comer dos veces al día.","veces","twice"],
+ ["Speaking of animals, my sister has a rabbit.|Speaking of pets, my sister has a rabbit.","Hablando de animales, mi hermana tiene un conejo.|Hablando de mascotas, mi hermana tiene un conejo.","conejo","rabbit"],
+ ["And you, do you have pets?|What about you, do you have any pets?|Do you have pets?","Y tú, ¿tienes mascotas?|Y usted, ¿tiene mascotas?|¿Tienes mascotas?","mascotas","pets"],
+ ["My dog barks at the mailman.|My dog barks at the mail carrier.","Mi perro le ladra al cartero.","ladra","barks"],
+ ["The vet says he is healthy.","El veterinario dice que está sano.|La veterinaria dice que está sano.","sano","healthy"],
+ ["I adopted my cat from a shelter.","(Yo) adopté a mi gato de un refugio.","adopté","adopted"],
+ ["My dog is my best friend.","Mi perro es mi mejor amigo.","mejor","best"],
+ ["Pets make me happy.|Animals make me happy.","Las mascotas me hacen feliz.|Los animales me hacen feliz.","feliz","happy"]
+]},
+{id:"friends", en:"My friends", es:"Mis amigos", nav:[8,9], it:[
+ ["My best friend is called Ana.|My best friend's name is Ana.","Mi mejor amiga se llama Ana.","mejor","best"],
+ ["We met at school.|We met in school.","Nos conocimos en la escuela.|Nos conocimos en el colegio.","conocimos","met"],
+ ["We have been friends for ten years.","Somos amigas desde hace diez años.|Hace diez años que somos amigas.","diez","ten"],
+ ["She is very funny.","Ella es muy graciosa.|Ella es muy divertida.","graciosa","funny"],
+ ["We talk on the phone every week.","Hablamos por teléfono cada semana.|Hablamos por teléfono todas las semanas.","teléfono","phone"],
+ ["On Fridays we go out to dinner.|On Fridays we go out for dinner.","Los viernes salimos a cenar.","viernes","Fridays"],
+ ["My friends always help me.","Mis amigos siempre me ayudan.","ayudan","help"],
+ ["I trust her completely.","Confío en ella completamente.|Confío en ella totalmente.","confío","trust"],
+ ["Speaking of friends, Luis is getting married.|Speaking of friends, Luis is going to get married.","Hablando de amigos, Luis se va a casar.|Hablando de amigos, Luis se casa.","casar","married"],
+ ["And you, how did you meet your best friend?|What about you, how did you meet your best friend?","Y tú, ¿cómo conociste a tu mejor amigo?|Y usted, ¿cómo conoció a su mejor amigo?","conociste","meet"],
+ ["We laugh a lot together.","Nos reímos mucho juntos.|Nos reímos mucho juntas.","reímos","laugh"],
+ ["I miss my friends from college.|I miss my college friends.","Extraño a mis amigos de la universidad.|Echo de menos a mis amigos de la universidad.","universidad","college"],
+ ["A good friend listens.","Un buen amigo escucha.","escucha","listens"],
+ ["We had a fight, but now we are fine.|We argued, but now we are fine.","Nos peleamos, pero ahora estamos bien.|Discutimos, pero ahora estamos bien.","ahora","now"],
+ ["I made new friends at work.","Hice nuevos amigos en el trabajo.|Hice amigos nuevos en el trabajo.","amigos","friends"]
+]},
+{id:"studies", en:"My studies", es:"Mis estudios", nav:[8,9], it:[
+ ["I am studying Spanish.|I am learning Spanish.","(Yo) estoy estudiando español.|(Yo) estoy aprendiendo español.","español","Spanish"],
+ ["I study every night for twenty minutes.|Every night I study for twenty minutes.","(Yo) estudio veinte minutos todas las noches.|Todas las noches estudio veinte minutos.","veinte","twenty"],
+ ["Grammar is difficult for me.|Grammar is hard for me.","La gramática es difícil para mí.","gramática","grammar"],
+ ["I learn new words every day.","(Yo) aprendo palabras nuevas todos los días.|(Yo) aprendo nuevas palabras todos los días.","palabras","words"],
+ ["I want to speak with native speakers.","(Yo) quiero hablar con hablantes nativos.","nativos","native"],
+ ["I took a class online.|I took an online class.","(Yo) tomé una clase en línea.|(Yo) hice una clase en línea.|(Yo) tomé una clase por internet.","clase","class"],
+ ["My teacher is very patient.","Mi [profesor|profesora|maestro|maestra] es muy paciente.","paciente","patient"],
+ ["I make a lot of mistakes, but I keep going.|I make many mistakes, but I keep going.","(Yo) cometo muchos errores, pero sigo adelante.","errores","mistakes"],
+ ["Speaking of studying, I have an exam on Monday.|Speaking of school, I have an exam on Monday.","Hablando de estudios, tengo un examen el lunes.|Hablando de estudiar, tengo un examen el lunes.","examen","exam"],
+ ["And you, why are you learning languages?|What about you, why are you learning languages?","Y tú, ¿por qué aprendes idiomas?|Y usted, ¿por qué aprende idiomas?","idiomas","languages"],
+ ["I watch series in Spanish.|I watch shows in Spanish.","(Yo) veo series en español.","series","series"],
+ ["Listening is the hardest part.","Escuchar es lo más difícil.|Entender es lo más difícil.","difícil","hardest"],
+ ["I write my notes in a notebook.","(Yo) escribo mis apuntes en un cuaderno.|(Yo) escribo mis notas en un cuaderno.","cuaderno","notebook"],
+ ["I studied engineering at university.|I studied engineering in college.","(Yo) estudié ingeniería en la universidad.","ingeniería","engineering"],
+ ["Little by little, I am improving.|Little by little I am getting better.","Poco a poco estoy mejorando.","mejorando","improving"]
+]},
+{id:"tech", en:"My phone and computer", es:"Mi teléfono y mi computadora", nav:[8,9], it:[
+ ["I use my phone too much.","(Yo) uso demasiado el teléfono.|(Yo) uso el teléfono demasiado.|(Yo) uso demasiado el celular.","demasiado","too"],
+ ["I fix computers at work.|I repair computers at work.","(Yo) arreglo computadoras en el trabajo.|(Yo) reparo computadoras en el trabajo.|(Yo) arreglo ordenadores en el trabajo.","computadoras","computers"],
+ ["My laptop is very fast.","Mi [portátil|laptop|computadora portátil] es muy rápida.|Mi portátil es muy rápido.","rápida","fast"],
+ ["I forgot my password again.","(Yo) olvidé mi contraseña otra vez.|Se me olvidó la contraseña otra vez.","contraseña","password"],
+ ["The internet is not working.|The internet doesn't work.","El internet no funciona.|Internet no funciona.","funciona","working"],
+ ["I download a lot of apps.","(Yo) descargo muchas aplicaciones.|(Yo) bajo muchas aplicaciones.","aplicaciones","apps"],
+ ["I need to charge my phone.","(Yo) necesito cargar el teléfono.|(Yo) tengo que cargar el teléfono.|(Yo) necesito cargar el celular.","cargar","charge"],
+ ["I send messages all day.","(Yo) mando mensajes todo el día.|(Yo) envío mensajes todo el día.","mensajes","messages"],
+ ["Speaking of technology, I bought new headphones.|Speaking of tech, I bought new headphones.","Hablando de tecnología, compré unos audífonos nuevos.|Hablando de tecnología, compré unos auriculares nuevos.","compré","bought"],
+ ["And you, what phone do you have?|What about you, what phone do you have?","Y tú, ¿qué teléfono tienes?|Y usted, ¿qué teléfono tiene?|Y tú, ¿qué celular tienes?","teléfono","phone"],
+ ["Turn it off and on again.","Apágalo y vuelve a encenderlo.|Apágalo y préndelo otra vez.","apágalo","off"],
+ ["The screen is broken.","La pantalla está rota.","pantalla","screen"],
+ ["I back up my photos every month.","(Yo) hago una copia de seguridad de mis fotos cada mes.|(Yo) respaldo mis fotos cada mes.","fotos","photos"],
+ ["I play video games at night.","(Yo) juego videojuegos por la noche.|(Yo) juego a los videojuegos por la noche.","videojuegos","games"],
+ ["Technology makes life easier.","La tecnología hace la vida más fácil.|La tecnología facilita la vida.","tecnología","technology"]
+]},
+{id:"music", en:"Music", es:"La música", nav:[8,9], it:[
+ ["I listen to music every day.","(Yo) escucho música todos los días.","escucho","listen"],
+ ["My favorite band is from Mexico.|My favourite band is from Mexico.","Mi banda favorita es de México.|Mi grupo favorito es de México.","favorita","favorite"],
+ ["I play the guitar a little.|I play guitar a little.","(Yo) toco un poco la guitarra.|(Yo) toco la guitarra un poco.","toco","play"],
+ ["I like to sing in the car.|I like singing in the car.","Me gusta cantar en el [carro|coche|auto].","cantar","sing"],
+ ["I went to a concert last month.","(Yo) fui a un concierto el mes pasado.","concierto","concert"],
+ ["This song reminds me of my childhood.","Esta canción me recuerda a mi infancia.|Esta canción me recuerda mi niñez.","canción","song"],
+ ["I don't like loud music.|I do not like loud music.","No me gusta la música muy alta.|No me gusta la música fuerte.","música","music"],
+ ["My brother plays the drums.","Mi hermano toca la batería.","batería","drums"],
+ ["Speaking of music, have you heard the new album?|Speaking of music, did you hear the new album?","Hablando de música, ¿has escuchado el nuevo álbum?|Hablando de música, ¿escuchaste el nuevo disco?","álbum","album"],
+ ["And you, what kind of music do you like?|What about you, what kind of music do you like?","Y tú, ¿qué tipo de música te gusta?|Y a ti, ¿qué tipo de música te gusta?|Y usted, ¿qué tipo de música le gusta?","tipo","kind"],
+ ["I learn Spanish with songs.","(Yo) aprendo español con canciones.","canciones","songs"],
+ ["We danced all night.","Bailamos toda la noche.","bailamos","danced"],
+ ["The lyrics are beautiful.","La letra es preciosa.|La letra es muy bonita.","letra","lyrics"],
+ ["I want to learn the piano.|I want to learn to play the piano.","(Yo) quiero aprender piano.|(Yo) quiero aprender a tocar el piano.","piano","piano"],
+ ["Music helps me relax.","La música me ayuda a relajarme.","relajarme","relax"]
+]},
+{id:"sports", en:"Sports and exercise", es:"El deporte", nav:[8,9], it:[
+ ["I go to the gym three times a week.","(Yo) voy al gimnasio tres veces por semana.|(Yo) voy al gimnasio tres veces a la semana.","gimnasio","gym"],
+ ["I play soccer with my friends.|I play football with my friends.","(Yo) juego al fútbol con mis amigos.|(Yo) juego fútbol con mis amigos.","fútbol","soccer"],
+ ["My favorite team won yesterday.|My favourite team won yesterday.","Mi equipo favorito ganó ayer.","ganó","won"],
+ ["I run in the park on Sundays.","(Yo) corro en el parque los domingos.","corro","run"],
+ ["I want to lose weight.","(Yo) quiero bajar de peso.|(Yo) quiero perder peso.","peso","weight"],
+ ["Swimming is my favorite sport.|Swimming is my favourite sport.","La natación es mi deporte favorito.|Nadar es mi deporte favorito.","deporte","sport"],
+ ["I watch basketball on TV.","(Yo) veo el baloncesto en la tele.|(Yo) veo básquetbol en la tele.","tele","TV"],
+ ["After exercising I feel great.|After exercise I feel great.","Después de hacer ejercicio me siento genial.|Después de hacer ejercicio me siento muy bien.","ejercicio","exercising"],
+ ["Speaking of sports, the final is on Saturday.|Speaking of sports, the final is Saturday.","Hablando de deportes, la final es el sábado.","final","final"],
+ ["And you, do you play any sports?|What about you, do you play a sport?","Y tú, ¿practicas algún deporte?|Y usted, ¿practica algún deporte?|Y tú, ¿juegas algún deporte?","deporte","sports"],
+ ["I hurt my knee playing tennis.","Me lastimé la rodilla jugando al tenis.|Me hice daño en la rodilla jugando al tenis.","rodilla","knee"],
+ ["We lost by two goals.","Perdimos por dos goles.","goles","goals"],
+ ["I stretch before running.","(Yo) estiro antes de correr.|(Yo) hago estiramientos antes de correr.","correr","running"],
+ ["My goal is to run a marathon.","Mi meta es correr un maratón.|Mi objetivo es correr un maratón.","maratón","marathon"],
+ ["I ride my bike to work.|I cycle to work.","(Yo) voy en bici al trabajo.|(Yo) voy en bicicleta al trabajo.","bici","bike"]
+]},
+{id:"weather", en:"Weather and seasons", es:"El clima y las estaciones", nav:[8,9], it:[
+ ["Today it is very hot.|It is very hot today.","Hoy hace mucho calor.","calor","hot"],
+ ["It rained all night.","Llovió toda la noche.","llovió","rained"],
+ ["My favorite season is fall.|My favourite season is autumn.|My favorite season is autumn.","Mi estación favorita es el otoño.","otoño","fall"],
+ ["In winter it snows a lot here.|It snows a lot here in winter.","En invierno nieva mucho aquí.|Aquí nieva mucho en invierno.","nieva","snows"],
+ ["I don't like the cold.|I do not like the cold.","No me gusta el frío.","frío","cold"],
+ ["Tomorrow it is going to be sunny.","Mañana va a hacer sol.|Mañana va a estar soleado.","sol","sunny"],
+ ["There is a storm coming.","Viene una tormenta.|Se acerca una tormenta.","tormenta","storm"],
+ ["In summer we go to the beach.","En verano vamos a la playa.","verano","summer"],
+ ["Speaking of the weather, take an umbrella.|Speaking of the weather, bring an umbrella.","Hablando del clima, lleva un paraguas.|Hablando del tiempo, lleva un paraguas.","paraguas","umbrella"],
+ ["And you, do you prefer heat or cold?|What about you, do you prefer the heat or the cold?","Y tú, ¿prefieres el calor o el frío?|Y usted, ¿prefiere el calor o el frío?","prefieres","prefer"],
+ ["It is very windy today.|It's very windy today.","Hoy hace mucho viento.","viento","windy"],
+ ["The weather is changing a lot.","El clima está cambiando mucho.","cambiando","changing"],
+ ["In spring there are flowers everywhere.","En primavera hay flores por todas partes.","primavera","spring"],
+ ["It is cloudy but it is not raining.|It's cloudy but it isn't raining.","Está nublado pero no llueve.|Está nublado pero no está lloviendo.","nublado","cloudy"],
+ ["What is the weather like where you live?|What's the weather like where you live?","¿Qué tiempo hace donde vives?|¿Cómo es el clima donde vives?","vives","live"]
+]},
+{id:"cooking", en:"Cooking", es:"La cocina", nav:[8,9], it:[
+ ["I cook dinner every night.","(Yo) preparo la cena todas las noches.|(Yo) cocino la cena todas las noches.","cena","dinner"],
+ ["My specialty is rice with chicken.|My speciality is chicken and rice.","Mi especialidad es el arroz con pollo.","especialidad","specialty"],
+ ["First you cut the onion.|First, cut the onion.","Primero se corta la cebolla.|Primero cortas la cebolla.","cebolla","onion"],
+ ["Add a little salt.|Add some salt.","Añade un poco de sal.|Agrega un poco de sal.","sal","salt"],
+ ["Cook it for ten minutes.","Cocínalo diez minutos.|Cocínalo durante diez minutos.","minutos","minutes"],
+ ["I learned to cook with my grandmother.","(Yo) aprendí a cocinar con mi abuela.","abuela","grandmother"],
+ ["I don't like to wash the dishes.|I do not like washing the dishes.","No me gusta lavar los platos.|No me gusta fregar los platos.","platos","dishes"],
+ ["The secret is to cook it slowly.","El secreto es cocinarlo despacio.|El secreto es cocinarlo a fuego lento.","secreto","secret"],
+ ["Speaking of food, I have a new recipe.|Speaking of cooking, I have a new recipe.","Hablando de comida, tengo una receta nueva.|Hablando de cocina, tengo una nueva receta.","receta","recipe"],
+ ["And you, do you like to cook?|What about you, do you like cooking?","Y tú, ¿te gusta cocinar?|Y a ti, ¿te gusta cocinar?|Y usted, ¿le gusta cocinar?","cocinar","cook"],
+ ["It smells delicious.","Huele delicioso.|Huele riquísimo.","huele","smells"],
+ ["I burned the bread.|I burnt the bread.","Se me quemó el pan.|(Yo) quemé el pan.","pan","bread"],
+ ["Can you pass me the pepper?","¿Me pasas la pimienta?|¿Me puedes pasar la pimienta?","pimienta","pepper"],
+ ["I buy fresh vegetables at the market.","(Yo) compro verduras frescas en el mercado.","verduras","vegetables"],
+ ["Dinner is ready!","¡La cena está lista!","lista","ready"]
+]},
+{id:"holidays", en:"Holidays and celebrations", es:"Fiestas y celebraciones", nav:[8,9], it:[
+ ["My birthday is in May.","Mi cumpleaños es en mayo.","cumpleaños","birthday"],
+ ["We celebrate Christmas with the whole family.","Celebramos la Navidad con toda la familia.","Navidad","Christmas"],
+ ["On New Year's Eve we eat twelve grapes.","En Nochevieja comemos doce uvas.|En Año Nuevo comemos doce uvas.","uvas","grapes"],
+ ["I love giving presents.|I love giving gifts.","Me encanta dar regalos.|Me encanta regalar cosas.","regalos","presents"],
+ ["We had a big party at home.","Hicimos una gran fiesta en casa.|Hicimos una fiesta grande en casa.","fiesta","party"],
+ ["My grandmother makes tamales every December.","Mi abuela hace tamales cada diciembre.|Mi abuela hace tamales todos los diciembres.","tamales","tamales"],
+ ["We watch the fireworks from the roof.","Vemos los fuegos artificiales desde la azotea.|Vemos los fuegos artificiales desde el techo.","fuegos","fireworks"],
+ ["Holidays are my favorite time of year.|The holidays are my favourite time of year.","Las fiestas son mi época favorita del año.","época","time"],
+ ["Speaking of parties, are you coming on Saturday?|Speaking of parties, will you come on Saturday?","Hablando de fiestas, ¿vienes el sábado?|Hablando de fiestas, ¿vas a venir el sábado?","sábado","Saturday"],
+ ["And you, how do you celebrate your birthday?|What about you, how do you celebrate your birthday?","Y tú, ¿cómo celebras tu cumpleaños?|Y usted, ¿cómo celebra su cumpleaños?","celebras","celebrate"],
+ ["Happy birthday!","¡Feliz cumpleaños!","feliz","happy"],
+ ["Merry Christmas and happy New Year!","¡Feliz Navidad y próspero Año Nuevo!|¡Feliz Navidad y feliz Año Nuevo!","Navidad","Christmas"],
+ ["We decorate the house in December.","Decoramos la casa en diciembre.","decoramos","decorate"],
+ ["My cousins come from far away.","Mis primos vienen de lejos.","primos","cousins"],
+ ["Cheers!","¡Salud!","salud","cheers"]
+]},
+{id:"dreams", en:"My plans and dreams", es:"Mis planes y sueños", nav:[8,9], it:[
+ ["Next year I want to travel to Spain.|I want to travel to Spain next year.","El año que viene quiero viajar a España.|El próximo año quiero viajar a España.","viajar","travel"],
+ ["My dream is to have my own business.","Mi sueño es tener mi propio negocio.","negocio","business"],
+ ["I am saving money for a car.","(Yo) estoy ahorrando dinero para un [carro|coche|auto].","ahorrando","saving"],
+ ["I would like to learn three languages.","Me gustaría aprender tres idiomas.","idiomas","languages"],
+ ["Someday I will buy a house.|One day I will buy a house.","Algún día compraré una casa.|Algún día voy a comprar una casa.","casa","house"],
+ ["I am going to get a certification this year.","Este año voy a sacar una certificación.|Voy a obtener una certificación este año.","certificación","certification"],
+ ["I want to spend more time with my family.","(Yo) quiero pasar más tiempo con mi familia.","tiempo","time"],
+ ["If I could, I would live by the sea.","Si pudiera, viviría cerca del mar.|Si pudiera, viviría junto al mar.","mar","sea"],
+ ["Speaking of plans, I start a new course in January.|Speaking of plans, I am starting a new course in January.","Hablando de planes, empiezo un curso nuevo en enero.|Hablando de planes, empiezo un nuevo curso en enero.","curso","course"],
+ ["And you, what is your biggest dream?|What about you, what is your biggest dream?","Y tú, ¿cuál es tu mayor sueño?|Y usted, ¿cuál es su mayor sueño?","sueño","dream"],
+ ["In five years I see myself happy.","En cinco años me veo feliz.|Dentro de cinco años me veo feliz.","feliz","happy"],
+ ["I never give up.","(Yo) nunca me rindo.","rindo","give"],
+ ["Step by step I will reach my goals.","Paso a paso alcanzaré mis metas.|Paso a paso voy a alcanzar mis metas.","metas","goals"],
+ ["I want to change jobs.","(Yo) quiero cambiar de trabajo.","cambiar","change"],
+ ["It is never too late to learn.|It's never too late to learn.","Nunca es tarde para aprender.|Nunca es demasiado tarde para aprender.","tarde","late"]
+]},
+{id:"feelings", en:"How I feel", es:"Cómo me siento", nav:[8,9], it:[
+ ["Today I feel very happy.|I feel very happy today.","Hoy me siento muy feliz.|Hoy estoy muy contento.|Hoy estoy muy contenta.","feliz","happy"],
+ ["I am a little tired.|I am a bit tired.","(Yo) estoy un poco cansado.|(Yo) estoy un poco cansada.","cansado","tired"],
+ ["I get nervous before an exam.|I get nervous before exams.","Me pongo nervioso antes de un examen.|Me pongo nerviosa antes de un examen.","nervioso","nervous"],
+ ["That makes me angry.","Eso me enoja.|Eso me enfada.|Eso me da rabia.","eso","that"],
+ ["I am proud of my work.","(Yo) estoy orgulloso de mi trabajo.|(Yo) estoy orgullosa de mi trabajo.","orgulloso","proud"],
+ ["I was worried about you.","(Yo) estaba preocupado por ti.|(Yo) estaba preocupada por ti.","preocupado","worried"],
+ ["I feel calm when I read.","Me siento tranquilo cuando leo.|Me siento tranquila cuando leo.","leo","read"],
+ ["Sometimes I feel a little lonely.","A veces me siento un poco solo.|A veces me siento un poco sola.","veces","sometimes"],
+ ["Speaking of feelings, I am excited about the trip.|Speaking of feelings, I'm excited about the trip.","Hablando de sentimientos, estoy emocionado por el viaje.|Hablando de sentimientos, estoy emocionada por el viaje.","viaje","trip"],
+ ["And you, how are you feeling today?|What about you, how do you feel today?","Y tú, ¿cómo te sientes hoy?|Y usted, ¿cómo se siente hoy?","sientes","feeling"],
+ ["I am bored.","(Yo) estoy aburrido.|(Yo) estoy aburrida.","aburrido","bored"],
+ ["I am in a good mood.","(Yo) estoy de buen humor.","humor","mood"],
+ ["It scares me to drive at night.|Driving at night scares me.","Me da miedo manejar de noche.|Me da miedo conducir de noche.","miedo","scares"],
+ ["I feel better now, thank you.|I feel better now, thanks.","Ahora me siento mejor, gracias.|Me siento mejor ahora, gracias.","mejor","better"],
+ ["I am grateful for my family.","(Yo) estoy agradecido por mi familia.|(Yo) estoy agradecida por mi familia.","familia","family"]
+]},
+{id:"movies", en:"Movies and TV", es:"Cine y televisión", nav:[8,9], it:[
+ ["I watch a movie every Friday.","(Yo) veo una película cada viernes.|(Yo) veo una película todos los viernes.","película","movie"],
+ ["My favorite movie is very old.|My favourite film is very old.|My favorite film is very old.","Mi película favorita es muy antigua.|Mi película favorita es muy vieja.","favorita","favorite"],
+ ["I prefer comedies to dramas.","(Yo) prefiero las comedias a los dramas.","comedias","comedies"],
+ ["The ending surprised me.","El final me sorprendió.","final","ending"],
+ ["I am watching a series about doctors.|I'm watching a show about doctors.","(Yo) estoy viendo una serie sobre médicos.|(Yo) estoy viendo una serie de médicos.","serie","series"],
+ ["The main actor is excellent.|The lead actor is excellent.","El actor principal es excelente.","actor","actor"],
+ ["I fell asleep in the middle of the movie.","Me dormí a mitad de la película.|Me quedé dormido a mitad de la película.","mitad","middle"],
+ ["We bought popcorn and soda.","Compramos palomitas y refresco.|Compramos palomitas y gaseosa.","palomitas","popcorn"],
+ ["Speaking of movies, a new one comes out tomorrow.|Speaking of films, a new one comes out tomorrow.","Hablando de películas, mañana se estrena una nueva.|Hablando de cine, mañana sale una nueva.","mañana","tomorrow"],
+ ["And you, what are you watching these days?|What about you, what are you watching lately?","Y tú, ¿qué estás viendo estos días?|Y usted, ¿qué está viendo estos días?","viendo","watching"],
+ ["Don't tell me the ending!|Do not tell me the ending!","¡No me cuentes el final!|¡No me digas el final!","final","ending"],
+ ["I watch it with subtitles.","(Yo) la veo con subtítulos.","subtítulos","subtitles"],
+ ["The book was better than the movie.","El libro fue mejor que la película.|El libro era mejor que la película.","libro","book"],
+ ["Horror movies scare me.|Horror films scare me.","Las películas de terror me dan miedo.","terror","horror"],
+ ["We should see it together.","Deberíamos verla juntos.|Deberíamos verla juntas.","juntos","together"]
+]},
+{id:"commute", en:"Getting around", es:"Moverme por la ciudad", nav:[8,9], it:[
+ ["I take the bus to work.","(Yo) tomo el autobús para ir al trabajo.|(Yo) tomo el bus al trabajo.|(Yo) cojo el autobús para ir al trabajo.","autobús","bus"],
+ ["The trip takes forty minutes.|The ride takes forty minutes.","El viaje dura cuarenta minutos.|El trayecto dura cuarenta minutos.","cuarenta","forty"],
+ ["There is a lot of traffic in the morning.","Hay mucho tráfico por la mañana.|Hay mucho tráfico en la mañana.","tráfico","traffic"],
+ ["I drive an old car.","(Yo) manejo un [carro|coche|auto] viejo.|(Yo) conduzco un [carro|coche|auto] viejo.","viejo","old"],
+ ["Gas is very expensive now.|Petrol is very expensive now.","La gasolina está muy cara ahora.","gasolina","gas"],
+ ["I got lost downtown.|I got lost in the city center.","Me perdí en el centro.","perdí","lost"],
+ ["The subway is faster than the bus.|The metro is faster than the bus.","El metro es más rápido que el autobús.","metro","subway"],
+ ["I always arrive on time.","(Yo) siempre llego a tiempo.|(Yo) siempre llego puntual.","llego","arrive"],
+ ["Speaking of traffic, there was an accident on the highway.|Speaking of traffic, there was an accident on the freeway.","Hablando de tráfico, hubo un accidente en la autopista.|Hablando de tráfico, hubo un accidente en la carretera.","accidente","accident"],
+ ["And you, how do you get to work?|What about you, how do you get to work?","Y tú, ¿cómo llegas al trabajo?|Y usted, ¿cómo llega al trabajo?|Y tú, ¿cómo vas al trabajo?","trabajo","work"],
+ ["Where is the nearest station?","¿Dónde está la estación más cercana?","estación","station"],
+ ["I need to park the car.","(Yo) necesito estacionar el [carro|coche|auto].|(Yo) necesito aparcar el coche.","estacionar","park"],
+ ["I like walking when the weather is nice.","Me gusta caminar cuando hace buen tiempo.","caminar","walking"],
+ ["My car broke down yesterday.","Mi [carro|coche|auto] se descompuso ayer.|Mi coche se averió ayer.","ayer","yesterday"],
+ ["Turn left at the light.|Turn left at the traffic light.","Gira a la izquierda en el semáforo.|Dobla a la izquierda en el semáforo.","semáforo","light"]
 ]}
 );
 
@@ -10596,6 +10853,234 @@ STORIES.push(
 ]}
 );
 
+/* ===================== Stories, third shelf ===================== */
+STORIES.push(
+/* ---------- A1 ---------- */
+{id:"bus", lv:"A1", ico:"🚌", t:{es:"El autobús equivocado", en:"The wrong bus"}, p:[
+ {s:"", es:"Tom es de Canadá. Está en Ciudad de México por primera vez.", en:"Tom is from Canada. He is in Mexico City for the first time."},
+ {s:"Tom", es:"Perdón, ¿este autobús va al museo?", en:"Excuse me, does this bus go to the museum?"},
+ {s:["Conductora","Driver"], es:"No, este va al aeropuerto. El autobús del museo es el número cinco.", en:"No, this one goes to the airport. The museum bus is number five."},
+ {q:{es:"¿Adónde va este autobús?", en:"Where does this bus go?"}, o:[{es:"Al museo", en:"To the museum"},{es:"Al aeropuerto", en:"To the airport"},{es:"Al hotel", en:"To the hotel"}], a:1},
+ {s:"Tom", es:"¿Y dónde está la parada del cinco?", en:"And where is the stop for number five?"},
+ {s:["Conductora","Driver"], es:"Allí, al lado del banco.", en:"Over there, next to the bank."},
+ {q:{es:"¿Qué número va al museo?", en:"Which number goes to the museum?"}, o:[{es:"El tres", en:"Number three"},{es:"El cinco", en:"Number five"},{es:"El diez", en:"Number ten"}], a:1},
+ {s:"", es:"Tom espera diez minutos. Llega el autobús número cinco.", en:"Tom waits ten minutes. Bus number five arrives."},
+ {s:"Tom", es:"¿Cuánto cuesta el billete?", en:"How much is the ticket?"},
+ {s:["Conductor","Driver"], es:"Siete pesos.", en:"Seven pesos."},
+ {q:{es:"¿Dónde está la parada?", en:"Where is the stop?"}, o:[{es:"Al lado del banco", en:"Next to the bank"},{es:"En el aeropuerto", en:"At the airport"},{es:"En el museo", en:"At the museum"}], a:0},
+ {s:"", es:"Por fin Tom llega al museo. ¡Está muy contento!", en:"Finally Tom arrives at the museum. He is very happy!"}
+]},
+{id:"birthdaycake", lv:"A1", ico:"🎂", t:{es:"El pastel", en:"The cake"}, p:[
+ {s:"", es:"Hoy es el cumpleaños de mamá. Pedro y su hermana Nora quieren hacer un pastel.", en:"Today is Mom's birthday. Pedro and his sister Nora want to make a cake."},
+ {s:"Nora", es:"Necesitamos huevos, harina, azúcar y leche.", en:"We need eggs, flour, sugar and milk."},
+ {s:"Pedro", es:"Hay huevos y harina, pero no hay leche.", en:"There are eggs and flour, but there is no milk."},
+ {q:{es:"¿Qué no hay en casa?", en:"What is there none of at home?"}, o:[{es:"Huevos", en:"Eggs"},{es:"Harina", en:"Flour"},{es:"Leche", en:"Milk"}], a:2},
+ {s:"Nora", es:"Voy a la tienda. ¡Tú no comas el chocolate!", en:"I'll go to the store. Don't eat the chocolate!"},
+ {s:"", es:"Nora vuelve con la leche. Pero el chocolate... ¡no está!", en:"Nora comes back with the milk. But the chocolate... is gone!"},
+ {q:{es:"¿Qué pasó con el chocolate?", en:"What happened to the chocolate?"}, o:[{es:"Pedro se lo comió", en:"Pedro ate it"},{es:"Mamá lo tiene", en:"Mom has it"},{es:"Está en la tienda", en:"It's at the store"}], a:0},
+ {s:"Pedro", es:"Perdón... tenía hambre.", en:"Sorry... I was hungry."},
+ {s:"Nora", es:"¡Pedro! Bueno, hacemos un pastel de vainilla.", en:"Pedro! Okay, we'll make a vanilla cake."},
+ {s:"", es:"Por la tarde, mamá llega a casa.", en:"In the afternoon, Mom gets home."},
+ {q:{es:"¿Qué dicen Pedro y Nora?", en:"What do Pedro and Nora say?"}, o:[{es:"¡Feliz cumpleaños, mamá!", en:"Happy birthday, Mom!"},{es:"¡Buenas noches!", en:"Good night!"},{es:"¿Cuánto cuesta?", en:"How much is it?"}], a:0, ol:"t"},
+ {s:["Pedro y Nora","Pedro and Nora"], es:"¡Feliz cumpleaños, mamá!", en:"Happy birthday, Mom!"},
+ {s:["Mamá","Mom"], es:"¡Qué rico! Me encanta el pastel de vainilla.", en:"How delicious! I love vanilla cake."}
+]},
+{id:"rain", lv:"A1", ico:"☔", t:{es:"Un día de lluvia", en:"A rainy day"}, p:[
+ {s:"", es:"Es domingo. Llueve mucho y Sara y Leo están en casa.", en:"It's Sunday. It's raining a lot and Sara and Leo are at home."},
+ {s:"Leo", es:"Estoy aburrido. No podemos ir al parque.", en:"I'm bored. We can't go to the park."},
+ {s:"Sara", es:"¿Jugamos a las cartas?", en:"Shall we play cards?"},
+ {q:{es:"¿Por qué no van al parque?", en:"Why don't they go to the park?"}, o:[{es:"Porque llueve", en:"Because it's raining"},{es:"Porque está cerrado", en:"Because it's closed"},{es:"Porque es tarde", en:"Because it's late"}], a:0},
+ {s:"Leo", es:"No, siempre ganas tú. Mejor vemos una película.", en:"No, you always win. Let's watch a movie instead."},
+ {s:"Sara", es:"Vale. ¿Hacemos palomitas?", en:"Okay. Shall we make popcorn?"},
+ {s:"", es:"Ven una película de animales y comen palomitas en el sofá.", en:"They watch a movie about animals and eat popcorn on the sofa."},
+ {q:{es:"¿Qué hacen al final?", en:"What do they do in the end?"}, o:[{es:"Juegan a las cartas", en:"They play cards"},{es:"Ven una película", en:"They watch a movie"},{es:"Van al parque", en:"They go to the park"}], a:1},
+ {s:"", es:"A las cinco, ya no llueve. Sale el sol.", en:"At five, it isn't raining anymore. The sun comes out."},
+ {q:{es:"¿Qué dice Leo ahora?", en:"What does Leo say now?"}, o:[{es:"¡Mira, sale el sol! ¡Vamos al parque!", en:"Look, the sun is out! Let's go to the park!"},{es:"Tengo sueño.", en:"I'm sleepy."},{es:"No me gusta el sol.", en:"I don't like the sun."}], a:0, ol:"t"},
+ {s:"Leo", es:"¡Mira, sale el sol! ¡Vamos al parque!", en:"Look, the sun is out! Let's go to the park!"}
+]},
+{id:"hotel", lv:"A1", ico:"🏨", t:{es:"En el hotel", en:"At the hotel"}, p:[
+ {s:"", es:"La señora Pérez llega a un hotel en Lima.", en:"Mrs. Pérez arrives at a hotel in Lima."},
+ {s:["Recepcionista","Receptionist"], es:"Buenas noches. ¿Tiene una reserva?", en:"Good evening. Do you have a reservation?"},
+ {s:["Sra. Pérez","Mrs. Pérez"], es:"Sí, a nombre de Carmen Pérez. Dos noches.", en:"Yes, under Carmen Pérez. Two nights."},
+ {q:{es:"¿Cuántas noches se queda?", en:"How many nights is she staying?"}, o:[{es:"Una", en:"One"},{es:"Dos", en:"Two"},{es:"Tres", en:"Three"}], a:1},
+ {s:["Recepcionista","Receptionist"], es:"Muy bien. Su habitación es la 304, en el tercer piso.", en:"Very good. Your room is 304, on the third floor."},
+ {s:["Sra. Pérez","Mrs. Pérez"], es:"¿A qué hora es el desayuno?", en:"What time is breakfast?"},
+ {s:["Recepcionista","Receptionist"], es:"De siete a diez, en el restaurante.", en:"From seven to ten, in the restaurant."},
+ {q:{es:"¿En qué piso está la habitación?", en:"Which floor is the room on?"}, o:[{es:"En el primero", en:"The first"},{es:"En el tercero", en:"The third"},{es:"En el quinto", en:"The fifth"}], a:1},
+ {s:"", es:"En la habitación, la señora Pérez ve que no hay toallas.", en:"In the room, Mrs. Pérez sees that there are no towels."},
+ {q:{es:"¿Qué dice ella por teléfono?", en:"What does she say on the phone?"}, o:[{es:"Perdón, no hay toallas en mi habitación.", en:"Excuse me, there are no towels in my room."},{es:"El desayuno está rico.", en:"Breakfast is tasty."},{es:"Quiero un taxi.", en:"I want a taxi."}], a:0, ol:"t"},
+ {s:["Sra. Pérez","Mrs. Pérez"], es:"Perdón, no hay toallas en mi habitación.", en:"Excuse me, there are no towels in my room."},
+ {s:["Recepcionista","Receptionist"], es:"¡Lo siento! Ahora mismo se las llevamos.", en:"I'm sorry! We'll bring them right away."}
+]},
+/* ---------- A2 ---------- */
+{id:"firstday", lv:"A2", ico:"🏫", t:{es:"El primer día de trabajo", en:"The first day at work"}, p:[
+ {s:"", es:"Ayer fue el primer día de Marcos en su nuevo trabajo. Se levantó a las seis porque estaba nervioso.", en:"Yesterday was Marcos's first day at his new job. He got up at six because he was nervous."},
+ {s:"", es:"Llegó a la oficina media hora antes. No había nadie.", en:"He got to the office half an hour early. There was nobody there."},
+ {q:{es:"¿Por qué se levantó temprano?", en:"Why did he get up early?"}, o:[{es:"Porque estaba nervioso", en:"Because he was nervous"},{es:"Porque vive lejos", en:"Because he lives far away"},{es:"Porque tenía hambre", en:"Because he was hungry"}], a:0},
+ {s:["Jefa","Boss"], es:"¡Buenos días, Marcos! Llegaste muy temprano. Te presento a tu equipo.", en:"Good morning, Marcos! You got here very early. Let me introduce you to your team."},
+ {s:"Julia", es:"Hola, soy Julia. Si tienes preguntas, me puedes preguntar a mí.", en:"Hi, I'm Julia. If you have questions, you can ask me."},
+ {s:"", es:"Por la mañana aprendió a usar el programa de la empresa. Fue difícil, pero Julia lo ayudó mucho.", en:"In the morning he learned to use the company's software. It was hard, but Julia helped him a lot."},
+ {q:{es:"¿Quién ayudó a Marcos?", en:"Who helped Marcos?"}, o:[{es:"Su jefa", en:"His boss"},{es:"Julia", en:"Julia"},{es:"Nadie", en:"Nobody"}], a:1},
+ {s:"", es:"A mediodía comieron todos juntos en un restaurante cerca de la oficina.", en:"At noon they all ate together at a restaurant near the office."},
+ {s:"", es:"Por la tarde, Marcos tuvo su primera reunión. Habló poco, pero escuchó mucho.", en:"In the afternoon, Marcos had his first meeting. He didn't talk much, but he listened a lot."},
+ {q:{es:"¿Qué hizo Marcos en la reunión?", en:"What did Marcos do in the meeting?"}, o:[{es:"Habló mucho", en:"He talked a lot"},{es:"Escuchó mucho", en:"He listened a lot"},{es:"Se durmió", en:"He fell asleep"}], a:1},
+ {s:"", es:"Cuando volvió a casa, su madre le preguntó qué tal el día.", en:"When he got home, his mother asked him how his day went."},
+ {q:{es:"¿Qué le responde Marcos?", en:"What does Marcos answer?"}, o:[{es:"Muy bien. Mis compañeros son muy simpáticos.", en:"Very good. My coworkers are really nice."},{es:"Mañana no voy a ir.", en:"I'm not going tomorrow."},{es:"Perdí el trabajo.", en:"I lost the job."}], a:0, ol:"t"},
+ {s:"Marcos", es:"Muy bien. Mis compañeros son muy simpáticos.", en:"Very good. My coworkers are really nice."}
+]},
+{id:"recipe", lv:"A2", ico:"🥘", t:{es:"La receta de la abuela", en:"Grandma's recipe"}, p:[
+ {s:"", es:"Lucía quería preparar la sopa de su abuela, así que la llamó por teléfono.", en:"Lucía wanted to make her grandmother's soup, so she called her on the phone."},
+ {s:["Abuela","Grandma"], es:"Primero, corta una cebolla, dos zanahorias y una papa.", en:"First, cut an onion, two carrots and a potato."},
+ {s:["Abuela","Grandma"], es:"Después, ponlo todo en una olla con agua y un poco de sal.", en:"Then, put it all in a pot with water and a little salt."},
+ {q:{es:"¿Cuántas zanahorias necesita?", en:"How many carrots does she need?"}, o:[{es:"Una", en:"One"},{es:"Dos", en:"Two"},{es:"Cuatro", en:"Four"}], a:1},
+ {s:"Lucía", es:"¿Y cuánto tiempo tiene que cocinarse?", en:"And how long does it need to cook?"},
+ {s:["Abuela","Grandma"], es:"Media hora, a fuego lento. Y al final, un poco de cilantro.", en:"Half an hour, on low heat. And at the end, a little cilantro."},
+ {q:{es:"¿Cuánto tiempo se cocina la sopa?", en:"How long does the soup cook?"}, o:[{es:"Diez minutos", en:"Ten minutes"},{es:"Media hora", en:"Half an hour"},{es:"Dos horas", en:"Two hours"}], a:1},
+ {s:"", es:"Lucía siguió todos los pasos. Pero mientras esperaba, se puso a ver una serie y se olvidó de la sopa.", en:"Lucía followed every step. But while she was waiting, she started watching a show and forgot about the soup."},
+ {s:"", es:"Cuando volvió a la cocina, la sopa estaba casi sin agua.", en:"When she went back to the kitchen, the soup had almost no water left."},
+ {q:{es:"¿Qué le pasó a la sopa?", en:"What happened to the soup?"}, o:[{es:"Se quedó casi sin agua", en:"It almost ran out of water"},{es:"Estaba fría", en:"It was cold"},{es:"Estaba perfecta", en:"It was perfect"}], a:0},
+ {s:"Lucía", es:"Abuela, creo que la sopa ahora es un guiso.", en:"Grandma, I think the soup is a stew now."},
+ {s:["Abuela","Grandma"], es:"¡Ja, ja! No pasa nada. El domingo la hacemos juntas.", en:"Ha ha! Don't worry. On Sunday we'll make it together."}
+]},
+{id:"moving", lv:"A2", ico:"📦", t:{es:"La mudanza", en:"Moving day"}, p:[
+ {s:"", es:"El sábado pasado, Diana y su novio se mudaron a un apartamento nuevo.", en:"Last Saturday, Diana and her boyfriend moved into a new apartment."},
+ {s:"", es:"Tenían cuarenta cajas, un sofá enorme y una planta muy grande.", en:"They had forty boxes, a huge sofa and a very big plant."},
+ {q:{es:"¿Cuántas cajas tenían?", en:"How many boxes did they have?"}, o:[{es:"Catorce", en:"Fourteen"},{es:"Cuarenta", en:"Forty"},{es:"Cuatrocientas", en:"Four hundred"}], a:1},
+ {s:"", es:"Sus amigos vinieron a ayudar. El problema era que el edificio no tenía ascensor y el apartamento estaba en el cuarto piso.", en:"Their friends came to help. The problem was that the building had no elevator and the apartment was on the fourth floor."},
+ {s:"Raúl", es:"¿Quién compró este sofá? ¡Pesa muchísimo!", en:"Who bought this sofa? It weighs a ton!"},
+ {q:{es:"¿Cuál era el problema?", en:"What was the problem?"}, o:[{es:"No había ascensor", en:"There was no elevator"},{es:"Llovía mucho", en:"It was raining hard"},{es:"Perdieron las llaves", en:"They lost the keys"}], a:0},
+ {s:"", es:"Después de cinco horas, todo estaba arriba. Estaban cansadísimos.", en:"After five hours, everything was upstairs. They were exhausted."},
+ {s:"Diana", es:"Muchas gracias a todos. Los invito a pizza.", en:"Thank you all so much. Pizza is on me."},
+ {s:"", es:"Mientras comían, Diana vio algo por la ventana: en el edificio de enfrente había un cartel.", en:"While they were eating, Diana saw something through the window: there was a sign on the building across the street."},
+ {q:{es:"¿Qué decía el cartel?", en:"What did the sign say?"}, o:[{es:"Se alquila apartamento con ascensor.", en:"Apartment for rent with elevator."},{es:"Pizza gratis.", en:"Free pizza."},{es:"Cerrado.", en:"Closed."}], a:0, ol:"t"},
+ {s:"", es:"El cartel decía: «Se alquila apartamento con ascensor».", en:"The sign said: \"Apartment for rent with elevator.\""},
+ {s:"Raúl", es:"La próxima vez, ¡miren eso primero!", en:"Next time, check that first!"}
+]},
+{id:"concert", lv:"A2", ico:"🎤", t:{es:"El concierto", en:"The concert"}, p:[
+ {s:"", es:"Valentina compró entradas para el concierto de su cantante favorita hace seis meses.", en:"Valentina bought tickets for her favorite singer's concert six months ago."},
+ {s:"", es:"El día del concierto, fue con su prima Sofía. Había muchísima gente.", en:"On the day of the concert, she went with her cousin Sofía. There were tons of people."},
+ {q:{es:"¿Con quién fue Valentina?", en:"Who did Valentina go with?"}, o:[{es:"Con su hermana", en:"With her sister"},{es:"Con su prima", en:"With her cousin"},{es:"Sola", en:"Alone"}], a:1},
+ {s:"Sofía", es:"¿Dónde están las entradas?", en:"Where are the tickets?"},
+ {s:"Valentina", es:"Están en mi teléfono... ¡Ay, no! ¡Tengo un cinco por ciento de batería!", en:"They're on my phone... Oh no! I have five percent battery!"},
+ {q:{es:"¿Cuál es el problema?", en:"What's the problem?"}, o:[{es:"El teléfono casi no tiene batería", en:"The phone is almost out of battery"},{es:"Perdió las entradas", en:"She lost the tickets"},{es:"El concierto se canceló", en:"The concert was canceled"}], a:0},
+ {s:"", es:"Corrieron a la entrada y enseñaron las entradas justo antes de que el teléfono se apagara.", en:"They ran to the entrance and showed the tickets right before the phone died."},
+ {s:"", es:"El concierto fue increíble. Cantaron todas las canciones y bailaron durante dos horas.", en:"The concert was amazing. They sang every song and danced for two hours."},
+ {q:{es:"¿Cuánto tiempo bailaron?", en:"How long did they dance?"}, o:[{es:"Media hora", en:"Half an hour"},{es:"Dos horas", en:"Two hours"},{es:"Toda la noche", en:"All night"}], a:1},
+ {s:"Sofía", es:"La próxima vez traemos una batería extra, ¿vale?", en:"Next time we bring a spare battery, okay?"},
+ {s:"Valentina", es:"¡Y entradas de papel!", en:"And paper tickets!"}
+]},
+/* ---------- B1 ---------- */
+{id:"blinddate", lv:"B1", ico:"☕", t:{es:"La cita a ciegas", en:"The blind date"}, p:[
+ {s:"", es:"Hacía meses que Julia no salía con nadie, así que su amiga Paula le organizó una cita a ciegas.", en:"Julia hadn't gone out with anyone in months, so her friend Paula set her up on a blind date."},
+ {s:"Paula", es:"Se llama Andrés. Es ingeniero, le encanta cocinar y tiene un perro. Te va a gustar.", en:"His name is Andrés. He's an engineer, he loves to cook and he has a dog. You're going to like him."},
+ {q:{es:"¿Quién organizó la cita?", en:"Who set up the date?"}, o:[{es:"Su madre", en:"Her mother"},{es:"Su amiga Paula", en:"Her friend Paula"},{es:"Una aplicación", en:"An app"}], a:1},
+ {s:"", es:"Quedaron en una cafetería a las seis. Julia llegó puntual, pero Andrés no aparecía.", en:"They agreed to meet at a café at six. Julia arrived on time, but Andrés didn't show up."},
+ {s:"", es:"A las seis y veinte, un chico entró corriendo, empapado por la lluvia.", en:"At twenty past six, a guy rushed in, soaked from the rain."},
+ {s:"Andrés", es:"¡Perdona! El autobús se averió y tuve que venir andando. Normalmente soy muy puntual, te lo prometo.", en:"Sorry! The bus broke down and I had to walk here. I'm usually very punctual, I promise."},
+ {q:{es:"¿Por qué llegó tarde Andrés?", en:"Why was Andrés late?"}, o:[{es:"Se le olvidó", en:"He forgot"},{es:"Se averió el autobús", en:"The bus broke down"},{es:"Estaba con su perro", en:"He was with his dog"}], a:1},
+ {s:"", es:"Julia se rio. Le pidió una toalla al camarero y Andrés pidió dos chocolates calientes.", en:"Julia laughed. She asked the waiter for a towel and Andrés ordered two hot chocolates."},
+ {s:"", es:"Hablaron de viajes, de libros y de sus peores citas. Cuando miraron el reloj, eran las diez.", en:"They talked about travel, books and their worst dates. When they looked at the clock, it was ten."},
+ {q:{es:"¿Qué quiere decir que «eran las diez»?", en:"What does \"it was ten\" tell us?"}, o:[{es:"Que se lo pasaron bien y el tiempo voló", en:"That they had a good time and time flew"},{es:"Que la cafetería cerró temprano", en:"That the café closed early"},{es:"Que se aburrieron", en:"That they got bored"}], a:0},
+ {s:"Andrés", es:"¿Te puedo invitar a cenar el sábado? Esta vez llego antes, aunque tenga que venir nadando.", en:"Can I take you to dinner on Saturday? This time I'll be early, even if I have to swim here."},
+ {q:{es:"¿Qué responde Julia?", en:"What does Julia answer?"}, o:[{es:"Me encantaría. Pero cocinas tú.", en:"I'd love to. But you're cooking."},{es:"No, gracias. Llegaste tarde.", en:"No, thanks. You were late."},{es:"No me gusta el chocolate.", en:"I don't like chocolate."}], a:0, ol:"t"},
+ {s:"Julia", es:"Me encantaría. Pero cocinas tú.", en:"I'd love to. But you're cooking."}
+]},
+{id:"scam", lv:"B1", ico:"📱", t:{es:"El mensaje sospechoso", en:"The suspicious message"}, p:[
+ {s:"", es:"Una mañana, Héctor recibió un mensaje en el móvil: «Su cuenta bancaria ha sido bloqueada. Haga clic aquí para desbloquearla».", en:"One morning, Héctor got a text: \"Your bank account has been blocked. Click here to unlock it.\""},
+ {s:"", es:"Se asustó, porque tenía que pagar el alquiler ese mismo día.", en:"He got scared, because he had to pay the rent that very day."},
+ {q:{es:"¿Por qué se asustó Héctor?", en:"Why did Héctor get scared?"}, o:[{es:"Tenía que pagar el alquiler ese día", en:"He had to pay the rent that day"},{es:"Perdió el móvil", en:"He lost his phone"},{es:"No tenía trabajo", en:"He had no job"}], a:0},
+ {s:"", es:"Estaba a punto de hacer clic cuando su hija adolescente miró la pantalla.", en:"He was about to click when his teenage daughter looked at the screen."},
+ {s:"Inés", es:"¡Papá, no! Mira el enlace. No es la página del banco. Es una estafa.", en:"Dad, no! Look at the link. That's not the bank's website. It's a scam."},
+ {s:"Héctor", es:"¿Cómo lo sabes?", en:"How do you know?"},
+ {s:"Inés", es:"El banco nunca te pide tu contraseña por mensaje. Además, tiene faltas de ortografía.", en:"The bank never asks for your password by text. Also, it has spelling mistakes."},
+ {q:{es:"¿Cómo supo Inés que era una estafa?", en:"How did Inés know it was a scam?"}, o:[{es:"Por el enlace y las faltas de ortografía", en:"From the link and the spelling mistakes"},{es:"Porque trabaja en el banco", en:"Because she works at the bank"},{es:"Porque lo vio en la tele", en:"Because she saw it on TV"}], a:0},
+ {s:"", es:"Héctor llamó al banco desde el número de su tarjeta. Su cuenta estaba perfectamente.", en:"Héctor called the bank using the number on his card. His account was perfectly fine."},
+ {s:"Héctor", es:"Si no hubieras estado aquí, habría perdido todo mi dinero.", en:"If you hadn't been here, I would have lost all my money."},
+ {q:{es:"¿Qué consejo nos da la historia?", en:"What advice does the story give us?"}, o:[{es:"Comprueba siempre antes de hacer clic", en:"Always check before you click"},{es:"Cambia de banco", en:"Change banks"},{es:"No uses el móvil", en:"Don't use your phone"}], a:0},
+ {s:"Inés", es:"Me debes una, papá. ¿Me subes la paga?", en:"You owe me one, Dad. Will you raise my allowance?"}
+]},
+{id:"roadtrip", lv:"B1", ico:"🚗", t:{es:"El viaje por carretera", en:"The road trip"}, p:[
+ {s:"", es:"Tres amigos decidieron cruzar el país en coche durante las vacaciones. Habían planeado cada detalle.", en:"Three friends decided to drive across the country during their vacation. They had planned every detail."},
+ {s:"", es:"El segundo día, en medio del desierto, el coche empezó a hacer un ruido extraño y se paró.", en:"On the second day, in the middle of the desert, the car started making a strange noise and stopped."},
+ {q:{es:"¿Dónde se paró el coche?", en:"Where did the car stop?"}, o:[{es:"En una ciudad", en:"In a city"},{es:"En medio del desierto", en:"In the middle of the desert"},{es:"En la playa", en:"At the beach"}], a:1},
+ {s:"Óscar", es:"No hay cobertura. ¿Qué hacemos ahora?", en:"There's no signal. What do we do now?"},
+ {s:"Nerea", es:"Tranquilos. Tenemos agua y comida. Esperemos a que pase alguien.", en:"Relax. We have water and food. Let's wait for someone to come by."},
+ {s:"", es:"Una hora después, paró un camión. El conductor, un señor mayor llamado Ramón, sabía de mecánica.", en:"An hour later, a truck stopped. The driver, an older man named Ramón, knew about mechanics."},
+ {q:{es:"¿Quién los ayudó?", en:"Who helped them?"}, o:[{es:"La policía", en:"The police"},{es:"Un camionero llamado Ramón", en:"A truck driver named Ramón"},{es:"Otros turistas", en:"Other tourists"}], a:1},
+ {s:"Ramón", es:"Es la correa del motor. La puedo arreglar, pero tardaré un rato.", en:"It's the engine belt. I can fix it, but it'll take a while."},
+ {s:"", es:"Mientras Ramón trabajaba, les contó historias de sus cuarenta años en la carretera. Los chicos no paraban de reír.", en:"While Ramón worked, he told them stories about his forty years on the road. The friends couldn't stop laughing."},
+ {q:{es:"¿Cómo se sintieron los amigos al final?", en:"How did the friends feel in the end?"}, o:[{es:"Agradecidos y contentos", en:"Grateful and happy"},{es:"Enfadados", en:"Angry"},{es:"Aburridos", en:"Bored"}], a:0},
+ {s:"Nerea", es:"Al final, lo mejor del viaje fue lo único que no habíamos planeado.", en:"In the end, the best part of the trip was the only thing we hadn't planned."}
+]},
+{id:"volunteer", lv:"B1", ico:"🤝", t:{es:"El voluntariado", en:"Volunteering"}, p:[
+ {s:"", es:"Después de jubilarse, Rosa se aburría en casa. Un día vio un anuncio: buscaban voluntarios para enseñar a leer a adultos.", en:"After retiring, Rosa was bored at home. One day she saw an ad: they were looking for volunteers to teach adults to read."},
+ {q:{es:"¿Por qué buscó Rosa algo que hacer?", en:"Why did Rosa look for something to do?"}, o:[{es:"Se aburría después de jubilarse", en:"She was bored after retiring"},{es:"Necesitaba dinero", en:"She needed money"},{es:"Su médico se lo dijo", en:"Her doctor told her to"}], a:0},
+ {s:"", es:"Su primer alumno fue don Ernesto, un hombre de setenta años que nunca había ido a la escuela.", en:"Her first student was Don Ernesto, a seventy-year-old man who had never gone to school."},
+ {s:"Ernesto", es:"Toda la vida he tenido vergüenza. Firmaba con una cruz.", en:"I've been ashamed my whole life. I signed with a cross."},
+ {s:"Rosa", es:"Nunca es tarde. Vamos a empezar con su nombre.", en:"It's never too late. Let's start with your name."},
+ {q:{es:"¿Por qué tenía vergüenza don Ernesto?", en:"Why was Don Ernesto ashamed?"}, o:[{es:"Porque no sabía leer ni escribir", en:"Because he couldn't read or write"},{es:"Porque era muy mayor", en:"Because he was very old"},{es:"Porque no tenía familia", en:"Because he had no family"}], a:0},
+ {s:"", es:"Durante meses se vieron dos veces por semana. Algunos días don Ernesto quería rendirse, pero Rosa no lo dejaba.", en:"For months they met twice a week. Some days Don Ernesto wanted to give up, but Rosa wouldn't let him."},
+ {s:"", es:"En diciembre, don Ernesto le dio a Rosa un sobre. Dentro había una tarjeta escrita a mano.", en:"In December, Don Ernesto gave Rosa an envelope. Inside was a handwritten card."},
+ {q:{es:"¿Qué había en el sobre?", en:"What was in the envelope?"}, o:[{es:"Una tarjeta escrita por él", en:"A card he had written"},{es:"Dinero", en:"Money"},{es:"Una foto", en:"A photo"}], a:0},
+ {s:"", es:"La tarjeta decía: «Gracias, maestra. Hoy le he leído un cuento a mi nieta».", en:"The card said: \"Thank you, teacher. Today I read a story to my granddaughter.\""},
+ {q:{es:"¿Cómo crees que se sintió Rosa?", en:"How do you think Rosa felt?"}, o:[{es:"Muy emocionada y orgullosa", en:"Very moved and proud"},{es:"Indiferente", en:"Indifferent"},{es:"Enfadada", en:"Angry"}], a:0}
+]},
+/* ---------- B2 ---------- */
+{id:"inheritance", lv:"B2", ico:"🗝️", t:{es:"La herencia", en:"The inheritance"}, p:[
+ {s:"", es:"Cuando murió su tío abuelo, a quien apenas conocía, Daniel recibió una carta del notario: le había dejado una casa en un pueblo de Asturias.", en:"When his great-uncle, whom he barely knew, died, Daniel received a letter from the notary: he had left him a house in a village in Asturias."},
+ {q:{es:"¿Qué heredó Daniel?", en:"What did Daniel inherit?"}, o:[{es:"Una casa en un pueblo", en:"A house in a village"},{es:"Mucho dinero", en:"A lot of money"},{es:"Un negocio", en:"A business"}], a:0},
+ {s:"", es:"Su primera idea fue venderla cuanto antes, pero decidió ir a verla antes de tomar una decisión.", en:"His first idea was to sell it as soon as possible, but he decided to go see it before making a decision."},
+ {s:"", es:"La casa estaba en ruinas, pero tenía unas vistas espectaculares al mar. En el pueblo todos parecían conocerlo.", en:"The house was in ruins, but it had spectacular views of the sea. In the village everyone seemed to know him."},
+ {s:["Vecina","Neighbor"], es:"¡Tú debes de ser Daniel! Tu tío hablaba de ti a todas horas. Guardaba todas las postales que le mandabas de niño.", en:"You must be Daniel! Your uncle talked about you all the time. He kept every postcard you sent him as a kid."},
+ {q:{es:"¿Qué descubrió Daniel?", en:"What did Daniel find out?"}, o:[{es:"Que su tío lo quería mucho", en:"That his uncle loved him very much"},{es:"Que la casa valía millones", en:"That the house was worth millions"},{es:"Que tenía un primo", en:"That he had a cousin"}], a:0},
+ {s:"", es:"Daniel no recordaba haberle escrito nunca. Pero en un cajón encontró decenas de postales con su letra infantil.", en:"Daniel didn't remember ever writing to him. But in a drawer he found dozens of postcards in his childish handwriting."},
+ {s:"Daniel", es:"Si lo hubiera sabido, habría venido a verlo. Ahora ya es tarde.", en:"If I had known, I would have come to see him. Now it's too late."},
+ {q:{es:"¿Qué siente Daniel?", en:"How does Daniel feel?"}, o:[{es:"Arrepentimiento", en:"Regret"},{es:"Alegría", en:"Joy"},{es:"Miedo", en:"Fear"}], a:0},
+ {s:"", es:"Esa noche, en lugar de llamar a la inmobiliaria, llamó a un arquitecto.", en:"That night, instead of calling the real estate agency, he called an architect."},
+ {q:{es:"¿Qué decidió hacer con la casa?", en:"What did he decide to do with the house?"}, o:[{es:"Restaurarla y quedársela", en:"Restore it and keep it"},{es:"Venderla", en:"Sell it"},{es:"Derribarla", en:"Tear it down"}], a:0},
+ {s:"", es:"Un año después, la casa tenía las ventanas nuevas y, en la pared del salón, un marco con todas las postales.", en:"A year later, the house had new windows and, on the living-room wall, a frame with all the postcards."}
+]},
+{id:"ai", lv:"B2", ico:"🤖", t:{es:"El ayudante perfecto", en:"The perfect assistant"}, p:[
+ {s:"", es:"Mónica, jefa de un pequeño estudio de diseño, empezó a usar un asistente de inteligencia artificial para ahorrar tiempo.", en:"Mónica, who runs a small design studio, started using an AI assistant to save time."},
+ {s:"", es:"Al principio estaba encantada: le redactaba los correos, le organizaba la agenda e incluso le proponía ideas.", en:"At first she was delighted: it drafted her emails, organized her schedule and even suggested ideas."},
+ {q:{es:"¿Para qué usaba Mónica el asistente al principio?", en:"What did Mónica use the assistant for at first?"}, o:[{es:"Para ahorrar tiempo en tareas", en:"To save time on tasks"},{es:"Para despedir empleados", en:"To fire employees"},{es:"Para jugar", en:"To play games"}], a:0},
+ {s:"", es:"Pero un día, un cliente importante la llamó, molesto: el presupuesto que había recibido tenía un precio equivocado.", en:"But one day, an important client called her, annoyed: the quote he had received had the wrong price."},
+ {s:"Mónica", es:"No lo entiendo. Yo no revisé ese correo; supuse que estaba bien.", en:"I don't get it. I didn't check that email; I assumed it was fine."},
+ {q:{es:"¿Cuál fue el error de Mónica?", en:"What was Mónica's mistake?"}, o:[{es:"No revisó el correo antes de enviarlo", en:"She didn't check the email before sending it"},{es:"Se olvidó de llamar", en:"She forgot to call"},{es:"Cobró demasiado poco a propósito", en:"She undercharged on purpose"}], a:0},
+ {s:"", es:"Mónica pidió disculpas, corrigió el precio y el cliente aceptó, aunque le dejó claro que esperaba más cuidado.", en:"Mónica apologized, corrected the price and the client accepted, though he made it clear he expected more care."},
+ {s:"Mónica", es:"La herramienta es útil, pero la responsabilidad sigue siendo mía.", en:"The tool is useful, but the responsibility is still mine."},
+ {q:{es:"¿Qué aprendió Mónica?", en:"What did Mónica learn?"}, o:[{es:"Que debe revisar lo que envía, aunque lo haga una herramienta", en:"That she must check what she sends, even if a tool wrote it"},{es:"Que la inteligencia artificial es inútil", en:"That AI is useless"},{es:"Que debe cambiar de cliente", en:"That she should change clients"}], a:0},
+ {s:"", es:"Desde entonces, sigue usando el asistente, pero ha añadido una regla en el estudio: nada sale sin que lo lea una persona.", en:"Since then, she still uses the assistant, but she has added a rule at the studio: nothing goes out unless a person has read it."},
+ {q:{es:"¿Cuál es la nueva regla?", en:"What is the new rule?"}, o:[{es:"Una persona lo revisa todo antes de enviarlo", en:"A person reviews everything before it goes out"},{es:"Prohibido usar el asistente", en:"The assistant is banned"},{es:"Solo se trabaja por la mañana", en:"Work only in the mornings"}], a:0}
+]},
+{id:"marathon", lv:"B2", ico:"🏃", t:{es:"El maratón", en:"The marathon"}, p:[
+ {s:"", es:"A los cuarenta y cinco años, Javier, que no había corrido en su vida, se apuntó a un maratón para demostrarse que todavía era capaz de cambiar.", en:"At forty-five, Javier, who had never run in his life, signed up for a marathon to prove to himself that he was still capable of change."},
+ {q:{es:"¿Por qué se apuntó Javier al maratón?", en:"Why did Javier sign up for the marathon?"}, o:[{es:"Para demostrarse que podía cambiar", en:"To prove to himself he could change"},{es:"Porque era atleta", en:"Because he was an athlete"},{es:"Por una apuesta", en:"Because of a bet"}], a:0},
+ {s:"", es:"Los primeros meses fueron duros. Tenía agujetas, se le hacían ampollas y más de una vez estuvo a punto de tirar la toalla.", en:"The first months were tough. He was sore, he got blisters and more than once he nearly threw in the towel."},
+ {s:"", es:"Su hija adolescente, que al principio se reía de él, empezó a acompañarlo en bicicleta.", en:"His teenage daughter, who laughed at him at first, started going with him on her bike."},
+ {q:{es:"¿Cómo cambió la actitud de su hija?", en:"How did his daughter's attitude change?"}, o:[{es:"Pasó de reírse a apoyarlo", en:"She went from laughing to supporting him"},{es:"Dejó de hablarle", en:"She stopped talking to him"},{es:"Empezó a correr más que él", en:"She started running faster than him"}], a:0},
+ {s:"", es:"El día de la carrera, en el kilómetro treinta, sintió que no podía más. Se paró junto a la valla.", en:"On race day, at kilometer thirty, he felt he couldn't go on. He stopped by the barrier."},
+ {s:["Hija","Daughter"], es:"¡Papá! ¡Quedan doce kilómetros, no doce años! ¡Venga!", en:"Dad! It's twelve kilometers to go, not twelve years! Come on!"},
+ {q:{es:"¿Qué hizo su hija en el kilómetro treinta?", en:"What did his daughter do at kilometer thirty?"}, o:[{es:"Lo animó a seguir", en:"She encouraged him to keep going"},{es:"Lo llevó a casa", en:"She took him home"},{es:"Llamó a un médico", en:"She called a doctor"}], a:0},
+ {s:"", es:"Javier cruzó la meta en cinco horas y diez minutos, casi el último. Pero nunca se había sentido tan orgulloso.", en:"Javier crossed the finish line in five hours and ten minutes, almost last. But he had never felt so proud."},
+ {s:"Javier", es:"No he ganado la carrera, pero me he ganado a mí mismo.", en:"I didn't win the race, but I won something in myself."},
+ {q:{es:"¿Qué quiere decir Javier?", en:"What does Javier mean?"}, o:[{es:"Que lo importante fue superarse", en:"That what mattered was overcoming himself"},{es:"Que hizo trampa", en:"That he cheated"},{es:"Que no volverá a correr", en:"That he'll never run again"}], a:0}
+]},
+{id:"strike", lv:"B2", ico:"🪧", t:{es:"La huelga", en:"The strike"}, p:[
+ {s:"", es:"Los trabajadores de la fábrica llevaban meses pidiendo una subida de sueldo. Ante la falta de respuesta, el sindicato convocó una huelga.", en:"The factory workers had been asking for a raise for months. With no answer, the union called a strike."},
+ {q:{es:"¿Por qué convocaron la huelga?", en:"Why was the strike called?"}, o:[{es:"La empresa no respondía a su petición de subida", en:"The company didn't respond to their request for a raise"},{es:"Cerraron la fábrica", en:"The factory closed"},{es:"Hubo un accidente", en:"There was an accident"}], a:0},
+ {s:"", es:"Elena, que llevaba veinte años en la empresa, dudaba. Tenía una hipoteca y dos hijos, y temía las consecuencias.", en:"Elena, who had been with the company for twenty years, hesitated. She had a mortgage and two kids, and she feared the consequences."},
+ {s:"Elena", es:"Estoy de acuerdo con las reivindicaciones, pero no puedo permitirme perder el trabajo.", en:"I agree with the demands, but I can't afford to lose my job."},
+ {s:["Compañero","Coworker"], es:"Si no nos unimos ahora, nada cambiará. Cuantos más seamos, más difícil será que nos ignoren.", en:"If we don't stand together now, nothing will change. The more of us there are, the harder it will be to ignore us."},
+ {q:{es:"¿Cuál es el argumento del compañero?", en:"What is the coworker's argument?"}, o:[{es:"La unión les da más fuerza", en:"Unity gives them more strength"},{es:"La huelga es ilegal", en:"The strike is illegal"},{es:"Elena debería cambiar de trabajo", en:"Elena should change jobs"}], a:0},
+ {s:"", es:"Al final, Elena se sumó a la huelga. Durante tres días, la fábrica estuvo parada.", en:"In the end, Elena joined the strike. For three days, the factory was at a standstill."},
+ {s:"", es:"El cuarto día, la dirección propuso negociar. Tras dos semanas de reuniones, llegaron a un acuerdo: una subida menor de lo que pedían, pero mayor de lo que ofrecían al principio.", en:"On the fourth day, management offered to negotiate. After two weeks of meetings, they reached an agreement: a smaller raise than they had asked for, but bigger than what was first offered."},
+ {q:{es:"¿Cómo terminó el conflicto?", en:"How did the conflict end?"}, o:[{es:"Con un acuerdo intermedio", en:"With a compromise"},{es:"Con despidos", en:"With layoffs"},{es:"Sin ningún cambio", en:"With no change at all"}], a:0},
+ {s:"Elena", es:"No conseguimos todo, pero aprendí que callarse también tiene un precio.", en:"We didn't get everything, but I learned that staying quiet has a price too."},
+ {q:{es:"¿Qué aprendió Elena?", en:"What did Elena learn?"}, o:[{es:"Que no actuar también tiene consecuencias", en:"That not acting has consequences too"},{es:"Que las huelgas no sirven", en:"That strikes don't work"},{es:"Que debe callarse", en:"That she should keep quiet"}], a:0}
+]}
+);
+
 /* ===================== Story player and daily quests ===================== */
 profile.path = {}; profile.mastered = 0; profile.stories = {}; profile.quests = {d:"", list:[]}; profile.questsDone = 0; profile.combo = 0;
 
@@ -11444,6 +11929,171 @@ renderMenu = (orig => function(){
   $("customGroup").hidden = setup.mode !== 9;
   if(setup.mode === 9){ $("levelGroup").hidden = true; renderCustom(); }
 })(renderMenu);
+
+/* ===================== The Clock: optional timers for every mode ===================== */
+Object.assign(I18N.en, {
+  clock:"Clock", ck_off:"Off", ck_relax:"Relaxed", ck_brisk:"Brisk", ck_blitz:"Blitz", ck_attack:"Time Attack",
+  ckn_off:"No timer. Take your time.",
+  ckn_relax:"About 30 seconds a question, more for long answers. Answer in the first half for bonus XP.",
+  ckn_brisk:"About 18 seconds a question. Quick answers earn bonus XP; three in a row sets you on fire.",
+  ckn_blitz:"About 10 seconds a question. Run out and it counts as a miss.",
+  ckn_attack:"One clock for the whole run: 60 seconds. Right answers add 5 seconds, misses take 3. How many can you get?",
+  timeUp:"⏰ Time's up!", quick:"⚡ Quick! +{xp} XP", lightning:"⚡ Lightning! +{xp} XP", onFire:"🔥 On fire! +{xp} XP",
+  atkOverT:"Time!", atkOverB:"{c} right answers out of {n} in Time Attack.", atkBest:"Best: {b}", atkNew:"🏆 New best!",
+  stFast:"fast answers", ckBestShort:"best {b}"
+});
+Object.assign(I18N.es, {
+  clock:"Reloj", ck_off:"Sin reloj", ck_relax:"Tranquilo", ck_brisk:"Ágil", ck_blitz:"Relámpago", ck_attack:"Contrarreloj",
+  ckn_off:"Sin temporizador. Tómate tu tiempo.",
+  ckn_relax:"Unos 30 segundos por pregunta, más si la respuesta es larga. Responde en la primera mitad para ganar XP extra.",
+  ckn_brisk:"Unos 18 segundos por pregunta. Las respuestas rápidas dan XP extra; tres seguidas y estás que ardes.",
+  ckn_blitz:"Unos 10 segundos por pregunta. Si se acaba el tiempo, cuenta como fallo.",
+  ckn_attack:"Un solo reloj para toda la partida: 60 segundos. Cada acierto suma 5 segundos y cada fallo resta 3. ¿Cuántas aciertas?",
+  timeUp:"⏰ ¡Se acabó el tiempo!", quick:"⚡ ¡Rápido! +{xp} XP", lightning:"⚡ ¡Relámpago! +{xp} XP", onFire:"🔥 ¡Estás que ardes! +{xp} XP",
+  atkOverT:"¡Tiempo!", atkOverB:"{c} aciertos de {n} en Contrarreloj.", atkBest:"Récord: {b}", atkNew:"🏆 ¡Nuevo récord!",
+  stFast:"respuestas rápidas", ckBestShort:"récord {b}"
+});
+const CLOCKS = ["off", "relax", "brisk", "blitz", "attack"];
+const CK_ICO = {off:"🕊️", relax:"🐢", brisk:"🐇", blitz:"⚡", attack:"⏱️"};
+const CK_BASE = {relax:30, brisk:18, blitz:10}, CK_PER = {relax:6, brisk:9, blitz:12}, CK_PAIR = {relax:4, brisk:3, blitz:2};
+const ATK_START = 60000, ATK_PLUS = 5000, ATK_MINUS = 3000;
+profile.clock = profile.clock || "off"; profile.attackBest = profile.attackBest || {};
+
+/* ---------- Menu: pick a clock ---------- */
+(() => {
+  const sec = document.createElement("section");
+  sec.className = "group"; sec.id = "clockGroup";
+  sec.innerHTML = `<h2>⏱️ <span data-i18n="clock">${esc(t("clock"))}</span></h2><div class="levels clocks" role="radiogroup" id="clockChips"></div><p class="note" id="clockNote"></p>`;
+  $("levelGroup").after(sec);
+})();
+function renderClock(){
+  const c = CLOCKS.includes(profile.clock) ? profile.clock : "off";
+  $("clockChips").innerHTML = CLOCKS.map(k => `<button class="lv ck" role="radio" aria-checked="${c === k}" data-clock="${k}"><span aria-hidden="true">${CK_ICO[k]}</span> ${esc(t("ck_" + k))}</button>`).join("");
+  const best = profile.attackBest[setup.mode];
+  $("clockNote").textContent = t("ckn_" + c) + (c === "attack" && best ? " " + t("atkBest", {b:best}) + "." : "");
+  $("clockGroup").hidden = setup.mode === 9;   // Custom Game has its own timer
+}
+renderMenu = (orig => function(){ orig(); renderClock(); })(renderMenu);
+$("clockChips").addEventListener("click", e => {
+  const b = e.target.closest("[data-clock]"); if(!b) return;
+  Sound.unlock(); Sound.tap();
+  profile.clock = b.dataset.clock; saveProfile(); renderClock();
+});
+document.addEventListener("click", e => { if(e.target.closest("[data-mode]")) setTimeout(renderClock, 0); });
+
+/* ---------- Every new run carries the chosen clock ---------- */
+freshState = (orig => function(o){
+  const st = orig(o);
+  st.clock = o.mode === 9 ? "off" : (CLOCKS.includes(profile.clock) ? profile.clock : "off");
+  if(st.clock === "attack") st.atk = {left:ATK_START};
+  return st;
+})(freshState);
+
+/* ---------- HUD chip and the draining bar ---------- */
+function ckEls(){
+  let chip = $("hudClock");
+  if(!chip){ chip = document.createElement("span"); chip.id = "hudClock"; chip.className = "ckchip"; chip.hidden = true; $("hudStreak").before(chip); }
+  let bar = $("clockBar");
+  if(!bar){ bar = document.createElement("div"); bar.id = "clockBar"; bar.className = "clockbar"; bar.hidden = true; bar.innerHTML = "<i></i>"; $("challengeCard").querySelector(".ch-body").prepend(bar); }
+  return {chip, bar};
+}
+function ckFloat(text, good){
+  const chip = $("hudClock"); if(!chip) return;
+  const f = document.createElement("span");
+  f.className = "ckfloat " + (good ? "up" : "down"); f.textContent = text;
+  chip.appendChild(f); setTimeout(() => f.remove(), 1000);
+}
+
+/* ---------- The ticking ---------- */
+const CK = {cur:null, left:0, budget:0, last:Date.now(), run:0, lastSec:-1};
+function ckBudget(ch){
+  const k = S.clock, len = String(ch.answerKey || ch.target || "").length;
+  let s = CK_BASE[k] + Math.round(len / CK_PER[k]);
+  if(Array.isArray(ch.pairs)) s += ch.pairs.length * CK_PAIR[k];
+  if(ch.game === "Echo Chamber") s += 4;
+  return s * 1000;
+}
+function ckPaused(){
+  return document.hidden || !$("settingsPanel").hidden || !!$("kbHelp") || $("challengeCard").hidden || $("submitBtn").disabled || $("giveUpBtn").disabled;
+}
+function ckEnd(){
+  S.status = "gameover"; S.timeUp = true; S.current = null; S.savedAt = Date.now();
+  Sound.wrong(); toast(t("timeUp"));
+  save(); showOver();
+}
+function ckTick(){
+  const now = Date.now(), dt = Math.min(1000, now - CK.last); CK.last = now;
+  const on = S && S.clock && S.clock !== "off" && S.status === "playing" && S.current && !$("game").hidden;
+  const {chip, bar} = ckEls();
+  if(!on){ chip.hidden = true; bar.hidden = true; CK.cur = null; return; }
+  const paused = ckPaused();
+  let left, full;
+  if(S.clock === "attack"){
+    if(!S.atk) S.atk = {left:ATK_START};
+    if(!paused) S.atk.left -= dt;
+    left = S.atk.left; full = Math.max(ATK_START, left);
+    if(CK.cur !== S.current){ CK.cur = S.current; CK.budget = 0; }
+    if(left <= 0){ chip.hidden = true; bar.hidden = true; ckEnd(); return; }
+  } else {
+    if(CK.cur !== S.current){ CK.cur = S.current; CK.budget = ckBudget(S.current.challenge); CK.left = CK.budget; CK.lastSec = -1; }
+    if(!paused) CK.left -= dt;
+    left = CK.left; full = CK.budget;
+    if(left <= 0){
+      CK.cur = null; CK.run = 0;
+      toast(t("timeUp"));
+      if(!$("giveUpBtn").disabled) $("giveUpBtn").click();
+      return;
+    }
+  }
+  const sec = Math.ceil(left / 1000), frac = Math.max(0, Math.min(1, left / full));
+  chip.hidden = false; bar.hidden = false;
+  if(chip.firstChild && chip.firstChild.nodeType === 3) chip.firstChild.nodeValue = "⏱️ " + sec; else chip.prepend(document.createTextNode("⏱️ " + sec));
+  chip.classList.toggle("low", sec <= 5);
+  const i = bar.firstChild;
+  i.style.width = (frac * 100).toFixed(1) + "%";
+  bar.classList.toggle("warn", frac < 0.5); bar.classList.toggle("low", sec <= 5);
+  if(sec <= 3 && sec !== CK.lastSec && !paused){ Sound.tap(); }
+  CK.lastSec = sec;
+}
+setInterval(ckTick, 100);
+document.addEventListener("visibilitychange", () => { CK.last = Date.now(); });
+
+/* ---------- Rewards: speed bonus, or time in Time Attack ---------- */
+grantRewards = (orig => function(plan, correct){
+  const fx = orig(plan, correct);
+  if(!S || !S.clock || S.clock === "off") return fx;
+  if(S.clock === "attack"){
+    if(!S.atk) S.atk = {left:ATK_START};
+    S.atk.left += correct ? ATK_PLUS : -ATK_MINUS;
+    ckFloat(correct ? "+" + ATK_PLUS / 1000 + "s" : "−" + ATK_MINUS / 1000 + "s", correct);
+    return fx;
+  }
+  if(!correct || !CK.budget){ CK.run = 0; return fx; }
+  const f = CK.left / CK.budget;
+  let bonus = f >= 0.75 ? 10 : f >= 0.5 ? 5 : 0;
+  if(!bonus){ CK.run = 0; return fx; }
+  CK.run++; S.stats.fast = (S.stats.fast || 0) + 1;
+  let msg = t(bonus >= 10 ? "lightning" : "quick", {xp:bonus});
+  if(CK.run % 3 === 0){ bonus += 20; msg = t("onFire", {xp:bonus}); setTimeout(() => confetti(60), 300); }
+  fx.xp += bonus; S.xp = (S.xp || 0) + bonus;
+  setTimeout(() => toast(msg, "badge"), 350);
+  return fx;
+})(grantRewards);
+
+/* ---------- Results ---------- */
+showOver = (orig => function(){
+  orig();
+  if(!S) return;
+  if(S.clock && S.clock !== "off" && S.clock !== "attack" && S.stats.fast)
+    $("overStats").insertAdjacentHTML("beforeend", `<div class="wide"><b>⚡ ${S.stats.fast}</b><small>${esc(t("stFast"))} · ${esc(t("ck_" + S.clock))}</small></div>`);
+  if(!S.timeUp) return;
+  const best = profile.attackBest[S.mode] || 0, isNew = S.stats.correct > best;
+  if(isNew){ profile.attackBest[S.mode] = S.stats.correct; saveProfile(); setTimeout(() => { Sound.levelUp(); confetti(120); }, 400); }
+  $("overTitle").textContent = t("atkOverT");
+  $("overEmoji").textContent = "⏱️";
+  $("overText").innerHTML = `${esc(t("atkOverB", {c:S.stats.correct, n:S.stats.answered}))}<br><b>${esc(isNew ? t("atkNew") : t("atkBest", {b:best}))}</b>`;
+  $("overIsland").hidden = true; $("overRestart").hidden = false;
+})(showOver);
 
 /* ===================== Keyboard play: everything without a mouse ===================== */
 Object.assign(I18N.en, {

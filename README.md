@@ -16,11 +16,12 @@ Free, open source, works offline. No account, no ads, no tracking.
 ## What's inside
 
 - **Full CEFR levels (A1 to B2):** every level covers grammar, everyday topics (food, home, travel, work, health, media, society...) and communication (introducing yourself, ordering, directions, invitations, opinions, complaints, formal emails...). Practice mode teaches each lesson, then brings it back until you recall it twice, and mixes in verb, tricky-pair and number drills.
-- **Stories:** short bilingual stories with comprehension questions and audio.
+- **Stories:** 32 short bilingual stories (A1 to B2) with comprehension questions and audio.
 - **Daily quests and a daily challenge**, streaks, XP and trophies.
-- **Game modes:** Practice, Level Select, Survivor, Number Cruncher, Lexicon Onslaught, Island Hopper (memorize phrases about your own life), Conjugation Gym and Tricky Pairs (ser/estar, por/para, este/esto/aquel…).
+- **Game modes:** Practice, Level Select, Survivor, Number Cruncher, Lexicon Onslaught, Island Hopper (25 topics of phrases about your own life), Conjugation Gym and Tricky Pairs (ser/estar, por/para, este/esto/aquel…).
 - **Listening:** Echo Chamber and read-aloud use the device's own text-to-speech voices.
 - **Custom Game:** build your own run. Pick content (grammar, topics, communication, verbs, tricky pairs, numbers, vocabulary), levels and mini-games, then set hearts, rounds, a per-question timer, strict accents, hints and re-asking misses. Quick picks and saved presets included.
+- **The Clock:** add a timer to any mode. Relaxed, Brisk or Blitz give each question a countdown with bonus XP for quick answers; Time Attack gives you 60 seconds for the whole run, +5 s for every right answer and −3 s for every miss.
 - **Match Madness grows with you:** 4 rows at A1, one more per level and a bonus row on a hot streak, up to 8.
 - **Animated:** cards, tiles, pairs, hearts, streaks and results all move. Switch it off in the 🎛️ panel; reduce-motion settings are respected.
 - **Keyboard play:** play with just the keyboard. The answer box stays focused, Enter submits and continues, 1–9 picks tiles and options, Alt+A/E/I/O/U/N types á é í ó ú ñ, and **?** shows every shortcut. You can turn it on or off in the 🎛️ panel or with the ⌨️ button on the menu.

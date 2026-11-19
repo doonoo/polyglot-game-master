@@ -359,7 +359,23 @@ textarea,input[type=text]{transition:border-color .2s,box-shadow .2s}
 body.noanim *,body.noanim *::before,body.noanim *::after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion: reduce){.glyphs span,.primary,.pr.sel{animation:none!important}}
 </style>""")
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("keyboard.js"), "", rd("anim.js"), "", E, rd("boot.js"), F]) + "\n"
+A = rep(A, "</style>", """/* the clock */
+.levels.clocks{flex-wrap:wrap;gap:4px}
+.lv.ck{flex:1 1 30%;padding:9px 6px;font-size:.95rem}
+.clockbar{height:7px;border-radius:9px;background:var(--violet-soft);overflow:hidden;margin:0 0 12px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+.clockbar i{display:block;height:100%;width:100%;border-radius:9px;background:linear-gradient(90deg,#2EC48C,#7BE0B5);transition:width .12s linear,background .3s}
+.clockbar.warn i{background:linear-gradient(90deg,var(--gold),#FFD45C)}
+.clockbar.low i{background:linear-gradient(90deg,#E94B4B,#FF8A7A)}
+.clockbar.low{animation:ckPulse .5s ease-in-out infinite alternate}
+@keyframes ckPulse{from{opacity:1}to{opacity:.55}}
+.ckchip{position:relative;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ckchip.low{color:var(--red,#E94B4B);display:inline-block;animation:ckBeat .5s ease-in-out infinite}
+@keyframes ckBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.ckfloat{position:absolute;left:50%;top:100%;font-size:.85rem;font-weight:800;pointer-events:none;animation:ckFl 1s ease-out forwards}
+.ckfloat.up{color:#1E9E6E}.ckfloat.down{color:#E94B4B}
+@keyframes ckFl{from{opacity:1;transform:translate(-50%,0) scale(1.2)}to{opacity:0;transform:translate(-50%,18px) scale(1)}}
+</style>""")
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", rd("content_islands3.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("stories3.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("timer.js"), "", rd("keyboard.js"), "", rd("anim.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----
