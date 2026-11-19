@@ -435,6 +435,15 @@ body.noanim *,body.noanim *::before,body.noanim *::after{animation:none!importan
 .ckfloat{position:absolute;left:50%;top:100%;font-size:.85rem;font-weight:800;pointer-events:none;animation:ckFl 1s ease-out forwards}
 .ckfloat.up{color:#1E9E6E}.ckfloat.down{color:#E94B4B}
 @keyframes ckFl{from{opacity:1;transform:translate(-50%,0) scale(1.2)}to{opacity:0;transform:translate(-50%,18px) scale(1)}}
+/* boss bar */
+.bossbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 16px;background:linear-gradient(90deg,#2A0A1A,#4A0F2E);color:#fff;font-weight:800}
+.bb-hp{display:flex;align-items:center;gap:5px}
+.bb-hp i{display:inline-block;width:26px;height:10px;border-radius:5px;background:rgba(255,255,255,.18)}
+.bb-hp i.on{background:linear-gradient(90deg,#FF3B5C,#FF8A3D);box-shadow:0 0 8px rgba(255,59,92,.7);animation:bbPulse 1.2s ease-in-out infinite}
+.bb-sh b{color:rgba(255,255,255,.35);margin-left:2px}
+@keyframes bbPulse{50%{filter:brightness(1.35)}}
+.challenge.boss{animation:bossShake .5s ease-out}
+@keyframes bossShake{0%{transform:scale(.96) rotate(-1deg)}30%{transform:scale(1.02) rotate(1deg)}60%{transform:rotate(-.5deg)}100%{transform:none}}
 </style>
 </head>
 <body>
@@ -10320,7 +10329,7 @@ function skipEcho(){
   if(!ch || !ch.target) return;
   c.challenge = {game:String(ch.game), boss: plan.boss ? String(ch.boss || "") : "", task:String(ch.task || ""), target:String(ch.target),
     hint: S.mode === 3 ? "" : String(ch.hint || ""), answerKey:String(ch.answerKey || ""), speak:"", acc:ch.acc || [], al:ch.al || "", k:ch.k || "s",
-    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:Array.isArray(ch.pairs) ? ch.pairs : null};
+    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double};
   S.lastGame = c.challenge.game;
   save();
   $("answer").value = "";
@@ -11955,7 +11964,10 @@ Object.assign(I18N.es, {
 });
 const CLOCKS = ["off", "relax", "brisk", "blitz", "attack"];
 const CK_ICO = {off:"🕊️", relax:"🐢", brisk:"🐇", blitz:"⚡", attack:"⏱️"};
-const CK_BASE = {relax:30, brisk:18, blitz:10}, CK_PER = {relax:6, brisk:9, blitz:12}, CK_PAIR = {relax:4, brisk:3, blitz:2};
+const CK_BASE = {relax:30, brisk:18, blitz:10, boss:24}, CK_PER = {relax:6, brisk:9, blitz:12, boss:7}, CK_PAIR = {relax:4, brisk:3, blitz:2, boss:3};
+/* Bosses always fight on the clock: their own timer, or yours if it is tighter */
+const ckBossNow = () => !!(S && S.current && S.current.plan && S.current.plan.boss && S.current.challenge && S.current.challenge.boss);
+const ckMode = () => S.clock === "attack" ? "attack" : ckBossNow() ? (S.clock === "blitz" ? "blitz" : S.clock === "brisk" ? "brisk" : "boss") : S.clock;
 const ATK_START = 60000, ATK_PLUS = 5000, ATK_MINUS = 3000;
 profile.clock = profile.clock || "off"; profile.attackBest = profile.attackBest || {};
 
@@ -12007,7 +12019,7 @@ function ckFloat(text, good){
 /* ---------- The ticking ---------- */
 const CK = {cur:null, left:0, budget:0, last:Date.now(), run:0, lastSec:-1};
 function ckBudget(ch){
-  const k = S.clock, len = String(ch.answerKey || ch.target || "").length;
+  const k = ckMode(), len = String(ch.answerKey || ch.target || "").length;
   let s = CK_BASE[k] + Math.round(len / CK_PER[k]);
   if(Array.isArray(ch.pairs)) s += ch.pairs.length * CK_PAIR[k];
   if(ch.game === "Echo Chamber") s += 4;
@@ -12023,12 +12035,12 @@ function ckEnd(){
 }
 function ckTick(){
   const now = Date.now(), dt = Math.min(1000, now - CK.last); CK.last = now;
-  const on = S && S.clock && S.clock !== "off" && S.status === "playing" && S.current && !$("game").hidden;
+  const on = S && S.status === "playing" && S.current && !$("game").hidden && ((S.clock && S.clock !== "off") || ckBossNow());
   const {chip, bar} = ckEls();
   if(!on){ chip.hidden = true; bar.hidden = true; CK.cur = null; return; }
   const paused = ckPaused();
   let left, full;
-  if(S.clock === "attack"){
+  if(ckMode() === "attack"){
     if(!S.atk) S.atk = {left:ATK_START};
     if(!paused) S.atk.left -= dt;
     left = S.atk.left; full = Math.max(ATK_START, left);
@@ -12061,8 +12073,8 @@ document.addEventListener("visibilitychange", () => { CK.last = Date.now(); });
 /* ---------- Rewards: speed bonus, or time in Time Attack ---------- */
 grantRewards = (orig => function(plan, correct){
   const fx = orig(plan, correct);
-  if(!S || !S.clock || S.clock === "off") return fx;
-  if(S.clock === "attack"){
+  if(!S || ((!S.clock || S.clock === "off") && !(plan && plan.boss))) return fx;
+  if(ckMode() === "attack"){
     if(!S.atk) S.atk = {left:ATK_START};
     S.atk.left += correct ? ATK_PLUS : -ATK_MINUS;
     ckFloat(correct ? "+" + ATK_PLUS / 1000 + "s" : "−" + ATK_MINUS / 1000 + "s", correct);
@@ -12094,6 +12106,151 @@ showOver = (orig => function(){
   $("overText").innerHTML = `${esc(t("atkOverB", {c:S.stats.correct, n:S.stats.answered}))}<br><b>${esc(isNew ? t("atkNew") : t("atkBest", {b:best}))}</b>`;
   $("overIsland").hidden = true; $("overRestart").hidden = false;
 })(showOver);
+
+/* ===================== Boss battles that actually fight back ===================== */
+Object.assign(I18N.en, {
+  bfIntro:"{name} attacks! Hit it {hp} times before it hits you twice. No hints, accents count, and the clock is running.",
+  bfPhase:"Hit {n} of {max}. Shield: {s}.", bfFinal:"Final blow! Translate both sentences, one after the other.",
+  bfHit:"💥 Hit! {name}: {hp} left", bfBlock:"🛡️ {name} hits back! One shield left.", bfLost:"👹 {name} wins this round. It will be back soon…",
+  bfWon:"🏆 {name} defeated! +{xp} XP", bfHp:"Boss health", bfShield:"Your shield", bfRematch:"Rematch!",
+  bfDouble:"Translate both, separated by a space:"
+});
+Object.assign(I18N.es, {
+  bfIntro:"¡{name} ataca! Dale {hp} golpes antes de que te dé dos. Sin pistas, los acentos cuentan y el reloj corre.",
+  bfPhase:"Golpe {n} de {max}. Escudo: {s}.", bfFinal:"¡Golpe final! Traduce las dos frases, una detrás de otra.",
+  bfHit:"💥 ¡Golpe! {name}: le quedan {hp}", bfBlock:"🛡️ ¡{name} contraataca! Te queda un escudo.", bfLost:"👹 {name} gana esta vez. Volverá pronto…",
+  bfWon:"🏆 ¡{name} derrotado! +{xp} XP", bfHp:"Vida del jefe", bfShield:"Tu escudo", bfRematch:"¡Revancha!",
+  bfDouble:"Traduce las dos, separadas por un espacio:"
+});
+const BOSS_MODES = [1, 2, 3, 4, 5, 6, 8];
+const BOSS_SHIELD = 2, BOSS_PHASE_XP = 20, BOSS_KILL_XP = 100;
+const bossMax = st => st.mode === 4 ? 3 : (LEVELS.indexOf(st.level) >= 2 ? 4 : 3);
+const bossName = st => { const L = GMT[LANG_CODE[st.native]] || GMT.en; return L.bosses[(st.bossFight && st.bossFight.n || 0) % L.bosses.length]; };
+
+/* What has this player already learned? Bosses only use that. */
+function bossPool(st){
+  const out = new Set((st.srs || []).map(x => x.k));
+  if(st.mode === 5) for(const w of (st.seenW || []).slice(-60)) out.add(w);
+  else if(st.syllabus && st.done) st.syllabus.forEach((k, i) => { if(st.done[i]) out.add(k); });
+  return [...out];
+}
+
+/* ---------- Planning: start a fight, keep it going, point it at learned material ---------- */
+makePlan = (orig => function(st, rolls, exclude){
+  const p = orig(st, rolls, exclude);
+  if(!p) return p;
+  if(!BOSS_MODES.includes(st.mode)){ p.boss = false; return p; }
+  // a fight every ~15 answers (first one after 8); a lost fight comes back after 4
+  const due = st.stats.answered >= (st.bossNext || 8), rematch = !!st.bossRematch && due;
+  if(!st.bossFight && due && (st.mode === 4 || bossPool(st).length)){
+    const max = bossMax(st);
+    st.bossFight = {n:Math.floor(rolls.c * 97), hp:max, max, shield:BOSS_SHIELD, hits:0, rematch:!!rematch};
+    st.bossRematch = 0;
+  }
+  if(!st.bossFight){ p.boss = false; return p; }
+  p.boss = true; p.bossPhase = st.bossFight.hits;
+  if(st.mode !== 4){
+    const pool = bossPool(st);
+    if(pool.length){
+      const key = pool[Math.floor(((rolls.s || 0) * 7919 + st.bossFight.hits * 31) % pool.length)];
+      Object.assign(p, st.mode === 5 ? {kind:"vocab", key, swarm:false} : {kind:"srs", key});
+      p.bossAlt = pool.length > 1 ? pool[(pool.indexOf(key) + 1 + Math.floor((rolls.g || 0) * (pool.length - 1))) % pool.length] : null;
+    }
+  }
+  return p;
+})(makePlan);
+
+/* ---------- Results: hits, shield, win or lose ---------- */
+applyResult = (orig => function(st, correct, plan){
+  st.bossJust = "";
+  orig(st, correct, plan);
+  const f = st.bossFight;
+  if(!f || !plan || !plan.boss) return;
+  if(correct){ f.hp--; f.hits++; st.bossJust = f.hp <= 0 ? "won" : "hit"; }
+  else { f.shield--; st.bossJust = f.shield <= 0 ? "lost" : "block"; }
+  if(st.bossJust === "won"){ st.bossFight = null; st.bossKills = (st.bossKills || 0) + 1; st.bossLastName = f.n; st.bossNext = st.stats.answered + 15; st.bossRematch = 0; }
+  if(st.bossJust === "lost"){ st.bossFight = null; st.bossNext = st.stats.answered + 4; st.bossRematch = 1; st.bossLastName = f.n; }
+  if(st.bossJust !== "won" && st.bossJust !== "lost") st.bossLastName = f.n;
+})(applyResult);
+
+/* ---------- Generation: no peeking, strict accents, a double final blow ---------- */
+function bossCombine(a, b){
+  const A = a.acc.flatMap(expand).slice(0, 12), B = b.acc.flatMap(expand).slice(0, 10), out = [];
+  for(const x of A) for(const y of B){ out.push(x + " " + y); if(out.length >= 120) return out; }
+  return out;
+}
+generate = (orig => function(st, plan){
+  const res = orig(st, plan);
+  if(!plan || !plan.boss || !st.bossFight || !res || !res.challenge) return res;
+  const f = st.bossFight, name = bossName(st), L = GMT[LANG_CODE[st.native]] || GMT.en;
+  let ch = res.challenge;
+  const last = f.hp === 1 && st.mode !== 4 && st.mode !== 5 && plan.bossAlt;
+  if(last){
+    // Final blow: two learned sentences at once, both native → target
+    let a = ch;
+    for(let i = 0; i < 6 && a.game !== "Classic Mine"; i++) a = orig(st, plan).challenge;
+    let b = null;
+    for(let i = 0; i < 8; i++){ const r = orig(st, Object.assign({}, plan, {key:plan.bossAlt})); if(r && r.challenge && r.challenge.game === "Classic Mine" && r.challenge.target !== a.target){ b = r.challenge; break; } }
+    if(a.game === "Classic Mine" && b){
+      ch = Object.assign({}, a, {target:a.target + "  ➕  " + b.target, acc:bossCombine(a, b), answerKey:a.answerKey + " " + b.answerKey, double:true,
+        why:(a.why || "") + "\n\n" + (b.why || ""), cw:[]});
+      ch.task = `👹 ${name}: ${t("bfFinal")}`;
+    }
+  }
+  ch.boss = name; ch.strict = true; ch.hint = "";
+  if(!ch.double){
+    let tk = String(ch.task || "");
+    for(const b of L.bosses){ const pre = "👹 " + b + " " + L.bossTask + " "; if(tk.startsWith(pre)){ tk = tk.slice(pre.length); break; } }
+    ch.task = `👹 ${name}: ` + tk;
+  }
+  res.challenge = ch;
+  res.lesson = {title:"👹 " + name + (f.rematch ? " · " + t("bfRematch") : ""), body: f.hits === 0 ? t("bfIntro", {name, hp:f.max}) : t("bfPhase", {n:f.hits + 1, max:f.max, s:"🛡️".repeat(f.shield)}), words:[]};
+  res.spotlight = null;
+  return res;
+})(generate);
+
+gradeLocal = (orig => function(st, ch, answer, force){
+  if(ch && ch.strict && st && st.mode !== 3) return orig(Object.assign({}, st, {mode:3}), ch, answer, force);
+  return orig(st, ch, answer, force);
+})(gradeLocal);
+
+/* ---------- Rewards and feedback ---------- */
+grantRewards = (orig => function(plan, correct){
+  const isBoss = !!(S && plan && plan.boss), adj = isBoss && correct;
+  // the old rule paid +50 and counted a kill for any boss answer; now hits pay a little and only the kill counts
+  if(adj && S.bossJust !== "won") S.bosses = (S.bosses || 0) - 1;
+  const fx = orig(plan, correct);
+  if(!isBoss) return fx;
+  if(adj){ fx.xp -= 50; S.xp -= 50; }
+  fx.boss = false;
+  const BL = (GMT[LANG_CODE[S.native]] || GMT.en).bosses, name = BL[(S.bossLastName || 0) % BL.length];
+  const just = S.bossJust;
+  if(just === "hit"){ fx.xp += BOSS_PHASE_XP; S.xp += BOSS_PHASE_XP; setTimeout(() => toast(t("bfHit", {name, hp:S.bossFight ? S.bossFight.hp : 0}), "boss"), 500); }
+  else if(just === "won"){ const x = BOSS_PHASE_XP + BOSS_KILL_XP; fx.xp += x; S.xp += x; setTimeout(() => { confetti(150); toast(t("bfWon", {name, xp:x}), "boss"); }, 900); }
+  else if(just === "block"){ setTimeout(() => toast(t("bfBlock", {name}), "boss"), 500); }
+  else if(just === "lost"){ setTimeout(() => { Sound.wrong(); toast(t("bfLost", {name}), "boss"); }, 500); }
+  for(const b of BADGES) if(!S.badges.includes(b.id) && b.test(S)){ S.badges.push(b.id); fx.badges.push(b); }
+  return fx;
+})(grantRewards);
+
+/* ---------- The boss bar ---------- */
+function renderBossBar(){
+  let bar = $("bossBar");
+  const f = S && S.status === "playing" && S.current && S.current.plan && S.current.plan.boss ? S.bossFight : null;
+  if(!f){ if(bar) bar.hidden = true; return; }
+  if(!bar){ bar = document.createElement("div"); bar.id = "bossBar"; bar.className = "bossbar"; $("challengeCard").querySelector(".ch-head").after(bar); }
+  bar.hidden = false;
+  bar.innerHTML = `<span class="bb-hp" aria-label="${esc(t("bfHp"))}">👹 ${"<i class=\"on\"></i>".repeat(f.hp)}${"<i></i>".repeat(f.max - f.hp)}</span>` +
+    `<span class="bb-sh" aria-label="${esc(t("bfShield"))}">${"🛡️".repeat(f.shield)}${"<b>✖</b>".repeat(BOSS_SHIELD - f.shield)}</span>`;
+}
+renderExtras = (orig => function(fresh){ orig(fresh); renderBossBar(); if(fresh && S && S.current && S.current.challenge && S.current.challenge.double) $("answer").setAttribute("rows", "3"); })(renderExtras);
+
+/* The big "BOSS BATTLE!" fanfare plays once per fight, not on every hit */
+bossIntro = (orig => function(){
+  const f = S && S.bossFight;
+  if(f && (f.hits > 0 || f.shield < BOSS_SHIELD)) return;
+  orig();
+})(bossIntro);
 
 /* ===================== Keyboard play: everything without a mouse ===================== */
 Object.assign(I18N.en, {
@@ -12497,7 +12654,7 @@ function absorb(res, answer, rolls, prevPlan){
   S.current = {
     plan,
     lesson:{title:String(lesson.title||""), body:String(lesson.body||""), words:Array.isArray(lesson.words) ? lesson.words.filter(w => w && w.w).slice(0,12) : []},
-    challenge:{game:String(ch.game || (plan && plan.game) || ""), boss: plan && plan.boss ? String(ch.boss || "") : "", task:String(ch.task||""), target:String(ch.target), hint: S.mode === 3 ? "" : String(ch.hint||""), answerKey:String(ch.answerKey||""), speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null}
+    challenge:{game:String(ch.game || (plan && plan.game) || ""), boss: plan && plan.boss ? String(ch.boss || "") : "", task:String(ch.task||""), target:String(ch.target), hint: S.mode === 3 ? "" : String(ch.hint||""), answerKey:String(ch.answerKey||""), speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double}
   };
   S.lastGame = S.current.challenge.game;
   if(plan && plan.scene) S.recentScenes = (S.recentScenes || []).concat(plan.scene).slice(-20);

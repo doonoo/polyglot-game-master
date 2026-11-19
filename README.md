@@ -21,6 +21,7 @@ Free, open source, works offline. No account, no ads, no tracking.
 - **Game modes:** Practice, Level Select, Survivor, Number Cruncher, Lexicon Onslaught, Island Hopper (25 topics of phrases about your own life), Conjugation Gym and Tricky Pairs (ser/estar, por/para, este/esto/aquel…).
 - **Listening:** Echo Chamber and read-aloud use the device's own text-to-speech voices.
 - **Custom Game:** build your own run. Pick content (grammar, topics, communication, verbs, tricky pairs, numbers, vocabulary), levels and mini-games, then set hearts, rounds, a per-question timer, strict accents, hints and re-asking misses. Quick picks and saved presets included.
+- **Boss battles:** every ~15 answers a boss attacks with 3–4 health against your 2-hit shield. It only uses what you've learned, gives no hints, counts accents, runs on a clock, and ends with a two-sentence final blow. Lose and it comes back for a rematch.
 - **The Clock:** add a timer to any mode. Relaxed, Brisk or Blitz give each question a countdown with bonus XP for quick answers; Time Attack gives you 60 seconds for the whole run, +5 s for every right answer and −3 s for every miss.
 - **Match Madness grows with you:** 4 rows at A1, one more per level and a bonus row on a hot streak, up to 8.
 - **Animated:** cards, tiles, pairs, hearts, streaks and results all move. Switch it off in the 🎛️ panel; reduce-motion settings are respected.

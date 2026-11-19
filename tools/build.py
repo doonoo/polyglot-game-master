@@ -285,7 +285,7 @@ D = rep(D, "function nextLevel(l){ const i = LEVELS.indexOf(l); return i < 0 || 
 D = rep(D, "nextLevel(st.level)", "nextLevel(st.level, st)", 2)
 
 # ---- absorb / rendering ----
-E = rep(E, 'speak:String(ch.speak||"")}', 'speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null}')
+E = rep(E, 'speak:String(ch.speak||"")}', 'speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double}')
 E = rep(E, 'lesson.words.filter(w => w && w.w).slice(0,6)', 'lesson.words.filter(w => w && w.w).slice(0,12)')
 E = rep(E, 'const v = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(l.lang.toLowerCase().slice(0, 2)));', 'const v = bestVoice(l.lang);')
 E = rep(E, "  renderPanels();\n  if(fresh){", "  renderPanels();\n  renderExtras(fresh);\n  if(fresh){")
@@ -375,7 +375,17 @@ A = rep(A, "</style>", """/* the clock */
 .ckfloat.up{color:#1E9E6E}.ckfloat.down{color:#E94B4B}
 @keyframes ckFl{from{opacity:1;transform:translate(-50%,0) scale(1.2)}to{opacity:0;transform:translate(-50%,18px) scale(1)}}
 </style>""")
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", rd("content_islands3.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("stories3.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("timer.js"), "", rd("keyboard.js"), "", rd("anim.js"), "", E, rd("boot.js"), F]) + "\n"
+A = rep(A, "</style>", """/* boss bar */
+.bossbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 16px;background:linear-gradient(90deg,#2A0A1A,#4A0F2E);color:#fff;font-weight:800}
+.bb-hp{display:flex;align-items:center;gap:5px}
+.bb-hp i{display:inline-block;width:26px;height:10px;border-radius:5px;background:rgba(255,255,255,.18)}
+.bb-hp i.on{background:linear-gradient(90deg,#FF3B5C,#FF8A3D);box-shadow:0 0 8px rgba(255,59,92,.7);animation:bbPulse 1.2s ease-in-out infinite}
+.bb-sh b{color:rgba(255,255,255,.35);margin-left:2px}
+@keyframes bbPulse{50%{filter:brightness(1.35)}}
+.challenge.boss{animation:bossShake .5s ease-out}
+@keyframes bossShake{0%{transform:scale(.96) rotate(-1deg)}30%{transform:scale(1.02) rotate(1deg)}60%{transform:rotate(-.5deg)}100%{transform:none}}
+</style>""")
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", rd("content_islands3.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("stories3.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("timer.js"), "", rd("boss.js"), "", rd("keyboard.js"), "", rd("anim.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----

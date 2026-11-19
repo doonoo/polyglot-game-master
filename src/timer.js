@@ -23,7 +23,10 @@ Object.assign(I18N.es, {
 });
 const CLOCKS = ["off", "relax", "brisk", "blitz", "attack"];
 const CK_ICO = {off:"🕊️", relax:"🐢", brisk:"🐇", blitz:"⚡", attack:"⏱️"};
-const CK_BASE = {relax:30, brisk:18, blitz:10}, CK_PER = {relax:6, brisk:9, blitz:12}, CK_PAIR = {relax:4, brisk:3, blitz:2};
+const CK_BASE = {relax:30, brisk:18, blitz:10, boss:24}, CK_PER = {relax:6, brisk:9, blitz:12, boss:7}, CK_PAIR = {relax:4, brisk:3, blitz:2, boss:3};
+/* Bosses always fight on the clock: their own timer, or yours if it is tighter */
+const ckBossNow = () => !!(S && S.current && S.current.plan && S.current.plan.boss && S.current.challenge && S.current.challenge.boss);
+const ckMode = () => S.clock === "attack" ? "attack" : ckBossNow() ? (S.clock === "blitz" ? "blitz" : S.clock === "brisk" ? "brisk" : "boss") : S.clock;
 const ATK_START = 60000, ATK_PLUS = 5000, ATK_MINUS = 3000;
 profile.clock = profile.clock || "off"; profile.attackBest = profile.attackBest || {};
 
@@ -75,7 +78,7 @@ function ckFloat(text, good){
 /* ---------- The ticking ---------- */
 const CK = {cur:null, left:0, budget:0, last:Date.now(), run:0, lastSec:-1};
 function ckBudget(ch){
-  const k = S.clock, len = String(ch.answerKey || ch.target || "").length;
+  const k = ckMode(), len = String(ch.answerKey || ch.target || "").length;
   let s = CK_BASE[k] + Math.round(len / CK_PER[k]);
   if(Array.isArray(ch.pairs)) s += ch.pairs.length * CK_PAIR[k];
   if(ch.game === "Echo Chamber") s += 4;
@@ -91,12 +94,12 @@ function ckEnd(){
 }
 function ckTick(){
   const now = Date.now(), dt = Math.min(1000, now - CK.last); CK.last = now;
-  const on = S && S.clock && S.clock !== "off" && S.status === "playing" && S.current && !$("game").hidden;
+  const on = S && S.status === "playing" && S.current && !$("game").hidden && ((S.clock && S.clock !== "off") || ckBossNow());
   const {chip, bar} = ckEls();
   if(!on){ chip.hidden = true; bar.hidden = true; CK.cur = null; return; }
   const paused = ckPaused();
   let left, full;
-  if(S.clock === "attack"){
+  if(ckMode() === "attack"){
     if(!S.atk) S.atk = {left:ATK_START};
     if(!paused) S.atk.left -= dt;
     left = S.atk.left; full = Math.max(ATK_START, left);
@@ -129,8 +132,8 @@ document.addEventListener("visibilitychange", () => { CK.last = Date.now(); });
 /* ---------- Rewards: speed bonus, or time in Time Attack ---------- */
 grantRewards = (orig => function(plan, correct){
   const fx = orig(plan, correct);
-  if(!S || !S.clock || S.clock === "off") return fx;
-  if(S.clock === "attack"){
+  if(!S || ((!S.clock || S.clock === "off") && !(plan && plan.boss))) return fx;
+  if(ckMode() === "attack"){
     if(!S.atk) S.atk = {left:ATK_START};
     S.atk.left += correct ? ATK_PLUS : -ATK_MINUS;
     ckFloat(correct ? "+" + ATK_PLUS / 1000 + "s" : "−" + ATK_MINUS / 1000 + "s", correct);
