@@ -27,6 +27,7 @@ function boot(lang, tts){
 
 let fails = 0;
 const fail = (...a) => { fails++; if(fails < 60) console.log("FAIL", ...a); };
+const matchSizes = new Set();
 
 /* ---------- 1. Content validation ---------- */
 {
@@ -189,11 +190,13 @@ function play(lang, mode, level, turns, wrongRate, opts){
     if(ch.game === "Match Madness"){
       const before0 = S.stats.answered, prs = [...d.querySelectorAll("#pairs .pr")];
       if(d.getElementById("pairs").hidden || prs.length < 6 || !d.getElementById("submitBtn").hidden) fail(tag, "pairs ui", prs.length);
-      const slips = Math.random() < 0.15 ? 2 : Math.random() < 0.3 ? 1 : 0;
+      const slips = Math.random() < 0.1 ? 3 : Math.random() < 0.15 ? 2 : Math.random() < 0.3 ? 1 : 0;
       for(let k = 0; k < slips; k++){ const l = prs.find(x => x.dataset.side === "l" && !x.classList.contains("done")), r = prs.find(x => x.dataset.side === "r" && x.dataset.pi !== l.dataset.pi); l.click(); r.click(); }
       for(const l of prs.filter(x => x.dataset.side === "l")){ if(l.classList.contains("done")) continue; l.click(); prs.find(x => x.dataset.side === "r" && x.dataset.pi === l.dataset.pi).click(); }
       if(P.S.stats.answered !== before0 + 1){ fail(tag, "match did not auto-submit"); break; }
-      if(P.S.judgement.correct !== (slips <= 1)) fail(tag, "match verdict", slips, P.S.judgement.correct);
+      const allow = prs.length / 2 >= 6 ? 2 : 1;
+      if(P.S.judgement.correct !== (slips <= allow)) fail(tag, "match verdict", slips, prs.length / 2, P.S.judgement.correct);
+      matchSizes.add(ch.pairs.length + "@" + S.level);
       seenGames["Match Madness"] = seenGames["Match Madness"]; continue;
     }
     const good = P.variantsOf(ch);
@@ -378,6 +381,8 @@ for(const lang of ["en", "es"]){
   if(dom.errors.length) fail("script error", dom.errors[0]);
   console.log("daily/mistakes/stats ok; daily share:\n" + share);
 }
+console.log("match board sizes seen:", [...matchSizes].sort().join(" "));
+if(![...matchSizes].some(x => +x.split("@")[0] > 4)) fail("match madness never grew past 4 rows");
 /* ---------- 6. Tricky pairs content ---------- */
 {
   const P = boot("en").window.__pgm;

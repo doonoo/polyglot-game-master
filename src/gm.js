@@ -27,7 +27,7 @@ en:{
   nCW:T => `Write this time in words in ${T}:`, nPC:T => `Read the scene and answer in words in ${T}:`,
   bossTask:"blocks your path! Beat this one for +50 XP.",
   tDuel:"Pick the right word:", tEcho:T => `Listen and type exactly what you hear in ${T}:`, vEcho:T => `Listen and type the word you hear in ${T}:`, hWords:n => `${n} words`,
-  vMatch:"Match each word with its meaning. You can slip once.",
+  vMatch:"Match each word with its meaning. You can slip once.", vMatch2:"Match each word with its meaning. Big board: you can slip twice.",
   bosses:["The Grammar Goblin","The Conjugation Kraken","Lord Typo","The Accent Assassin","The Syntax Serpent","Baron von Verb","The Preposition Phantom","Count Cloze"]
 },
 es:{
@@ -52,7 +52,7 @@ es:{
   nCW:T => `Escribe esta hora con palabras en ${T}:`, nPC:T => `Lee la escena y responde con palabras en ${T}:`,
   bossTask:"te cierra el paso. Gánale y llévate +50 XP.",
   tDuel:"Elige la palabra correcta:", tEcho:T => `Escucha y escribe exactamente lo que oyes en ${T}:`, vEcho:T => `Escucha y escribe la palabra que oyes en ${T}:`, hWords:n => `${n} palabras`,
-  vMatch:"Une cada palabra con su significado. Puedes fallar una vez.",
+  vMatch:"Une cada palabra con su significado. Puedes fallar una vez.", vMatch2:"Une cada palabra con su significado. Tablero grande: puedes fallar dos veces.",
   bosses:["El Duende de la Gramática","El Kraken de las Conjugaciones","Lord Errata","El Asesino de Acentos","La Serpiente de la Sintaxis","El Barón del Verbo","El Fantasma de las Preposiciones","El Conde Hueco"]
 }
 };
@@ -568,6 +568,12 @@ function genNumber(st, plan, c, review, res){
   return res;
 }
 
+/* Match Madness grows with difficulty: 4 rows at A1, +1 per level, +1 on a hot streak, up to 8 */
+function matchRows(st){
+  const lv = Math.max(0, LEVELS.indexOf(st.level));
+  const hot = st.stats && st.stats.streak >= 5 ? 1 : 0;
+  return Math.min(8, 4 + lv + hot);
+}
 function genVocab(st, plan){
   const nat = LANG_CODE[st.native], tgt = LANG_CODE[st.target], L = GMT[nat], res = {};
   const list = VLIST[st.level] || VLIST.A1;
@@ -613,10 +619,10 @@ function genVocab(st, plan){
   } else if(game === "Echo Chamber"){
     task = L.vEcho(LN[nat][st.target]); ch.target = k; ch.hint = L.hLetter(core.charAt(0), core.length);
   } else if(game === "Match Madness"){
-    const others = shuffle(known).filter((e, i, a) => a.findIndex(x => mean(x) === mean(e)) === i && mean(e) !== m).slice(0, 3);
+    const others = shuffle(known).filter((e, i, a) => a.findIndex(x => mean(x) === mean(e)) === i && mean(e) !== m && key(e) !== k).slice(0, matchRows(st) - 1);
     ch.pairs = shuffle([[k, m]].concat(others.map(e => [key(e), mean(e)])));
     ch.k = "p"; ch.acc = ["✓"]; ch.target = ch.pairs.map(p => p[0]).join(" · "); ch.answerKey = ch.pairs.map(p => p[0] + " = " + p[1]).join(" · ");
-    task = L.vMatch;
+    task = ch.pairs.length >= 6 ? L.vMatch2 : L.vMatch;
   } else {
     const oc = pick(oddCats), others = shuffle(byCat[oc]).slice(0, 3).map(key);
     task = L.vOdd; ch.target = shuffle(others.concat(k)).join("  ·  "); ch.hint = L.hOdd(CATS[oc][nat]);

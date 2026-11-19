@@ -310,7 +310,56 @@ body.kb #quizOpts,body.kb #quizBuild{counter-reset:kbo}
 kbd{font-family:ui-monospace,monospace;font-size:.8rem;background:var(--field);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px}
 .srowbtn{width:100%;margin-top:4px}
 </style>""")
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("keyboard.js"), "", E, rd("boot.js"), F]) + "\n"
+A = rep(A, "</style>", """/* ===== motion ===== */
+@keyframes aIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes aPage{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes aPop{0%{opacity:0;transform:scale(.7)}65%{opacity:1;transform:scale(1.05)}100%{transform:none}}
+@keyframes aSt{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes aMatch{0%{transform:scale(1)}35%{transform:scale(1.12);box-shadow:0 0 0 6px rgba(46,196,140,.35)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(46,196,140,0)}}
+@keyframes aSel{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes aHurt{0%{transform:none}20%{transform:scale(1.35) rotate(-8deg);filter:saturate(2)}40%{transform:translateX(-4px)}60%{transform:translateX(4px)}100%{transform:none}}
+@keyframes aBump{0%{transform:scale(1)}40%{transform:scale(1.45)}100%{transform:scale(1)}}
+@keyframes aLevel{0%{transform:scale(1)}30%{transform:scale(1.3) rotate(-6deg)}60%{transform:scale(.95) rotate(3deg)}100%{transform:none}}
+@keyframes aTick{0%{transform:translateY(-6px);opacity:.3}100%{transform:none;opacity:1}}
+@keyframes aOk{0%{box-shadow:0 0 0 0 rgba(46,196,140,.55)}100%{box-shadow:0 0 0 18px rgba(46,196,140,0)}}
+@keyframes aBad{0%{box-shadow:0 0 0 0 rgba(238,84,84,.5)}100%{box-shadow:0 0 0 18px rgba(238,84,84,0)}}
+@keyframes aDrop{0%{transform:translateY(-60px) scale(.6);opacity:0}60%{transform:translateY(8px) scale(1.1);opacity:1}80%{transform:translateY(-4px)}100%{transform:none}}
+@keyframes aFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes aTap{0%{transform:scale(1)}40%{transform:scale(.9)}100%{transform:scale(1)}}
+@keyframes aSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes aShine{from{background-position:-200% 0}to{background-position:200% 0}}
+#menu,#game,#over,#book,#quiz,#statsPage,#storiesPage,#storyPage,#notifyPage{animation:aPage .4s cubic-bezier(.2,.8,.2,1)}
+.card,.daily,#quizCard,#quizFeedback,#quizIntro,.alert{animation:aIn .4s cubic-bezier(.2,.8,.2,1) backwards}
+.a-in{animation:aIn .45s cubic-bezier(.2,.8,.2,1) backwards}
+.judge.a-pop{animation:aPop .45s cubic-bezier(.2,1.4,.4,1) backwards}
+.a-okglow{animation:aOk .8s ease-out}
+.a-badglow{animation:aBad .8s ease-out}
+.a-st{animation:aSt .38s cubic-bezier(.2,.9,.3,1.2) backwards;animation-delay:calc(var(--i,0) * 45ms)}
+.pr.sel{animation:aSel .6s ease-in-out infinite}
+.pr.a-matched{animation:aMatch .5s ease-out}
+.a-hurt{display:inline-block;animation:aHurt .6s}
+.a-bump{display:inline-block;animation:aBump .45s cubic-bezier(.2,1.6,.4,1)}
+.a-levelup{animation:aLevel .8s cubic-bezier(.2,1.4,.4,1)}
+.a-tick{display:inline-block;animation:aTick .35s ease-out}
+.a-drop{animation:aDrop .8s cubic-bezier(.2,1.2,.4,1)}
+.a-tap{animation:aTap .22s ease-out}
+.glyphs span{animation:aFloat 3.2s ease-in-out infinite}
+.glyphs span:nth-child(2){animation-delay:.4s}.glyphs span:nth-child(3){animation-delay:.8s}.glyphs span:nth-child(4){animation-delay:1.2s}.glyphs span:nth-child(5){animation-delay:1.6s}.glyphs span:nth-child(6){animation-delay:2s}
+.hero .title{animation:aPop .6s cubic-bezier(.2,1.4,.4,1) backwards}
+.emoji{animation:aDrop .8s cubic-bezier(.2,1.2,.4,1)}
+.settings:not([hidden]){animation:aSlide .25s ease-out}
+details.panel[open] .panel-body{animation:aSlide .3s ease-out}
+.kbov{animation:aPage .2s ease-out}.kbbox{animation:aPop .35s cubic-bezier(.2,1.3,.4,1)}
+.primary,.ghost,.chip,.tile,.pr,.mode,.word,.lv,.key,.sopt,.iconbtn,.continue{transition:transform .16s cubic-bezier(.2,.8,.2,1),box-shadow .16s,background-color .2s,border-color .2s,opacity .2s}
+@media (hover:hover){.primary:hover:not(:disabled),.ghost:hover,.chip:hover,.tile:hover:not(:disabled):not(.used),.pr:hover:not(.done),.mode:hover,button.word:hover,.sopt:hover:not(:disabled),.continue:hover{transform:translateY(-2px)}.iconbtn:hover{transform:scale(1.12) rotate(-6deg)}}
+.tile.used{transform:scale(.92)}
+.primary:not(:disabled){background-image:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.18) 50%,transparent 60%);background-size:200% 100%;animation:aShine 3.5s linear infinite}
+textarea,input[type=text]{transition:border-color .2s,box-shadow .2s}
+.toast{animation-duration:.35s}
+body.noanim *,body.noanim *::before,body.noanim *::after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion: reduce){.glyphs span,.primary,.pr.sel{animation:none!important}}
+</style>""")
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("keyboard.js"), "", rd("anim.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----

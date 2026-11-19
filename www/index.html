@@ -372,6 +372,54 @@ body.kb #quizOpts,body.kb #quizBuild{counter-reset:kbo}
 .kbbox h2{margin:0 0 12px}.kbt{width:100%;border-collapse:collapse;margin:12px 0}.kbt td{padding:6px 4px;border-top:1px solid var(--line);vertical-align:top}.kbt td:first-child{white-space:nowrap;padding-right:12px}
 kbd{font-family:ui-monospace,monospace;font-size:.8rem;background:var(--field);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px}
 .srowbtn{width:100%;margin-top:4px}
+/* ===== motion ===== */
+@keyframes aIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes aPage{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes aPop{0%{opacity:0;transform:scale(.7)}65%{opacity:1;transform:scale(1.05)}100%{transform:none}}
+@keyframes aSt{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes aMatch{0%{transform:scale(1)}35%{transform:scale(1.12);box-shadow:0 0 0 6px rgba(46,196,140,.35)}100%{transform:scale(1);box-shadow:0 0 0 0 rgba(46,196,140,0)}}
+@keyframes aSel{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes aHurt{0%{transform:none}20%{transform:scale(1.35) rotate(-8deg);filter:saturate(2)}40%{transform:translateX(-4px)}60%{transform:translateX(4px)}100%{transform:none}}
+@keyframes aBump{0%{transform:scale(1)}40%{transform:scale(1.45)}100%{transform:scale(1)}}
+@keyframes aLevel{0%{transform:scale(1)}30%{transform:scale(1.3) rotate(-6deg)}60%{transform:scale(.95) rotate(3deg)}100%{transform:none}}
+@keyframes aTick{0%{transform:translateY(-6px);opacity:.3}100%{transform:none;opacity:1}}
+@keyframes aOk{0%{box-shadow:0 0 0 0 rgba(46,196,140,.55)}100%{box-shadow:0 0 0 18px rgba(46,196,140,0)}}
+@keyframes aBad{0%{box-shadow:0 0 0 0 rgba(238,84,84,.5)}100%{box-shadow:0 0 0 18px rgba(238,84,84,0)}}
+@keyframes aDrop{0%{transform:translateY(-60px) scale(.6);opacity:0}60%{transform:translateY(8px) scale(1.1);opacity:1}80%{transform:translateY(-4px)}100%{transform:none}}
+@keyframes aFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes aTap{0%{transform:scale(1)}40%{transform:scale(.9)}100%{transform:scale(1)}}
+@keyframes aSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes aShine{from{background-position:-200% 0}to{background-position:200% 0}}
+#menu,#game,#over,#book,#quiz,#statsPage,#storiesPage,#storyPage,#notifyPage{animation:aPage .4s cubic-bezier(.2,.8,.2,1)}
+.card,.daily,#quizCard,#quizFeedback,#quizIntro,.alert{animation:aIn .4s cubic-bezier(.2,.8,.2,1) backwards}
+.a-in{animation:aIn .45s cubic-bezier(.2,.8,.2,1) backwards}
+.judge.a-pop{animation:aPop .45s cubic-bezier(.2,1.4,.4,1) backwards}
+.a-okglow{animation:aOk .8s ease-out}
+.a-badglow{animation:aBad .8s ease-out}
+.a-st{animation:aSt .38s cubic-bezier(.2,.9,.3,1.2) backwards;animation-delay:calc(var(--i,0) * 45ms)}
+.pr.sel{animation:aSel .6s ease-in-out infinite}
+.pr.a-matched{animation:aMatch .5s ease-out}
+.a-hurt{display:inline-block;animation:aHurt .6s}
+.a-bump{display:inline-block;animation:aBump .45s cubic-bezier(.2,1.6,.4,1)}
+.a-levelup{animation:aLevel .8s cubic-bezier(.2,1.4,.4,1)}
+.a-tick{display:inline-block;animation:aTick .35s ease-out}
+.a-drop{animation:aDrop .8s cubic-bezier(.2,1.2,.4,1)}
+.a-tap{animation:aTap .22s ease-out}
+.glyphs span{animation:aFloat 3.2s ease-in-out infinite}
+.glyphs span:nth-child(2){animation-delay:.4s}.glyphs span:nth-child(3){animation-delay:.8s}.glyphs span:nth-child(4){animation-delay:1.2s}.glyphs span:nth-child(5){animation-delay:1.6s}.glyphs span:nth-child(6){animation-delay:2s}
+.hero .title{animation:aPop .6s cubic-bezier(.2,1.4,.4,1) backwards}
+.emoji{animation:aDrop .8s cubic-bezier(.2,1.2,.4,1)}
+.settings:not([hidden]){animation:aSlide .25s ease-out}
+details.panel[open] .panel-body{animation:aSlide .3s ease-out}
+.kbov{animation:aPage .2s ease-out}.kbbox{animation:aPop .35s cubic-bezier(.2,1.3,.4,1)}
+.primary,.ghost,.chip,.tile,.pr,.mode,.word,.lv,.key,.sopt,.iconbtn,.continue{transition:transform .16s cubic-bezier(.2,.8,.2,1),box-shadow .16s,background-color .2s,border-color .2s,opacity .2s}
+@media (hover:hover){.primary:hover:not(:disabled),.ghost:hover,.chip:hover,.tile:hover:not(:disabled):not(.used),.pr:hover:not(.done),.mode:hover,button.word:hover,.sopt:hover:not(:disabled),.continue:hover{transform:translateY(-2px)}.iconbtn:hover{transform:scale(1.12) rotate(-6deg)}}
+.tile.used{transform:scale(.92)}
+.primary:not(:disabled){background-image:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.18) 50%,transparent 60%);background-size:200% 100%;animation:aShine 3.5s linear infinite}
+textarea,input[type=text]{transition:border-color .2s,box-shadow .2s}
+.toast{animation-duration:.35s}
+body.noanim *,body.noanim *::before,body.noanim *::after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion: reduce){.glyphs span,.primary,.pr.sel{animation:none!important}}
 </style>
 </head>
 <body>
@@ -3666,7 +3714,7 @@ en:{
   nCW:T => `Write this time in words in ${T}:`, nPC:T => `Read the scene and answer in words in ${T}:`,
   bossTask:"blocks your path! Beat this one for +50 XP.",
   tDuel:"Pick the right word:", tEcho:T => `Listen and type exactly what you hear in ${T}:`, vEcho:T => `Listen and type the word you hear in ${T}:`, hWords:n => `${n} words`,
-  vMatch:"Match each word with its meaning. You can slip once.",
+  vMatch:"Match each word with its meaning. You can slip once.", vMatch2:"Match each word with its meaning. Big board: you can slip twice.",
   bosses:["The Grammar Goblin","The Conjugation Kraken","Lord Typo","The Accent Assassin","The Syntax Serpent","Baron von Verb","The Preposition Phantom","Count Cloze"]
 },
 es:{
@@ -3691,7 +3739,7 @@ es:{
   nCW:T => `Escribe esta hora con palabras en ${T}:`, nPC:T => `Lee la escena y responde con palabras en ${T}:`,
   bossTask:"te cierra el paso. Gánale y llévate +50 XP.",
   tDuel:"Elige la palabra correcta:", tEcho:T => `Escucha y escribe exactamente lo que oyes en ${T}:`, vEcho:T => `Escucha y escribe la palabra que oyes en ${T}:`, hWords:n => `${n} palabras`,
-  vMatch:"Une cada palabra con su significado. Puedes fallar una vez.",
+  vMatch:"Une cada palabra con su significado. Puedes fallar una vez.", vMatch2:"Une cada palabra con su significado. Tablero grande: puedes fallar dos veces.",
   bosses:["El Duende de la Gramática","El Kraken de las Conjugaciones","Lord Errata","El Asesino de Acentos","La Serpiente de la Sintaxis","El Barón del Verbo","El Fantasma de las Preposiciones","El Conde Hueco"]
 }
 };
@@ -4207,6 +4255,12 @@ function genNumber(st, plan, c, review, res){
   return res;
 }
 
+/* Match Madness grows with difficulty: 4 rows at A1, +1 per level, +1 on a hot streak, up to 8 */
+function matchRows(st){
+  const lv = Math.max(0, LEVELS.indexOf(st.level));
+  const hot = st.stats && st.stats.streak >= 5 ? 1 : 0;
+  return Math.min(8, 4 + lv + hot);
+}
 function genVocab(st, plan){
   const nat = LANG_CODE[st.native], tgt = LANG_CODE[st.target], L = GMT[nat], res = {};
   const list = VLIST[st.level] || VLIST.A1;
@@ -4252,10 +4306,10 @@ function genVocab(st, plan){
   } else if(game === "Echo Chamber"){
     task = L.vEcho(LN[nat][st.target]); ch.target = k; ch.hint = L.hLetter(core.charAt(0), core.length);
   } else if(game === "Match Madness"){
-    const others = shuffle(known).filter((e, i, a) => a.findIndex(x => mean(x) === mean(e)) === i && mean(e) !== m).slice(0, 3);
+    const others = shuffle(known).filter((e, i, a) => a.findIndex(x => mean(x) === mean(e)) === i && mean(e) !== m && key(e) !== k).slice(0, matchRows(st) - 1);
     ch.pairs = shuffle([[k, m]].concat(others.map(e => [key(e), mean(e)])));
     ch.k = "p"; ch.acc = ["✓"]; ch.target = ch.pairs.map(p => p[0]).join(" · "); ch.answerKey = ch.pairs.map(p => p[0] + " = " + p[1]).join(" · ");
-    task = L.vMatch;
+    task = ch.pairs.length >= 6 ? L.vMatch2 : L.vMatch;
   } else {
     const oc = pick(oddCats), others = shuffle(byCat[oc]).slice(0, 3).map(key);
     task = L.vOdd; ch.target = shuffle(others.concat(k)).join("  ·  "); ch.hint = L.hOdd(CATS[oc][nat]);
@@ -6785,7 +6839,7 @@ deep("en", "A1", {
  ["Estoy en el trabajo.","I am at work.","at","I am in the work."],
  ["El gato está detrás del sofá.","The cat is behind the sofa.|The cat is behind the couch.","behind","The cat is behind of the sofa."],
  ["La foto está en la pared.","The photo is on the wall.|The picture is on the wall.","wall","The photo is in the wall."],
- ["El café está entre el banco y la tienda.","The café is between the bank and the shop.|The cafe is between the bank and the store.","between","The café is among the bank and the shop."]
+ ["El café está entre el banco y la tienda.","The cafe is between the bank and the shop.|The café is between the bank and the shop.|The cafe is between the bank and the store.","between","The cafe is among the bank and the shop."]
 ],
 "Would like: pedir con educación":[
  ["Me gustaría un vaso de agua.|Quisiera un vaso de agua.","I would like a glass of water.","glass","I would like a glass with water."],
@@ -9785,7 +9839,7 @@ $("pairs").addEventListener("click", e => {
     pairState.done.add(b.dataset.pi);
     Sound.tap();
     if(pairState.done.size === pairState.n){
-      $("answer").value = pairState.miss <= 1 ? "✓" : "✗ " + t("pairMisses", {n:pairState.miss});
+      $("answer").value = pairState.miss <= (pairState.n >= 6 ? 2 : 1) ? "✓" : "✗ " + t("pairMisses", {n:pairState.miss});
       Sound.correct();
       if(PAIR_DELAY) setTimeout(() => submit(false), PAIR_DELAY); else submit(false);
     }
@@ -11627,6 +11681,113 @@ document.addEventListener("keydown", e => {
   $("menuMusicBtn").after(chip);
   document.querySelectorAll(".kbChk").forEach(x => x.checked = kbOn);
   document.body.classList.toggle("kb", kbOn);
+})();
+
+/* ===================== Motion: animate everything (with an off switch) ===================== */
+Object.assign(I18N.en, {animToggle:"Animations"});
+Object.assign(I18N.es, {animToggle:"Animaciones"});
+let animOn = (() => { try{ return localStorage.getItem("pgm-anim") !== "off"; }catch(e){ return true; } })();
+function setAnim(v){
+  animOn = !!v;
+  try{ localStorage.setItem("pgm-anim", animOn ? "on" : "off"); }catch(e){}
+  document.body.classList.toggle("noanim", !animOn);
+  document.querySelectorAll(".animChk").forEach(x => x.checked = animOn);
+}
+
+/* Replay an entrance animation on an element that stays on screen */
+function replay(el, cls){
+  if(!el || !animOn) return;
+  el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+}
+function animOnce(el, cls, ms){
+  if(!el || !animOn) return;
+  replay(el, cls);
+  setTimeout(() => el.classList.remove(cls), ms || 700);
+}
+
+/* Stagger: give every child of these containers its place in line */
+const STAGGER = ["#modes", "#levels", "#tiles", "#pairs", ".words", ".sq", "#quizOpts", "#quizBuild", "#overStats", "#storiesList",
+  "#bookList", "#questBox", ".quests", "#customBody .chips", "#stTiles", "#stModes", ".trophies", "#islandChips", ".kbt tbody"];
+function stagger(root){
+  for(const sel of STAGGER){
+    const boxes = root.matches && root.matches(sel) ? [root] : [...(root.querySelectorAll ? root.querySelectorAll(sel) : [])];
+    for(const box of boxes){
+      let i = 0;
+      for(const c of box.children){ if(c.nodeType === 1){ c.style.setProperty("--i", Math.min(i, 14)); c.classList.add("a-st"); i++; } }
+    }
+  }
+}
+if(window.MutationObserver){
+  new MutationObserver(list => {
+    if(!animOn) return;
+    const roots = new Set();
+    for(const m of list) if(m.type === "childList" && m.addedNodes.length) roots.add(m.target);
+    for(const r of roots){ stagger(r); let p = r.parentElement; for(let k = 0; k < 3 && p; k++, p = p.parentElement) if(STAGGER.some(s => p.matches(s))){ stagger(p); break; } }
+  }).observe(document.body, {childList:true, subtree:true});
+}
+
+/* Each new turn: cards slide in again, the verdict lands with a glow */
+renderExtras = (orig => function(fresh){
+  orig(fresh);
+  if(!fresh || !animOn) return;
+  replay($("challengeCard"), "a-in");
+  if(!$("lessonCard").hidden) replay($("lessonCard"), "a-in");
+  const j = $("judgeCard");
+  if(!j.hidden){ replay(j, "a-pop"); animOnce($("challengeCard"), j.classList.contains("ok") ? "a-okglow" : "a-badglow", 900); }
+})(renderExtras);
+
+/* HUD: hearts break, streak bumps, level badge pops */
+let animPrev = {hp:null, streak:0, badge:"", prog:""};
+renderHud = (orig => function(){
+  orig();
+  if(!S) return;
+  if(animPrev.hp !== null && S.hp < animPrev.hp) animOnce($("hudHearts"), "a-hurt", 700);
+  if(S.stats.streak > animPrev.streak && S.stats.streak > 1) animOnce($("hudStreak"), "a-bump", 500);
+  const badge = $("hudBadge").textContent;
+  if(animPrev.badge && badge !== animPrev.badge) animOnce($("hudBadge"), "a-levelup", 900);
+  const prog = $("hudProg").textContent;
+  if(animPrev.prog && prog !== animPrev.prog) animOnce($("hudProg"), "a-tick", 400);
+  animPrev = {hp:S.hp, streak:S.stats.streak, badge, prog};
+})(renderHud);
+
+/* Results: numbers count up */
+function countUp(el){
+  const m = /^(\d+)(.*)$/.exec(el.textContent.trim()); if(!m) return;
+  const end = +m[1], tail = m[2], t0 = performance.now(), dur = Math.min(1200, 300 + end * 25);
+  if(end < 2) return;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = Math.round(end * e) + tail;
+    if(k < 1) requestAnimationFrame(step);
+  };
+  el.textContent = "0" + tail; requestAnimationFrame(step);
+}
+showOver = (orig => function(){
+  animPrev.hp = null;
+  orig();
+  if(!animOn || window.__PGM_TEST) return;
+  $("overStats").querySelectorAll("b").forEach((b, i) => setTimeout(() => countUp(b), 250 + i * 90));
+  replay($("overEmoji"), "a-drop");
+})(showOver);
+
+/* Match Madness: a satisfying snap when a pair locks in */
+$("pairs").addEventListener("click", e => {
+  const b = e.target.closest(".pr"); if(!b || !animOn) return;
+  setTimeout(() => { if(b.classList.contains("done")) $("pairs").querySelectorAll(".pr.done:not(.a-matched)").forEach(x => x.classList.add("a-matched")); }, 0);
+});
+/* Tiles squash when tapped */
+document.addEventListener("click", e => { const t = e.target.closest(".tile, .key, .sopt, .lv, .chip"); if(t) animOnce(t, "a-tap", 250); });
+
+/* Settings row */
+(() => {
+  const row = document.createElement("label");
+  row.className = "srow";
+  row.innerHTML = `<span>✨ <span data-i18n="animToggle">${esc(t("animToggle"))}</span></span><input type="checkbox" class="animChk">`;
+  const kbBtn = $("settingsPanel").querySelector(".kbHelpBtn");
+  $("settingsPanel").insertBefore(row, kbBtn || null);
+  document.addEventListener("change", e => { if(e.target.classList && e.target.classList.contains("animChk")) setAnim(e.target.checked); });
+  setAnim(animOn);
+  stagger(document.body);
 })();
 
 function absorb(res, answer, rolls, prevPlan){

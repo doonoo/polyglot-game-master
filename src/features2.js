@@ -74,7 +74,7 @@ $("pairs").addEventListener("click", e => {
     pairState.done.add(b.dataset.pi);
     Sound.tap();
     if(pairState.done.size === pairState.n){
-      $("answer").value = pairState.miss <= 1 ? "✓" : "✗ " + t("pairMisses", {n:pairState.miss});
+      $("answer").value = pairState.miss <= (pairState.n >= 6 ? 2 : 1) ? "✓" : "✗ " + t("pairMisses", {n:pairState.miss});
       Sound.correct();
       if(PAIR_DELAY) setTimeout(() => submit(false), PAIR_DELAY); else submit(false);
     }

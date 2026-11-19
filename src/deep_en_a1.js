@@ -202,7 +202,7 @@ deep("en", "A1", {
  ["Estoy en el trabajo.","I am at work.","at","I am in the work."],
  ["El gato está detrás del sofá.","The cat is behind the sofa.|The cat is behind the couch.","behind","The cat is behind of the sofa."],
  ["La foto está en la pared.","The photo is on the wall.|The picture is on the wall.","wall","The photo is in the wall."],
- ["El café está entre el banco y la tienda.","The café is between the bank and the shop.|The cafe is between the bank and the store.","between","The café is among the bank and the shop."]
+ ["El café está entre el banco y la tienda.","The cafe is between the bank and the shop.|The café is between the bank and the shop.|The cafe is between the bank and the store.","between","The cafe is among the bank and the shop."]
 ],
 "Would like: pedir con educación":[
  ["Me gustaría un vaso de agua.|Quisiera un vaso de agua.","I would like a glass of water.","glass","I would like a glass with water."],
