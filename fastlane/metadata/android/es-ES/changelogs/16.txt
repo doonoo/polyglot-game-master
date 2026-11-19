@@ -1,0 +1,1 @@
+El consejo largo de la lección ya no se repite en cada fallo: solo aparece cuando la frase usa alguna de las expresiones que explica.

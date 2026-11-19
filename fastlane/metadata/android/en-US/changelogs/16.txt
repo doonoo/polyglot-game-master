@@ -1,0 +1,1 @@
+The long lesson tip no longer repeats after every miss: it only appears when the sentence actually uses one of the phrases it explains.

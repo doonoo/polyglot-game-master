@@ -24,6 +24,15 @@ if(!/estar/.test(jc.querySelector(".fbnotes").textContent)) fail("ser/estar note
 if(!jc.querySelector(".dx-acc")) fail("accent not marked");
 jc = play({game:"Reverse Mine", target:"Estoy casado.", acc:["I am married.|I'm married."], k:"s", al:"en", answerKey:"I'm married."}, "the weather is nice today");
 if(/pixel|Close/i.test(P.S.judgement.headline)) fail("far miss got a 'close' headline", P.S.judgement.headline);
+// the long lesson tip only shows when one of its phrases is in the answer
+const tip = P.COURSE.es.A1.find(c => /me llamo/.test(c.b || "") && /soy de/.test(c.b || "")).b;
+function playWhy(ch, ans){ P.S.current.plan.boss = false; Object.assign(P.S.current.challenge, ch, {cw:[], why:tip}); $("answer").value = ans; $("submitBtn").click(); return P.S.judgement.feedback; }
+let fb = playWhy({game:"Classic Mine", target:"I'm married.", acc:["Estoy casado.|Soy casado."], k:"s", al:"es", answerKey:"Estoy casado."}, "Tengo cansado");
+if(/me llamo/.test(fb) === /estoy casado/i.test(tip) ? false : /me llamo/.test(fb) && !/estoy casado/i.test(tip)) fail("irrelevant tip shown", fb);
+fb = playWhy({game:"Classic Mine", target:"I live in Texas.", acc:["Vivo en Texas."], k:"s", al:"es", answerKey:"Vivo en Texas."}, "Vivo a Texas");
+if(/me llamo/.test(fb)) fail("irrelevant tip shown for 'Vivo en Texas'", fb);
+fb = playWhy({game:"Classic Mine", target:"Where are you from?", acc:["¿De dónde eres?"], k:"s", al:"es", answerKey:"¿De dónde eres?"}, "Donde eres de");
+if(!/me llamo/.test(fb)) fail("relevant tip hidden for '¿De dónde eres?'", fb);
 // content regression: soy casado is accepted
 const item = P.COURSE.es.A1.flatMap(c => c.it).find(it => it[0] === "I'm married.");
 if(!item || !P.expand(item[1]).includes("Soy casado.")) fail("'Soy casado' not accepted");

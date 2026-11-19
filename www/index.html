@@ -4144,14 +4144,22 @@ function gradeLocal(st, ch, answer, force){
   }
   const forced = !!force && !correct;
   if(forced) correct = true;
+  // The lesson tip lists many phrases; only show it when one of them is actually in this answer
+  let why = ch.why || "";
+  const terms = (why.match(/\*\*([^*]+)\*\*/g) || []).map(x => x.slice(2, -2));
+  if(terms.length >= 3){
+    const have = new Set(nrm(best || ch.answerKey || "", ch, false).split(" "));
+    const hit = terms.some(tm => { const ws = nrm(tm.replace(/\/[a-záéíóúñ]+/gi, "").replace(/\.\.\.|…|\+/g, " "), ch, false).split(" ").filter(Boolean); return ws.length && ws.every(w => have.has(w)); });
+    if(!hit) why = "";
+  }
   const isCloze = ch.game === "Cloze Combat" || ch.game === "Word Duel";
   const shown = isCloze ? ch.answerKey : best;
   let feedback;
-  if(answer === null) feedback = `${L.idkFb} **${shown}**` + (ch.why ? `\n${ch.why}` : "");
+  if(answer === null) feedback = `${L.idkFb} **${shown}**` + (why ? `\n${why}` : "");
   else if(forced) feedback = L.forced;
   else if(correct && accentMiss) feedback = `${L.accent} ${boldDiff(best, answer, ch, true)}`;
   else if(correct) feedback = pick(L.okFb);
-  else feedback = `${L.fix} ${isCloze ? "**" + shown + "**" : boldDiff(best, answer, ch, accentMiss)}` + (accentMiss ? ` ${L.accentStrict}` : "") + (ch.why ? `\n${ch.why}` : "");
+  else feedback = `${L.fix} ${isCloze ? "**" + shown + "**" : boldDiff(best, answer, ch, accentMiss)}` + (accentMiss ? ` ${L.accentStrict}` : "") + (why ? `\n${why}` : "");
   const struggled = [];
   if(!correct || forced){
     if(ch.k === "w" && ch.wk) struggled.push({w:ch.wk, m:ch.wm});
