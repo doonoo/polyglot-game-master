@@ -1,1 +1,1 @@
-Fixed a stripe of frozen confetti that could get stuck across the screen on Android after switching apps or opening the keyboard. Confetti now always finishes and clears itself. The reminder buttons no longer wrap onto two lines.
+Confetti fix: it now rains down from the top instead of bursting in a flat band across the middle, so it no longer covers the answer box or accent keys, and it can't get stuck on screen when the keyboard opens or closes. The reminder buttons no longer wrap.

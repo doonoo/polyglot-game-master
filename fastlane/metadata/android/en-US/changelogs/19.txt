@@ -1,0 +1,1 @@
+Confetti can no longer freeze into a stripe: if Android pauses the animation (switching apps, keyboard, battery saver), it restarts or clears itself, and it always disappears within a few seconds.

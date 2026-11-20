@@ -1,0 +1,1 @@
+El confeti ya no puede congelarse en una franja: si Android pausa la animación (cambiar de app, teclado, ahorro de batería), se reinicia o se borra, y siempre desaparece en pocos segundos.
