@@ -1,0 +1,6 @@
+8-bit sound effects for everything you do.
+• New NES-style effects made from the same chip sounds as the soundtrack.
+• Stage clear fanfare when you beat a level, a game over tune when you lose.
+• Sounds for combos, lost hearts, stars, unlocks, tiles, matched pairs, badges and loot.
+• Boss fights: an ominous entrance, hits, counterattacks, the final blow and an explosion when it goes down.
+• The 🔊 sound switch still turns them all off.

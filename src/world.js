@@ -438,10 +438,12 @@ function wlGrade(P, ok, note){
     if(R.boss){ R.boss.hp = Math.max(0, R.boss.hp - 1); setTimeout(() => { const f = $("wlBossFace"); if(f){ f.classList.add("hit"); try{ const c = juCenter(f); juBurst(c.x, c.y, 16, ["#FF5A5F", "#FFD45C", "#FFFFFF"], 70); }catch(e){} } }, 30); }
     try{ const p = juHere(); juBurst(p.x, p.y, 14, ["#4FD195", "#FFD45C", "#F2B01E", "#FFFFFF"]); juFloat(p.x, p.y - 10, t("wl_xp", {n:xp}), "#4FD195");
       if(R.streak === 3) juBanner(t("ju_nice")); else if(R.streak === 5) juBanner(t("ju_great"), "ok"); else if(R.streak === 8) juBanner(t("ju_awesome"), "lvl"); }catch(e){}
+    if(R.boss) Sound.bossHit(); else if(R.streak === 3 || R.streak === 5 || R.streak === 8) Sound.combo(R.streak);
     if(key && pr.miss[key]) pr.miss[key] = Math.max(0, pr.miss[key] - 1);
   } else {
     R.streak = 0; R.miss++; R.hp--;
     Sound.wrong();
+    setTimeout(() => { if(R.boss) Sound.bossAttack(); else Sound.heart(); }, 200);
     try{ recordAnswer(false, 0); }catch(e){}
     try{ juVignette(); if(R.boss){ juFlash("#E5384F"); juShake($("worldPage"), "jx-quake"); } }catch(e){}
     if(key) pr.miss[key] = (pr.miss[key] || 0) + 1;
@@ -466,7 +468,7 @@ function wlNext(P){
         if(j > 0) [R.items[R.i], R.items[j]] = [R.items[j], R.items[R.i]];
         else R.items.splice(R.i, 0, wlBossItems(P, R.boss.k).find(x => x.type === "build"));
       }
-      setTimeout(() => { try{ juBanner(t("wl_final"), "boss"); }catch(e){} }, 120);
+      setTimeout(() => { try{ juBanner(t("wl_final"), "boss"); Sound.finalBlow(); }catch(e){} }, 120);
     }
     return wlRender();
   }
@@ -485,8 +487,12 @@ function wlFinish(P, won){
     if(R.boss){ R.xp += 30; pr.b[R.boss.k] = true; }
     else if(WV.unit >= 0){ R.firstClear = !pr.u[WV.unit]; pr.u[WV.unit] = Math.max(pr.u[WV.unit] || 0, stars); }
     wpSave();
-    setTimeout(() => { try{ Sound.levelUp(); confetti(stars === 3 || R.boss ? 160 : 90); if(R.boss){ juFlash("#FFFFFF"); juBanner(t("ju_bossDown"), "ok"); } else if(stars === 3) juBanner(t("ju_perfect"), "ok"); }catch(e){} }, 250);
-  } else { try{ Sound.gameOver(); }catch(e){} }
+    const nextOpen = !R.boss && WV.unit >= 0 && R.firstClear && WV.unit + 1 < P.units.length && wlUnlocked(P.code, WV.unit + 1);
+    if(R.boss) Sound.bossDefeat();
+    else { for(let k = 0; k < stars; k++) setTimeout(() => Sound.star(k), 250 + k * 200); setTimeout(() => Sound.stageClear(), 300 + stars * 200); }
+    if(nextOpen || (R.boss && 4 * R.boss.k + 4 < P.units.length)) setTimeout(() => Sound.unlocked(), R.boss ? 3300 : 2600);
+    setTimeout(() => { try{ confetti(stars === 3 || R.boss ? 160 : 90); if(R.boss){ juFlash("#FFFFFF"); juBanner(t("ju_bossDown"), "ok"); } else if(stars === 3) juBanner(t("ju_perfect"), "ok"); }catch(e){} }, 250);
+  } else { try{ setTimeout(() => Sound.stageFail(), 300); }catch(e){} }
   wlGo("end");
 }
 function wlEnd(el, P){
@@ -544,6 +550,7 @@ document.addEventListener("click", e => {
   if(un){ const i = +un.dataset.wunit; if(!wlUnlocked(P.code, i)){ Sound.wrong(); toast("🔒 " + t(i % 4 === 0 && wpOf(P.code).u[i - 1] ? "wl_bossGate" : "wl_locked")); return; } Sound.tap(); return wlGo("intro", P.code, i); }
   if(e.target.closest("#wlPractice")){ Sound.tap(); return wlStart(P, -1); }
   if(e.target.closest("#wlGo")){ Sound.unlock(); Sound.start(); return wlStart(P, WV.unit); }
+  if(e.target.closest("#wlFight")){ Sound.unlock(); Sound.start(); }
   const bs = e.target.closest("[data-wboss]");
   if(bs){ const k = +bs.dataset.wboss; if(!wlBossUnlocked(P.code, k)){ Sound.wrong(); toast("🔒 " + t("wl_bossLocked")); return; } Sound.unlock(); Sound.bossIntro(); WV.boss = k; return wlGo("bossIntro"); }
   if(e.target.closest("#wlFight")){ Sound.unlock(); return wlStart(P, WV.unit, WV.boss); }
@@ -557,17 +564,17 @@ document.addEventListener("click", e => {
   const R = WV.run, c = R.items[R.i];
   const op = e.target.closest("[data-wopt]"); if(op) return wlAnswerOpt(P, +op.dataset.wopt);
   const tl = e.target.closest("[data-wtile]");
-  if(tl && R.state === "ask"){ const i = +tl.dataset.wtile; if(!R.picked.includes(i)){ R.picked.push(i); Sound.tap(); if(Narrator.available() && canEcho()) Narrator.say([{text:c.tiles[i].t, lang:P.tts}]); wlRender(); } return; }
-  const ut = e.target.closest("[data-wun]"); if(ut && R.state === "ask"){ R.picked = R.picked.filter(x => x !== +ut.dataset.wun); Sound.tap(); return wlRender(); }
+  if(tl && R.state === "ask"){ const i = +tl.dataset.wtile; if(!R.picked.includes(i)){ R.picked.push(i); Sound.tile(); if(Narrator.available() && canEcho()) Narrator.say([{text:c.tiles[i].t, lang:P.tts}]); wlRender(); } return; }
+  const ut = e.target.closest("[data-wun]"); if(ut && R.state === "ask"){ R.picked = R.picked.filter(x => x !== +ut.dataset.wun); Sound.untile(); return wlRender(); }
   if(e.target.closest("#wlCheck")) return wlCheck(P);
   if(e.target.closest("#wlNext")){ Sound.tap(); return wlNext(P); }
   const ml = e.target.closest("[data-wml]"), mr = e.target.closest("[data-wmr]");
   if((ml || mr) && c.type === "match" && R.state === "ask"){
     const side = ml ? "l" : "r", idx = +(ml || mr).dataset[ml ? "wml" : "wmr"];
     if(side === "l" && Narrator.available() && canEcho()) Narrator.say([{text:c.pairs[idx].t, lang:P.tts}]);
-    if(!c.sel || c.sel.side === side){ c.sel = {side, idx}; Sound.tap(); pg.querySelectorAll(".wmatch .sel").forEach(b => b.classList.remove("sel")); (ml || mr).classList.add("sel"); return; }
+    if(!c.sel || c.sel.side === side){ c.sel = {side, idx}; Sound.pick(); pg.querySelectorAll(".wmatch .sel").forEach(b => b.classList.remove("sel")); (ml || mr).classList.add("sel"); return; }
     if(c.sel.idx === idx){
-      c.done.push(idx); c.sel = null; Sound.correct();
+      c.done.push(idx); c.sel = null; Sound.match();
       try{ const p = juHere(); juBurst(p.x, p.y, 8, ["#4FD195", "#FFD45C"], 60); }catch(e){}
       if(c.done.length === c.pairs.length) return wlGrade(P, !c.missed);
       return wlRender();

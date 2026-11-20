@@ -67,6 +67,11 @@ function boot(withVoice){
   const sel = $("uiSel"); sel.value = "es"; sel.dispatchEvent(new w.Event("change", {bubbles:true}));
   await new Promise(r => setTimeout(r, 20));
   if(btn.getAttribute("aria-label") !== "Voz y audio") fail("menu button not translated", btn.getAttribute("aria-label"));
+  // 8-bit sound effects are wired up
+  const SX = w.__sfx;
+  if(!SX) fail("no sfx module");
+  else for(const n of ["tap","correct","wrong","heart","combo","levelUp","stageClear","stageFail","star","unlocked","badge","loot","tile","untile","pick","match","bossIntro","bossHit","bossAttack","bossBlock","finalBlow","bossDefeat","page"])
+    if(typeof SX.Sound[n] !== "function") fail("missing sound", n); else { try{ SX.Sound[n](1); }catch(e){ fail("sound threw", n, e.message); } }
   if(dom.errors.length) fail("page errors", dom.errors.slice(0, 3).map(String));
 
   /* ---------- device without voice ---------- */

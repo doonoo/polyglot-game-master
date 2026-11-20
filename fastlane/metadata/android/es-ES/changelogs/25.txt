@@ -1,0 +1,6 @@
+Efectos de sonido de 8 bits para todo lo que haces.
+• Efectos nuevos al estilo NES con los mismos sonidos de chip que la música.
+• Fanfarria al superar un nivel y melodía de derrota al perder.
+• Sonidos para combos, corazones perdidos, estrellas, desbloqueos, fichas, parejas, logros y botín.
+• Jefes: entrada siniestra, golpes, contraataques, golpe final y explosión al vencerlos.
+• El interruptor 🔊 los apaga todos.
