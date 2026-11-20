@@ -72,13 +72,13 @@ Read this first in any new chat about this project. It is the short version of e
 3. Update `README.md` if features changed.
 4. Run `python3 tools/build.py`, then `npm test`, which must be all green.
 5. Commit with the attribution lines and push to main.
-6. Create the GitHub release `vX.Y.Z` in Chrome at `https://github.com/doonoo/polyglot-game-master/releases/new?tag=vX.Y.Z&target=main&title=vX.Y.Z`. Pushing tags is blocked by the proxy, so the release page creates the tag.
+6. Create the GitHub release `vX.Y.Z` in Chrome at `https://github.com/doonoo/polyglot-game-master/releases/new?tag=vX.Y.Z&target=main&title=vX.Y.Z`. Pushing tags is blocked by the proxy and the REST API refuses to create releases from these sessions, so the release page creates the tag.
    - Fill the notes, then click Publish.
    - If the first Chrome call says "browser-internal URL", run a `find` first.
 7. Wait for the "Android APK" run on the tag:
    - `gh api repos/doonoo/polyglot-game-master/actions/runs/<id>`. The `gh` GraphQL commands are blocked, so use `gh api` (REST).
    - Re-run on a transient Maven failure: `gh api -X POST .../actions/runs/<id>/rerun`.
-8. Check the APK is signed with the release key. The v2 signing block's certificate SHA-256 must be `32:17:36:43:A8:8A:0A:FD:9F:6C:13:8E:91:B2:BB:70:29:A8:59:C1:EB:09:CB:8B:79:24:8A:B2:A6:B0:49:C0`.
+8. Check the APK is signed with the release key. Download it with `gh api -H "Accept: application/octet-stream" repos/doonoo/polyglot-game-master/releases/assets/<asset id>` (`gh release download` uses GraphQL and fails). The v2 signing block's certificate SHA-256 must be `32:17:36:43:A8:8A:0A:FD:9F:6C:13:8E:91:B2:BB:70:29:A8:59:C1:EB:09:CB:8B:79:24:8A:B2:A6:B0:49:C0`.
 9. Republish the artifact from a copy of `www/index.html` with these changes:
    - Remove the manifest link, theme and app-capable metas, the icon links and the `native-tts.js` script tag.
    - Swap `fonts/fonts.css` for the Google Fonts links (Atkinson Hyperlegible plus Bricolage Grotesque).
