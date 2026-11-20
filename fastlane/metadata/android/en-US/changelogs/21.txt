@@ -1,0 +1,4 @@
+8-bit soundtrack and a much livelier game.
+• New NES-style music: 9 original chiptune tracks, one for each kind of play (a street-brawler theme for Survivor, a boss theme, calypso for Island Hopper, a Time Attack rush...) plus victory and game-over jingles.
+• Pick any track in the 🎛️ panel, or leave it on Auto.
+• Pixel bursts, +XP pop-ups, combo banners, screen shake, boss flashes, a burning streak and a moving background.
