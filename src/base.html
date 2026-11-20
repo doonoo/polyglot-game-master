@@ -1408,19 +1408,19 @@ let parts = [], fxRunning = false;
 function confetti(n){
   if(reduceMotion) return;
   const c = $("fx"); if(!c || !c.getContext) return;
-  const dpr = window.devicePixelRatio || 1, w = window.innerWidth, h = window.innerHeight;
-  c.width = w * dpr; c.height = h * dpr;
-  const cols = ["#F2B01E","#5B4BD6","#2BB7D4","#E5384F","#4FD195","#FFD45C"];
-  for(let i = 0; i < n; i++) parts.push({x: w/2 + (Math.random()-0.5) * w * 0.6, y: h * 0.35, vx: (Math.random()-0.5) * 9, vy: -Math.random() * 11 - 3, r: Math.random() * 6, s: 5 + Math.random() * 6, c: cols[i % cols.length], life: 0});
+  const fit = () => { const dpr = window.devicePixelRatio || 1, W = Math.round(window.innerWidth * dpr), H = Math.round(window.innerHeight * dpr); if(c.width !== W || c.height !== H){ c.width = W; c.height = H; } return dpr; };
+  fit(); c.style.visibility = "visible"; const w = window.innerWidth, h = window.innerHeight, cols = ["#F2B01E","#5B4BD6","#2BB7D4","#E5384F","#4FD195","#FFD45C"];
+  for(let i = 0; i < n; i++) parts.push({x: Math.random() * w, y: -10 - Math.random() * h * 0.25, vx: (Math.random()-0.5) * 3, vy: 2 + Math.random() * 4, r: Math.random() * 6, s: 5 + Math.random() * 6, c: cols[i % cols.length], life: 0});   // rain from the top edge, never a band over the answer box
+  clearTimeout(confetti.guard); confetti.guard = setTimeout(() => { parts = []; }, 6000);   // never leave pieces stuck on screen
   if(fxRunning) return;
-  fxRunning = true;
-  const g = c.getContext("2d");
+  fxRunning = true; const g = c.getContext("2d"), wipe = () => { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height); };
   (function frame(){
-    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
-    parts.forEach(p => { p.vy += 0.35; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += 0.15; p.life++;
+    const dpr = fit(), H = window.innerHeight;   // the screen can change size (keyboard, rotation) mid-animation
+    wipe(); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    parts.forEach(p => { p.vy = Math.min(p.vy + 0.18, 9); p.vx = p.vx * 0.99 + Math.sin(p.life / 9 + p.r) * 0.15; p.x += p.vx; p.y += p.vy; p.r += 0.15; p.life++;
       g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.fillStyle = p.c; g.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); g.restore(); });
-    parts = parts.filter(p => p.y < h + 20 && p.life < 160);
-    if(parts.length) requestAnimationFrame(frame); else { g.clearRect(0, 0, w, h); fxRunning = false; }
+    parts = parts.filter(p => p.y < H + 40 && p.life < 220);
+    if(parts.length) requestAnimationFrame(frame); else { wipe(); c.style.visibility = "hidden"; fxRunning = false; }
   })();
 }
 function bossIntro(){

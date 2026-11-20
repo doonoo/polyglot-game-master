@@ -377,6 +377,8 @@ A = rep(A, "</style>", """/* the clock */
 </style>""")
 A = rep(A, "</style>", """/* bug fixes */
 html{overflow-x:hidden;overflow-x:clip}
+#fx{visibility:hidden}
+#nBannerYes,#nBannerNo{white-space:nowrap}
 .fbq{padding-bottom:6px;margin-bottom:6px;border-bottom:1px dashed var(--line)}
 .dx{border-radius:5px;padding:0 3px}
 .dx-del{background:rgba(233,75,75,.16);color:#E94B4B;text-decoration:line-through;text-decoration-thickness:2px}

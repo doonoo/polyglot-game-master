@@ -1,0 +1,1 @@
+Confeti corregido: ahora cae desde arriba en lugar de estallar en una franja plana en medio, así que ya no tapa el cuadro de respuesta ni los acentos, y no puede quedarse pegado al abrir o cerrar el teclado. Los botones del recordatorio ya no se parten.
