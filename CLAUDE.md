@@ -23,7 +23,7 @@ Read this first in any new chat about this project. It is the short version of e
   2. Apply exact-string `rep()` patches, including the CSS blocks injected before `</style>`.
   3. Append every `src/*.js` module in the order of the `out = "\n".join([...])` line near the bottom of build.py.
 - All modules share one scope, an IIFE. Extend existing functions by wrapping them: `fn = (orig => function(...){ ...orig(...)... })(fn);`.
-- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js → world.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
+- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js → world.js → voiceprefs.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
 - A new feature module needs adding to that join list. A new CEFR content file needs adding to the `CEFR = [...]` list.
 - `www/native-tts.js` bridges the native Android text-to-speech plugin. The `www/` folder (with `index.html` built) is what Capacitor packages.
 - After changing npm Capacitor plugins, run `npx cap sync android` and commit the changed `android/` gradle files.
@@ -64,11 +64,12 @@ Read this first in any new chat about this project. It is the short version of e
   - `chiptune.js`: NES-style soundtrack. Replaces Music's methods; tracks live in `CHIP_TRACKS` (16 tokens per bar, notation at the top of the file); `syncMood()` picks the track per mode.
   - `juice.js`: arcade effects (pixel bursts, +XP, combo banners, shake, boss flash, beat pulses, now-playing tag). DOM + CSS only, off under `__PGM_TEST`, the Animations switch or reduced motion.
   - `world.js`: World Languages (Mandarin, Arabic, French, Portuguese). Its own page, lesson path and mini-games, separate from the Spanish/English engine. Progress in localStorage `pgm-world`; answers count toward XP, streak and quests via `recordAnswer`.
+  - `voiceprefs.js`: the 🔈 Audio sheet (main menu and World Languages path). Its switches drive the existing settings: listening = `#echoChk` / `pgm-echo` / `canEcho()`, speaking = `.voiceChk` / `pgm-voice`. Anything that plays audio or asks the player to listen should check `canEcho()`.
   - `voice.js`: Speak Up game plus 🎤 dictation. Only where `SpeechRecognition` exists or the Android plugin `@capacitor-community/speech-recognition` is present.
 - **Challenge copying:** when a challenge is copied into `S.current`, only listed fields survive. The list is in a build.py rep ending with `strict, double, parts`. A new challenge field must be added there.
 
 ## Testing
-- Run `npm test`: test.js and test4–test12, all JSDOM. It takes a few minutes.
+- Run `npm test`: test.js and test4–test13, all JSDOM. It takes a few minutes.
   - Tests set `window.__PGM_TEST = true`, which exposes `window.__pgm` (S, setup, COURSE, variantsOf, gradeLocal, expand, tipsFor…).
   - Test pages keep timers running, so a new test file must end with `process.exit(0)`.
 - For real-browser checks, use Playwright with `/usr/bin/google-chrome`. Chrome has a native `SpeechRecognition`; override both `SpeechRecognition` and `webkitSpeechRecognition` when faking voice.
@@ -108,8 +109,9 @@ Read this first in any new chat about this project. It is the short version of e
 | 2.1.0 | NES chiptune soundtrack, arcade animations |
 | 2.2.0 | World Languages: Mandarin, Arabic, French, Portuguese (A1) |
 | 2.3.0 | World Languages A2, boss battles |
+| 2.3.1 | Voice & audio switches (turn off listening / speaking rounds) |
 
-Current version: 2.3.0, versionCode 23.
+Current version: 2.3.1, versionCode 24.
 
 ## Working with Emmanuel
 - He likes short, direct answers and wants Claude to take the initiative on scope.

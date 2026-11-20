@@ -124,7 +124,7 @@ function wlRomOf(P, tok){
 function wlLesson(P, ui){
   const u = P.units[ui], W = wlShuf(u.words), S = wlShuf(u.sents);
   const special = P.typing ? "type" : P.rom === "pinyin" ? "tone" : "read";
-  const listen = typeof Narrator !== "undefined" && Narrator.available() ? "listen" : "rev";
+  const listen = typeof canEcho === "function" ? (canEcho() ? "listen" : "rev") : (Narrator.available() ? "listen" : "rev");
   const plan = [["pick", W[0]], ["rev", W[1]], ["pick", W[2]], [listen, W[3]], ["build", S[0]], ["match", wlShuf(u.words).slice(0, 4)],
     ["pick", W[4]], [special, W[5]], ["build", S[1]], ["fill", S[2]], ["rev", W[6]], [special, W[7]], ["build", S[3]], ["pick", W[8] || W[0]]];
   return plan.filter(p => p[1]).map(([ty, src]) => wlMake(P, ty, src));
@@ -557,14 +557,14 @@ document.addEventListener("click", e => {
   const R = WV.run, c = R.items[R.i];
   const op = e.target.closest("[data-wopt]"); if(op) return wlAnswerOpt(P, +op.dataset.wopt);
   const tl = e.target.closest("[data-wtile]");
-  if(tl && R.state === "ask"){ const i = +tl.dataset.wtile; if(!R.picked.includes(i)){ R.picked.push(i); Sound.tap(); if(Narrator.available()) Narrator.say([{text:c.tiles[i].t, lang:P.tts}]); wlRender(); } return; }
+  if(tl && R.state === "ask"){ const i = +tl.dataset.wtile; if(!R.picked.includes(i)){ R.picked.push(i); Sound.tap(); if(Narrator.available() && canEcho()) Narrator.say([{text:c.tiles[i].t, lang:P.tts}]); wlRender(); } return; }
   const ut = e.target.closest("[data-wun]"); if(ut && R.state === "ask"){ R.picked = R.picked.filter(x => x !== +ut.dataset.wun); Sound.tap(); return wlRender(); }
   if(e.target.closest("#wlCheck")) return wlCheck(P);
   if(e.target.closest("#wlNext")){ Sound.tap(); return wlNext(P); }
   const ml = e.target.closest("[data-wml]"), mr = e.target.closest("[data-wmr]");
   if((ml || mr) && c.type === "match" && R.state === "ask"){
     const side = ml ? "l" : "r", idx = +(ml || mr).dataset[ml ? "wml" : "wmr"];
-    if(side === "l" && Narrator.available()) Narrator.say([{text:c.pairs[idx].t, lang:P.tts}]);
+    if(side === "l" && Narrator.available() && canEcho()) Narrator.say([{text:c.pairs[idx].t, lang:P.tts}]);
     if(!c.sel || c.sel.side === side){ c.sel = {side, idx}; Sound.tap(); pg.querySelectorAll(".wmatch .sel").forEach(b => b.classList.remove("sel")); (ml || mr).classList.add("sel"); return; }
     if(c.sel.idx === idx){
       c.done.push(idx); c.sel = null; Sound.correct();

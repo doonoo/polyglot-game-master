@@ -1,0 +1,4 @@
+Apaga los retos de voz cuando no puedas hacerlos.
+• Nuevo botón 🔈 Audio en el menú (y en Idiomas del mundo): activa o desactiva los retos de escucha y los de hablar.
+• El modo silencio apaga los dos con un toque. Esas rondas pasan a ser de lectura y escritura, sin penalización.
+• Idiomas del mundo ya no pone rondas de escucha ni audio automático si la escucha está apagada.

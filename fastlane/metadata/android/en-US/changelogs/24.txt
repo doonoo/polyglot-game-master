@@ -1,0 +1,4 @@
+Switch off voice challenges when you can't do them.
+• New 🔈 Audio button on the main menu (and in World Languages): turn listening challenges and speaking challenges on or off.
+• Quiet mode turns both off in one tap. Those rounds become reading and typing rounds, with no penalty.
+• World Languages now skips "What do you hear?" rounds and automatic audio when listening is off.
