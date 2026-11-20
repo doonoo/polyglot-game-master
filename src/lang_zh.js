@@ -1,7 +1,7 @@
-/* ===================== World Languages: Mandarin Chinese (A1, simplified + pinyin, taught through English) =====================
+/* ===================== World Languages: Mandarin Chinese (A1–A2, simplified + pinyin, taught through English) =====================
    w: [hanzi, english, pinyin]   s: [english, hanzi words separated by spaces, pinyin with one entry per word] */
 var WL = WL || {};
-WL.zh = {code:"zh", name:"Mandarin Chinese", self:"中文", flag:"🇨🇳", tts:"zh-CN", dir:"ltr", typing:false, rom:"pinyin", seg:true, music:"lantern", units:[
+WL.zh = {code:"zh", name:"Mandarin Chinese", self:"中文", flag:"🇨🇳", tts:"zh-CN", dir:"ltr", typing:false, rom:"pinyin", seg:true, music:"lantern", bosses:[["🐉","玉龙 · The Jade Dragon"],["🦁","石狮 · The Stone Lion"],["🐲","年兽 · The Nian Beast"],["🦊","九尾狐 · The Nine-Tailed Fox"]], units:[
  {t:"Greetings", ico:"👋",
   b:"Mandarin has four tones plus a light neutral one: **mā** (high and flat), **má** (rising), **mǎ** (dips then rises), **mà** (falling). The tone changes the meaning, so listen closely. **你好** (nǐ hǎo) = hello, **谢谢** (xièxie) = thank you.",
   w:[["你好","hello","nǐ hǎo"],["您好","hello (polite)","nín hǎo"],["谢谢","thank you","xièxie"],["不客气","you're welcome","bú kèqi"],["再见","goodbye","zàijiàn"],["对不起","sorry","duìbuqǐ"],["没关系","it's OK","méi guānxi"],["请","please","qǐng"],["老师","teacher","lǎoshī"],["很","very","hěn"]],
@@ -33,5 +33,37 @@ WL.zh = {code:"zh", name:"Mandarin Chinese", self:"中文", flag:"🇨🇳", tts
  {t:"Everyday verbs", ico:"🏃",
   b:"**不** (bù) makes verbs negative, but **有** (to have) takes **没** (méi): **我没有钱** = I don't have money. **会** (huì) shows a skill: **我会说中文** = I can speak Chinese.",
   w:[["喜欢","to like","xǐhuan"],["想","to want to","xiǎng"],["有","to have","yǒu"],["没有","not have","méiyǒu"],["去","to go","qù"],["说","to speak","shuō"],["学","to learn","xué"],["懂","to understand","dǒng"],["住","to live","zhù"],["中文","Chinese (language)","Zhōngwén"]],
-  s:[["I can speak a little Chinese.","我 会 说 一点儿 中文","wǒ huì shuō yìdiǎnr Zhōngwén"],["I don't understand.","我 不 懂","wǒ bù dǒng"],["We live in America.","我们 住 在 美国","wǒmen zhù zài Měiguó"],["Do you want to go?","你 想 去 吗","nǐ xiǎng qù ma"],["I like tea.","我 喜欢 茶","wǒ xǐhuan chá"]]}
+  s:[["I can speak a little Chinese.","我 会 说 一点儿 中文","wǒ huì shuō yìdiǎnr Zhōngwén"],["I don't understand.","我 不 懂","wǒ bù dǒng"],["We live in America.","我们 住 在 美国","wǒmen zhù zài Měiguó"],["Do you want to go?","你 想 去 吗","nǐ xiǎng qù ma"],["I like tea.","我 喜欢 茶","wǒ xǐhuan chá"]]},
+ {lv:"A2", t:"Shopping", ico:"🛍️",
+  b:"**多少钱?** (duōshao qián) = How much is it? **太贵了** (tài guì le) = too expensive. People say **块** (kuài) for yuan when speaking; prices are written with **元** (yuán).",
+  w:[["多少","how much","duōshao"],["钱","money","qián"],["贵","expensive","guì"],["便宜","cheap","piányi"],["买","to buy","mǎi"],["卖","to sell","mài"],["块","yuan (spoken)","kuài"],["这个","this one","zhège"],["那个","that one","nàge"],["一百","one hundred","yìbǎi"]],
+  s:[["How much is this?","这个 多少 钱","zhège duōshao qián"],["It's too expensive!","太 贵 了","tài guì le"],["I'll buy that one.","我 买 那个","wǒ mǎi nàge"],["Can it be a bit cheaper?","可以 便宜 一点儿 吗","kěyǐ piányi yìdiǎnr ma"],["One hundred yuan.","一百 块","yìbǎi kuài"]]},
+ {lv:"A2", t:"Clothes and colors", ico:"👕",
+  b:"Colors work like adjectives with **的** (de): **红色的帽子** = a red hat. Measure words: **一件衣服** (a piece of clothing), **一双鞋** (a pair of shoes). **穿** (chuān) = to wear.",
+  w:[["衣服","clothes","yīfu"],["裤子","trousers","kùzi"],["鞋","shoes","xié"],["帽子","hat","màozi"],["穿","to wear","chuān"],["红色","red","hóngsè"],["蓝色","blue","lánsè"],["绿色","green","lǜsè"],["黑色","black","hēisè"],["白色","white","báisè"]],
+  s:[["I want to buy a red hat.","我 想 买 一 个 红色 的 帽子","wǒ xiǎng mǎi yí gè hóngsè de màozi"],["These shoes are black.","这 双 鞋 是 黑色 的","zhè shuāng xié shì hēisè de"],["He likes white clothes.","他 喜欢 白色 的 衣服","tā xǐhuan báisè de yīfu"],["What are you wearing today?","你 今天 穿 什么","nǐ jīntiān chuān shénme"],["The trousers are too big.","裤子 太 大 了","kùzi tài dà le"]]},
+ {lv:"A2", t:"At home", ico:"🏠",
+  b:"**有** (yǒu) also means 'there is': **我家有三个房间** = my home has three rooms. **在** + place says where someone is: **妈妈在厨房** = Mom is in the kitchen.",
+  w:[["房子","house","fángzi"],["房间","room","fángjiān"],["厨房","kitchen","chúfáng"],["卧室","bedroom","wòshì"],["洗手间","bathroom","xǐshǒujiān"],["客厅","living room","kètīng"],["桌子","table","zhuōzi"],["床","bed","chuáng"],["门","door","mén"],["窗户","window","chuānghu"]],
+  s:[["My home has three rooms.","我 家 有 三 个 房间","wǒ jiā yǒu sān gè fángjiān"],["Mom is in the kitchen.","妈妈 在 厨房","māma zài chúfáng"],["Where is the bathroom?","洗手间 在 哪里","xǐshǒujiān zài nǎlǐ"],["Please open the window.","请 开 窗户","qǐng kāi chuānghu"],["The bed is very big.","床 很 大","chuáng hěn dà"]]},
+ {lv:"A2", t:"Daily routine", ico:"⏰",
+  b:"Times: **七点** (qī diǎn) = seven o'clock, **七点半** = half past seven. The time goes **before** the verb: **我七点起床** = I get up at seven. **每天** (měitiān) = every day.",
+  w:[["起床","to get up","qǐchuáng"],["睡觉","to sleep","shuìjiào"],["洗澡","to shower","xǐzǎo"],["早上","morning","zǎoshang"],["晚上","evening","wǎnshang"],["早饭","breakfast","zǎofàn"],["午饭","lunch","wǔfàn"],["晚饭","dinner","wǎnfàn"],["每天","every day","měitiān"],["半","half","bàn"]],
+  s:[["I get up at seven o'clock.","我 七 点 起床","wǒ qī diǎn qǐchuáng"],["She showers in the evening.","她 晚上 洗澡","tā wǎnshang xǐzǎo"],["We eat dinner at half past six.","我们 六 点 半 吃 晚饭","wǒmen liù diǎn bàn chī wǎnfàn"],["I drink coffee every morning.","我 每天 早上 喝 咖啡","wǒ měitiān zǎoshang hē kāfēi"],["He goes to bed at eleven.","他 十一 点 睡觉","tā shíyī diǎn shuìjiào"]]},
+ {lv:"A2", t:"Weather and seasons", ico:"☀️",
+  b:"**天气怎么样?** = How's the weather? **下雨** (xià yǔ, literally 'falls rain') = to rain, **下雪** = to snow. **了** (le) at the end marks a change: **下雨了!** = It's started raining!",
+  w:[["天气","weather","tiānqì"],["热","hot","rè"],["冷","cold","lěng"],["下雨","to rain","xià yǔ"],["下雪","to snow","xià xuě"],["太阳","sun","tàiyáng"],["风","wind","fēng"],["夏天","summer","xiàtiān"],["冬天","winter","dōngtiān"],["季节","season","jìjié"]],
+  s:[["How's the weather today?","今天 天气 怎么样","jīntiān tiānqì zěnmeyàng"],["It's very hot in summer.","夏天 很 热","xiàtiān hěn rè"],["It's raining!","下雨 了","xiàyǔ le"],["It snows in winter.","冬天 下雪","dōngtiān xiàxuě"],["The wind is strong today.","今天 风 很 大","jīntiān fēng hěn dà"]]},
+ {lv:"A2", t:"Getting around", ico:"✈️",
+  b:"**坐** (zuò, to sit) is used for riding: **坐火车** (by train), **坐飞机** (by plane). But **走路** (zǒulù) = to walk. **票** (piào) = ticket.",
+  w:[["火车","train","huǒchē"],["飞机","plane","fēijī"],["汽车","car","qìchē"],["公共汽车","bus","gōnggòng qìchē"],["自行车","bike","zìxíngchē"],["走路","to walk","zǒulù"],["票","ticket","piào"],["坐","to ride (sit)","zuò"],["出发","to leave","chūfā"],["到","to arrive","dào"]],
+  s:[["I go to work by bus.","我 坐 公共汽车 上班","wǒ zuò gōnggòngqìchē shàngbān"],["A ticket to Beijing, please.","请 给 我 一 张 去 北京 的 票","qǐng gěi wǒ yì zhāng qù Běijīng de piào"],["The train leaves at ten.","火车 十 点 出发","huǒchē shí diǎn chūfā"],["We arrive tomorrow.","我们 明天 到","wǒmen míngtiān dào"],["She walks to school.","她 走路 去 学校","tā zǒulù qù xuéxiào"]]},
+ {lv:"A2", t:"Health and body", ico:"🩺",
+  b:"**...疼** (téng) = ... hurts: **我头疼** = I have a headache, **我肚子疼** = my stomach hurts. **感冒** = a cold. **药** (yào) = medicine; careful, it sounds just like **要** (to want).",
+  w:[["头","head","tóu"],["肚子","stomach","dùzi"],["手","hand","shǒu"],["脚","foot","jiǎo"],["眼睛","eyes","yǎnjing"],["疼","to hurt","téng"],["生病","to be sick","shēngbìng"],["药","medicine","yào"],["药店","pharmacy","yàodiàn"],["感冒","a cold","gǎnmào"]],
+  s:[["I have a headache.","我 头 疼","wǒ tóu téng"],["I'm sick today.","我 今天 生病 了","wǒ jīntiān shēngbìng le"],["My stomach hurts.","我 肚子 疼","wǒ dùzi téng"],["Where is the pharmacy?","药店 在 哪里","yàodiàn zài nǎlǐ"],["I have a cold.","我 感冒 了","wǒ gǎnmào le"]]},
+ {lv:"A2", t:"Talking about the past", ico:"⏪",
+  b:"Chinese verbs never change for the past. Add **了** (le) after the verb for a finished action: **我吃了** = I ate. **过** (guo) = have ever done: **我去过中国** = I've been to China. For 'didn't', use **没**: **我没去** = I didn't go.",
+  w:[["上个星期","last week","shàng gè xīngqī"],["昨天晚上","last night","zuótiān wǎnshang"],["已经","already","yǐjīng"],["过","have ever (done)","guò"],["看见","to see","kànjiàn"],["电影","film","diànyǐng"],["中国","China","Zhōngguó"],["北京","Beijing","Běijīng"],["旅行","to travel","lǚxíng"],["没","didn't","méi"]],
+  s:[["I ate noodles this morning.","我 今天 早上 吃 了 面条","wǒ jīntiān zǎoshang chī le miàntiáo"],["We saw a film last night.","我们 昨天 晚上 看 了 电影","wǒmen zuótiān wǎnshang kàn le diànyǐng"],["She went to Beijing last week.","她 上 个 星期 去 了 北京","tā shàng gè xīngqī qù le Běijīng"],["I have been to China.","我 去 过 中国","wǒ qù guo Zhōngguó"],["I didn't go yesterday.","我 昨天 没 去","wǒ zuótiān méi qù"]]}
 ]};

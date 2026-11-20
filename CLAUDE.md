@@ -43,7 +43,8 @@ Read this first in any new chat about this project. It is the short version of e
   - Push lessons into `ES_A1…ES_B2` (Spanish course) or `EN_A1…EN_B2` (English course, for Spanish speakers). For the English course, titles and tips are written in Spanish.
 - **Island:** 15 items of `[en, es, clozeES, clozeEN]`. Files: `content_islands2.js` and `content_islands3.js`.
 - **Story:** `{id, lv, ico, t:{es,en}, p:[{s, es, en} | {q:{es,en}, o:[...], a}]}`, with at least 3 questions. Files: `stories*.js`.
-- **World Languages pack** (`src/lang_<code>.js`, taught through English only): `WL.<code> = {name, self, flag, tts, dir, typing, rom?, seg?, music, units:[{t, ico, b, w:[[target, english, rom?]], s:[[english, target, rom?]]}]}`.
+- **World Languages pack** (`src/lang_<code>.js`, taught through English only): `WL.<code> = {name, self, flag, tts, dir, typing, rom?, seg?, music, bosses:[[emoji, name]...], units:[{lv, t, ico, b, w:[[target, english, rom?]], s:[[english, target, rom?]]}]}`.
+  - Units come in blocks of 4; a boss (`bosses[k]`) follows each block and must be beaten to open the next unit. Bosses hide romanization, need exact accents, give 2 hearts, have 8 HP, and the final blow is always a sentence build.
   - Sentence targets are split into words by spaces; those become the tiles. `seg:true` (Chinese) hides the spaces on screen.
   - `rom` (pinyin / transliteration) needs one entry per word, separated by normal spaces; use a no-break space inside one entry (`Lǐ Míng`).
   - Every word target and every English meaning must be unique within a pack; tips need a **bold** term. test12 checks all of this and plays every unit.
@@ -106,8 +107,9 @@ Read this first in any new chat about this project. It is the short version of e
 | 2.0.0 | Voice exercises, idioms and slang lessons |
 | 2.1.0 | NES chiptune soundtrack, arcade animations |
 | 2.2.0 | World Languages: Mandarin, Arabic, French, Portuguese (A1) |
+| 2.3.0 | World Languages A2, boss battles |
 
-Current version: 2.2.0, versionCode 22.
+Current version: 2.3.0, versionCode 23.
 
 ## Working with Emmanuel
 - He likes short, direct answers and wants Claude to take the initiative on scope.

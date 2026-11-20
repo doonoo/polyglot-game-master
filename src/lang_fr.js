@@ -1,7 +1,7 @@
-/* ===================== World Languages: French (A1, taught through English) =====================
+/* ===================== World Languages: French (A1–A2, taught through English) =====================
    w: [target, english]   s: [english, target]   Sentences: words separated by spaces (tiles). */
 var WL = WL || {};
-WL.fr = {code:"fr", name:"French", self:"Français", flag:"🇫🇷", tts:"fr-FR", dir:"ltr", typing:true, music:"cafe", units:[
+WL.fr = {code:"fr", name:"French", self:"Français", flag:"🇫🇷", tts:"fr-FR", dir:"ltr", typing:true, music:"cafe", bosses:[["🗿","La Gargouille"],["🐺","Le Loup-Garou"],["🐉","La Tarasque"],["🧙","La Sorcière"]], units:[
  {t:"Greetings", ico:"👋",
   b:"**Bonjour** = hello (all day), **bonsoir** = good evening, **salut** = hi with friends. **Merci** = thank you, and the answer is **de rien**. **S'il vous plaît** is the polite please.",
   w:[["bonjour","hello"],["bonsoir","good evening"],["salut","hi"],["au revoir","goodbye"],["merci","thank you"],["s'il vous plaît","please"],["de rien","you're welcome"],["oui","yes"],["non","no"],["pardon","excuse me"]],
@@ -33,5 +33,37 @@ WL.fr = {code:"fr", name:"French", self:"Français", flag:"🇫🇷", tts:"fr-FR
  {t:"Everyday verbs", ico:"🏃",
   b:"Regular **-er** verbs: **je parle**, **tu parles**, **il parle**, **nous parlons**. Wrap the verb in **ne ... pas** for a negative: **je ne parle pas** = I don't speak.",
   w:[["aimer","to like"],["vouloir","to want"],["avoir","to have"],["aller","to go"],["parler","to speak"],["faire","to do"],["comprendre","to understand"],["habiter","to live"],["travailler","to work"],["apprendre","to learn"]],
-  s:[["I speak a little French.","Je parle un peu français."],["I don't understand.","Je ne comprends pas."],["We live in Nashville.","Nous habitons à Nashville."],["Do you want to go to the beach?","Tu veux aller à la plage ?"],["I am learning French.","J'apprends le français."]]}
+  s:[["I speak a little French.","Je parle un peu français."],["I don't understand.","Je ne comprends pas."],["We live in Nashville.","Nous habitons à Nashville."],["Do you want to go to the beach?","Tu veux aller à la plage ?"],["I am learning French.","J'apprends le français."]]},
+ {lv:"A2", t:"Shopping", ico:"🛍️",
+  b:"**Combien ça coûte ?** = How much does it cost? **C'est trop cher** = it's too expensive. **Je prends...** = I'll take... Bigger numbers: **vingt** (20), **cinquante** (50), **cent** (100).",
+  w:[["combien","how much"],["cher","expensive"],["pas cher","cheap"],["le magasin","shop"],["le marché","market"],["acheter","to buy"],["payer","to pay"],["l'argent","money"],["vingt","twenty"],["cent","one hundred"]],
+  s:[["How much does it cost?","Combien ça coûte ?"],["It's too expensive.","C'est trop cher."],["I'll take this one.","Je prends celui-ci."],["Can I pay by card?","Je peux payer par carte ?"],["The market is open today.","Le marché est ouvert aujourd'hui."]]},
+ {lv:"A2", t:"Clothes and colors", ico:"👕",
+  b:"Colors come **after** the noun and agree with it: **une robe verte**, **des chaussures noires**. **Porter** = to wear.",
+  w:[["la chemise","shirt"],["le pantalon","trousers"],["la robe","dress"],["les chaussures","shoes"],["le manteau","coat"],["rouge","red"],["bleu","blue"],["vert","green"],["noir","black"],["blanc","white"]],
+  s:[["I'm looking for a blue shirt.","Je cherche une chemise bleue."],["She is wearing a green dress.","Elle porte une robe verte."],["These shoes are black.","Ces chaussures sont noires."],["My coat is white.","Mon manteau est blanc."],["Do you have a bigger size?","Vous avez une taille plus grande ?"]]},
+ {lv:"A2", t:"At home", ico:"🏠",
+  b:"**Il y a** = there is / there are: **il y a trois chambres**. **Chez moi** = at my place. Rooms: **la cuisine**, **la chambre**, **la salle de bains**.",
+  w:[["la maison","house"],["l'appartement","apartment"],["la cuisine","kitchen"],["la chambre","bedroom"],["la salle de bains","bathroom"],["le salon","living room"],["la table","table"],["le lit","bed"],["la porte","door"],["la fenêtre","window"]],
+  s:[["My apartment is small.","Mon appartement est petit."],["There are two bedrooms.","Il y a deux chambres."],["The kitchen is next to the living room.","La cuisine est à côté du salon."],["Close the window, please.","Ferme la fenêtre, s'il te plaît."],["Come to my place tonight.","Viens chez moi ce soir."]]},
+ {lv:"A2", t:"Daily routine", ico:"⏰",
+  b:"Reflexive verbs use **me / te / se**: **je me lève** = I get up, **il se couche** = he goes to bed. Times: **à sept heures** = at seven o'clock.",
+  w:[["se lever","to get up"],["se coucher","to go to bed"],["se doucher","to shower"],["le matin","morning"],["le soir","evening"],["le petit-déjeuner","breakfast"],["le déjeuner","lunch"],["le dîner","dinner"],["toujours","always"],["souvent","often"]],
+  s:[["I get up at seven o'clock.","Je me lève à sept heures."],["She showers in the morning.","Elle se douche le matin."],["We eat dinner at eight.","Nous dînons à huit heures."],["He always goes to bed late.","Il se couche toujours tard."],["I often drink tea at breakfast.","Je bois souvent du thé au petit-déjeuner."]]},
+ {lv:"A2", t:"Weather and seasons", ico:"☀️",
+  b:"Weather uses **il fait**: **il fait chaud** (it's hot), **il fait froid** (it's cold), **il fait beau** (it's nice). But **il pleut** = it's raining and **il neige** = it's snowing.",
+  w:[["il fait chaud","it's hot"],["il fait froid","it's cold"],["il fait beau","the weather is nice"],["il pleut","it's raining"],["il neige","it's snowing"],["le soleil","sun"],["le vent","wind"],["l'été","summer"],["l'hiver","winter"],["la saison","season"]],
+  s:[["It's very hot in summer.","Il fait très chaud en été."],["It snows in winter.","Il neige en hiver."],["Today it's raining.","Aujourd'hui, il pleut."],["What's the weather like?","Quel temps fait-il ?"],["There is a lot of wind.","Il y a beaucoup de vent."]]},
+ {lv:"A2", t:"Getting around", ico:"✈️",
+  b:"Most transport takes **en**: **en train**, **en voiture**, **en avion**. But **à pied** (on foot) and **à vélo** (by bike). **Un billet** = a ticket.",
+  w:[["le train","train"],["l'avion","plane"],["la voiture","car"],["le bus","bus"],["le vélo","bike"],["à pied","on foot"],["le billet","ticket"],["la valise","suitcase"],["partir","to leave"],["arriver","to arrive"]],
+  s:[["I go to work by bus.","Je vais au travail en bus."],["A ticket to Paris, please.","Un billet pour Paris, s'il vous plaît."],["The train leaves at ten.","Le train part à dix heures."],["We arrive tomorrow by plane.","Nous arrivons demain en avion."],["She goes to school on foot.","Elle va à l'école à pied."]]},
+ {lv:"A2", t:"Health and body", ico:"🩺",
+  b:"**J'ai mal à...** = my ... hurts: **j'ai mal à la tête** (my head hurts). **À + le** becomes **au**: **j'ai mal au dos**. **Je suis malade** = I'm sick.",
+  w:[["la tête","head"],["le dos","back"],["le ventre","stomach"],["la main","hand"],["le pied","foot"],["les yeux","eyes"],["malade","sick"],["le médecin","doctor"],["la pharmacie","pharmacy"],["le médicament","medicine"]],
+  s:[["My head hurts.","J'ai mal à la tête."],["I am sick today.","Je suis malade aujourd'hui."],["My back hurts.","J'ai mal au dos."],["Where is the pharmacy?","Où est la pharmacie ?"],["You need to see a doctor.","Tu dois voir un médecin."]]},
+ {lv:"A2", t:"Talking about the past", ico:"⏪",
+  b:"The **passé composé** is **avoir** + past participle: **j'ai mangé** (I ate), **tu as parlé** (you spoke). Movement verbs use **être**: **je suis allé** (I went), **elle est arrivée** (she arrived).",
+  w:[["j'ai mangé","I ate"],["j'ai bu","I drank"],["j'ai vu","I saw"],["j'ai fait","I did"],["j'ai acheté","I bought"],["je suis allé","I went"],["je suis arrivé","I arrived"],["la semaine dernière","last week"],["hier soir","last night"],["déjà","already"]],
+  s:[["I ate a croissant this morning.","J'ai mangé un croissant ce matin."],["We saw a film last night.","Nous avons vu un film hier soir."],["She went to Paris last week.","Elle est allée à Paris la semaine dernière."],["I already bought the tickets.","J'ai déjà acheté les billets."],["What did you do yesterday?","Qu'est-ce que tu as fait hier ?"]]}
 ]};

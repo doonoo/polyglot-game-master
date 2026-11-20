@@ -1,6 +1,6 @@
 /* ===================== World Languages: Portuguese (Brazil, A1, taught through English) ===================== */
 var WL = WL || {};
-WL.pt = {code:"pt", name:"Portuguese", self:"Português", flag:"🇧🇷", tts:"pt-BR", dir:"ltr", typing:true, music:"samba", units:[
+WL.pt = {code:"pt", name:"Portuguese", self:"Português", flag:"🇧🇷", tts:"pt-BR", dir:"ltr", typing:true, music:"samba", bosses:[["🐊","O Jacaré-Açu"],["🧜","A Iara"],["🔥","O Boitatá"],["🌪️","O Saci"]], units:[
  {t:"Greetings", ico:"👋",
   b:"**Oi** is the everyday hi in Brazil. **Tudo bem?** = How's it going? Say **obrigado** if you're a man and **obrigada** if you're a woman. The answer is **de nada**.",
   w:[["olá","hello"],["oi","hi"],["bom dia","good morning"],["boa tarde","good afternoon"],["boa noite","good evening"],["tchau","bye"],["obrigado","thank you"],["por favor","please"],["de nada","you're welcome"],["desculpa","sorry"]],
@@ -32,5 +32,37 @@ WL.pt = {code:"pt", name:"Portuguese", self:"Português", flag:"🇧🇷", tts:"
  {t:"Everyday verbs", ico:"🏃",
   b:"Regular **-ar** verbs: **eu falo**, **você fala**, **nós falamos**. Put **não** before the verb for a negative: **eu não falo** = I don't speak.",
   w:[["gostar","to like"],["querer","to want"],["ter","to have"],["ir","to go"],["falar","to speak"],["fazer","to do"],["entender","to understand"],["morar","to live"],["trabalhar","to work"],["aprender","to learn"]],
-  s:[["I speak a little Portuguese.","Eu falo um pouco de português."],["I don't understand.","Eu não entendo."],["We live in Nashville.","Nós moramos em Nashville."],["Do you want to go to the beach?","Você quer ir à praia?"],["I am learning Portuguese.","Eu estou aprendendo português."]]}
+  s:[["I speak a little Portuguese.","Eu falo um pouco de português."],["I don't understand.","Eu não entendo."],["We live in Nashville.","Nós moramos em Nashville."],["Do you want to go to the beach?","Você quer ir à praia?"],["I am learning Portuguese.","Eu estou aprendendo português."]]},
+ {lv:"A2", t:"Shopping", ico:"🛍️",
+  b:"**Quanto custa?** = How much does it cost? **É caro** = it's expensive, **é barato** = it's cheap. **Vou levar** = I'll take it. Bigger numbers: **vinte** (20), **cinquenta** (50), **cem** (100).",
+  w:[["quanto","how much"],["caro","expensive"],["barato","cheap"],["a loja","shop"],["o mercado","market"],["comprar","to buy"],["pagar","to pay"],["o dinheiro","money"],["vinte","twenty"],["cem","one hundred"]],
+  s:[["How much does it cost?","Quanto custa?"],["It's too expensive.","É muito caro."],["I'll take this one.","Vou levar este."],["Can I pay by card?","Posso pagar com cartão?"],["The market opens at eight.","O mercado abre às oito."]]},
+ {lv:"A2", t:"Clothes and colors", ico:"👕",
+  b:"Colors usually come **after** the noun and agree with it: **uma camisa branca**, **sapatos pretos**. **Usar** = to wear.",
+  w:[["a camisa","shirt"],["a calça","trousers"],["o vestido","dress"],["os sapatos","shoes"],["o casaco","coat"],["vermelho","red"],["azul","blue"],["verde","green"],["preto","black"],["branco","white"]],
+  s:[["I'm looking for a blue shirt.","Estou procurando uma camisa azul."],["She is wearing a green dress.","Ela está usando um vestido verde."],["These shoes are black.","Estes sapatos são pretos."],["My coat is white.","Meu casaco é branco."],["Do you have a bigger size?","Você tem um tamanho maior?"]]},
+ {lv:"A2", t:"At home", ico:"🏠",
+  b:"**Tem** = there is / there are: **tem dois quartos**. Rooms: **a cozinha**, **o quarto**, **o banheiro**, **a sala**. **Na minha casa** = at my house.",
+  w:[["a casa","house"],["o apartamento","apartment"],["a cozinha","kitchen"],["o quarto","bedroom"],["o banheiro","bathroom"],["a sala","living room"],["a mesa","table"],["a cama","bed"],["a porta","door"],["a janela","window"]],
+  s:[["My apartment is small.","Meu apartamento é pequeno."],["There are two bedrooms.","Tem dois quartos."],["The kitchen is next to the living room.","A cozinha fica ao lado da sala."],["Close the window, please.","Fecha a janela, por favor."],["Come to my house tonight.","Vem na minha casa hoje à noite."]]},
+ {lv:"A2", t:"Daily routine", ico:"⏰",
+  b:"Reflexive verbs use **me / se**: **eu me levanto** = I get up. In Brazil people often drop it when speaking: **eu levanto cedo**. Times: **às sete horas** = at seven o'clock.",
+  w:[["acordar","to wake up"],["levantar","to get up"],["tomar banho","to shower"],["dormir","to sleep"],["a manhã","morning"],["o café da manhã","breakfast"],["o almoço","lunch"],["o jantar","dinner"],["sempre","always"],["cedo","early"]],
+  s:[["I wake up at seven o'clock.","Eu acordo às sete horas."],["She showers in the morning.","Ela toma banho de manhã."],["We have dinner at eight.","Nós jantamos às oito."],["He always sleeps late.","Ele sempre dorme tarde."],["I eat breakfast early.","Eu tomo café da manhã cedo."]]},
+ {lv:"A2", t:"Weather and seasons", ico:"☀️",
+  b:"**Está quente** = it's hot, **está frio** = it's cold, **está chovendo** = it's raining. **Faz calor** and **faz frio** work too. In Brazil **o verão** (summer) runs from December to March.",
+  w:[["quente","hot"],["frio","cold"],["chover","to rain"],["o sol","sun"],["o vento","wind"],["a chuva","rain"],["o verão","summer"],["o inverno","winter"],["a estação do ano","season"],["o tempo","weather"]],
+  s:[["It's very hot in summer.","Faz muito calor no verão."],["It's raining today.","Hoje está chovendo."],["It's cold in winter.","No inverno faz frio."],["What's the weather like?","Como está o tempo?"],["It's very windy.","Está ventando muito."]]},
+ {lv:"A2", t:"Getting around", ico:"✈️",
+  b:"Transport takes **de**: **de ônibus**, **de carro**, **de avião**. But **a pé** = on foot. **A passagem** = the ticket.",
+  w:[["o trem","train"],["o avião","plane"],["o carro","car"],["o ônibus","bus"],["a bicicleta","bike"],["a pé","on foot"],["a passagem","ticket"],["a mala","suitcase"],["sair","to leave"],["chegar","to arrive"]],
+  s:[["I go to work by bus.","Eu vou para o trabalho de ônibus."],["A ticket to Rio, please.","Uma passagem para o Rio, por favor."],["The train leaves at ten.","O trem sai às dez."],["We arrive tomorrow by plane.","Nós chegamos amanhã de avião."],["She goes to school on foot.","Ela vai para a escola a pé."]]},
+ {lv:"A2", t:"Health and body", ico:"🩺",
+  b:"**Estou com dor de...** = I have a ...ache: **dor de cabeça** (headache), **dor de barriga** (stomachache). **Estou doente** = I'm sick.",
+  w:[["a cabeça","head"],["as costas","back"],["a barriga","stomach"],["a mão","hand"],["o pé","foot"],["os olhos","eyes"],["doente","sick"],["o médico","doctor"],["a farmácia","pharmacy"],["o remédio","medicine"]],
+  s:[["I have a headache.","Estou com dor de cabeça."],["I am sick today.","Hoje estou doente."],["My back hurts.","Minhas costas doem."],["Where is the pharmacy?","Onde fica a farmácia?"],["You need to see a doctor.","Você precisa ir ao médico."]]},
+ {lv:"A2", t:"Talking about the past", ico:"⏪",
+  b:"The past (**pretérito perfeito**): **falar → eu falei, você falou**; **comer → eu comi**. Common irregulars: **eu fui** (I went / I was), **eu fiz** (I did), **eu tive** (I had).",
+  w:[["eu comi","I ate"],["eu bebi","I drank"],["eu vi","I saw"],["eu fiz","I did"],["eu comprei","I bought"],["eu fui","I went"],["eu cheguei","I arrived"],["a semana passada","last week"],["ontem à noite","last night"],["já","already"]],
+  s:[["I ate a pastel this morning.","Eu comi um pastel hoje de manhã."],["We saw a film last night.","Nós vimos um filme ontem à noite."],["She went to Rio last week.","Ela foi para o Rio na semana passada."],["I already bought the tickets.","Eu já comprei as passagens."],["What did you do yesterday?","O que você fez ontem?"]]}
 ]};

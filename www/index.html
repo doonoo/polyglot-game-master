@@ -14723,10 +14723,10 @@ document.addEventListener("pgm-track", e => {
   setTimeout(() => { if(n === juNp){ n.remove(); juNp = null; } }, juOn() ? 3300 : 2500);
 });
 
-/* ===================== World Languages: Mandarin Chinese (A1, simplified + pinyin, taught through English) =====================
+/* ===================== World Languages: Mandarin Chinese (A1–A2, simplified + pinyin, taught through English) =====================
    w: [hanzi, english, pinyin]   s: [english, hanzi words separated by spaces, pinyin with one entry per word] */
 var WL = WL || {};
-WL.zh = {code:"zh", name:"Mandarin Chinese", self:"中文", flag:"🇨🇳", tts:"zh-CN", dir:"ltr", typing:false, rom:"pinyin", seg:true, music:"lantern", units:[
+WL.zh = {code:"zh", name:"Mandarin Chinese", self:"中文", flag:"🇨🇳", tts:"zh-CN", dir:"ltr", typing:false, rom:"pinyin", seg:true, music:"lantern", bosses:[["🐉","玉龙 · The Jade Dragon"],["🦁","石狮 · The Stone Lion"],["🐲","年兽 · The Nian Beast"],["🦊","九尾狐 · The Nine-Tailed Fox"]], units:[
  {t:"Greetings", ico:"👋",
   b:"Mandarin has four tones plus a light neutral one: **mā** (high and flat), **má** (rising), **mǎ** (dips then rises), **mà** (falling). The tone changes the meaning, so listen closely. **你好** (nǐ hǎo) = hello, **谢谢** (xièxie) = thank you.",
   w:[["你好","hello","nǐ hǎo"],["您好","hello (polite)","nín hǎo"],["谢谢","thank you","xièxie"],["不客气","you're welcome","bú kèqi"],["再见","goodbye","zàijiàn"],["对不起","sorry","duìbuqǐ"],["没关系","it's OK","méi guānxi"],["请","please","qǐng"],["老师","teacher","lǎoshī"],["很","very","hěn"]],
@@ -14758,13 +14758,45 @@ WL.zh = {code:"zh", name:"Mandarin Chinese", self:"中文", flag:"🇨🇳", tts
  {t:"Everyday verbs", ico:"🏃",
   b:"**不** (bù) makes verbs negative, but **有** (to have) takes **没** (méi): **我没有钱** = I don't have money. **会** (huì) shows a skill: **我会说中文** = I can speak Chinese.",
   w:[["喜欢","to like","xǐhuan"],["想","to want to","xiǎng"],["有","to have","yǒu"],["没有","not have","méiyǒu"],["去","to go","qù"],["说","to speak","shuō"],["学","to learn","xué"],["懂","to understand","dǒng"],["住","to live","zhù"],["中文","Chinese (language)","Zhōngwén"]],
-  s:[["I can speak a little Chinese.","我 会 说 一点儿 中文","wǒ huì shuō yìdiǎnr Zhōngwén"],["I don't understand.","我 不 懂","wǒ bù dǒng"],["We live in America.","我们 住 在 美国","wǒmen zhù zài Měiguó"],["Do you want to go?","你 想 去 吗","nǐ xiǎng qù ma"],["I like tea.","我 喜欢 茶","wǒ xǐhuan chá"]]}
+  s:[["I can speak a little Chinese.","我 会 说 一点儿 中文","wǒ huì shuō yìdiǎnr Zhōngwén"],["I don't understand.","我 不 懂","wǒ bù dǒng"],["We live in America.","我们 住 在 美国","wǒmen zhù zài Měiguó"],["Do you want to go?","你 想 去 吗","nǐ xiǎng qù ma"],["I like tea.","我 喜欢 茶","wǒ xǐhuan chá"]]},
+ {lv:"A2", t:"Shopping", ico:"🛍️",
+  b:"**多少钱?** (duōshao qián) = How much is it? **太贵了** (tài guì le) = too expensive. People say **块** (kuài) for yuan when speaking; prices are written with **元** (yuán).",
+  w:[["多少","how much","duōshao"],["钱","money","qián"],["贵","expensive","guì"],["便宜","cheap","piányi"],["买","to buy","mǎi"],["卖","to sell","mài"],["块","yuan (spoken)","kuài"],["这个","this one","zhège"],["那个","that one","nàge"],["一百","one hundred","yìbǎi"]],
+  s:[["How much is this?","这个 多少 钱","zhège duōshao qián"],["It's too expensive!","太 贵 了","tài guì le"],["I'll buy that one.","我 买 那个","wǒ mǎi nàge"],["Can it be a bit cheaper?","可以 便宜 一点儿 吗","kěyǐ piányi yìdiǎnr ma"],["One hundred yuan.","一百 块","yìbǎi kuài"]]},
+ {lv:"A2", t:"Clothes and colors", ico:"👕",
+  b:"Colors work like adjectives with **的** (de): **红色的帽子** = a red hat. Measure words: **一件衣服** (a piece of clothing), **一双鞋** (a pair of shoes). **穿** (chuān) = to wear.",
+  w:[["衣服","clothes","yīfu"],["裤子","trousers","kùzi"],["鞋","shoes","xié"],["帽子","hat","màozi"],["穿","to wear","chuān"],["红色","red","hóngsè"],["蓝色","blue","lánsè"],["绿色","green","lǜsè"],["黑色","black","hēisè"],["白色","white","báisè"]],
+  s:[["I want to buy a red hat.","我 想 买 一 个 红色 的 帽子","wǒ xiǎng mǎi yí gè hóngsè de màozi"],["These shoes are black.","这 双 鞋 是 黑色 的","zhè shuāng xié shì hēisè de"],["He likes white clothes.","他 喜欢 白色 的 衣服","tā xǐhuan báisè de yīfu"],["What are you wearing today?","你 今天 穿 什么","nǐ jīntiān chuān shénme"],["The trousers are too big.","裤子 太 大 了","kùzi tài dà le"]]},
+ {lv:"A2", t:"At home", ico:"🏠",
+  b:"**有** (yǒu) also means 'there is': **我家有三个房间** = my home has three rooms. **在** + place says where someone is: **妈妈在厨房** = Mom is in the kitchen.",
+  w:[["房子","house","fángzi"],["房间","room","fángjiān"],["厨房","kitchen","chúfáng"],["卧室","bedroom","wòshì"],["洗手间","bathroom","xǐshǒujiān"],["客厅","living room","kètīng"],["桌子","table","zhuōzi"],["床","bed","chuáng"],["门","door","mén"],["窗户","window","chuānghu"]],
+  s:[["My home has three rooms.","我 家 有 三 个 房间","wǒ jiā yǒu sān gè fángjiān"],["Mom is in the kitchen.","妈妈 在 厨房","māma zài chúfáng"],["Where is the bathroom?","洗手间 在 哪里","xǐshǒujiān zài nǎlǐ"],["Please open the window.","请 开 窗户","qǐng kāi chuānghu"],["The bed is very big.","床 很 大","chuáng hěn dà"]]},
+ {lv:"A2", t:"Daily routine", ico:"⏰",
+  b:"Times: **七点** (qī diǎn) = seven o'clock, **七点半** = half past seven. The time goes **before** the verb: **我七点起床** = I get up at seven. **每天** (měitiān) = every day.",
+  w:[["起床","to get up","qǐchuáng"],["睡觉","to sleep","shuìjiào"],["洗澡","to shower","xǐzǎo"],["早上","morning","zǎoshang"],["晚上","evening","wǎnshang"],["早饭","breakfast","zǎofàn"],["午饭","lunch","wǔfàn"],["晚饭","dinner","wǎnfàn"],["每天","every day","měitiān"],["半","half","bàn"]],
+  s:[["I get up at seven o'clock.","我 七 点 起床","wǒ qī diǎn qǐchuáng"],["She showers in the evening.","她 晚上 洗澡","tā wǎnshang xǐzǎo"],["We eat dinner at half past six.","我们 六 点 半 吃 晚饭","wǒmen liù diǎn bàn chī wǎnfàn"],["I drink coffee every morning.","我 每天 早上 喝 咖啡","wǒ měitiān zǎoshang hē kāfēi"],["He goes to bed at eleven.","他 十一 点 睡觉","tā shíyī diǎn shuìjiào"]]},
+ {lv:"A2", t:"Weather and seasons", ico:"☀️",
+  b:"**天气怎么样?** = How's the weather? **下雨** (xià yǔ, literally 'falls rain') = to rain, **下雪** = to snow. **了** (le) at the end marks a change: **下雨了!** = It's started raining!",
+  w:[["天气","weather","tiānqì"],["热","hot","rè"],["冷","cold","lěng"],["下雨","to rain","xià yǔ"],["下雪","to snow","xià xuě"],["太阳","sun","tàiyáng"],["风","wind","fēng"],["夏天","summer","xiàtiān"],["冬天","winter","dōngtiān"],["季节","season","jìjié"]],
+  s:[["How's the weather today?","今天 天气 怎么样","jīntiān tiānqì zěnmeyàng"],["It's very hot in summer.","夏天 很 热","xiàtiān hěn rè"],["It's raining!","下雨 了","xiàyǔ le"],["It snows in winter.","冬天 下雪","dōngtiān xiàxuě"],["The wind is strong today.","今天 风 很 大","jīntiān fēng hěn dà"]]},
+ {lv:"A2", t:"Getting around", ico:"✈️",
+  b:"**坐** (zuò, to sit) is used for riding: **坐火车** (by train), **坐飞机** (by plane). But **走路** (zǒulù) = to walk. **票** (piào) = ticket.",
+  w:[["火车","train","huǒchē"],["飞机","plane","fēijī"],["汽车","car","qìchē"],["公共汽车","bus","gōnggòng qìchē"],["自行车","bike","zìxíngchē"],["走路","to walk","zǒulù"],["票","ticket","piào"],["坐","to ride (sit)","zuò"],["出发","to leave","chūfā"],["到","to arrive","dào"]],
+  s:[["I go to work by bus.","我 坐 公共汽车 上班","wǒ zuò gōnggòngqìchē shàngbān"],["A ticket to Beijing, please.","请 给 我 一 张 去 北京 的 票","qǐng gěi wǒ yì zhāng qù Běijīng de piào"],["The train leaves at ten.","火车 十 点 出发","huǒchē shí diǎn chūfā"],["We arrive tomorrow.","我们 明天 到","wǒmen míngtiān dào"],["She walks to school.","她 走路 去 学校","tā zǒulù qù xuéxiào"]]},
+ {lv:"A2", t:"Health and body", ico:"🩺",
+  b:"**...疼** (téng) = ... hurts: **我头疼** = I have a headache, **我肚子疼** = my stomach hurts. **感冒** = a cold. **药** (yào) = medicine; careful, it sounds just like **要** (to want).",
+  w:[["头","head","tóu"],["肚子","stomach","dùzi"],["手","hand","shǒu"],["脚","foot","jiǎo"],["眼睛","eyes","yǎnjing"],["疼","to hurt","téng"],["生病","to be sick","shēngbìng"],["药","medicine","yào"],["药店","pharmacy","yàodiàn"],["感冒","a cold","gǎnmào"]],
+  s:[["I have a headache.","我 头 疼","wǒ tóu téng"],["I'm sick today.","我 今天 生病 了","wǒ jīntiān shēngbìng le"],["My stomach hurts.","我 肚子 疼","wǒ dùzi téng"],["Where is the pharmacy?","药店 在 哪里","yàodiàn zài nǎlǐ"],["I have a cold.","我 感冒 了","wǒ gǎnmào le"]]},
+ {lv:"A2", t:"Talking about the past", ico:"⏪",
+  b:"Chinese verbs never change for the past. Add **了** (le) after the verb for a finished action: **我吃了** = I ate. **过** (guo) = have ever done: **我去过中国** = I've been to China. For 'didn't', use **没**: **我没去** = I didn't go.",
+  w:[["上个星期","last week","shàng gè xīngqī"],["昨天晚上","last night","zuótiān wǎnshang"],["已经","already","yǐjīng"],["过","have ever (done)","guò"],["看见","to see","kànjiàn"],["电影","film","diànyǐng"],["中国","China","Zhōngguó"],["北京","Beijing","Běijīng"],["旅行","to travel","lǚxíng"],["没","didn't","méi"]],
+  s:[["I ate noodles this morning.","我 今天 早上 吃 了 面条","wǒ jīntiān zǎoshang chī le miàntiáo"],["We saw a film last night.","我们 昨天 晚上 看 了 电影","wǒmen zuótiān wǎnshang kàn le diànyǐng"],["She went to Beijing last week.","她 上 个 星期 去 了 北京","tā shàng gè xīngqī qù le Běijīng"],["I have been to China.","我 去 过 中国","wǒ qù guo Zhōngguó"],["I didn't go yesterday.","我 昨天 没 去","wǒ zuótiān méi qù"]]}
 ]};
 
 /* ===================== World Languages: Arabic (Modern Standard, A1, taught through English) =====================
    w: [arabic, english, transliteration]   s: [english, arabic words, transliteration with one entry per word] */
 var WL = WL || {};
-WL.ar = {code:"ar", name:"Arabic", self:"العربية", flag:"🇸🇦", tts:"ar-SA", dir:"rtl", typing:false, rom:"transliteration", music:"oasis", units:[
+WL.ar = {code:"ar", name:"Arabic", self:"العربية", flag:"🇸🇦", tts:"ar-SA", dir:"rtl", typing:false, rom:"transliteration", music:"oasis", bosses:[["🧞","الجني · The Djinn"],["🦅","الرخ · The Roc"],["🦂","العقرب · The Scorpion"],["🐍","ثعبان الصحراء · The Desert Serpent"]], units:[
  {t:"Greetings", ico:"👋",
   b:"Arabic is written **right to left**. **السلام عليكم** (as-salāmu ʿalaykum, 'peace be upon you') is the classic greeting; the reply is **وعليكم السلام**. **شكرا** (shukran) = thank you. This course teaches Modern Standard Arabic, understood across the Arab world.",
   w:[["مرحبا","hello","marḥaban"],["السلام عليكم","peace be upon you","as-salāmu ʿalaykum"],["صباح الخير","good morning","ṣabāḥ al-khayr"],["مساء الخير","good evening","masāʾ al-khayr"],["شكرا","thank you","shukran"],["عفوا","you're welcome","ʿafwan"],["من فضلك","please","min faḍlik"],["نعم","yes","naʿam"],["لا","no","lā"],["مع السلامة","goodbye","maʿa as-salāma"]],
@@ -14796,13 +14828,45 @@ WL.ar = {code:"ar", name:"Arabic", self:"العربية", flag:"🇸🇦", tts:"
  {t:"Everyday verbs", ico:"🏃",
   b:"**لا** before a verb makes it negative: **لا أفهم** (lā afham) = I don't understand. **أريد أن** + verb = I want to...: **أريد أن أذهب** = I want to go.",
   w:[["أحب","I like","uḥibb"],["أريد","I want","urīd"],["عندي","I have","ʿindī"],["أذهب","I go","adhhab"],["أتكلم","I speak","atakallam"],["أفهم","I understand","afham"],["أسكن","I live","askun"],["أعمل","I work","aʿmal"],["أتعلم","I learn","ataʿallam"],["العربية","Arabic (language)","al-ʿarabiyya"]],
-  s:[["I speak a little Arabic.","أتكلم العربية قليلا","atakallam al-ʿarabiyya qalīlan"],["I don't understand.","لا أفهم","lā afham"],["We live in America.","نسكن في أمريكا","naskun fī amrīkā"],["Do you want to go?","هل تريد أن تذهب","hal turīd an tadhhab"],["I am learning Arabic.","أتعلم العربية","ataʿallam al-ʿarabiyya"]]}
+  s:[["I speak a little Arabic.","أتكلم العربية قليلا","atakallam al-ʿarabiyya qalīlan"],["I don't understand.","لا أفهم","lā afham"],["We live in America.","نسكن في أمريكا","naskun fī amrīkā"],["Do you want to go?","هل تريد أن تذهب","hal turīd an tadhhab"],["I am learning Arabic.","أتعلم العربية","ataʿallam al-ʿarabiyya"]]},
+ {lv:"A2", t:"Shopping", ico:"🛍️",
+  b:"**بكم هذا؟** (bikam hādhā) = How much is this? **غالي** = expensive, **رخيص** = cheap. **سـ** (sa-) before a verb makes it future: **سأشتري** = I'll buy. Saudi money is the **ريال** (riyāl).",
+  w:[["بكم","how much","bikam"],["غالي","expensive","ghālī"],["رخيص","cheap","rakhīṣ"],["محل","shop","maḥall"],["أشتري","I buy","ashtarī"],["أدفع","I pay","adfaʿ"],["مال","money","māl"],["ريال","riyal","riyāl"],["عشرون","twenty","ʿishrūn"],["مئة","one hundred","miʾa"]],
+  s:[["How much is this?","بكم هذا","bikam hādhā"],["This is very expensive.","هذا غالي جدا","hādhā ghālī jiddan"],["I'll buy this one.","سأشتري هذا","sa-ashtarī hādhā"],["Can I pay by card?","هل يمكن أن أدفع بالبطاقة","hal yumkin an adfaʿ bil-biṭāqa"],["The shop is closed today.","المحل مغلق اليوم","al-maḥall mughlaq al-yawm"]]},
+ {lv:"A2", t:"Clothes and colors", ico:"👕",
+  b:"Adjectives come **after** the noun and agree with it: **قميص أبيض** (a white shirt), **سيارة بيضاء** (a white car). **ألبس** (albas) = I wear.",
+  w:[["قميص","shirt","qamīṣ"],["بنطلون","trousers","banṭalūn"],["فستان","dress","fustān"],["حذاء","shoes","ḥidhāʾ"],["معطف","coat","miʿṭaf"],["أحمر","red","aḥmar"],["أزرق","blue","azraq"],["أخضر","green","akhḍar"],["أسود","black","aswad"],["أبيض","white","abyaḍ"]],
+  s:[["I want a blue shirt.","أريد قميصا أزرق","urīd qamīṣan azraq"],["She is wearing a green dress.","هي تلبس فستانا أخضر","hiya talbas fustānan akhḍar"],["The shoes are black.","الحذاء أسود","al-ḥidhāʾ aswad"],["My coat is white.","معطفي أبيض","miʿṭafī abyaḍ"],["Do you have a bigger size?","هل عندك مقاس أكبر","hal ʿindak maqās akbar"]]},
+ {lv:"A2", t:"At home", ico:"🏠",
+  b:"**في** (fī) = in: **في المطبخ** = in the kitchen. **عندنا** (ʿindanā) = we have: **عندنا ثلاث غرف** = we have three rooms.",
+  w:[["بيت","house","bayt"],["شقة","apartment","shaqqa"],["مطبخ","kitchen","maṭbakh"],["غرفة نوم","bedroom","ghurfat nawm"],["حمام","bathroom","ḥammām"],["غرفة الجلوس","living room","ghurfat al-julūs"],["طاولة","table","ṭāwila"],["سرير","bed","sarīr"],["باب","door","bāb"],["نافذة","window","nāfidha"]],
+  s:[["My apartment is small.","شقتي صغيرة","shaqqatī ṣaghīra"],["We have three rooms.","عندنا ثلاث غرف","ʿindanā thalāth ghuraf"],["My mother is in the kitchen.","أمي في المطبخ","ummī fī al-maṭbakh"],["Where is the bathroom?","أين الحمام","ayna al-ḥammām"],["Open the window, please.","افتح النافذة من فضلك","iftaḥ an-nāfidha min faḍlik"]]},
+ {lv:"A2", t:"Daily routine", ico:"⏰",
+  b:"Times: **الساعة السابعة** = seven o'clock, **والنصف** = and a half. **كل يوم** (kull yawm) = every day. 'I' verbs start with **أ**: **أستيقظ** = I wake up, **أنام** = I sleep.",
+  w:[["أستيقظ","I wake up","astayqiẓ"],["أنام","I sleep","anām"],["أستحم","I shower","astaḥimm"],["الصباح","morning","aṣ-ṣabāḥ"],["المساء","evening","al-masāʾ"],["الفطور","breakfast","al-fuṭūr"],["الغداء","lunch","al-ghadāʾ"],["العشاء","dinner","al-ʿashāʾ"],["كل يوم","every day","kull yawm"],["دائما","always","dāʾiman"]],
+  s:[["I wake up at seven o'clock.","أستيقظ الساعة السابعة","astayqiẓ as-sāʿa as-sābiʿa"],["I shower in the morning.","أستحم في الصباح","astaḥimm fī aṣ-ṣabāḥ"],["We eat dinner at eight.","نتعشى الساعة الثامنة","nataʿashshā as-sāʿa ath-thāmina"],["He always sleeps late.","هو ينام متأخرا دائما","huwa yanām mutaʾakhkhiran dāʾiman"],["I drink coffee every day.","أشرب القهوة كل يوم","ashrab al-qahwa kull yawm"]]},
+ {lv:"A2", t:"Weather and seasons", ico:"☀️",
+  b:"**الجو حار** = the weather is hot, **الجو بارد** = it's cold. **تمطر** (tumṭir) = it's raining. **الجو** and **الطقس** both mean the weather.",
+  w:[["الطقس","weather","aṭ-ṭaqs"],["حار","hot","ḥārr"],["بارد","cold","bārid"],["مطر","rain","maṭar"],["شمس","sun","shams"],["رياح","wind","riyāḥ"],["الصيف","summer","aṣ-ṣayf"],["الشتاء","winter","ash-shitāʾ"],["فصل","season","faṣl"],["غيوم","clouds","ghuyūm"]],
+  s:[["The weather is very hot in summer.","الجو حار جدا في الصيف","al-jaww ḥārr jiddan fī aṣ-ṣayf"],["It's raining today.","اليوم تمطر","al-yawm tumṭir"],["Winter is cold.","الشتاء بارد","ash-shitāʾ bārid"],["How is the weather?","كيف الطقس","kayfa aṭ-ṭaqs"],["The sun is strong.","الشمس قوية","ash-shams qawiyya"]]},
+ {lv:"A2", t:"Getting around", ico:"✈️",
+  b:"**بالـ** (bil-) = by: **بالسيارة** (by car), **بالطائرة** (by plane), **بالقطار** (by train). But **مشيا** (mashyan) = on foot. **تذكرة** = ticket.",
+  w:[["قطار","train","qiṭār"],["طائرة","plane","ṭāʾira"],["سيارة","car","sayyāra"],["حافلة","bus","ḥāfila"],["دراجة","bike","darrāja"],["مشيا","on foot","mashyan"],["تذكرة","ticket","tadhkira"],["حقيبة","suitcase","ḥaqība"],["يغادر","it leaves","yughādir"],["أصل","I arrive","aṣil"]],
+  s:[["I go to work by bus.","أذهب إلى العمل بالحافلة","adhhab ilā al-ʿamal bil-ḥāfila"],["A ticket to Cairo, please.","تذكرة إلى القاهرة من فضلك","tadhkira ilā al-qāhira min faḍlik"],["The train leaves at ten.","يغادر القطار الساعة العاشرة","yughādir al-qiṭār as-sāʿa al-ʿāshira"],["We arrive tomorrow by plane.","نصل غدا بالطائرة","naṣil ghadan biṭ-ṭāʾira"],["She goes to school on foot.","هي تذهب إلى المدرسة مشيا","hiya tadhhab ilā al-madrasa mashyan"]]},
+ {lv:"A2", t:"Health and body", ico:"🩺",
+  b:"**عندي صداع** = I have a headache. **يؤلمني...** = my ... hurts: **يؤلمني بطني** = my stomach hurts. **أنا مريض** (to a man) / **مريضة** (a woman) = I'm sick.",
+  w:[["رأس","head","raʾs"],["ظهر","back","ẓahr"],["بطن","stomach","baṭn"],["يد","hand","yad"],["قدم","foot","qadam"],["عين","eye","ʿayn"],["مريض","sick","marīḍ"],["دواء","medicine","dawāʾ"],["صيدلية","pharmacy","ṣaydaliyya"],["صداع","headache","ṣudāʿ"]],
+  s:[["I have a headache.","عندي صداع","ʿindī ṣudāʿ"],["I am sick today.","أنا مريض اليوم","anā marīḍ al-yawm"],["My stomach hurts.","يؤلمني بطني","yuʾlimunī baṭnī"],["Where is the pharmacy?","أين الصيدلية","ayna aṣ-ṣaydaliyya"],["You need to see a doctor.","يجب أن تذهب إلى الطبيب","yajib an tadhhab ilā aṭ-ṭabīb"]]},
+ {lv:"A2", t:"Talking about the past", ico:"⏪",
+  b:"The past tense adds endings to the verb: **ذهب** (dhahaba) = he went. Add **ـتُ** (-tu) for 'I': **ذهبتُ** = I went, **أكلتُ** = I ate. Add **ـنا** (-nā) for 'we': **رأينا** = we saw.",
+  w:[["أكلت","I ate","akaltu"],["شربت","I drank","sharibtu"],["رأيت","I saw","raʾaytu"],["ذهبت","I went","dhahabtu"],["اشتريت","I bought","ishtaraytu"],["وصلت","I arrived","waṣaltu"],["الأسبوع الماضي","last week","al-usbūʿ al-māḍī"],["أمس مساء","last night","ams masāʾan"],["فعلت","I did","faʿaltu"],["فيلم","film","fīlm"]],
+  s:[["I ate bread this morning.","أكلت خبزا هذا الصباح","akaltu khubzan hādhā aṣ-ṣabāḥ"],["We saw a film last night.","رأينا فيلما أمس مساء","raʾaynā fīlman ams masāʾan"],["She went to Cairo last week.","ذهبت إلى القاهرة الأسبوع الماضي","dhahabat ilā al-qāhira al-usbūʿ al-māḍī"],["I bought the tickets.","اشتريت التذاكر","ishtaraytu at-tadhākir"],["What did you do yesterday?","ماذا فعلت أمس","mādhā faʿalta ams"]]}
 ]};
 
-/* ===================== World Languages: French (A1, taught through English) =====================
+/* ===================== World Languages: French (A1–A2, taught through English) =====================
    w: [target, english]   s: [english, target]   Sentences: words separated by spaces (tiles). */
 var WL = WL || {};
-WL.fr = {code:"fr", name:"French", self:"Français", flag:"🇫🇷", tts:"fr-FR", dir:"ltr", typing:true, music:"cafe", units:[
+WL.fr = {code:"fr", name:"French", self:"Français", flag:"🇫🇷", tts:"fr-FR", dir:"ltr", typing:true, music:"cafe", bosses:[["🗿","La Gargouille"],["🐺","Le Loup-Garou"],["🐉","La Tarasque"],["🧙","La Sorcière"]], units:[
  {t:"Greetings", ico:"👋",
   b:"**Bonjour** = hello (all day), **bonsoir** = good evening, **salut** = hi with friends. **Merci** = thank you, and the answer is **de rien**. **S'il vous plaît** is the polite please.",
   w:[["bonjour","hello"],["bonsoir","good evening"],["salut","hi"],["au revoir","goodbye"],["merci","thank you"],["s'il vous plaît","please"],["de rien","you're welcome"],["oui","yes"],["non","no"],["pardon","excuse me"]],
@@ -14834,12 +14898,44 @@ WL.fr = {code:"fr", name:"French", self:"Français", flag:"🇫🇷", tts:"fr-FR
  {t:"Everyday verbs", ico:"🏃",
   b:"Regular **-er** verbs: **je parle**, **tu parles**, **il parle**, **nous parlons**. Wrap the verb in **ne ... pas** for a negative: **je ne parle pas** = I don't speak.",
   w:[["aimer","to like"],["vouloir","to want"],["avoir","to have"],["aller","to go"],["parler","to speak"],["faire","to do"],["comprendre","to understand"],["habiter","to live"],["travailler","to work"],["apprendre","to learn"]],
-  s:[["I speak a little French.","Je parle un peu français."],["I don't understand.","Je ne comprends pas."],["We live in Nashville.","Nous habitons à Nashville."],["Do you want to go to the beach?","Tu veux aller à la plage ?"],["I am learning French.","J'apprends le français."]]}
+  s:[["I speak a little French.","Je parle un peu français."],["I don't understand.","Je ne comprends pas."],["We live in Nashville.","Nous habitons à Nashville."],["Do you want to go to the beach?","Tu veux aller à la plage ?"],["I am learning French.","J'apprends le français."]]},
+ {lv:"A2", t:"Shopping", ico:"🛍️",
+  b:"**Combien ça coûte ?** = How much does it cost? **C'est trop cher** = it's too expensive. **Je prends...** = I'll take... Bigger numbers: **vingt** (20), **cinquante** (50), **cent** (100).",
+  w:[["combien","how much"],["cher","expensive"],["pas cher","cheap"],["le magasin","shop"],["le marché","market"],["acheter","to buy"],["payer","to pay"],["l'argent","money"],["vingt","twenty"],["cent","one hundred"]],
+  s:[["How much does it cost?","Combien ça coûte ?"],["It's too expensive.","C'est trop cher."],["I'll take this one.","Je prends celui-ci."],["Can I pay by card?","Je peux payer par carte ?"],["The market is open today.","Le marché est ouvert aujourd'hui."]]},
+ {lv:"A2", t:"Clothes and colors", ico:"👕",
+  b:"Colors come **after** the noun and agree with it: **une robe verte**, **des chaussures noires**. **Porter** = to wear.",
+  w:[["la chemise","shirt"],["le pantalon","trousers"],["la robe","dress"],["les chaussures","shoes"],["le manteau","coat"],["rouge","red"],["bleu","blue"],["vert","green"],["noir","black"],["blanc","white"]],
+  s:[["I'm looking for a blue shirt.","Je cherche une chemise bleue."],["She is wearing a green dress.","Elle porte une robe verte."],["These shoes are black.","Ces chaussures sont noires."],["My coat is white.","Mon manteau est blanc."],["Do you have a bigger size?","Vous avez une taille plus grande ?"]]},
+ {lv:"A2", t:"At home", ico:"🏠",
+  b:"**Il y a** = there is / there are: **il y a trois chambres**. **Chez moi** = at my place. Rooms: **la cuisine**, **la chambre**, **la salle de bains**.",
+  w:[["la maison","house"],["l'appartement","apartment"],["la cuisine","kitchen"],["la chambre","bedroom"],["la salle de bains","bathroom"],["le salon","living room"],["la table","table"],["le lit","bed"],["la porte","door"],["la fenêtre","window"]],
+  s:[["My apartment is small.","Mon appartement est petit."],["There are two bedrooms.","Il y a deux chambres."],["The kitchen is next to the living room.","La cuisine est à côté du salon."],["Close the window, please.","Ferme la fenêtre, s'il te plaît."],["Come to my place tonight.","Viens chez moi ce soir."]]},
+ {lv:"A2", t:"Daily routine", ico:"⏰",
+  b:"Reflexive verbs use **me / te / se**: **je me lève** = I get up, **il se couche** = he goes to bed. Times: **à sept heures** = at seven o'clock.",
+  w:[["se lever","to get up"],["se coucher","to go to bed"],["se doucher","to shower"],["le matin","morning"],["le soir","evening"],["le petit-déjeuner","breakfast"],["le déjeuner","lunch"],["le dîner","dinner"],["toujours","always"],["souvent","often"]],
+  s:[["I get up at seven o'clock.","Je me lève à sept heures."],["She showers in the morning.","Elle se douche le matin."],["We eat dinner at eight.","Nous dînons à huit heures."],["He always goes to bed late.","Il se couche toujours tard."],["I often drink tea at breakfast.","Je bois souvent du thé au petit-déjeuner."]]},
+ {lv:"A2", t:"Weather and seasons", ico:"☀️",
+  b:"Weather uses **il fait**: **il fait chaud** (it's hot), **il fait froid** (it's cold), **il fait beau** (it's nice). But **il pleut** = it's raining and **il neige** = it's snowing.",
+  w:[["il fait chaud","it's hot"],["il fait froid","it's cold"],["il fait beau","the weather is nice"],["il pleut","it's raining"],["il neige","it's snowing"],["le soleil","sun"],["le vent","wind"],["l'été","summer"],["l'hiver","winter"],["la saison","season"]],
+  s:[["It's very hot in summer.","Il fait très chaud en été."],["It snows in winter.","Il neige en hiver."],["Today it's raining.","Aujourd'hui, il pleut."],["What's the weather like?","Quel temps fait-il ?"],["There is a lot of wind.","Il y a beaucoup de vent."]]},
+ {lv:"A2", t:"Getting around", ico:"✈️",
+  b:"Most transport takes **en**: **en train**, **en voiture**, **en avion**. But **à pied** (on foot) and **à vélo** (by bike). **Un billet** = a ticket.",
+  w:[["le train","train"],["l'avion","plane"],["la voiture","car"],["le bus","bus"],["le vélo","bike"],["à pied","on foot"],["le billet","ticket"],["la valise","suitcase"],["partir","to leave"],["arriver","to arrive"]],
+  s:[["I go to work by bus.","Je vais au travail en bus."],["A ticket to Paris, please.","Un billet pour Paris, s'il vous plaît."],["The train leaves at ten.","Le train part à dix heures."],["We arrive tomorrow by plane.","Nous arrivons demain en avion."],["She goes to school on foot.","Elle va à l'école à pied."]]},
+ {lv:"A2", t:"Health and body", ico:"🩺",
+  b:"**J'ai mal à...** = my ... hurts: **j'ai mal à la tête** (my head hurts). **À + le** becomes **au**: **j'ai mal au dos**. **Je suis malade** = I'm sick.",
+  w:[["la tête","head"],["le dos","back"],["le ventre","stomach"],["la main","hand"],["le pied","foot"],["les yeux","eyes"],["malade","sick"],["le médecin","doctor"],["la pharmacie","pharmacy"],["le médicament","medicine"]],
+  s:[["My head hurts.","J'ai mal à la tête."],["I am sick today.","Je suis malade aujourd'hui."],["My back hurts.","J'ai mal au dos."],["Where is the pharmacy?","Où est la pharmacie ?"],["You need to see a doctor.","Tu dois voir un médecin."]]},
+ {lv:"A2", t:"Talking about the past", ico:"⏪",
+  b:"The **passé composé** is **avoir** + past participle: **j'ai mangé** (I ate), **tu as parlé** (you spoke). Movement verbs use **être**: **je suis allé** (I went), **elle est arrivée** (she arrived).",
+  w:[["j'ai mangé","I ate"],["j'ai bu","I drank"],["j'ai vu","I saw"],["j'ai fait","I did"],["j'ai acheté","I bought"],["je suis allé","I went"],["je suis arrivé","I arrived"],["la semaine dernière","last week"],["hier soir","last night"],["déjà","already"]],
+  s:[["I ate a croissant this morning.","J'ai mangé un croissant ce matin."],["We saw a film last night.","Nous avons vu un film hier soir."],["She went to Paris last week.","Elle est allée à Paris la semaine dernière."],["I already bought the tickets.","J'ai déjà acheté les billets."],["What did you do yesterday?","Qu'est-ce que tu as fait hier ?"]]}
 ]};
 
 /* ===================== World Languages: Portuguese (Brazil, A1, taught through English) ===================== */
 var WL = WL || {};
-WL.pt = {code:"pt", name:"Portuguese", self:"Português", flag:"🇧🇷", tts:"pt-BR", dir:"ltr", typing:true, music:"samba", units:[
+WL.pt = {code:"pt", name:"Portuguese", self:"Português", flag:"🇧🇷", tts:"pt-BR", dir:"ltr", typing:true, music:"samba", bosses:[["🐊","O Jacaré-Açu"],["🧜","A Iara"],["🔥","O Boitatá"],["🌪️","O Saci"]], units:[
  {t:"Greetings", ico:"👋",
   b:"**Oi** is the everyday hi in Brazil. **Tudo bem?** = How's it going? Say **obrigado** if you're a man and **obrigada** if you're a woman. The answer is **de nada**.",
   w:[["olá","hello"],["oi","hi"],["bom dia","good morning"],["boa tarde","good afternoon"],["boa noite","good evening"],["tchau","bye"],["obrigado","thank you"],["por favor","please"],["de nada","you're welcome"],["desculpa","sorry"]],
@@ -14871,7 +14967,39 @@ WL.pt = {code:"pt", name:"Portuguese", self:"Português", flag:"🇧🇷", tts:"
  {t:"Everyday verbs", ico:"🏃",
   b:"Regular **-ar** verbs: **eu falo**, **você fala**, **nós falamos**. Put **não** before the verb for a negative: **eu não falo** = I don't speak.",
   w:[["gostar","to like"],["querer","to want"],["ter","to have"],["ir","to go"],["falar","to speak"],["fazer","to do"],["entender","to understand"],["morar","to live"],["trabalhar","to work"],["aprender","to learn"]],
-  s:[["I speak a little Portuguese.","Eu falo um pouco de português."],["I don't understand.","Eu não entendo."],["We live in Nashville.","Nós moramos em Nashville."],["Do you want to go to the beach?","Você quer ir à praia?"],["I am learning Portuguese.","Eu estou aprendendo português."]]}
+  s:[["I speak a little Portuguese.","Eu falo um pouco de português."],["I don't understand.","Eu não entendo."],["We live in Nashville.","Nós moramos em Nashville."],["Do you want to go to the beach?","Você quer ir à praia?"],["I am learning Portuguese.","Eu estou aprendendo português."]]},
+ {lv:"A2", t:"Shopping", ico:"🛍️",
+  b:"**Quanto custa?** = How much does it cost? **É caro** = it's expensive, **é barato** = it's cheap. **Vou levar** = I'll take it. Bigger numbers: **vinte** (20), **cinquenta** (50), **cem** (100).",
+  w:[["quanto","how much"],["caro","expensive"],["barato","cheap"],["a loja","shop"],["o mercado","market"],["comprar","to buy"],["pagar","to pay"],["o dinheiro","money"],["vinte","twenty"],["cem","one hundred"]],
+  s:[["How much does it cost?","Quanto custa?"],["It's too expensive.","É muito caro."],["I'll take this one.","Vou levar este."],["Can I pay by card?","Posso pagar com cartão?"],["The market opens at eight.","O mercado abre às oito."]]},
+ {lv:"A2", t:"Clothes and colors", ico:"👕",
+  b:"Colors usually come **after** the noun and agree with it: **uma camisa branca**, **sapatos pretos**. **Usar** = to wear.",
+  w:[["a camisa","shirt"],["a calça","trousers"],["o vestido","dress"],["os sapatos","shoes"],["o casaco","coat"],["vermelho","red"],["azul","blue"],["verde","green"],["preto","black"],["branco","white"]],
+  s:[["I'm looking for a blue shirt.","Estou procurando uma camisa azul."],["She is wearing a green dress.","Ela está usando um vestido verde."],["These shoes are black.","Estes sapatos são pretos."],["My coat is white.","Meu casaco é branco."],["Do you have a bigger size?","Você tem um tamanho maior?"]]},
+ {lv:"A2", t:"At home", ico:"🏠",
+  b:"**Tem** = there is / there are: **tem dois quartos**. Rooms: **a cozinha**, **o quarto**, **o banheiro**, **a sala**. **Na minha casa** = at my house.",
+  w:[["a casa","house"],["o apartamento","apartment"],["a cozinha","kitchen"],["o quarto","bedroom"],["o banheiro","bathroom"],["a sala","living room"],["a mesa","table"],["a cama","bed"],["a porta","door"],["a janela","window"]],
+  s:[["My apartment is small.","Meu apartamento é pequeno."],["There are two bedrooms.","Tem dois quartos."],["The kitchen is next to the living room.","A cozinha fica ao lado da sala."],["Close the window, please.","Fecha a janela, por favor."],["Come to my house tonight.","Vem na minha casa hoje à noite."]]},
+ {lv:"A2", t:"Daily routine", ico:"⏰",
+  b:"Reflexive verbs use **me / se**: **eu me levanto** = I get up. In Brazil people often drop it when speaking: **eu levanto cedo**. Times: **às sete horas** = at seven o'clock.",
+  w:[["acordar","to wake up"],["levantar","to get up"],["tomar banho","to shower"],["dormir","to sleep"],["a manhã","morning"],["o café da manhã","breakfast"],["o almoço","lunch"],["o jantar","dinner"],["sempre","always"],["cedo","early"]],
+  s:[["I wake up at seven o'clock.","Eu acordo às sete horas."],["She showers in the morning.","Ela toma banho de manhã."],["We have dinner at eight.","Nós jantamos às oito."],["He always sleeps late.","Ele sempre dorme tarde."],["I eat breakfast early.","Eu tomo café da manhã cedo."]]},
+ {lv:"A2", t:"Weather and seasons", ico:"☀️",
+  b:"**Está quente** = it's hot, **está frio** = it's cold, **está chovendo** = it's raining. **Faz calor** and **faz frio** work too. In Brazil **o verão** (summer) runs from December to March.",
+  w:[["quente","hot"],["frio","cold"],["chover","to rain"],["o sol","sun"],["o vento","wind"],["a chuva","rain"],["o verão","summer"],["o inverno","winter"],["a estação do ano","season"],["o tempo","weather"]],
+  s:[["It's very hot in summer.","Faz muito calor no verão."],["It's raining today.","Hoje está chovendo."],["It's cold in winter.","No inverno faz frio."],["What's the weather like?","Como está o tempo?"],["It's very windy.","Está ventando muito."]]},
+ {lv:"A2", t:"Getting around", ico:"✈️",
+  b:"Transport takes **de**: **de ônibus**, **de carro**, **de avião**. But **a pé** = on foot. **A passagem** = the ticket.",
+  w:[["o trem","train"],["o avião","plane"],["o carro","car"],["o ônibus","bus"],["a bicicleta","bike"],["a pé","on foot"],["a passagem","ticket"],["a mala","suitcase"],["sair","to leave"],["chegar","to arrive"]],
+  s:[["I go to work by bus.","Eu vou para o trabalho de ônibus."],["A ticket to Rio, please.","Uma passagem para o Rio, por favor."],["The train leaves at ten.","O trem sai às dez."],["We arrive tomorrow by plane.","Nós chegamos amanhã de avião."],["She goes to school on foot.","Ela vai para a escola a pé."]]},
+ {lv:"A2", t:"Health and body", ico:"🩺",
+  b:"**Estou com dor de...** = I have a ...ache: **dor de cabeça** (headache), **dor de barriga** (stomachache). **Estou doente** = I'm sick.",
+  w:[["a cabeça","head"],["as costas","back"],["a barriga","stomach"],["a mão","hand"],["o pé","foot"],["os olhos","eyes"],["doente","sick"],["o médico","doctor"],["a farmácia","pharmacy"],["o remédio","medicine"]],
+  s:[["I have a headache.","Estou com dor de cabeça."],["I am sick today.","Hoje estou doente."],["My back hurts.","Minhas costas doem."],["Where is the pharmacy?","Onde fica a farmácia?"],["You need to see a doctor.","Você precisa ir ao médico."]]},
+ {lv:"A2", t:"Talking about the past", ico:"⏪",
+  b:"The past (**pretérito perfeito**): **falar → eu falei, você falou**; **comer → eu comi**. Common irregulars: **eu fui** (I went / I was), **eu fiz** (I did), **eu tive** (I had).",
+  w:[["eu comi","I ate"],["eu bebi","I drank"],["eu vi","I saw"],["eu fiz","I did"],["eu comprei","I bought"],["eu fui","I went"],["eu cheguei","I arrived"],["a semana passada","last week"],["ontem à noite","last night"],["já","already"]],
+  s:[["I ate a pastel this morning.","Eu comi um pastel hoje de manhã."],["We saw a film last night.","Nós vimos um filme ontem à noite."],["She went to Rio last week.","Ela foi para o Rio na semana passada."],["I already bought the tickets.","Eu já comprei as passagens."],["What did you do yesterday?","O que você fez ontem?"]]}
 ]};
 
 /* ===================== World Languages =====================
@@ -14890,7 +15018,11 @@ Object.assign(I18N.en, {
   wl_fill:"Fill in the blank", wl_match:"Tap the matching pairs", wl_type:"Type this in {lang}", wl_tone:"Which tones are right?",
   wl_read:"How do you read this?", wl_done:"Unit complete!", wl_fail:"Out of hearts", wl_failSub:"Each miss costs a heart. Try again: you'll get it.",
   wl_retry:"Try again", wl_next:"Next unit", wl_xp:"+{n} XP", wl_accents:"Right! Watch the accents: {a}", wl_new:"NEW",
-  wl_comingSoon:"More units coming soon", wl_tip:"Tip", wl_hear:"Listen", wl_skip:"Can't listen now"
+  wl_comingSoon:"More units coming soon", wl_tip:"Tip", wl_hear:"Listen", wl_skip:"Can't listen now",
+  wl_level:"Level {lv}", wl_boss:"Boss", wl_bossLocked:"Finish the units before the boss", wl_bossGate:"Beat the boss to unlock",
+  wl_bossRules:"A test of units {a}–{b}. No {r}, no hints. You have 2 hearts; every right answer hits the boss, and the final blow is a full sentence.",
+  wl_bossRulesPlain:"A test of units {a}–{b}. No hints, accents count. You have 2 hearts; every right answer hits the boss, and the final blow is a full sentence.",
+  wl_fight:"Fight!", wl_bossWin:"Boss defeated!", wl_bossLose:"The boss won this round", wl_bossLoseSub:"Review the units and come back for a rematch.", wl_final:"FINAL BLOW!", wl_beaten:"Defeated"
 });
 Object.assign(I18N.es, {
   wl_title:"Idiomas del mundo", wl_sub:"Se aprenden en inglés", wl_back:"Atrás", wl_units:"{n} de {m} unidades", wl_start:"Empezar",
@@ -14900,7 +15032,11 @@ Object.assign(I18N.es, {
   wl_fill:"Completa el hueco", wl_match:"Toca las parejas", wl_type:"Escríbelo en {lang}", wl_tone:"¿Qué tonos son correctos?",
   wl_read:"¿Cómo se lee?", wl_done:"¡Unidad completada!", wl_fail:"Sin corazones", wl_failSub:"Cada fallo cuesta un corazón. Inténtalo otra vez.",
   wl_retry:"Reintentar", wl_next:"Siguiente unidad", wl_xp:"+{n} XP", wl_accents:"¡Bien! Ojo con los acentos: {a}", wl_new:"NUEVO",
-  wl_comingSoon:"Pronto habrá más unidades", wl_tip:"Consejo", wl_hear:"Escuchar", wl_skip:"No puedo escuchar ahora"
+  wl_comingSoon:"Pronto habrá más unidades", wl_tip:"Consejo", wl_hear:"Escuchar", wl_skip:"No puedo escuchar ahora",
+  wl_level:"Nivel {lv}", wl_boss:"Jefe", wl_bossLocked:"Termina las unidades antes del jefe", wl_bossGate:"Vence al jefe para seguir",
+  wl_bossRules:"Examen de las unidades {a}–{b}. Sin {r} y sin pistas. Tienes 2 corazones; cada acierto golpea al jefe y el golpe final es una frase completa.",
+  wl_bossRulesPlain:"Examen de las unidades {a}–{b}. Sin pistas y con acentos. Tienes 2 corazones; cada acierto golpea al jefe y el golpe final es una frase completa.",
+  wl_fight:"¡A luchar!", wl_bossWin:"¡Jefe derrotado!", wl_bossLose:"El jefe ganó esta vez", wl_bossLoseSub:"Repasa las unidades y vuelve a por la revancha.", wl_final:"¡GOLPE FINAL!", wl_beaten:"Derrotado"
 });
 const WL_ORDER = ["zh", "ar", "fr", "pt"];   // most speakers first
 
@@ -14929,6 +15065,7 @@ function wlToneVariants(p){
 function wlPack(code){
   const P = WL[code]; if(!P || P._ready) return P;
   P.units.forEach((u, ui) => {
+    u.lv = u.lv || "A1";
     u.words = u.w.map(([t, en, r]) => ({t, en, r:r || "", ui}));
     u.sents = u.s.map(([en, t, r]) => ({en, t, r:r || "", ui, tk:wlToks(t), rk:wlRomToks(r)}));
   });
@@ -14941,9 +15078,11 @@ function wlPack(code){
 let WP = {};
 try{ WP = JSON.parse(localStorage.getItem("pgm-world") || "{}") || {}; }catch(e){ WP = {}; }
 const wpSave = () => { try{ localStorage.setItem("pgm-world", JSON.stringify(WP)); }catch(e){} };
-const wpOf = c => { const p = WP[c] || (WP[c] = {}); p.u = p.u || {}; p.miss = p.miss || {}; if(p.rom === undefined) p.rom = true; p.xp = p.xp || 0; return p; };
+const wpOf = c => { const p = WP[c] || (WP[c] = {}); p.u = p.u || {}; p.b = p.b || {}; p.miss = p.miss || {}; if(p.rom === undefined) p.rom = true; p.xp = p.xp || 0; return p; };
 const wlDoneCount = c => Object.keys(wpOf(c).u).length;
-const wlUnlocked = (c, i) => i === 0 || !!wpOf(c).u[i - 1];
+const wlUnlocked = (c, i) => i === 0 || (!!wpOf(c).u[i - 1] && (i % 4 !== 0 || !!wpOf(c).b[i / 4 - 1]));
+const wlBossCount = P => Math.min(Math.floor(P.units.length / 4), (P.bosses || []).length);
+const wlBossUnlocked = (c, k) => !!wpOf(c).u[4 * k + 3];
 
 /* ---------- challenge generation ---------- */
 function wlWordOpts(P, w, n, key){
@@ -15006,8 +15145,15 @@ function wlReview(P){
   return plan.filter(p => p[1] && (!Array.isArray(p[1]) || p[1].length >= 3)).map(([ty, src]) => wlMake(P, ty, src));
 }
 
+function wlBossItems(P, k){
+  const lo = 4 * k, hi = 4 * k + 3, inR = x => x.ui >= lo && x.ui <= hi;
+  const W = wlShuf(P.allWords.filter(inR)), S = wlShuf(P.allSents.filter(inR));
+  const special = P.typing ? "type" : P.rom === "pinyin" ? "tone" : "read";
+  const plan = [["build", S[0]], ["rev", W[0]], [special, W[1]], ["fill", S[1]], ["build", S[2]], ["pick", W[2]], [special, W[3]], ["build", S[3]], ["fill", S[4]], ["rev", W[4]], ["build", S[5]], [special, W[5]]];
+  return plan.filter(p => p[1]).map(([ty, src]) => wlMake(P, ty, src));
+}
 /* ---------- state ---------- */
-let WV = {view:"home", pack:null, unit:-1, run:null};
+let WV = {view:"home", pack:null, unit:-1, boss:-1, run:null};
 
 /* ---------- page shell ---------- */
 (() => {
@@ -15044,6 +15190,23 @@ let WV = {view:"home", pack:null, unit:-1, run:null};
 .wnode:nth-child(4n+2){transform:translateX(-50px)}.wnode:nth-child(4n){transform:translateX(50px)}
 @keyframes wlPulse{0%,100%{box-shadow:0 6px 0 var(--violet-deep),0 0 0 0 rgba(91,75,214,.5)}50%{box-shadow:0 6px 0 var(--violet-deep),0 0 0 14px rgba(91,75,214,0)}}
 .wsoon{color:var(--muted);text-align:center;font-size:.9rem;margin-top:10px}
+.wlvl{align-self:stretch;display:flex;align-items:center;gap:10px;margin:14px 0 6px;font:800 1rem/1 "Bricolage Grotesque",sans-serif;color:var(--violet)}
+.wlvl::before,.wlvl::after{content:"";flex:1;height:2px;background:var(--line)}
+.wnode.boss .c{width:88px;height:88px;font-size:2.6rem;background:linear-gradient(140deg,#E5384F,#7A1020);box-shadow:0 6px 0 #4A0A14}
+.wnode.boss.done .c{background:linear-gradient(140deg,#4FD195,#1F8A5B);box-shadow:0 6px 0 #145C3C}
+.wnode.boss.lock .c{background:var(--line);box-shadow:0 6px 0 rgba(0,0,0,.15)}
+.wnode.boss.cur .c{animation:wlBossPulse 1.2s ease-in-out infinite}
+.wnode.boss small{color:var(--red);font-weight:700}
+.wnode.boss.done small{color:var(--green)}
+@keyframes wlBossPulse{0%,100%{transform:scale(1) rotate(0)}25%{transform:scale(1.06) rotate(-4deg)}75%{transform:scale(1.06) rotate(4deg)}}
+.wbossintro{text-align:center;padding:10px 0}
+.wbossintro .face{font-size:6rem;line-height:1;display:inline-block;animation:wlBossPulse 1.4s ease-in-out infinite;filter:drop-shadow(0 10px 18px rgba(229,56,79,.45))}
+.wbossintro h2{font-size:1.7rem;margin:10px 0 6px}
+.wbosshead{display:flex;align-items:center;gap:10px;flex:1}
+.wbosshead .face{font-size:2.2rem;line-height:1;display:inline-block}
+.wbosshead .face.hit{animation:jxShake .42s}
+.wbosshead .hpbar{flex:1;height:14px;border-radius:9px;background:#3A1020;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.4)}
+.wbosshead .hpbar i{display:block;height:100%;background:linear-gradient(90deg,#FF5A5F,#FF9A6B);transition:width .35s steps(6)}
 .wtools{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:12px}
 .wcard{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
 .wtip{background:var(--gold-soft);border-radius:14px;padding:12px 14px;margin:10px 0 14px}
@@ -15120,7 +15283,9 @@ showOnly = (orig => function(id){
 showMenu = (orig => function(){ const pg = $("worldPage"); if(pg) pg.hidden = true; return orig.apply(this, arguments); })(showMenu);
 syncMood = (orig => function(){
   const pg = $("worldPage");
-  if(pg && !pg.hidden){ Music.setMood(WV.pack && WL[WV.pack] && WV.view !== "home" ? WL[WV.pack].music || "arcade" : "arcade"); return; }
+  if(pg && !pg.hidden){
+    const bossOn = (WV.view === "play" && WV.run && WV.run.boss) || WV.view === "bossIntro";
+    Music.setMood(bossOn ? "boss" : WV.pack && WL[WV.pack] && WV.view !== "home" ? WL[WV.pack].music || "arcade" : "arcade"); return; }
   return orig.apply(this, arguments);
 })(syncMood);
 
@@ -15142,6 +15307,7 @@ function wlRender(){
   const P = wlPack(WV.pack);
   if(v === "path") return wlPath(el, P);
   if(v === "intro") return wlIntro(el, P);
+  if(v === "bossIntro") return wlBossIntro(el, P);
   if(v === "play") return wlPlay(el, P);
   if(v === "end") return wlEnd(el, P);
 }
@@ -15157,10 +15323,33 @@ function wlPath(el, P){
   el.innerHTML = `<div class="wtop">${wlBack("home")}<div><h1 class="display">${P.flag} ${esc(P.name)}</h1><div class="sub">${esc(t("wl_units", {n:wlDoneCount(P.code), m:P.units.length}))}</div></div></div>
   <div class="wtools">${P.rom ? `<label class="chip"><input type="checkbox" id="wlRom" ${pr.rom ? "checked" : ""}> ${esc(t("wl_rom", {r:P.rom}))}</label>` : "<span></span>"}
     <button class="ghost" id="wlPractice" ${wlDoneCount(P.code) ? "" : "disabled"}>🔁 ${esc(t("wl_practice"))}</button></div>
-  <div class="wpath">${P.units.map((u, i) => { const ok = wlUnlocked(P.code, i), st = pr.u[i] || 0;
-    return `<button class="wnode ${st ? "done" : ok ? "" : "lock"} ${i === cur ? "cur" : ""}" data-wunit="${i}" ${ok ? "" : `aria-disabled="true" title="${esc(t("wl_locked"))}"`}>
-      <span class="c" aria-hidden="true">${ok ? u.ico : "🔒"}${st ? `<span class="st">${"⭐".repeat(st)}</span>` : ""}</span><b>${i + 1}. ${esc(u.t)}</b></button>`; }).join("")}</div>
+  <div class="wpath">${wlPathNodes(P)}</div>
   <p class="wsoon">✨ ${esc(t("wl_comingSoon"))}</p>`;
+}
+function wlPathNodes(P){
+  const pr = wpOf(P.code), out = [];
+  const cur = P.units.findIndex((u, i) => !pr.u[i] && wlUnlocked(P.code, i));
+  const nb = wlBossCount(P);
+  const curBoss = [...Array(nb).keys()].find(k => wlBossUnlocked(P.code, k) && !pr.b[k]);
+  P.units.forEach((u, i) => {
+    if(i === 0 || u.lv !== P.units[i - 1].lv) out.push(`<div class="wlvl">${esc(t("wl_level", {lv:u.lv}))}</div>`);
+    const ok = wlUnlocked(P.code, i), st = pr.u[i] || 0;
+    out.push(`<button class="wnode ${st ? "done" : ok ? "" : "lock"} ${i === cur && curBoss === undefined ? "cur" : ""}" data-wunit="${i}" ${ok ? "" : `aria-disabled="true" title="${esc(t(i % 4 === 0 && pr.u[i - 1] ? "wl_bossGate" : "wl_locked"))}"`}>
+      <span class="c" aria-hidden="true">${ok ? u.ico : "🔒"}${st ? `<span class="st">${"⭐".repeat(st)}</span>` : ""}</span><b>${i + 1}. ${esc(u.t)}</b></button>`);
+    if((i + 1) % 4 === 0 && (i + 1) / 4 - 1 < nb){
+      const k = (i + 1) / 4 - 1, [face, name] = P.bosses[k], bok = wlBossUnlocked(P.code, k), won = !!pr.b[k];
+      out.push(`<button class="wnode boss ${won ? "done" : bok ? "" : "lock"} ${curBoss === k ? "cur" : ""}" data-wboss="${k}" ${bok ? "" : `aria-disabled="true" title="${esc(t("wl_bossLocked"))}"`}>
+        <span class="c" aria-hidden="true">${bok ? face : "🔒"}</span><b>👹 ${esc(t("wl_boss"))}: <span${wlAttr(P)}>${esc(name)}</span></b>${won ? `<small>✅ ${esc(t("wl_beaten"))}</small>` : ""}</button>`);
+    }
+  });
+  return out.join("");
+}
+function wlBossIntro(el, P){
+  const k = WV.boss, [face, name] = P.bosses[k];
+  el.innerHTML = `<div class="wtop">${wlBack("path")}<div><h1 class="display">👹 ${esc(t("wl_boss"))}</h1><div class="sub">${P.flag} ${esc(P.name)}</div></div></div>
+  <div class="wcard wbossintro"><div class="face" aria-hidden="true">${face}</div><h2 class="display">${esc(name)}</h2>
+  <p class="lede">${esc(t(P.rom ? "wl_bossRules" : "wl_bossRulesPlain", {a:4 * k + 1, b:4 * k + 4, r:P.rom || ""}))}</p></div>
+  <button class="primary" id="wlFight" style="width:100%">⚔️ ${esc(t("wl_fight"))}</button>`;
 }
 function wlIntro(el, P){
   const u = P.units[WV.unit], pr = wpOf(P.code);
@@ -15169,13 +15358,16 @@ function wlIntro(el, P){
   <div class="wwords">${u.words.map((w, i) => `<button class="wword" data-wsay="${i}"><span class="t"${wlAttr(P)}>${esc(w.t)}</span>${w.r && pr.rom ? `<span class="r">${esc(w.r)}</span>` : ""}<span class="e">${esc(w.en)}</span></button>`).join("")}</div></div>
   <button class="primary" id="wlGo" style="width:100%">${esc(t("wl_start"))} ▶</button>`;
 }
-function wlStart(P, ui){
-  const items = ui === -1 ? wlReview(P) : wlLesson(P, ui);
+function wlStart(P, ui, bossK){
+  const isBoss = bossK !== undefined && bossK >= 0;
+  const items = isBoss ? wlBossItems(P, bossK) : ui === -1 ? wlReview(P) : wlLesson(P, ui);
   if(!items || !items.length) return;
-  WV.run = {items, i:0, hp:3, miss:0, xp:0, total:items.length, retried:new Set(), streak:0, state:"ask", picked:[], typed:""};
-  wlGo("play", P.code, ui);
+  WV.boss = isBoss ? bossK : -1;
+  WV.run = {items, i:0, hp:isBoss ? 2 : 3, maxHp:isBoss ? 2 : 3, miss:0, xp:0, total:items.length, retried:new Set(), streak:0, state:"ask", picked:[], typed:"",
+    boss:isBoss ? {k:bossK, hp:8, max:8} : null};
+  wlGo("play", P.code, isBoss ? WV.unit : ui);
 }
-function wlRomOn(P){ return P.rom && wpOf(P.code).rom; }
+function wlRomOn(P){ return P.rom && wpOf(P.code).rom && !(WV.run && WV.run.boss && WV.view === "play"); }
 function wlSayBtn(){ return Narrator.available() ? `<button class="ghost wsay" data-wsay="cur">🔊 ${esc(t("wl_hear"))}</button>` : ""; }
 function wlPlay(el, P){
   const R = WV.run, c = R.items[R.i], rom = wlRomOn(P);
@@ -15219,7 +15411,9 @@ function wlPlay(el, P){
   } else if(needsCheck){
     foot = `<div class="wfoot"><button class="primary" id="wlCheck" ${c.type === "build" && !R.picked.length ? "disabled" : ""}>${esc(t("wl_check"))}</button></div>`;
   }
-  el.innerHTML = `<div class="wplay"><div class="head"><button class="iconbtn" data-wgo="path" aria-label="${esc(t("wl_back"))}">✕</button><span class="bar"><i style="width:${pct}%"></i></span><span class="hp">${"❤️".repeat(R.hp)}${"🖤".repeat(3 - R.hp)}</span></div>
+  const B = R.boss;
+  const mid = B ? `<span class="wbosshead"><span class="face" id="wlBossFace" aria-hidden="true">${P.bosses[B.k][0]}</span><span class="hpbar" role="img" aria-label="${B.hp}/${B.max}"><i style="width:${Math.round(100 * B.hp / B.max)}%"></i></span></span>` : `<span class="bar"><i style="width:${pct}%"></i></span>`;
+  el.innerHTML = `<div class="wplay"><div class="head"><button class="iconbtn" data-wgo="path" aria-label="${esc(t("wl_back"))}">✕</button>${mid}<span class="hp">${"❤️".repeat(Math.max(0, R.hp))}${"🖤".repeat(Math.max(0, R.maxHp - R.hp))}</span></div>
     <div class="wcard" id="wlCard">${body}</div>${foot}</div>`;
   if(c.type === "type" && R.state === "ask"){ const inp = $("wlType"); inp.focus(); inp.addEventListener("input", () => { R.typed = inp.value; }); }
   if(R.state === "ask" && (c.type === "listen" || (c.type === "rev" && R.autoSaid !== R.i))){ R.autoSaid = R.i; wlSayCur(P, true); }
@@ -15245,6 +15439,7 @@ function wlGrade(P, ok, note){
     const xp = firstTry ? 10 : 5; R.xp += xp;
     Sound.correct();
     try{ recordAnswer(true, xp); }catch(e){}
+    if(R.boss){ R.boss.hp = Math.max(0, R.boss.hp - 1); setTimeout(() => { const f = $("wlBossFace"); if(f){ f.classList.add("hit"); try{ const c = juCenter(f); juBurst(c.x, c.y, 16, ["#FF5A5F", "#FFD45C", "#FFFFFF"], 70); }catch(e){} } }, 30); }
     try{ const p = juHere(); juBurst(p.x, p.y, 14, ["#4FD195", "#FFD45C", "#F2B01E", "#FFFFFF"]); juFloat(p.x, p.y - 10, t("wl_xp", {n:xp}), "#4FD195");
       if(R.streak === 3) juBanner(t("ju_nice")); else if(R.streak === 5) juBanner(t("ju_great"), "ok"); else if(R.streak === 8) juBanner(t("ju_awesome"), "lvl"); }catch(e){}
     if(key && pr.miss[key]) pr.miss[key] = Math.max(0, pr.miss[key] - 1);
@@ -15252,7 +15447,7 @@ function wlGrade(P, ok, note){
     R.streak = 0; R.miss++; R.hp--;
     Sound.wrong();
     try{ recordAnswer(false, 0); }catch(e){}
-    try{ juVignette(); }catch(e){}
+    try{ juVignette(); if(R.boss){ juFlash("#E5384F"); juShake($("worldPage"), "jx-quake"); } }catch(e){}
     if(key) pr.miss[key] = (pr.miss[key] || 0) + 1;
     if(!R.retried.has(R.i) && c.type !== "match"){ const copy = Object.assign({}, c); R.items.push(copy); R.retried.add(R.items.length - 1); }
   }
@@ -15264,7 +15459,21 @@ function wlGrade(P, ok, note){
 function wlNext(P){
   const R = WV.run;
   if(R.hp <= 0) return wlFinish(P, false);
+  if(R.boss && R.boss.hp <= 0) return wlFinish(P, true);
   R.i++; R.state = "ask"; R.picked = []; R.typed = ""; R.note = "";
+  if(R.boss){
+    if(R.i >= R.items.length) R.items.push(...wlBossItems(P, R.boss.k));
+    if(R.boss.hp === 1){
+      // the final blow is always a full sentence
+      if(R.items[R.i].type !== "build"){
+        const j = R.items.findIndex((x, n) => n > R.i && x.type === "build");
+        if(j > 0) [R.items[R.i], R.items[j]] = [R.items[j], R.items[R.i]];
+        else R.items.splice(R.i, 0, wlBossItems(P, R.boss.k).find(x => x.type === "build"));
+      }
+      setTimeout(() => { try{ juBanner(t("wl_final"), "boss"); }catch(e){} }, 120);
+    }
+    return wlRender();
+  }
   if(R.i >= R.items.length) return wlFinish(P, true);
   wlRender();
 }
@@ -15277,14 +15486,25 @@ function wlFinish(P, won){
     const bonus = 20 + (stars === 3 ? 10 : 0); R.xp += bonus;
     try{ profile.xp += bonus; saveProfile(); questAdd("xp", bonus); renderDaily(); }catch(e){}
     pr.xp += R.xp;
-    if(WV.unit >= 0){ R.firstClear = !pr.u[WV.unit]; pr.u[WV.unit] = Math.max(pr.u[WV.unit] || 0, stars); }
+    if(R.boss){ R.xp += 30; pr.b[R.boss.k] = true; }
+    else if(WV.unit >= 0){ R.firstClear = !pr.u[WV.unit]; pr.u[WV.unit] = Math.max(pr.u[WV.unit] || 0, stars); }
     wpSave();
-    setTimeout(() => { try{ Sound.levelUp(); confetti(stars === 3 ? 160 : 90); if(stars === 3) juBanner(t("ju_perfect"), "ok"); }catch(e){} }, 250);
+    setTimeout(() => { try{ Sound.levelUp(); confetti(stars === 3 || R.boss ? 160 : 90); if(R.boss){ juFlash("#FFFFFF"); juBanner(t("ju_bossDown"), "ok"); } else if(stars === 3) juBanner(t("ju_perfect"), "ok"); }catch(e){} }, 250);
   } else { try{ Sound.gameOver(); }catch(e){} }
   wlGo("end");
 }
 function wlEnd(el, P){
-  const R = WV.run, more = WV.unit >= 0 && WV.unit + 1 < P.units.length;
+  const R = WV.run;
+  if(R.boss){
+    const [face, name] = P.bosses[R.boss.k], nextU = 4 * R.boss.k + 4;
+    el.innerHTML = R.won ? `<div class="wend"><div class="stars">🏆</div><h2 class="display">${esc(t("wl_bossWin"))}</h2><p class="lede">${face} <span${wlAttr(P)}>${esc(name)}</span> · <b>${esc(t("wl_xp", {n:R.xp}))}</b></p>
+        <div class="btns">${nextU < P.units.length ? `<button class="primary" id="wlNextUnit" data-u="${nextU}">${esc(t("wl_next"))}: ${P.units[nextU].ico} ${esc(P.units[nextU].t)}</button>` : ""}
+        <button class="${nextU < P.units.length ? "ghost" : "primary"}" data-wgo="path">${esc(t("wl_continue"))}</button></div></div>`
+      : `<div class="wend"><div class="stars">${face}</div><h2 class="display">${esc(t("wl_bossLose"))}</h2><p class="lede">${esc(t("wl_bossLoseSub"))}</p>
+        <div class="btns"><button class="primary" id="wlRetry">${esc(t("wl_retry"))}</button><button class="ghost" data-wgo="path">${esc(t("wl_back"))}</button></div></div>`;
+    return;
+  }
+  const more = WV.unit >= 0 && WV.unit + 1 < P.units.length;
   el.innerHTML = R.won ? `<div class="wend"><div class="stars">${[0, 1, 2].map(i => `<span>${i < R.stars ? "⭐" : "☆"}</span>`).join("")}</div>
       <h2 class="display">${esc(WV.unit >= 0 ? t("wl_done") : t("wl_practice"))}</h2><p class="lede">${P.flag} ${esc(WV.unit >= 0 ? P.units[WV.unit].t : P.name)} · <b>${esc(t("wl_xp", {n:R.xp}))}</b></p>
       <div class="btns">${more ? `<button class="primary" id="wlNextUnit">${esc(t("wl_next"))}: ${P.units[WV.unit + 1].ico} ${esc(P.units[WV.unit + 1].t)}</button>` : ""}
@@ -15314,6 +15534,7 @@ function wlCheck(P){
     const wants = [c.ans].concat(c.ans.replace(/^(le|la|les|l'|o|a|os|as)\s*/i, "") !== c.ans ? [c.ans.replace(/^(le|la|les|l'|o|a|os|as)\s*/i, "")] : []);
     const exact = wants.some(w => wlNorm(w, true) === wlNorm(got, true));
     const loose = wants.some(w => wlNorm(w) === wlNorm(got));
+    if(R.boss) return wlGrade(P, exact);
     return wlGrade(P, exact || loose, !exact && loose ? t("wl_accents", {a:c.ans}) : "");
   }
 }
@@ -15324,11 +15545,15 @@ document.addEventListener("click", e => {
   if(go){ Sound.tap(); const v = go.dataset.wgo; if(v === "menu"){ Narrator.stop(); showMenu(); } else wlGo(v); return; }
   const pk = e.target.closest("[data-wpack]"); if(pk){ Sound.unlock(); Sound.tap(); return wlGo("path", pk.dataset.wpack); }
   const un = e.target.closest("[data-wunit]");
-  if(un){ const i = +un.dataset.wunit; if(!wlUnlocked(P.code, i)){ Sound.wrong(); toast("🔒 " + t("wl_locked")); return; } Sound.tap(); return wlGo("intro", P.code, i); }
+  if(un){ const i = +un.dataset.wunit; if(!wlUnlocked(P.code, i)){ Sound.wrong(); toast("🔒 " + t(i % 4 === 0 && wpOf(P.code).u[i - 1] ? "wl_bossGate" : "wl_locked")); return; } Sound.tap(); return wlGo("intro", P.code, i); }
   if(e.target.closest("#wlPractice")){ Sound.tap(); return wlStart(P, -1); }
   if(e.target.closest("#wlGo")){ Sound.unlock(); Sound.start(); return wlStart(P, WV.unit); }
-  if(e.target.closest("#wlRetry")) return wlStart(P, WV.unit);
-  if(e.target.closest("#wlNextUnit")){ Sound.tap(); return wlGo("intro", P.code, WV.unit + 1); }
+  const bs = e.target.closest("[data-wboss]");
+  if(bs){ const k = +bs.dataset.wboss; if(!wlBossUnlocked(P.code, k)){ Sound.wrong(); toast("🔒 " + t("wl_bossLocked")); return; } Sound.unlock(); Sound.bossIntro(); WV.boss = k; return wlGo("bossIntro"); }
+  if(e.target.closest("#wlFight")){ Sound.unlock(); return wlStart(P, WV.unit, WV.boss); }
+  if(e.target.closest("#wlRetry")) return WV.run && WV.run.boss ? wlStart(P, WV.unit, WV.run.boss.k) : wlStart(P, WV.unit);
+  const nu = e.target.closest("#wlNextUnit");
+  if(nu){ Sound.tap(); const u = nu.dataset.u !== undefined ? +nu.dataset.u : WV.unit + 1; WV.run = null; return wlGo("intro", P.code, u); }
   const sw = e.target.closest("[data-wsay]");
   if(sw){ Sound.unlock(); if(sw.dataset.wsay === "cur") return wlSayCur(P); const w = P.units[WV.unit].words[+sw.dataset.wsay]; if(w && Narrator.available()) Narrator.say([{text:w.t, lang:P.tts}]); return; }
   if(e.target.closest("#wlNoListen")){ const R = WV.run, c = R.items[R.i]; R.items[R.i] = wlMake(P, "rev", c.w); return wlRender(); }
@@ -15371,7 +15596,7 @@ document.addEventListener("keydown", e => {
   if(e.key === "Backspace" && c.type === "build" && R.state === "ask" && R.picked.length){ e.preventDefault(); R.picked.pop(); wlRender(); }
 });
 
-if(window.__PGM_TEST) window.__world = {WL, WV, WP, wlPack, wlLesson, wlReview, wlStart, wlGo, wlGrade, wlNext, wlCheck, wlAnswerOpt, wlToneVariants, wlToks, wlRomToks, wlNorm, wpOf};
+if(window.__PGM_TEST) window.__world = {get WV(){ return WV; }, WL, WP, wlBossItems, wlUnlocked, wlBossUnlocked, wlPack, wlLesson, wlReview, wlStart, wlGo, wlGrade, wlNext, wlCheck, wlAnswerOpt, wlToneVariants, wlToks, wlRomToks, wlNorm, wpOf};
 
 function sail(id){
   const old = S;

@@ -14,7 +14,11 @@ Object.assign(I18N.en, {
   wl_fill:"Fill in the blank", wl_match:"Tap the matching pairs", wl_type:"Type this in {lang}", wl_tone:"Which tones are right?",
   wl_read:"How do you read this?", wl_done:"Unit complete!", wl_fail:"Out of hearts", wl_failSub:"Each miss costs a heart. Try again: you'll get it.",
   wl_retry:"Try again", wl_next:"Next unit", wl_xp:"+{n} XP", wl_accents:"Right! Watch the accents: {a}", wl_new:"NEW",
-  wl_comingSoon:"More units coming soon", wl_tip:"Tip", wl_hear:"Listen", wl_skip:"Can't listen now"
+  wl_comingSoon:"More units coming soon", wl_tip:"Tip", wl_hear:"Listen", wl_skip:"Can't listen now",
+  wl_level:"Level {lv}", wl_boss:"Boss", wl_bossLocked:"Finish the units before the boss", wl_bossGate:"Beat the boss to unlock",
+  wl_bossRules:"A test of units {a}–{b}. No {r}, no hints. You have 2 hearts; every right answer hits the boss, and the final blow is a full sentence.",
+  wl_bossRulesPlain:"A test of units {a}–{b}. No hints, accents count. You have 2 hearts; every right answer hits the boss, and the final blow is a full sentence.",
+  wl_fight:"Fight!", wl_bossWin:"Boss defeated!", wl_bossLose:"The boss won this round", wl_bossLoseSub:"Review the units and come back for a rematch.", wl_final:"FINAL BLOW!", wl_beaten:"Defeated"
 });
 Object.assign(I18N.es, {
   wl_title:"Idiomas del mundo", wl_sub:"Se aprenden en inglés", wl_back:"Atrás", wl_units:"{n} de {m} unidades", wl_start:"Empezar",
@@ -24,7 +28,11 @@ Object.assign(I18N.es, {
   wl_fill:"Completa el hueco", wl_match:"Toca las parejas", wl_type:"Escríbelo en {lang}", wl_tone:"¿Qué tonos son correctos?",
   wl_read:"¿Cómo se lee?", wl_done:"¡Unidad completada!", wl_fail:"Sin corazones", wl_failSub:"Cada fallo cuesta un corazón. Inténtalo otra vez.",
   wl_retry:"Reintentar", wl_next:"Siguiente unidad", wl_xp:"+{n} XP", wl_accents:"¡Bien! Ojo con los acentos: {a}", wl_new:"NUEVO",
-  wl_comingSoon:"Pronto habrá más unidades", wl_tip:"Consejo", wl_hear:"Escuchar", wl_skip:"No puedo escuchar ahora"
+  wl_comingSoon:"Pronto habrá más unidades", wl_tip:"Consejo", wl_hear:"Escuchar", wl_skip:"No puedo escuchar ahora",
+  wl_level:"Nivel {lv}", wl_boss:"Jefe", wl_bossLocked:"Termina las unidades antes del jefe", wl_bossGate:"Vence al jefe para seguir",
+  wl_bossRules:"Examen de las unidades {a}–{b}. Sin {r} y sin pistas. Tienes 2 corazones; cada acierto golpea al jefe y el golpe final es una frase completa.",
+  wl_bossRulesPlain:"Examen de las unidades {a}–{b}. Sin pistas y con acentos. Tienes 2 corazones; cada acierto golpea al jefe y el golpe final es una frase completa.",
+  wl_fight:"¡A luchar!", wl_bossWin:"¡Jefe derrotado!", wl_bossLose:"El jefe ganó esta vez", wl_bossLoseSub:"Repasa las unidades y vuelve a por la revancha.", wl_final:"¡GOLPE FINAL!", wl_beaten:"Derrotado"
 });
 const WL_ORDER = ["zh", "ar", "fr", "pt"];   // most speakers first
 
@@ -53,6 +61,7 @@ function wlToneVariants(p){
 function wlPack(code){
   const P = WL[code]; if(!P || P._ready) return P;
   P.units.forEach((u, ui) => {
+    u.lv = u.lv || "A1";
     u.words = u.w.map(([t, en, r]) => ({t, en, r:r || "", ui}));
     u.sents = u.s.map(([en, t, r]) => ({en, t, r:r || "", ui, tk:wlToks(t), rk:wlRomToks(r)}));
   });
@@ -65,9 +74,11 @@ function wlPack(code){
 let WP = {};
 try{ WP = JSON.parse(localStorage.getItem("pgm-world") || "{}") || {}; }catch(e){ WP = {}; }
 const wpSave = () => { try{ localStorage.setItem("pgm-world", JSON.stringify(WP)); }catch(e){} };
-const wpOf = c => { const p = WP[c] || (WP[c] = {}); p.u = p.u || {}; p.miss = p.miss || {}; if(p.rom === undefined) p.rom = true; p.xp = p.xp || 0; return p; };
+const wpOf = c => { const p = WP[c] || (WP[c] = {}); p.u = p.u || {}; p.b = p.b || {}; p.miss = p.miss || {}; if(p.rom === undefined) p.rom = true; p.xp = p.xp || 0; return p; };
 const wlDoneCount = c => Object.keys(wpOf(c).u).length;
-const wlUnlocked = (c, i) => i === 0 || !!wpOf(c).u[i - 1];
+const wlUnlocked = (c, i) => i === 0 || (!!wpOf(c).u[i - 1] && (i % 4 !== 0 || !!wpOf(c).b[i / 4 - 1]));
+const wlBossCount = P => Math.min(Math.floor(P.units.length / 4), (P.bosses || []).length);
+const wlBossUnlocked = (c, k) => !!wpOf(c).u[4 * k + 3];
 
 /* ---------- challenge generation ---------- */
 function wlWordOpts(P, w, n, key){
@@ -130,8 +141,15 @@ function wlReview(P){
   return plan.filter(p => p[1] && (!Array.isArray(p[1]) || p[1].length >= 3)).map(([ty, src]) => wlMake(P, ty, src));
 }
 
+function wlBossItems(P, k){
+  const lo = 4 * k, hi = 4 * k + 3, inR = x => x.ui >= lo && x.ui <= hi;
+  const W = wlShuf(P.allWords.filter(inR)), S = wlShuf(P.allSents.filter(inR));
+  const special = P.typing ? "type" : P.rom === "pinyin" ? "tone" : "read";
+  const plan = [["build", S[0]], ["rev", W[0]], [special, W[1]], ["fill", S[1]], ["build", S[2]], ["pick", W[2]], [special, W[3]], ["build", S[3]], ["fill", S[4]], ["rev", W[4]], ["build", S[5]], [special, W[5]]];
+  return plan.filter(p => p[1]).map(([ty, src]) => wlMake(P, ty, src));
+}
 /* ---------- state ---------- */
-let WV = {view:"home", pack:null, unit:-1, run:null};
+let WV = {view:"home", pack:null, unit:-1, boss:-1, run:null};
 
 /* ---------- page shell ---------- */
 (() => {
@@ -168,6 +186,23 @@ let WV = {view:"home", pack:null, unit:-1, run:null};
 .wnode:nth-child(4n+2){transform:translateX(-50px)}.wnode:nth-child(4n){transform:translateX(50px)}
 @keyframes wlPulse{0%,100%{box-shadow:0 6px 0 var(--violet-deep),0 0 0 0 rgba(91,75,214,.5)}50%{box-shadow:0 6px 0 var(--violet-deep),0 0 0 14px rgba(91,75,214,0)}}
 .wsoon{color:var(--muted);text-align:center;font-size:.9rem;margin-top:10px}
+.wlvl{align-self:stretch;display:flex;align-items:center;gap:10px;margin:14px 0 6px;font:800 1rem/1 "Bricolage Grotesque",sans-serif;color:var(--violet)}
+.wlvl::before,.wlvl::after{content:"";flex:1;height:2px;background:var(--line)}
+.wnode.boss .c{width:88px;height:88px;font-size:2.6rem;background:linear-gradient(140deg,#E5384F,#7A1020);box-shadow:0 6px 0 #4A0A14}
+.wnode.boss.done .c{background:linear-gradient(140deg,#4FD195,#1F8A5B);box-shadow:0 6px 0 #145C3C}
+.wnode.boss.lock .c{background:var(--line);box-shadow:0 6px 0 rgba(0,0,0,.15)}
+.wnode.boss.cur .c{animation:wlBossPulse 1.2s ease-in-out infinite}
+.wnode.boss small{color:var(--red);font-weight:700}
+.wnode.boss.done small{color:var(--green)}
+@keyframes wlBossPulse{0%,100%{transform:scale(1) rotate(0)}25%{transform:scale(1.06) rotate(-4deg)}75%{transform:scale(1.06) rotate(4deg)}}
+.wbossintro{text-align:center;padding:10px 0}
+.wbossintro .face{font-size:6rem;line-height:1;display:inline-block;animation:wlBossPulse 1.4s ease-in-out infinite;filter:drop-shadow(0 10px 18px rgba(229,56,79,.45))}
+.wbossintro h2{font-size:1.7rem;margin:10px 0 6px}
+.wbosshead{display:flex;align-items:center;gap:10px;flex:1}
+.wbosshead .face{font-size:2.2rem;line-height:1;display:inline-block}
+.wbosshead .face.hit{animation:jxShake .42s}
+.wbosshead .hpbar{flex:1;height:14px;border-radius:9px;background:#3A1020;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.4)}
+.wbosshead .hpbar i{display:block;height:100%;background:linear-gradient(90deg,#FF5A5F,#FF9A6B);transition:width .35s steps(6)}
 .wtools{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:12px}
 .wcard{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
 .wtip{background:var(--gold-soft);border-radius:14px;padding:12px 14px;margin:10px 0 14px}
@@ -244,7 +279,9 @@ showOnly = (orig => function(id){
 showMenu = (orig => function(){ const pg = $("worldPage"); if(pg) pg.hidden = true; return orig.apply(this, arguments); })(showMenu);
 syncMood = (orig => function(){
   const pg = $("worldPage");
-  if(pg && !pg.hidden){ Music.setMood(WV.pack && WL[WV.pack] && WV.view !== "home" ? WL[WV.pack].music || "arcade" : "arcade"); return; }
+  if(pg && !pg.hidden){
+    const bossOn = (WV.view === "play" && WV.run && WV.run.boss) || WV.view === "bossIntro";
+    Music.setMood(bossOn ? "boss" : WV.pack && WL[WV.pack] && WV.view !== "home" ? WL[WV.pack].music || "arcade" : "arcade"); return; }
   return orig.apply(this, arguments);
 })(syncMood);
 
@@ -266,6 +303,7 @@ function wlRender(){
   const P = wlPack(WV.pack);
   if(v === "path") return wlPath(el, P);
   if(v === "intro") return wlIntro(el, P);
+  if(v === "bossIntro") return wlBossIntro(el, P);
   if(v === "play") return wlPlay(el, P);
   if(v === "end") return wlEnd(el, P);
 }
@@ -281,10 +319,33 @@ function wlPath(el, P){
   el.innerHTML = `<div class="wtop">${wlBack("home")}<div><h1 class="display">${P.flag} ${esc(P.name)}</h1><div class="sub">${esc(t("wl_units", {n:wlDoneCount(P.code), m:P.units.length}))}</div></div></div>
   <div class="wtools">${P.rom ? `<label class="chip"><input type="checkbox" id="wlRom" ${pr.rom ? "checked" : ""}> ${esc(t("wl_rom", {r:P.rom}))}</label>` : "<span></span>"}
     <button class="ghost" id="wlPractice" ${wlDoneCount(P.code) ? "" : "disabled"}>🔁 ${esc(t("wl_practice"))}</button></div>
-  <div class="wpath">${P.units.map((u, i) => { const ok = wlUnlocked(P.code, i), st = pr.u[i] || 0;
-    return `<button class="wnode ${st ? "done" : ok ? "" : "lock"} ${i === cur ? "cur" : ""}" data-wunit="${i}" ${ok ? "" : `aria-disabled="true" title="${esc(t("wl_locked"))}"`}>
-      <span class="c" aria-hidden="true">${ok ? u.ico : "🔒"}${st ? `<span class="st">${"⭐".repeat(st)}</span>` : ""}</span><b>${i + 1}. ${esc(u.t)}</b></button>`; }).join("")}</div>
+  <div class="wpath">${wlPathNodes(P)}</div>
   <p class="wsoon">✨ ${esc(t("wl_comingSoon"))}</p>`;
+}
+function wlPathNodes(P){
+  const pr = wpOf(P.code), out = [];
+  const cur = P.units.findIndex((u, i) => !pr.u[i] && wlUnlocked(P.code, i));
+  const nb = wlBossCount(P);
+  const curBoss = [...Array(nb).keys()].find(k => wlBossUnlocked(P.code, k) && !pr.b[k]);
+  P.units.forEach((u, i) => {
+    if(i === 0 || u.lv !== P.units[i - 1].lv) out.push(`<div class="wlvl">${esc(t("wl_level", {lv:u.lv}))}</div>`);
+    const ok = wlUnlocked(P.code, i), st = pr.u[i] || 0;
+    out.push(`<button class="wnode ${st ? "done" : ok ? "" : "lock"} ${i === cur && curBoss === undefined ? "cur" : ""}" data-wunit="${i}" ${ok ? "" : `aria-disabled="true" title="${esc(t(i % 4 === 0 && pr.u[i - 1] ? "wl_bossGate" : "wl_locked"))}"`}>
+      <span class="c" aria-hidden="true">${ok ? u.ico : "🔒"}${st ? `<span class="st">${"⭐".repeat(st)}</span>` : ""}</span><b>${i + 1}. ${esc(u.t)}</b></button>`);
+    if((i + 1) % 4 === 0 && (i + 1) / 4 - 1 < nb){
+      const k = (i + 1) / 4 - 1, [face, name] = P.bosses[k], bok = wlBossUnlocked(P.code, k), won = !!pr.b[k];
+      out.push(`<button class="wnode boss ${won ? "done" : bok ? "" : "lock"} ${curBoss === k ? "cur" : ""}" data-wboss="${k}" ${bok ? "" : `aria-disabled="true" title="${esc(t("wl_bossLocked"))}"`}>
+        <span class="c" aria-hidden="true">${bok ? face : "🔒"}</span><b>👹 ${esc(t("wl_boss"))}: <span${wlAttr(P)}>${esc(name)}</span></b>${won ? `<small>✅ ${esc(t("wl_beaten"))}</small>` : ""}</button>`);
+    }
+  });
+  return out.join("");
+}
+function wlBossIntro(el, P){
+  const k = WV.boss, [face, name] = P.bosses[k];
+  el.innerHTML = `<div class="wtop">${wlBack("path")}<div><h1 class="display">👹 ${esc(t("wl_boss"))}</h1><div class="sub">${P.flag} ${esc(P.name)}</div></div></div>
+  <div class="wcard wbossintro"><div class="face" aria-hidden="true">${face}</div><h2 class="display">${esc(name)}</h2>
+  <p class="lede">${esc(t(P.rom ? "wl_bossRules" : "wl_bossRulesPlain", {a:4 * k + 1, b:4 * k + 4, r:P.rom || ""}))}</p></div>
+  <button class="primary" id="wlFight" style="width:100%">⚔️ ${esc(t("wl_fight"))}</button>`;
 }
 function wlIntro(el, P){
   const u = P.units[WV.unit], pr = wpOf(P.code);
@@ -293,13 +354,16 @@ function wlIntro(el, P){
   <div class="wwords">${u.words.map((w, i) => `<button class="wword" data-wsay="${i}"><span class="t"${wlAttr(P)}>${esc(w.t)}</span>${w.r && pr.rom ? `<span class="r">${esc(w.r)}</span>` : ""}<span class="e">${esc(w.en)}</span></button>`).join("")}</div></div>
   <button class="primary" id="wlGo" style="width:100%">${esc(t("wl_start"))} ▶</button>`;
 }
-function wlStart(P, ui){
-  const items = ui === -1 ? wlReview(P) : wlLesson(P, ui);
+function wlStart(P, ui, bossK){
+  const isBoss = bossK !== undefined && bossK >= 0;
+  const items = isBoss ? wlBossItems(P, bossK) : ui === -1 ? wlReview(P) : wlLesson(P, ui);
   if(!items || !items.length) return;
-  WV.run = {items, i:0, hp:3, miss:0, xp:0, total:items.length, retried:new Set(), streak:0, state:"ask", picked:[], typed:""};
-  wlGo("play", P.code, ui);
+  WV.boss = isBoss ? bossK : -1;
+  WV.run = {items, i:0, hp:isBoss ? 2 : 3, maxHp:isBoss ? 2 : 3, miss:0, xp:0, total:items.length, retried:new Set(), streak:0, state:"ask", picked:[], typed:"",
+    boss:isBoss ? {k:bossK, hp:8, max:8} : null};
+  wlGo("play", P.code, isBoss ? WV.unit : ui);
 }
-function wlRomOn(P){ return P.rom && wpOf(P.code).rom; }
+function wlRomOn(P){ return P.rom && wpOf(P.code).rom && !(WV.run && WV.run.boss && WV.view === "play"); }
 function wlSayBtn(){ return Narrator.available() ? `<button class="ghost wsay" data-wsay="cur">🔊 ${esc(t("wl_hear"))}</button>` : ""; }
 function wlPlay(el, P){
   const R = WV.run, c = R.items[R.i], rom = wlRomOn(P);
@@ -343,7 +407,9 @@ function wlPlay(el, P){
   } else if(needsCheck){
     foot = `<div class="wfoot"><button class="primary" id="wlCheck" ${c.type === "build" && !R.picked.length ? "disabled" : ""}>${esc(t("wl_check"))}</button></div>`;
   }
-  el.innerHTML = `<div class="wplay"><div class="head"><button class="iconbtn" data-wgo="path" aria-label="${esc(t("wl_back"))}">✕</button><span class="bar"><i style="width:${pct}%"></i></span><span class="hp">${"❤️".repeat(R.hp)}${"🖤".repeat(3 - R.hp)}</span></div>
+  const B = R.boss;
+  const mid = B ? `<span class="wbosshead"><span class="face" id="wlBossFace" aria-hidden="true">${P.bosses[B.k][0]}</span><span class="hpbar" role="img" aria-label="${B.hp}/${B.max}"><i style="width:${Math.round(100 * B.hp / B.max)}%"></i></span></span>` : `<span class="bar"><i style="width:${pct}%"></i></span>`;
+  el.innerHTML = `<div class="wplay"><div class="head"><button class="iconbtn" data-wgo="path" aria-label="${esc(t("wl_back"))}">✕</button>${mid}<span class="hp">${"❤️".repeat(Math.max(0, R.hp))}${"🖤".repeat(Math.max(0, R.maxHp - R.hp))}</span></div>
     <div class="wcard" id="wlCard">${body}</div>${foot}</div>`;
   if(c.type === "type" && R.state === "ask"){ const inp = $("wlType"); inp.focus(); inp.addEventListener("input", () => { R.typed = inp.value; }); }
   if(R.state === "ask" && (c.type === "listen" || (c.type === "rev" && R.autoSaid !== R.i))){ R.autoSaid = R.i; wlSayCur(P, true); }
@@ -369,6 +435,7 @@ function wlGrade(P, ok, note){
     const xp = firstTry ? 10 : 5; R.xp += xp;
     Sound.correct();
     try{ recordAnswer(true, xp); }catch(e){}
+    if(R.boss){ R.boss.hp = Math.max(0, R.boss.hp - 1); setTimeout(() => { const f = $("wlBossFace"); if(f){ f.classList.add("hit"); try{ const c = juCenter(f); juBurst(c.x, c.y, 16, ["#FF5A5F", "#FFD45C", "#FFFFFF"], 70); }catch(e){} } }, 30); }
     try{ const p = juHere(); juBurst(p.x, p.y, 14, ["#4FD195", "#FFD45C", "#F2B01E", "#FFFFFF"]); juFloat(p.x, p.y - 10, t("wl_xp", {n:xp}), "#4FD195");
       if(R.streak === 3) juBanner(t("ju_nice")); else if(R.streak === 5) juBanner(t("ju_great"), "ok"); else if(R.streak === 8) juBanner(t("ju_awesome"), "lvl"); }catch(e){}
     if(key && pr.miss[key]) pr.miss[key] = Math.max(0, pr.miss[key] - 1);
@@ -376,7 +443,7 @@ function wlGrade(P, ok, note){
     R.streak = 0; R.miss++; R.hp--;
     Sound.wrong();
     try{ recordAnswer(false, 0); }catch(e){}
-    try{ juVignette(); }catch(e){}
+    try{ juVignette(); if(R.boss){ juFlash("#E5384F"); juShake($("worldPage"), "jx-quake"); } }catch(e){}
     if(key) pr.miss[key] = (pr.miss[key] || 0) + 1;
     if(!R.retried.has(R.i) && c.type !== "match"){ const copy = Object.assign({}, c); R.items.push(copy); R.retried.add(R.items.length - 1); }
   }
@@ -388,7 +455,21 @@ function wlGrade(P, ok, note){
 function wlNext(P){
   const R = WV.run;
   if(R.hp <= 0) return wlFinish(P, false);
+  if(R.boss && R.boss.hp <= 0) return wlFinish(P, true);
   R.i++; R.state = "ask"; R.picked = []; R.typed = ""; R.note = "";
+  if(R.boss){
+    if(R.i >= R.items.length) R.items.push(...wlBossItems(P, R.boss.k));
+    if(R.boss.hp === 1){
+      // the final blow is always a full sentence
+      if(R.items[R.i].type !== "build"){
+        const j = R.items.findIndex((x, n) => n > R.i && x.type === "build");
+        if(j > 0) [R.items[R.i], R.items[j]] = [R.items[j], R.items[R.i]];
+        else R.items.splice(R.i, 0, wlBossItems(P, R.boss.k).find(x => x.type === "build"));
+      }
+      setTimeout(() => { try{ juBanner(t("wl_final"), "boss"); }catch(e){} }, 120);
+    }
+    return wlRender();
+  }
   if(R.i >= R.items.length) return wlFinish(P, true);
   wlRender();
 }
@@ -401,14 +482,25 @@ function wlFinish(P, won){
     const bonus = 20 + (stars === 3 ? 10 : 0); R.xp += bonus;
     try{ profile.xp += bonus; saveProfile(); questAdd("xp", bonus); renderDaily(); }catch(e){}
     pr.xp += R.xp;
-    if(WV.unit >= 0){ R.firstClear = !pr.u[WV.unit]; pr.u[WV.unit] = Math.max(pr.u[WV.unit] || 0, stars); }
+    if(R.boss){ R.xp += 30; pr.b[R.boss.k] = true; }
+    else if(WV.unit >= 0){ R.firstClear = !pr.u[WV.unit]; pr.u[WV.unit] = Math.max(pr.u[WV.unit] || 0, stars); }
     wpSave();
-    setTimeout(() => { try{ Sound.levelUp(); confetti(stars === 3 ? 160 : 90); if(stars === 3) juBanner(t("ju_perfect"), "ok"); }catch(e){} }, 250);
+    setTimeout(() => { try{ Sound.levelUp(); confetti(stars === 3 || R.boss ? 160 : 90); if(R.boss){ juFlash("#FFFFFF"); juBanner(t("ju_bossDown"), "ok"); } else if(stars === 3) juBanner(t("ju_perfect"), "ok"); }catch(e){} }, 250);
   } else { try{ Sound.gameOver(); }catch(e){} }
   wlGo("end");
 }
 function wlEnd(el, P){
-  const R = WV.run, more = WV.unit >= 0 && WV.unit + 1 < P.units.length;
+  const R = WV.run;
+  if(R.boss){
+    const [face, name] = P.bosses[R.boss.k], nextU = 4 * R.boss.k + 4;
+    el.innerHTML = R.won ? `<div class="wend"><div class="stars">🏆</div><h2 class="display">${esc(t("wl_bossWin"))}</h2><p class="lede">${face} <span${wlAttr(P)}>${esc(name)}</span> · <b>${esc(t("wl_xp", {n:R.xp}))}</b></p>
+        <div class="btns">${nextU < P.units.length ? `<button class="primary" id="wlNextUnit" data-u="${nextU}">${esc(t("wl_next"))}: ${P.units[nextU].ico} ${esc(P.units[nextU].t)}</button>` : ""}
+        <button class="${nextU < P.units.length ? "ghost" : "primary"}" data-wgo="path">${esc(t("wl_continue"))}</button></div></div>`
+      : `<div class="wend"><div class="stars">${face}</div><h2 class="display">${esc(t("wl_bossLose"))}</h2><p class="lede">${esc(t("wl_bossLoseSub"))}</p>
+        <div class="btns"><button class="primary" id="wlRetry">${esc(t("wl_retry"))}</button><button class="ghost" data-wgo="path">${esc(t("wl_back"))}</button></div></div>`;
+    return;
+  }
+  const more = WV.unit >= 0 && WV.unit + 1 < P.units.length;
   el.innerHTML = R.won ? `<div class="wend"><div class="stars">${[0, 1, 2].map(i => `<span>${i < R.stars ? "⭐" : "☆"}</span>`).join("")}</div>
       <h2 class="display">${esc(WV.unit >= 0 ? t("wl_done") : t("wl_practice"))}</h2><p class="lede">${P.flag} ${esc(WV.unit >= 0 ? P.units[WV.unit].t : P.name)} · <b>${esc(t("wl_xp", {n:R.xp}))}</b></p>
       <div class="btns">${more ? `<button class="primary" id="wlNextUnit">${esc(t("wl_next"))}: ${P.units[WV.unit + 1].ico} ${esc(P.units[WV.unit + 1].t)}</button>` : ""}
@@ -438,6 +530,7 @@ function wlCheck(P){
     const wants = [c.ans].concat(c.ans.replace(/^(le|la|les|l'|o|a|os|as)\s*/i, "") !== c.ans ? [c.ans.replace(/^(le|la|les|l'|o|a|os|as)\s*/i, "")] : []);
     const exact = wants.some(w => wlNorm(w, true) === wlNorm(got, true));
     const loose = wants.some(w => wlNorm(w) === wlNorm(got));
+    if(R.boss) return wlGrade(P, exact);
     return wlGrade(P, exact || loose, !exact && loose ? t("wl_accents", {a:c.ans}) : "");
   }
 }
@@ -448,11 +541,15 @@ document.addEventListener("click", e => {
   if(go){ Sound.tap(); const v = go.dataset.wgo; if(v === "menu"){ Narrator.stop(); showMenu(); } else wlGo(v); return; }
   const pk = e.target.closest("[data-wpack]"); if(pk){ Sound.unlock(); Sound.tap(); return wlGo("path", pk.dataset.wpack); }
   const un = e.target.closest("[data-wunit]");
-  if(un){ const i = +un.dataset.wunit; if(!wlUnlocked(P.code, i)){ Sound.wrong(); toast("🔒 " + t("wl_locked")); return; } Sound.tap(); return wlGo("intro", P.code, i); }
+  if(un){ const i = +un.dataset.wunit; if(!wlUnlocked(P.code, i)){ Sound.wrong(); toast("🔒 " + t(i % 4 === 0 && wpOf(P.code).u[i - 1] ? "wl_bossGate" : "wl_locked")); return; } Sound.tap(); return wlGo("intro", P.code, i); }
   if(e.target.closest("#wlPractice")){ Sound.tap(); return wlStart(P, -1); }
   if(e.target.closest("#wlGo")){ Sound.unlock(); Sound.start(); return wlStart(P, WV.unit); }
-  if(e.target.closest("#wlRetry")) return wlStart(P, WV.unit);
-  if(e.target.closest("#wlNextUnit")){ Sound.tap(); return wlGo("intro", P.code, WV.unit + 1); }
+  const bs = e.target.closest("[data-wboss]");
+  if(bs){ const k = +bs.dataset.wboss; if(!wlBossUnlocked(P.code, k)){ Sound.wrong(); toast("🔒 " + t("wl_bossLocked")); return; } Sound.unlock(); Sound.bossIntro(); WV.boss = k; return wlGo("bossIntro"); }
+  if(e.target.closest("#wlFight")){ Sound.unlock(); return wlStart(P, WV.unit, WV.boss); }
+  if(e.target.closest("#wlRetry")) return WV.run && WV.run.boss ? wlStart(P, WV.unit, WV.run.boss.k) : wlStart(P, WV.unit);
+  const nu = e.target.closest("#wlNextUnit");
+  if(nu){ Sound.tap(); const u = nu.dataset.u !== undefined ? +nu.dataset.u : WV.unit + 1; WV.run = null; return wlGo("intro", P.code, u); }
   const sw = e.target.closest("[data-wsay]");
   if(sw){ Sound.unlock(); if(sw.dataset.wsay === "cur") return wlSayCur(P); const w = P.units[WV.unit].words[+sw.dataset.wsay]; if(w && Narrator.available()) Narrator.say([{text:w.t, lang:P.tts}]); return; }
   if(e.target.closest("#wlNoListen")){ const R = WV.run, c = R.items[R.i]; R.items[R.i] = wlMake(P, "rev", c.w); return wlRender(); }
@@ -495,4 +592,4 @@ document.addEventListener("keydown", e => {
   if(e.key === "Backspace" && c.type === "build" && R.state === "ask" && R.picked.length){ e.preventDefault(); R.picked.pop(); wlRender(); }
 });
 
-if(window.__PGM_TEST) window.__world = {WL, WV, WP, wlPack, wlLesson, wlReview, wlStart, wlGo, wlGrade, wlNext, wlCheck, wlAnswerOpt, wlToneVariants, wlToks, wlRomToks, wlNorm, wpOf};
+if(window.__PGM_TEST) window.__world = {get WV(){ return WV; }, WL, WP, wlBossItems, wlUnlocked, wlBossUnlocked, wlPack, wlLesson, wlReview, wlStart, wlGo, wlGrade, wlNext, wlCheck, wlAnswerOpt, wlToneVariants, wlToks, wlRomToks, wlNorm, wpOf};

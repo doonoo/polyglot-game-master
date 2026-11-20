@@ -1,7 +1,7 @@
 /* ===================== World Languages: Arabic (Modern Standard, A1, taught through English) =====================
    w: [arabic, english, transliteration]   s: [english, arabic words, transliteration with one entry per word] */
 var WL = WL || {};
-WL.ar = {code:"ar", name:"Arabic", self:"العربية", flag:"🇸🇦", tts:"ar-SA", dir:"rtl", typing:false, rom:"transliteration", music:"oasis", units:[
+WL.ar = {code:"ar", name:"Arabic", self:"العربية", flag:"🇸🇦", tts:"ar-SA", dir:"rtl", typing:false, rom:"transliteration", music:"oasis", bosses:[["🧞","الجني · The Djinn"],["🦅","الرخ · The Roc"],["🦂","العقرب · The Scorpion"],["🐍","ثعبان الصحراء · The Desert Serpent"]], units:[
  {t:"Greetings", ico:"👋",
   b:"Arabic is written **right to left**. **السلام عليكم** (as-salāmu ʿalaykum, 'peace be upon you') is the classic greeting; the reply is **وعليكم السلام**. **شكرا** (shukran) = thank you. This course teaches Modern Standard Arabic, understood across the Arab world.",
   w:[["مرحبا","hello","marḥaban"],["السلام عليكم","peace be upon you","as-salāmu ʿalaykum"],["صباح الخير","good morning","ṣabāḥ al-khayr"],["مساء الخير","good evening","masāʾ al-khayr"],["شكرا","thank you","shukran"],["عفوا","you're welcome","ʿafwan"],["من فضلك","please","min faḍlik"],["نعم","yes","naʿam"],["لا","no","lā"],["مع السلامة","goodbye","maʿa as-salāma"]],
@@ -33,5 +33,37 @@ WL.ar = {code:"ar", name:"Arabic", self:"العربية", flag:"🇸🇦", tts:"
  {t:"Everyday verbs", ico:"🏃",
   b:"**لا** before a verb makes it negative: **لا أفهم** (lā afham) = I don't understand. **أريد أن** + verb = I want to...: **أريد أن أذهب** = I want to go.",
   w:[["أحب","I like","uḥibb"],["أريد","I want","urīd"],["عندي","I have","ʿindī"],["أذهب","I go","adhhab"],["أتكلم","I speak","atakallam"],["أفهم","I understand","afham"],["أسكن","I live","askun"],["أعمل","I work","aʿmal"],["أتعلم","I learn","ataʿallam"],["العربية","Arabic (language)","al-ʿarabiyya"]],
-  s:[["I speak a little Arabic.","أتكلم العربية قليلا","atakallam al-ʿarabiyya qalīlan"],["I don't understand.","لا أفهم","lā afham"],["We live in America.","نسكن في أمريكا","naskun fī amrīkā"],["Do you want to go?","هل تريد أن تذهب","hal turīd an tadhhab"],["I am learning Arabic.","أتعلم العربية","ataʿallam al-ʿarabiyya"]]}
+  s:[["I speak a little Arabic.","أتكلم العربية قليلا","atakallam al-ʿarabiyya qalīlan"],["I don't understand.","لا أفهم","lā afham"],["We live in America.","نسكن في أمريكا","naskun fī amrīkā"],["Do you want to go?","هل تريد أن تذهب","hal turīd an tadhhab"],["I am learning Arabic.","أتعلم العربية","ataʿallam al-ʿarabiyya"]]},
+ {lv:"A2", t:"Shopping", ico:"🛍️",
+  b:"**بكم هذا؟** (bikam hādhā) = How much is this? **غالي** = expensive, **رخيص** = cheap. **سـ** (sa-) before a verb makes it future: **سأشتري** = I'll buy. Saudi money is the **ريال** (riyāl).",
+  w:[["بكم","how much","bikam"],["غالي","expensive","ghālī"],["رخيص","cheap","rakhīṣ"],["محل","shop","maḥall"],["أشتري","I buy","ashtarī"],["أدفع","I pay","adfaʿ"],["مال","money","māl"],["ريال","riyal","riyāl"],["عشرون","twenty","ʿishrūn"],["مئة","one hundred","miʾa"]],
+  s:[["How much is this?","بكم هذا","bikam hādhā"],["This is very expensive.","هذا غالي جدا","hādhā ghālī jiddan"],["I'll buy this one.","سأشتري هذا","sa-ashtarī hādhā"],["Can I pay by card?","هل يمكن أن أدفع بالبطاقة","hal yumkin an adfaʿ bil-biṭāqa"],["The shop is closed today.","المحل مغلق اليوم","al-maḥall mughlaq al-yawm"]]},
+ {lv:"A2", t:"Clothes and colors", ico:"👕",
+  b:"Adjectives come **after** the noun and agree with it: **قميص أبيض** (a white shirt), **سيارة بيضاء** (a white car). **ألبس** (albas) = I wear.",
+  w:[["قميص","shirt","qamīṣ"],["بنطلون","trousers","banṭalūn"],["فستان","dress","fustān"],["حذاء","shoes","ḥidhāʾ"],["معطف","coat","miʿṭaf"],["أحمر","red","aḥmar"],["أزرق","blue","azraq"],["أخضر","green","akhḍar"],["أسود","black","aswad"],["أبيض","white","abyaḍ"]],
+  s:[["I want a blue shirt.","أريد قميصا أزرق","urīd qamīṣan azraq"],["She is wearing a green dress.","هي تلبس فستانا أخضر","hiya talbas fustānan akhḍar"],["The shoes are black.","الحذاء أسود","al-ḥidhāʾ aswad"],["My coat is white.","معطفي أبيض","miʿṭafī abyaḍ"],["Do you have a bigger size?","هل عندك مقاس أكبر","hal ʿindak maqās akbar"]]},
+ {lv:"A2", t:"At home", ico:"🏠",
+  b:"**في** (fī) = in: **في المطبخ** = in the kitchen. **عندنا** (ʿindanā) = we have: **عندنا ثلاث غرف** = we have three rooms.",
+  w:[["بيت","house","bayt"],["شقة","apartment","shaqqa"],["مطبخ","kitchen","maṭbakh"],["غرفة نوم","bedroom","ghurfat nawm"],["حمام","bathroom","ḥammām"],["غرفة الجلوس","living room","ghurfat al-julūs"],["طاولة","table","ṭāwila"],["سرير","bed","sarīr"],["باب","door","bāb"],["نافذة","window","nāfidha"]],
+  s:[["My apartment is small.","شقتي صغيرة","shaqqatī ṣaghīra"],["We have three rooms.","عندنا ثلاث غرف","ʿindanā thalāth ghuraf"],["My mother is in the kitchen.","أمي في المطبخ","ummī fī al-maṭbakh"],["Where is the bathroom?","أين الحمام","ayna al-ḥammām"],["Open the window, please.","افتح النافذة من فضلك","iftaḥ an-nāfidha min faḍlik"]]},
+ {lv:"A2", t:"Daily routine", ico:"⏰",
+  b:"Times: **الساعة السابعة** = seven o'clock, **والنصف** = and a half. **كل يوم** (kull yawm) = every day. 'I' verbs start with **أ**: **أستيقظ** = I wake up, **أنام** = I sleep.",
+  w:[["أستيقظ","I wake up","astayqiẓ"],["أنام","I sleep","anām"],["أستحم","I shower","astaḥimm"],["الصباح","morning","aṣ-ṣabāḥ"],["المساء","evening","al-masāʾ"],["الفطور","breakfast","al-fuṭūr"],["الغداء","lunch","al-ghadāʾ"],["العشاء","dinner","al-ʿashāʾ"],["كل يوم","every day","kull yawm"],["دائما","always","dāʾiman"]],
+  s:[["I wake up at seven o'clock.","أستيقظ الساعة السابعة","astayqiẓ as-sāʿa as-sābiʿa"],["I shower in the morning.","أستحم في الصباح","astaḥimm fī aṣ-ṣabāḥ"],["We eat dinner at eight.","نتعشى الساعة الثامنة","nataʿashshā as-sāʿa ath-thāmina"],["He always sleeps late.","هو ينام متأخرا دائما","huwa yanām mutaʾakhkhiran dāʾiman"],["I drink coffee every day.","أشرب القهوة كل يوم","ashrab al-qahwa kull yawm"]]},
+ {lv:"A2", t:"Weather and seasons", ico:"☀️",
+  b:"**الجو حار** = the weather is hot, **الجو بارد** = it's cold. **تمطر** (tumṭir) = it's raining. **الجو** and **الطقس** both mean the weather.",
+  w:[["الطقس","weather","aṭ-ṭaqs"],["حار","hot","ḥārr"],["بارد","cold","bārid"],["مطر","rain","maṭar"],["شمس","sun","shams"],["رياح","wind","riyāḥ"],["الصيف","summer","aṣ-ṣayf"],["الشتاء","winter","ash-shitāʾ"],["فصل","season","faṣl"],["غيوم","clouds","ghuyūm"]],
+  s:[["The weather is very hot in summer.","الجو حار جدا في الصيف","al-jaww ḥārr jiddan fī aṣ-ṣayf"],["It's raining today.","اليوم تمطر","al-yawm tumṭir"],["Winter is cold.","الشتاء بارد","ash-shitāʾ bārid"],["How is the weather?","كيف الطقس","kayfa aṭ-ṭaqs"],["The sun is strong.","الشمس قوية","ash-shams qawiyya"]]},
+ {lv:"A2", t:"Getting around", ico:"✈️",
+  b:"**بالـ** (bil-) = by: **بالسيارة** (by car), **بالطائرة** (by plane), **بالقطار** (by train). But **مشيا** (mashyan) = on foot. **تذكرة** = ticket.",
+  w:[["قطار","train","qiṭār"],["طائرة","plane","ṭāʾira"],["سيارة","car","sayyāra"],["حافلة","bus","ḥāfila"],["دراجة","bike","darrāja"],["مشيا","on foot","mashyan"],["تذكرة","ticket","tadhkira"],["حقيبة","suitcase","ḥaqība"],["يغادر","it leaves","yughādir"],["أصل","I arrive","aṣil"]],
+  s:[["I go to work by bus.","أذهب إلى العمل بالحافلة","adhhab ilā al-ʿamal bil-ḥāfila"],["A ticket to Cairo, please.","تذكرة إلى القاهرة من فضلك","tadhkira ilā al-qāhira min faḍlik"],["The train leaves at ten.","يغادر القطار الساعة العاشرة","yughādir al-qiṭār as-sāʿa al-ʿāshira"],["We arrive tomorrow by plane.","نصل غدا بالطائرة","naṣil ghadan biṭ-ṭāʾira"],["She goes to school on foot.","هي تذهب إلى المدرسة مشيا","hiya tadhhab ilā al-madrasa mashyan"]]},
+ {lv:"A2", t:"Health and body", ico:"🩺",
+  b:"**عندي صداع** = I have a headache. **يؤلمني...** = my ... hurts: **يؤلمني بطني** = my stomach hurts. **أنا مريض** (to a man) / **مريضة** (a woman) = I'm sick.",
+  w:[["رأس","head","raʾs"],["ظهر","back","ẓahr"],["بطن","stomach","baṭn"],["يد","hand","yad"],["قدم","foot","qadam"],["عين","eye","ʿayn"],["مريض","sick","marīḍ"],["دواء","medicine","dawāʾ"],["صيدلية","pharmacy","ṣaydaliyya"],["صداع","headache","ṣudāʿ"]],
+  s:[["I have a headache.","عندي صداع","ʿindī ṣudāʿ"],["I am sick today.","أنا مريض اليوم","anā marīḍ al-yawm"],["My stomach hurts.","يؤلمني بطني","yuʾlimunī baṭnī"],["Where is the pharmacy?","أين الصيدلية","ayna aṣ-ṣaydaliyya"],["You need to see a doctor.","يجب أن تذهب إلى الطبيب","yajib an tadhhab ilā aṭ-ṭabīb"]]},
+ {lv:"A2", t:"Talking about the past", ico:"⏪",
+  b:"The past tense adds endings to the verb: **ذهب** (dhahaba) = he went. Add **ـتُ** (-tu) for 'I': **ذهبتُ** = I went, **أكلتُ** = I ate. Add **ـنا** (-nā) for 'we': **رأينا** = we saw.",
+  w:[["أكلت","I ate","akaltu"],["شربت","I drank","sharibtu"],["رأيت","I saw","raʾaytu"],["ذهبت","I went","dhahabtu"],["اشتريت","I bought","ishtaraytu"],["وصلت","I arrived","waṣaltu"],["الأسبوع الماضي","last week","al-usbūʿ al-māḍī"],["أمس مساء","last night","ams masāʾan"],["فعلت","I did","faʿaltu"],["فيلم","film","fīlm"]],
+  s:[["I ate bread this morning.","أكلت خبزا هذا الصباح","akaltu khubzan hādhā aṣ-ṣabāḥ"],["We saw a film last night.","رأينا فيلما أمس مساء","raʾaynā fīlman ams masāʾan"],["She went to Cairo last week.","ذهبت إلى القاهرة الأسبوع الماضي","dhahabat ilā al-qāhira al-usbūʿ al-māḍī"],["I bought the tickets.","اشتريت التذاكر","ishtaraytu at-tadhākir"],["What did you do yesterday?","ماذا فعلت أمس","mādhā faʿalta ams"]]}
 ]};
