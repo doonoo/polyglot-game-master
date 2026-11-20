@@ -19,7 +19,7 @@ function trackMistake(prevCh, j){
   const m = S.mode, mm = profile.modes[m] = profile.modes[m] || {a:0, c:0};
   if(!j.gaveUp) mm.a++;
   if(j.correct) mm.c++;
-  if(prevCh.k === "p" || prevCh.game === "Echo Chamber") return;
+  if(prevCh.k === "p" || prevCh.game === "Echo Chamber" || prevCh.game === "Speak Up") return;
   const key = mistakeKey(prevCh);
   profile.mistakes = profile.mistakes.filter(x => mistakeKey(x.ch) !== key);
   if(!j.correct){
@@ -51,7 +51,7 @@ function buildDaily(){
       if(m === 5) plan = {kind:"vocab", swarm:true, game:pick(["Classic Mine","Reverse Mine","Syntax Scramble"])};
       else {
         st.syllabus = syllabusFor(st); st.done = st.syllabus.map(() => false);
-        const games = gamesFor(st).filter(g => g !== "Echo Chamber" && g !== "Match Madness");
+        const games = gamesFor(st).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && g !== "Speak Up");
         plan = {kind:"syllabus", idx:Math.floor(Math.random() * st.syllabus.length), game:pick(games)};
       }
       let res = null;

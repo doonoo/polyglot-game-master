@@ -1,0 +1,5 @@
+Voice exercises, idioms and slang.
+• Speak Up: read a sentence out loud, or say it in the language you're learning. Only shows up where speech recognition works; asks for the microphone once.
+• 🎤 in the answer box to dictate any answer (Alt+M).
+• New lessons: everyday idioms (B1), body and animal idioms (B2), and slang from Mexico, Spain, Argentina, Colombia, the Caribbean, the US and the UK.
+• Turn voice off in the settings panel.

@@ -6,10 +6,11 @@
   "private": true,
   "scripts": {
     "build": "python3 tools/build.py",
-    "test": "node test/test.js && node test/test4.js && node test/test5.js && node test/test6.js && node test/test7.js && node test/test8.js && node test/test9.js && node test/test10.js",
+    "test": "node test/test.js && node test/test4.js && node test/test5.js && node test/test6.js && node test/test7.js && node test/test8.js && node test/test9.js && node test/test10.js && node test/test11.js",
     "android": "npx cap sync android && npx cap open android"
   },
   "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
     "@capacitor-community/text-to-speech": "^8.0.2",
     "@capacitor/android": "^8.6.2",
     "@capacitor/cli": "^8.6.2",

@@ -82,10 +82,11 @@ function ckBudget(ch){
   let s = CK_BASE[k] + Math.round(len / CK_PER[k]);
   if(Array.isArray(ch.pairs)) s += ch.pairs.length * CK_PAIR[k];
   if(ch.game === "Echo Chamber") s += 4;
+  if(ch.game === "Speak Up") s += 6;
   return s * 1000;
 }
 function ckPaused(){
-  return document.hidden || !$("settingsPanel").hidden || !!$("kbHelp") || $("challengeCard").hidden || $("submitBtn").disabled || $("giveUpBtn").disabled;
+  return document.hidden || document.body.classList.contains("listening") || !$("settingsPanel").hidden || !!$("kbHelp") || $("challengeCard").hidden || $("submitBtn").disabled || $("giveUpBtn").disabled;
 }
 function ckEnd(){
   S.status = "gameover"; S.timeUp = true; S.current = null; S.savedAt = Date.now();

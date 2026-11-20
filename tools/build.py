@@ -298,7 +298,7 @@ E = rep(E, '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</bu
         '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</button>` : ""}${canOverride() ? `<button class="listen" data-act="override">✋ ${esc(t("override"))}</button>` : ""}</div>`;')
 E = rep(E, '$("overIsland").hidden = !conquered;', '$("overIsland").hidden = !conquered;\n  if(conquered) renderNextChips();')
 
-CEFR = ["cefr_es1.js", "cefr_es2.js", "cefr_en1.js", "cefr_en2.js"]
+CEFR = ["cefr_es1.js", "cefr_es2.js", "cefr_en1.js", "cefr_en2.js", "cefr_idioms.js"]
 E = rep(E, '$("sylBody").innerHTML = S.syllabus ? `<ol class="syl">${S.syllabus.map((s,i) => `<li class="${S.done[i] ? "done" : ""}"><span class="n">${S.done[i] ? "✓" : i+1}</span><span>${esc(s)}</span></li>`).join("")}</ol>` : `<p class="empty">${esc(t("generating"))}</p>`;', '$("sylBody").innerHTML = sylHtml();')
 A = rep(A, "</style>", """/* keyboard play */
 body.kb .tile[data-kb]::before,body.kb .pr[data-kb]::before{content:attr(data-kb);display:inline-block;min-width:1.25em;margin-right:6px;padding:0 4px;border-radius:6px;background:var(--field);border:1px solid var(--line);font-size:.75rem;color:var(--muted);vertical-align:middle}
@@ -408,7 +408,25 @@ A = rep(A, "</style>", """/* boss bar */
 .challenge.boss{animation:bossShake .5s ease-out}
 @keyframes bossShake{0%{transform:scale(.96) rotate(-1deg)}30%{transform:scale(1.02) rotate(1deg)}60%{transform:rotate(-.5deg)}100%{transform:none}}
 </style>""")
-out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", rd("content_islands3.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("stories3.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("timer.js"), "", rd("boss.js"), "", rd("tips.js"), "", rd("feedback.js"), "", rd("keyboard.js"), "", rd("anim.js"), "", rd("fx.js"), "", E, rd("boot.js"), F]) + "\n"
+A = rep(A, "</style>", """/* voice exercises */
+.speak{display:flex;flex-direction:column;align-items:center;gap:10px;margin:6px 0 10px}
+.mic-big{display:flex;align-items:center;gap:10px;padding:14px 26px;border-radius:999px;border:0;background:linear-gradient(135deg,var(--violet),var(--violet-deep));color:#fff;font-weight:800;font-size:1.05rem;box-shadow:var(--shadow);cursor:pointer}
+.mic-big .mic-ico{font-size:1.5rem}
+body.listening .mic-big{background:linear-gradient(135deg,#FF3B5C,#FF8A3D);animation:micPulse 1.1s ease-in-out infinite}
+.speak-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.speak-heard{min-height:1.2em;text-align:center;margin:0}
+body.speaking #answer,body.speaking label[for="answer"]{display:none}
+body.speaking #submitBtn,body.speaking #accentKeys{display:none!important}
+.answrap{position:relative}
+.answrap #answer{width:100%}
+body.micok .answrap #answer{padding-right:54px}
+.answrap .mic{position:absolute;right:8px;bottom:12px;width:40px;height:40px;min-height:0;padding:0;border-radius:50%;font-size:1.1rem;display:flex;align-items:center;justify-content:center;background:var(--card)}
+.answrap .mic[hidden]{display:none}
+.answrap .mic.on{background:#FF3B5C;color:#fff;border-color:#FF3B5C;animation:micPulse 1.1s ease-in-out infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,59,92,.55)}50%{box-shadow:0 0 0 12px rgba(255,59,92,0)}}
+body.noanim .mic-big,body.noanim .answrap .mic.on{animation:none}
+</style>""")
+out = "\n".join([A, rd("m1.js"), "", D, rd("content_es.js"), "", rd("content_en.js"), "", rd("content_bank.js"), "", rd("content_b1.js"), "", rd("content_b2.js"), "", rd("content_islands2.js"), "", rd("content_islands3.js"), "", *[rd(f) for f in MORE], rd("gm.js"), "", rd("conj.js"), "", rd("tricky.js"), "", *[rd(f) for f in CEFR if os.path.exists(os.path.join(base, "src", f))], rd("deep_loader.js"), *[rd(f) for f in sorted(os.listdir(os.path.join(base, "src"))) if f.startswith("deep_") and f != "deep_loader.js"], "applyDeep();", rd("features.js"), "", rd("features2.js"), "", rd("features3.js"), "", rd("stories.js"), "", rd("stories2.js"), "", rd("stories3.js"), "", rd("features4.js"), "", rd("island.js"), "", rd("notify.js"), "", rd("practice.js"), "", rd("custom.js"), "", rd("timer.js"), "", rd("boss.js"), "", rd("tips.js"), "", rd("feedback.js"), "", rd("keyboard.js"), "", rd("anim.js"), "", rd("fx.js"), "", rd("voice.js"), "", E, rd("boot.js"), F]) + "\n"
 for bad in ["claude.use", "sample.json", "prompt("]:
     assert bad not in out, bad
 # ---- app wrapper: local fonts, installable web app, native text-to-speech ----

@@ -466,6 +466,23 @@ html{overflow-x:hidden;overflow-x:clip}
 @keyframes bbPulse{50%{filter:brightness(1.35)}}
 .challenge.boss{animation:bossShake .5s ease-out}
 @keyframes bossShake{0%{transform:scale(.96) rotate(-1deg)}30%{transform:scale(1.02) rotate(1deg)}60%{transform:rotate(-.5deg)}100%{transform:none}}
+/* voice exercises */
+.speak{display:flex;flex-direction:column;align-items:center;gap:10px;margin:6px 0 10px}
+.mic-big{display:flex;align-items:center;gap:10px;padding:14px 26px;border-radius:999px;border:0;background:linear-gradient(135deg,var(--violet),var(--violet-deep));color:#fff;font-weight:800;font-size:1.05rem;box-shadow:var(--shadow);cursor:pointer}
+.mic-big .mic-ico{font-size:1.5rem}
+body.listening .mic-big{background:linear-gradient(135deg,#FF3B5C,#FF8A3D);animation:micPulse 1.1s ease-in-out infinite}
+.speak-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.speak-heard{min-height:1.2em;text-align:center;margin:0}
+body.speaking #answer,body.speaking label[for="answer"]{display:none}
+body.speaking #submitBtn,body.speaking #accentKeys{display:none!important}
+.answrap{position:relative}
+.answrap #answer{width:100%}
+body.micok .answrap #answer{padding-right:54px}
+.answrap .mic{position:absolute;right:8px;bottom:12px;width:40px;height:40px;min-height:0;padding:0;border-radius:50%;font-size:1.1rem;display:flex;align-items:center;justify-content:center;background:var(--card)}
+.answrap .mic[hidden]{display:none}
+.answrap .mic.on{background:#FF3B5C;color:#fff;border-color:#FF3B5C;animation:micPulse 1.1s ease-in-out infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,59,92,.55)}50%{box-shadow:0 0 0 12px rgba(255,59,92,0)}}
+body.noanim .mic-big,body.noanim .answrap .mic.on{animation:none}
 </style>
 </head>
 <body>
@@ -6913,6 +6930,133 @@ EN_B2.push(
  ["Estaba muy avergonzado.|Estaba muy avergonzada.","I was very embarrassed.|I was really embarrassed.","embarrassed","I was very embarrassing."]
  ]}
 );
+/* ===================== Idioms and slang (v2.0) =====================
+   Spanish course: everyday idioms (B1), body/animal idioms (B2), regional slang (B2).
+   English course: the same for Spanish speakers (tips in Spanish).
+   "{Region:}" shows the region in the prompt but is optional when typing it back. */
+ES_B1.push(
+{t:"Everyday idioms", k:"t",
+ b:"Idioms rarely translate word for word. **Llueve a cántaros** (it's pouring), **es pan comido** (it's a piece of cake), **costar un ojo de la cara** (to cost an arm and a leg), **estar hecho polvo** (to be exhausted), **tomar el pelo** (to pull someone's leg), **estar en las nubes** (to daydream). **Está chupado** is the Spain version of *pan comido*.",
+ w:[["llover a cántaros","to pour (rain)"],["ser pan comido","to be a piece of cake"],["costar un ojo de la cara","to cost a fortune"],["estar hecho polvo","to be worn out"],["tomar el pelo","to pull someone's leg"],["estar en las nubes","to daydream"]],
+ it:[
+ ["It's raining cats and dogs.","Llueve a cántaros.|Está lloviendo a cántaros.|Llueve a mares.","cántaros","Llueve gatos y perros."],
+ ["It's a piece of cake.","Es pan comido.|Está chupado.","comido","Es un trozo de pastel."],
+ ["I'm all ears.","Soy todo oídos.","oídos","Soy todo orejas."],
+ ["It cost an arm and a leg.","Costó un ojo de la cara.|Me costó un ojo de la cara.","ojo","Costó un brazo y una pierna."],
+ ["I'm dead tired.","Estoy hecho polvo.|Estoy hecha polvo.","polvo","Soy hecho polvo."],
+ ["You're daydreaming.","Estás en las nubes.|Estás en la luna.","nubes","Eres en las nubes."],
+ ["He kicked the bucket.","Estiró la pata.","pata","Pateó el cubo."],
+ ["Let's get to the point.","Vamos al grano.","grano","Vamos a la grano."],
+ ["Are you pulling my leg?","¿Me estás tomando el pelo?|¿Me tomas el pelo?","pelo","¿Me estás tirando la pierna?"],
+ ["Better late than never.","Más vale tarde que nunca.|Mejor tarde que nunca.","tarde","Más vale tarde de nunca."],
+ ["Today I got up on the wrong side of the bed.","Hoy me levanté con el pie izquierdo.|Hoy me he levantado con el pie izquierdo.","izquierdo","Hoy me levanté del lado equivocado de la cama."],
+ ["It's not my thing.","No es lo mío.","mío","No es mi cosa."],
+ ["I feel like a fish out of water.","Me siento como (un) pez fuera del agua.","pez","Me siento como un pescado fuera del agua."],
+ ["No way!","¡Ni hablar!|¡Ni de broma!|¡Ni en broma!","hablar","¡No manera!"]
+ ]}
+);
+ES_B2.push(
+{t:"Body and animal idioms", k:"t",
+ b:"Spanish loves body parts and animals: **meter la pata** (to put your foot in it), **dar en el clavo** (to hit the nail on the head), **no tener pelos en la lengua** (not to mince words), **la oveja negra** (the black sheep), **cuatro gatos** (hardly anyone), **cuando las ranas críen pelo** (when pigs fly — note the subjunctive after *cuando*). With body parts use the article, not a possessive: **en la lengua**, not *en su lengua*.",
+ w:[["meter la pata","to put your foot in it"],["dar en el clavo","to hit the nail on the head"],["no tener pelos en la lengua","not to mince words"],["la oveja negra","the black sheep"],["cuatro gatos","hardly anyone"],["dar plantón","to stand someone up"]],
+ it:[
+ ["You've got some nerve!","¡Qué cara tienes!|¡Qué cara más dura!|¡Tienes mucha cara!","cara","¡Qué nervio tienes!"],
+ ["I put my foot in it.","Metí la pata.|He metido la pata.","pata","Puse mi pie en ello."],
+ ["Keep an eye on the kids.","Échales un ojo a los niños.|Échale un ojo a los niños.|Vigila a los niños.","ojo","Mantén un ojo en los niños."],
+ ["You hit the nail on the head.","Has dado en el clavo.|Diste en el clavo.","clavo","Golpeaste el clavo en la cabeza."],
+ ["We'll kill two birds with one stone.","Mataremos dos pájaros de un tiro.|Vamos a matar dos pájaros de un tiro.","pájaros","Mataremos dos pájaros con una piedra."],
+ ["There were hardly any people.","Había cuatro gatos.","gatos","Habían cuatro gatos."],
+ ["I was speechless.","Me quedé con la boca abierta.|Me quedé sin palabras.","boca","Me quedé con la boca abierto."],
+ ["She doesn't mince her words.","No tiene pelos en la lengua.","pelos","No tiene pelos en su lengua."],
+ ["He's the black sheep of the family.","Es la oveja negra de la familia.","oveja","Es el oveja negra de la familia."],
+ ["She's the apple of her father's eye.","Es la niña de los ojos de su padre.","niña","Es la manzana del ojo de su padre."],
+ ["He stood me up.","Me dio plantón.|Me dejó plantado.|Me dejó plantada.","plantón","Me paró arriba."],
+ ["I'll do it when pigs fly.","Lo haré cuando las ranas críen pelo.","ranas","Lo haré cuando los cerdos vuelen."],
+ ["I'm up to my neck in problems.","Estoy con el agua al cuello.","cuello","Estoy en agua caliente."]
+ ]},
+{t:"Slang around the Spanish-speaking world", k:"t",
+ b:"Slang changes from country to country. Cool: **¡Qué padre! / ¡Qué chido!** (Mexico), **¡Qué guay! / ¡Mola!** (Spain), **¡Qué chévere! / ¡Qué bacano!** (Colombia, Venezuela), **re copado** (Argentina). Money: **lana** (Mexico), **pasta** (Spain), **guita** (Argentina). Work: **la chamba** (Mexico), **el curro** (Spain). Friends: **güey, carnal, compa** (Mexico), **tío/tía** (Spain), **parce/parcero** (Colombia). Careful: **coger** (to take) is vulgar in Mexico and Argentina — say **tomar** there. Don't mix up **guay** (Spain, cool) and **güey** (Mexico, dude).",
+ w:[["¡Qué padre!","That's cool! (Mexico)"],["¡Qué guay!","That's cool! (Spain)"],["¡Qué chévere!","That's great! (Colombia)"],["la lana","money (Mexico)"],["la pasta","money (Spain)"],["la guagua","bus (Caribbean)"]],
+ it:[
+ ["{Mexico:} That's cool!","¡Qué padre!|¡Qué chido!","padre","¡Qué papá!"],
+ ["{Spain:} That's cool!","¡Qué guay!|¡Mola!|¡Mola mucho!","guay","¡Qué güey!"],
+ ["{Colombia:} That's great!","¡Qué chévere!|¡Qué bacano!","chévere","¡Qué chévre!"],
+ ["{Mexico:} Hey dude, what's up?","¿Qué onda, güey?|¿Qué onda, wey?|¿Qué onda, carnal?|¿Qué onda, compa?","onda","¿Qué ola, güey?"],
+ ["{Spain:} Hey man, how's it going?","¿Qué pasa, tío?|¿Qué tal, tío?","tío","¿Qué pasas, tío?"],
+ ["{Spain:} I don't have any money.","No tengo pasta.|No tengo un duro.","pasta","No tengo pasto."],
+ ["{Mexico:} I don't have any money.","No tengo lana.|Ando sin lana.","lana","No tengo lano."],
+ ["{Argentina:} I don't have any money.","No tengo guita.|No tengo un mango.","guita","No tengo un mangos."],
+ ["{Mexico:} I have to go to work.","Tengo que ir a la chamba.|Me voy a la chamba.|Tengo que chambear.","chamba","Tengo de ir a la chamba."],
+ ["{Spain:} I have to go to work.","Tengo que ir al curro.|Me voy al curro.","curro","Tengo que ir a el curro."],
+ ["{Caribbean:} We're going to take the bus.","Vamos a coger la guagua.|Vamos a tomar la guagua.","guagua","Vamos a coger el guagua."],
+ ["{Argentina:} That party was awesome!","¡Esa fiesta estuvo re copada!|¡La fiesta estuvo re copada!","copada","¡Esa fiesta estuvo re copado!"],
+ ["{Mexico:} OK, let's go!","¡Órale, vamos!|¡Órale, vámonos!","Órale","¡Órale, vamos nos!"],
+ ["{Spain:} OK, sounds good.","Vale, me parece bien.|Vale, perfecto.","Vale","Vale, me parezco bien."],
+ ["{Colombia:} My friends are crazy.","Mis parceros están locos.|Mis parces están locos.","parceros","Mis parceros está locos."],
+ ["{Argentina:} Come on, hurry up!","¡Dale, apurate!|¡Dale, apúrate!","Dale","¡Dale, apurarte!"]
+ ]}
+);
+EN_B1.push(
+{t:"Modismos en inglés del día a día", k:"t",
+ b:"Los modismos no se traducen palabra por palabra. **It's raining cats and dogs** (llueve a cántaros), **a piece of cake** (pan comido), **to cost an arm and a leg** (costar un ojo de la cara), **to pull someone's leg** (tomar el pelo), **to give someone a hand** (echar una mano), **to break the ice** (romper el hielo). Cansado de verdad: **I'm beat**, **I'm worn out**.",
+ w:[["a piece of cake","pan comido"],["to cost an arm and a leg","costar un ojo de la cara"],["to pull someone's leg","tomar el pelo"],["to give someone a hand","echar una mano"],["to break the ice","romper el hielo"],["I'm beat","estoy hecho polvo"]],
+ it:[
+ ["Llueve a cántaros.","It's raining cats and dogs.|It's pouring.","cats","It's raining dogs and cats."],
+ ["Es pan comido.","It's a piece of cake.|It's a breeze.","piece","It's a bread eaten."],
+ ["Soy todo oídos.","I'm all ears.","ears","I'm all hears."],
+ ["Costó un ojo de la cara.","It cost an arm and a leg.","arm","It cost an eye of the face."],
+ ["Estoy hecho polvo.","I'm beat.|I'm worn out.|I'm exhausted.|I'm wiped out.","beat","I'm made dust."],
+ ["¿Me estás tomando el pelo?","Are you pulling my leg?|Are you kidding me?","leg","Are you taking my hair?"],
+ ["Vamos al grano.","Let's get to the point.|Let's cut to the chase.","point","Let's go to the grain."],
+ ["Hoy me levanté con el pie izquierdo.","I got up on the wrong side of the bed today.|Today I got up on the wrong side of the bed.|I woke up on the wrong side of the bed today.","wrong","I got up with the left foot today."],
+ ["Más vale tarde que nunca.","Better late than never.","late","Better later than never."],
+ ["No es lo mío.","It's not my thing.|It's not my cup of tea.","thing","It's not the mine."],
+ ["Me siento como pez fuera del agua.","I feel like a fish out of water.","fish","I feel as a fish out of water."],
+ ["Te echo una mano.","I'll give you a hand.|Let me give you a hand.|I'll lend you a hand.","hand","I'll throw you a hand."],
+ ["Estás en las nubes.","Your head is in the clouds.|You're daydreaming.","clouds","You are in the clouds."],
+ ["Rompamos el hielo.","Let's break the ice.","ice","Let's broke the ice."]
+ ]}
+);
+EN_B2.push(
+{t:"Más modismos: cuerpo, animales y dinero", k:"t",
+ b:"**To put your foot in it / in your mouth** (meter la pata), **to hit the nail on the head** (dar en el clavo), **to kill two birds with one stone** (matar dos pájaros de un tiro), **the last straw** (la gota que colma el vaso), **to let the cat out of the bag** (irse de la lengua), **speak of the devil** (hablando del rey de Roma), **when pigs fly** (cuando las ranas críen pelo). Ojo: **broke** = sin dinero; **broken** = roto.",
+ w:[["to put your foot in it","meter la pata"],["to hit the nail on the head","dar en el clavo"],["the last straw","la gota que colma el vaso"],["to let the cat out of the bag","irse de la lengua"],["speak of the devil","hablando del rey de Roma"],["when pigs fly","cuando las ranas críen pelo"]],
+ it:[
+ ["Metí la pata.","I put my foot in my mouth.|I put my foot in it.|I messed up.","foot","I put the leg."],
+ ["Diste en el clavo.","You hit the nail on the head.","nail","You gave in the nail."],
+ ["Mataremos dos pájaros de un tiro.","We'll kill two birds with one stone.|We will kill two birds with one stone.","birds","We'll kill two birds of one shot."],
+ ["Es la oveja negra de la familia.","He's the black sheep of the family.|She's the black sheep of the family.","sheep","He's the black sheeps of the family."],
+ ["Cuando las ranas críen pelo.","When pigs fly.","pigs","When pigs flies."],
+ ["Me dio plantón.","He stood me up.|She stood me up.","stood","He stand me up."],
+ ["No tiene pelos en la lengua.","She doesn't mince her words.|He doesn't mince his words.|She tells it like it is.|He tells it like it is.","mince","She don't mince her words."],
+ ["Estoy con el agua al cuello.","I'm in over my head.|I'm up to my neck in it.","head","I'm with the water to the neck."],
+ ["Échale un ojo a los niños.","Keep an eye on the kids.","eye","Throw an eye to the kids."],
+ ["Me timaron con el precio.","I got ripped off.","ripped","I got rip off."],
+ ["Es la gota que colma el vaso.","It's the last straw.|That's the last straw.","straw","It's the drop that fills the glass."],
+ ["Me fui de la lengua.","I let the cat out of the bag.|I spilled the beans.","cat","I let the cat out of the box."],
+ ["Hablando del rey de Roma...","Speak of the devil.|Talk of the devil.","devil","Speaking of the king of Rome."]
+ ]},
+{t:"Jerga (slang) en inglés", k:"t",
+ b:"Inglés informal de EE. UU. y Reino Unido. Genial: **awesome, dope, sick, lit, fire** (EE. UU.), **brilliant, wicked, ace** (Reino Unido). Amigo: **dude, man, bro** (EE. UU.), **mate** (Reino Unido). **I'm broke** (sin dinero), **I'm knackered** (Reino Unido: hecho polvo), **to hang out** (pasar el rato) — ojo, **to hang up** es colgar el teléfono. **No cap** (de verdad) es jerga juvenil; no la uses en el trabajo.",
+ w:[["awesome / dope","genial (EE. UU.)"],["brilliant / wicked","genial (Reino Unido)"],["dude / bro","tío, güey"],["mate","colega (Reino Unido)"],["to hang out","pasar el rato"],["I'm broke","no tengo pasta"]],
+ it:[
+ ["{EE. UU.:} ¡Qué guay!","That's awesome!|That's dope!|That's sick!|That's lit!","awesome","That's awful!"],
+ ["{Reino Unido:} ¡Qué guay!","That's brilliant!|That's wicked!|That's ace!","brilliant","That's brillant!"],
+ ["¿Qué pasa, tío?","What's up, dude?|What's up, man?|What's up, bro?","dude","What's pass, dude?"],
+ ["{Reino Unido:} ¿Qué tal, colega?","All right, mate?|Alright, mate?|How's it going, mate?","mate","All right, mat?"],
+ ["No tengo pasta.","I'm broke.|I'm flat broke.","broke","I'm broken."],
+ ["Es un pesado.","He's such a pain.|He's so annoying.","pain","He's such a heavy."],
+ ["{EE. UU.:} Vamos a pasar el rato.","Let's hang out.|Let's chill.","hang","Let's hang up."],
+ ["Estoy flipando.","I'm freaking out.|I can't believe it.","freaking","I'm flipping."],
+ ["Ni de broma.","No way.|Not a chance.|No chance.","way","No how."],
+ ["{Reino Unido:} Estoy hecho polvo.","I'm knackered.|I'm shattered.","knackered","I'm knackering."],
+ ["{EE. UU.:} Me encanta tu ropa, es genial.","I love your outfit, it's fire.|I love your outfit, it's on point.","fire","I love your outfit, it's burning."],
+ ["Tranquilo, no pasa nada.","Chill, it's no big deal.|Relax, it's no big deal.|Chill out, it's no big deal.","Chill","Chill, it's not big deal."],
+ ["Lo pillo.","I get it.|Got it.|Gotcha.","get","I catch it."],
+ ["{EE. UU.:} Ese examen fue muy difícil, de verdad.","That test was hard, for real.|That test was hard, no cap.","real","That test was hardly, for real."],
+ ["{Reino Unido:} Voy a tomar algo con mis amigos.","I'm going for a pint with my mates.|I'm grabbing a pint with my mates.","mates","I'm going for a pint with my mate's."]
+ ]}
+);
 /* ===================== Deeper lesson banks =====================
    DEEP[lang][level][lesson title] = extra items in the usual lesson format.
    Added on top of each lesson so every round draws from a bigger pool. */
@@ -10396,7 +10540,7 @@ function trackMistake(prevCh, j){
   const m = S.mode, mm = profile.modes[m] = profile.modes[m] || {a:0, c:0};
   if(!j.gaveUp) mm.a++;
   if(j.correct) mm.c++;
-  if(prevCh.k === "p" || prevCh.game === "Echo Chamber") return;
+  if(prevCh.k === "p" || prevCh.game === "Echo Chamber" || prevCh.game === "Speak Up") return;
   const key = mistakeKey(prevCh);
   profile.mistakes = profile.mistakes.filter(x => mistakeKey(x.ch) !== key);
   if(!j.correct){
@@ -10428,7 +10572,7 @@ function buildDaily(){
       if(m === 5) plan = {kind:"vocab", swarm:true, game:pick(["Classic Mine","Reverse Mine","Syntax Scramble"])};
       else {
         st.syllabus = syllabusFor(st); st.done = st.syllabus.map(() => false);
-        const games = gamesFor(st).filter(g => g !== "Echo Chamber" && g !== "Match Madness");
+        const games = gamesFor(st).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && g !== "Speak Up");
         plan = {kind:"syllabus", idx:Math.floor(Math.random() * st.syllabus.length), game:pick(games)};
       }
       let res = null;
@@ -11661,7 +11805,7 @@ makePlanCore = (orig => function(st, rolls, exclude){
     const srcs = mixSources(st);
     if(srcs.length){
       const src = srcs[Math.floor(rolls.s * srcs.length)], m = mixState(st, src);
-      const games = gamesFor(m).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && !(st.mode === 3 && (g === "Cloze Combat" || g === "Word Duel")));
+      const games = gamesFor(m).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && g !== "Speak Up" && !(st.mode === 3 && (g === "Cloze Combat" || g === "Word Duel")));
       return {kind:"mix", src, idx:Math.floor(rolls.c * m.syllabus.length), game:games[Math.floor(rolls.g * games.length)]};
     }
   }
@@ -12060,10 +12204,11 @@ function ckBudget(ch){
   let s = CK_BASE[k] + Math.round(len / CK_PER[k]);
   if(Array.isArray(ch.pairs)) s += ch.pairs.length * CK_PAIR[k];
   if(ch.game === "Echo Chamber") s += 4;
+  if(ch.game === "Speak Up") s += 6;
   return s * 1000;
 }
 function ckPaused(){
-  return document.hidden || !$("settingsPanel").hidden || !!$("kbHelp") || $("challengeCard").hidden || $("submitBtn").disabled || $("giveUpBtn").disabled;
+  return document.hidden || document.body.classList.contains("listening") || !$("settingsPanel").hidden || !!$("kbHelp") || $("challengeCard").hidden || $("submitBtn").disabled || $("giveUpBtn").disabled;
 }
 function ckEnd(){
   S.status = "gameover"; S.timeUp = true; S.current = null; S.savedAt = Date.now();
@@ -13071,6 +13216,288 @@ confetti = function(n){
 // leaving the app or switching screens never leaves pieces behind
 document.addEventListener("visibilitychange", () => { if(document.hidden) fxStop(); });
 window.addEventListener("pagehide", fxStop);
+
+/* ===================== Voice exercises (v2.0) =====================
+   Only where the device can do speech recognition: Chrome/Edge/Safari on the web
+   (Web Speech API) or the Android app (phone's own recognizer, via
+   @capacitor-community/speech-recognition). Everywhere else it stays hidden.
+   - "Speak Up": read a sentence out loud, or hear it in your language and say it.
+   - 🎤 button next to the answer box: dictate any typed answer. */
+Object.assign(I18N.en, {
+  "game.Speak Up":"Speak Up", vToggle:"Voice exercises", vToggleSub:"Speak Up rounds and a 🎤 button to dictate answers. Uses your device's speech recognition (may need internet).",
+  vTap:"Tap and speak", vListening:"Listening… speak now", vStop:"Tap to stop", vHear:"Hear it", vSkip:"Can't talk now", vMic:"Dictate your answer",
+  vHeard:"I heard: {s}", vClose:"Close enough! I heard: {s}", vNoSpeech:"I didn't catch that. Tap the mic and try again.",
+  vDenied:"Microphone access is blocked, so voice exercises are off for now. You can allow it in your browser or phone settings.",
+  vNet:"Speech recognition needs an internet connection right now.", vErr:"Speech recognition didn't work. You can type your answer instead.",
+  vSkipped:"No problem, here's a typing round instead.", kbMic:"Speak (voice exercises)"
+});
+Object.assign(I18N.es, {
+  "game.Speak Up":"¡Habla!", vToggle:"Ejercicios de voz", vToggleSub:"Rondas de «¡Habla!» y un botón 🎤 para dictar respuestas. Usa el reconocimiento de voz de tu dispositivo (puede necesitar internet).",
+  vTap:"Toca y habla", vListening:"Escuchando… habla ahora", vStop:"Toca para parar", vHear:"Escuchar", vSkip:"No puedo hablar ahora", vMic:"Dicta tu respuesta",
+  vHeard:"Escuché: {s}", vClose:"¡Casi perfecto! Escuché: {s}", vNoSpeech:"No te entendí. Toca el micrófono e inténtalo otra vez.",
+  vDenied:"El micrófono está bloqueado, así que los ejercicios de voz se desactivan por ahora. Puedes permitirlo en los ajustes del navegador o del teléfono.",
+  vNet:"El reconocimiento de voz necesita conexión a internet ahora mismo.", vErr:"El reconocimiento de voz no funcionó. Puedes escribir tu respuesta.",
+  vSkipped:"Sin problema, aquí tienes una ronda escrita.", kbMic:"Hablar (ejercicios de voz)"
+});
+GAME_ICO["Speak Up"] = "🎤";
+const VTASK = {
+  en:{read:T => `Read this out loud in ${T}:`, talk:T => `Say this out loud in ${T}:`},
+  es:{read:T => `Lee esto en voz alta en ${T}:`, talk:T => `Dilo en voz alta en ${T}:`}
+};
+
+const VOICE = (() => {
+  const C = window.Capacitor;
+  const native = !!(C && C.isNativePlatform && C.isNativePlatform());
+  let plug = null;
+  if(native){ try{ plug = (C.Plugins && C.Plugins.SpeechRecognition) || (C.registerPlugin && C.registerPlugin("SpeechRecognition")); }catch(e){} }
+  const WebSR = native ? null : (window.SpeechRecognition || window.webkitSpeechRecognition || null);
+  let ok = !!(plug || WebSR), busy = false, rec = null;
+  if(plug) Promise.resolve().then(() => plug.available()).then(r => { ok = !!(r && r.available); voiceRefresh(); }).catch(() => { ok = false; voiceRefresh(); });
+  function locale(code){
+    const mine = (navigator.languages || [navigator.language || ""]).find(l => l && l.toLowerCase().startsWith(code + "-"));
+    return mine || (code === "es" ? "es-MX" : "en-US");
+  }
+  async function listenNative(code){
+    let p = await plug.checkPermissions().catch(() => ({}));
+    if(!p || p.speechRecognition !== "granted") p = await plug.requestPermissions().catch(() => ({}));
+    if(!p || p.speechRecognition !== "granted") throw {code:"denied"};
+    let r;
+    try{ r = await plug.start({language:locale(code), maxResults:5, partialResults:false, popup:false}); }
+    catch(e){ throw {code: /permission/i.test(String(e && e.message)) ? "denied" : "nospeech"}; }
+    const m = ((r && r.matches) || []).filter(Boolean);
+    if(!m.length) throw {code:"nospeech"};
+    return m;
+  }
+  function listenWeb(code){
+    return new Promise((resolve, reject) => {
+      const r = new WebSR(); rec = r;
+      r.lang = locale(code); r.interimResults = false; r.maxAlternatives = 5; r.continuous = false;
+      let got = null, err = null;
+      r.onresult = e => { const res = e.results[0]; got = []; for(let i = 0; i < res.length; i++) if(res[i].transcript) got.push(res[i].transcript); };
+      r.onerror = e => { err = e.error || "error"; };
+      r.onend = () => {
+        rec = null;
+        if(got && got.length) resolve(got);
+        else reject({code: err === "not-allowed" || err === "service-not-allowed" ? "denied" : !err || err === "no-speech" || err === "aborted" ? "nospeech" : err === "network" ? "network" : "error"});
+      };
+      try{ r.start(); }catch(e){ rec = null; reject({code:"error"}); }
+    });
+  }
+  async function listen(code){
+    if(busy) throw {code:"busy"};
+    busy = true;
+    try{ return plug ? await listenNative(code) : await listenWeb(code); }
+    finally{ busy = false; }
+  }
+  function stop(){ try{ if(rec) rec.stop(); }catch(e){} try{ if(plug && busy) plug.stop().catch(() => {}); }catch(e){} }
+  return {supported:() => ok, listen, stop, busy:() => busy, locale, native};
+})();
+
+let voiceOn = true, voiceBlocked = false, voiceSuppress = false;
+try{ voiceOn = localStorage.getItem("pgm-voice") !== "off"; }catch(e){}
+const canSpeak = () => voiceOn && !voiceBlocked && !voiceSuppress && VOICE.supported();
+const SPEAK_MODES = new Set([1, 2, 3, 6]);
+profile.voice = profile.voice || 0;
+
+/* ---------- Rotation: Speak Up joins the sentence games ---------- */
+gamesFor = (orig => function(st){
+  const g = orig(st);
+  return canSpeak() && SPEAK_MODES.has(st.mode) && !g.includes("Speak Up") ? g.concat("Speak Up") : g;
+})(gamesFor);
+
+genSentence = (orig => function(st, plan, c, review, res){
+  if(!plan || plan.game !== "Speak Up" || plan.boss || !canSpeak()) return orig(st, plan, c, review, res);
+  const out = orig(st, Object.assign({}, plan, {game:"Classic Mine"}), c, review, res);
+  const ch = out && out.challenge;
+  if(!ch || ch.game !== "Classic Mine") return out;
+  const nat = LANG_CODE[st.native], lv = Math.max(0, LEVELS.indexOf(st.level));
+  const talk = Math.random() < ([0, 0.3, 0.5, 0.6][lv] ?? 0.6);
+  const Tn = LN[nat][st.target], V = VTASK[nat] || VTASK.en;
+  ch.game = "Speak Up";
+  if(talk) ch.task = V.talk(Tn);
+  else { ch.task = V.read(Tn); ch.target = ch.answerKey; ch.hint = ""; }
+  if(out._k) out._k = out._k.replace(/^Classic Mine/, "Speak Up");
+  return out;
+})(genSentence);
+
+/* ---------- Matching what was heard ---------- */
+function voiceDigits(s, lang){
+  return String(s).replace(/\d+(?:[.,]\d+)?/g, d => {
+    const n = Number(d.replace(",", "."));
+    if(!Number.isInteger(n) || n < 0 || n > 999999999) return d;
+    try{ return lang === "es" ? esNum(n) : enNum(n); }catch(e){ return d; }
+  });
+}
+// Pick the closest transcript; an exact (or, when reading aloud, nearly exact) match
+// is submitted as the expected sentence so speech-to-text punctuation/accents don't count against you.
+function speakMatch(alts, ch){
+  const vars = variantsOf(ch), cands = [];
+  for(const a of alts){ cands.push(a); const w = voiceDigits(a, ch.al); if(w !== a) cands.push(w); }
+  let best = null;
+  for(const a of cands){
+    const aw = nrm(a, ch, false).split(" ").filter(Boolean);
+    for(const v of vars){
+      const vw = nrm(v, ch, false).split(" ").filter(Boolean), d = lev(aw, vw);
+      if(!best || d < best.d) best = {d, a, v, n:vw.length};
+    }
+  }
+  const heard = String(alts[0] || "");
+  if(!best) return {answer:heard, heard, close:false, exact:false};
+  const reading = ch.target === ch.answerKey;
+  const tol = reading ? Math.floor(best.n / 6) : 0;
+  if(best.d === 0) return {answer:best.v, heard:best.a, close:false, exact:true};
+  if(best.d <= tol) return {answer:best.v, heard:best.a, close:true, exact:false};
+  return {answer:best.a, heard:best.a, close:false, exact:false};
+}
+
+/* ---------- UI ---------- */
+function voiceEls(){
+  if(!$("speakBox")){
+    const box = document.createElement("div");
+    box.id = "speakBox"; box.className = "speak"; box.hidden = true;
+    $("chTarget").parentElement.after(box);
+  }
+  if(!$("micBtn")){
+    const b = document.createElement("button");
+    b.type = "button"; b.id = "micBtn"; b.className = "ghost mic"; b.hidden = true;
+    b.textContent = "🎤"; b.setAttribute("aria-label", t("vMic")); b.title = t("vMic");
+    const a = $("answer"), wrap = document.createElement("div");
+    wrap.className = "answrap"; a.before(wrap); wrap.appendChild(a); wrap.appendChild(b);
+  }
+}
+function isSpeakUp(ch){ return !!(ch && ch.game === "Speak Up" && canSpeak()); }
+function voiceUI(fresh){
+  voiceEls();
+  const box = $("speakBox"), mic = $("micBtn"), c = S && S.current, ch = c && c.challenge;
+  if(!ch){ box.hidden = true; mic.hidden = true; return; }
+  const sp = isSpeakUp(ch);
+  if(ch.game === "Speak Up" && !sp && S.status === "playing"){ setTimeout(() => voiceSkip(true), 0); }
+  box.hidden = !sp;
+  if(sp && (fresh || box.dataset.key !== ch.target + "|" + ch.task)){
+    box.dataset.key = ch.target + "|" + ch.task;
+    const reading = ch.target === ch.answerKey;
+    box.innerHTML = `<button class="mic-big" type="button" data-vmic="speak"><span class="mic-ico" aria-hidden="true">🎤</span><span class="mic-lbl">${esc(t("vTap"))}</span></button>
+      <div class="speak-row">${reading && typeof canEcho === "function" && canEcho() ? `<button class="chip" type="button" data-vhear="1">🔊 ${esc(t("vHear"))}</button>` : ""}<button class="chip" type="button" data-vskip="1">🔇 ${esc(t("vSkip"))}</button></div>
+      <p class="note speak-heard" id="speakHeard" aria-live="polite"></p>`;
+  }
+  const textAns = !$("answer").hidden && !(ch.game === "Match Madness") && $("tiles").hidden;
+  mic.hidden = !(canSpeak() && textAns && !sp);
+  document.body.classList.toggle("micok", !mic.hidden);
+  if(!mic.hidden){ mic.setAttribute("aria-label", t("vMic")); mic.title = t("vMic"); }
+  document.body.classList.toggle("speaking", sp);
+}
+renderExtras = (orig => function(fresh){ orig(fresh); voiceUI(fresh); })(renderExtras);
+
+function setListening(on){
+  document.body.classList.toggle("listening", on);
+  const big = document.querySelector("#speakBox .mic-lbl");
+  if(big) big.textContent = t(on ? "vListening" : "vTap");
+  const mic = $("micBtn"); if(mic) mic.classList.toggle("on", on);
+}
+function voiceSay(msg){ const h = $("speakHeard"); if(h && !$("speakBox").hidden) h.textContent = msg; else toast(msg); }
+function voiceErr(code){
+  if(code === "busy") return;
+  if(code === "denied"){
+    voiceBlocked = true; toast("🎤 " + t("vDenied"));
+    const c = S && S.current;
+    if(c && c.challenge.game === "Speak Up") voiceSkip(true); else renderGame(false);
+    voiceRefresh();
+    return;
+  }
+  voiceSay(code === "nospeech" ? t("vNoSpeech") : code === "network" ? t("vNet") : t("vErr"));
+}
+async function voiceGo(kind){
+  const c = S && S.current; if(!c || S.status !== "playing") return;
+  if(VOICE.busy()){ VOICE.stop(); return; }
+  if($("submitBtn").disabled) return;
+  const ch = c.challenge;
+  try{ Narrator.stop(); }catch(e){}
+  try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+  Sound.unlock();
+  setListening(true);
+  let alts;
+  try{ alts = await VOICE.listen(ch.al); }
+  catch(e){ setListening(false); if(S && S.current === c) voiceErr(e && e.code); return; }
+  setListening(false);
+  if(!S || S.current !== c || S.status !== "playing") return;
+  if(kind === "speak"){
+    const r = speakMatch(alts, ch);
+    voiceSay(t(r.close ? "vClose" : "vHeard", {s:r.heard}));
+    if(r.close) toast("🎤 " + t("vClose", {s:r.heard}));
+    $("answer").value = r.answer;
+    submit(false);
+  } else {
+    const a = $("answer"), add = String(alts[0] || "").trim();
+    a.value = (a.value.trim() ? a.value.trim() + " " : "") + add;
+    try{ a.focus({preventScroll:true}); a.setSelectionRange(a.value.length, a.value.length); }catch(e){}
+  }
+}
+// Swap a Speak Up round for a typing round (no penalty), like skipping a listening round
+function voiceSkip(quiet){
+  const c = S && S.current;
+  if(!c || c.challenge.game !== "Speak Up" || S.status !== "playing") return;
+  VOICE.stop();
+  const plan = Object.assign({}, c.plan, {game:"Classic Mine", swarm:false});
+  let res = null;
+  voiceSuppress = true;
+  try{ res = generate(Object.assign({}, S, {lastGame:"Speak Up"}), plan); }catch(e){}
+  finally{ voiceSuppress = false; }
+  const ch = res && res.challenge;
+  if(!ch || !ch.target) return;
+  c.challenge = {game:String(ch.game), boss:"", task:String(ch.task || ""), target:String(ch.target),
+    hint: S.mode === 3 ? "" : String(ch.hint || ""), answerKey:String(ch.answerKey || ""), speak:"", acc:ch.acc || [], al:ch.al || "", k:ch.k || "s",
+    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double, parts:null};
+  S.lastGame = c.challenge.game;
+  save();
+  $("answer").value = "";
+  renderGame(true);
+  if(!quiet) toast("🔇 " + t("vSkipped"));
+}
+document.addEventListener("click", e => {
+  const m = e.target.closest("[data-vmic]"); if(m){ voiceGo("speak"); return; }
+  if(e.target.closest("#micBtn")){ voiceGo("dictate"); return; }
+  if(e.target.closest("[data-vhear]")){ Sound.unlock(); echoPlay(false); return; }
+  if(e.target.closest("[data-vskip]")) voiceSkip(false);
+});
+document.addEventListener("keydown", e => {
+  if(!e.altKey || e.ctrlKey || e.metaKey || e.code !== "KeyM") return;
+  const big = document.querySelector("#speakBox:not([hidden]) [data-vmic]"), mic = $("micBtn");
+  if(big){ e.preventDefault(); voiceGo("speak"); }
+  else if(mic && !mic.hidden){ e.preventDefault(); voiceGo("dictate"); }
+}, true);
+if(typeof kbHelpHtml === "function") kbHelpHtml = (orig => function(){
+  const h = orig();
+  return canSpeak() ? h.replace("<tr><td><kbd>Alt+A E I O U N Y</kbd>", `<tr><td><kbd>Alt+M</kbd></td><td>${esc(t("kbMic"))}</td></tr>$&`) : h;
+})(kbHelpHtml);
+
+// Stats: count good spoken answers
+recordTurn = (orig => function(prevCh, j){
+  if(prevCh && j && j.correct && !j.gaveUp && prevCh.game === "Speak Up") profile.voice = (profile.voice || 0) + 1;
+  return orig(prevCh, j);
+})(recordTurn);
+
+/* ---------- Settings toggle (only shown where voice works) ---------- */
+(() => {
+  const row = document.createElement("label");
+  row.className = "srow"; row.id = "voiceExRow";
+  row.innerHTML = `<span>🎤 <span data-i18n="vToggle">${esc(t("vToggle"))}</span></span><input type="checkbox" class="voiceChk">`;
+  row.title = t("vToggleSub");
+  $("settingsPanel").appendChild(row);
+})();
+function voiceRefresh(){
+  const row = $("voiceExRow"); if(!row) return;
+  row.hidden = !VOICE.supported() || voiceBlocked;
+  document.querySelectorAll(".voiceChk").forEach(x => x.checked = voiceOn);
+  if(S && S.current && $("game") && !$("game").hidden) voiceUI(false);
+}
+document.addEventListener("change", e => {
+  if(!e.target.classList || !e.target.classList.contains("voiceChk")) return;
+  voiceOn = e.target.checked;
+  try{ localStorage.setItem("pgm-voice", voiceOn ? "on" : "off"); }catch(err){}
+  if(!voiceOn){ VOICE.stop(); const c = S && S.current; if(c && c.challenge.game === "Speak Up") voiceSkip(true); }
+  voiceRefresh();
+});
+voiceRefresh();
 
 function absorb(res, answer, rolls, prevPlan){
   const backup = clone(S);

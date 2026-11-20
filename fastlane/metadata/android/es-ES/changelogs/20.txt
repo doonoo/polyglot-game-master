@@ -1,0 +1,5 @@
+Ejercicios de voz, modismos y jerga.
+• ¡Habla!: lee una frase en voz alta o dila en el idioma que aprendes. Solo aparece si hay reconocimiento de voz; pide el micrófono una vez.
+• 🎤 en el cuadro de respuesta para dictar (Alt+M).
+• Lecciones nuevas: modismos (B1), modismos con cuerpo y animales (B2) y jerga de México, España, Argentina, Colombia, el Caribe, EE. UU. y Reino Unido.
+• Desactiva la voz en el panel de ajustes.
