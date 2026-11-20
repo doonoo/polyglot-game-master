@@ -1,0 +1,37 @@
+/* ===================== World Languages: French (A1, taught through English) =====================
+   w: [target, english]   s: [english, target]   Sentences: words separated by spaces (tiles). */
+var WL = WL || {};
+WL.fr = {code:"fr", name:"French", self:"Français", flag:"🇫🇷", tts:"fr-FR", dir:"ltr", typing:true, music:"cafe", units:[
+ {t:"Greetings", ico:"👋",
+  b:"**Bonjour** = hello (all day), **bonsoir** = good evening, **salut** = hi with friends. **Merci** = thank you, and the answer is **de rien**. **S'il vous plaît** is the polite please.",
+  w:[["bonjour","hello"],["bonsoir","good evening"],["salut","hi"],["au revoir","goodbye"],["merci","thank you"],["s'il vous plaît","please"],["de rien","you're welcome"],["oui","yes"],["non","no"],["pardon","excuse me"]],
+  s:[["Hello, sir.","Bonjour, monsieur."],["Good evening, madam.","Bonsoir, madame."],["Thank you very much.","Merci beaucoup."],["Goodbye and thank you.","Au revoir et merci."],["Excuse me, please.","Pardon, s'il vous plaît."],["Hi, how are you?","Salut, ça va ?"]]},
+ {t:"Me and you", ico:"🙋",
+  b:"**Je suis** = I am, **tu es** = you are (a friend), **vous êtes** = you are (polite or several people), **il est / elle est** = he is / she is. **Je m'appelle** = my name is.",
+  w:[["je","I"],["tu","you (informal)"],["vous","you (formal)"],["il","he"],["elle","she"],["nous","we"],["je suis","I am"],["tu es","you are"],["il est","he is"],["je m'appelle","my name is"]],
+  s:[["I am a student.","Je suis étudiant."],["My name is Paul.","Je m'appelle Paul."],["Are you tired?","Tu es fatigué ?"],["She is French.","Elle est française."],["We are friends.","Nous sommes amis."],["He is in Paris.","Il est à Paris."]]},
+ {t:"Numbers 1–10", ico:"🔢",
+  b:"**Un** goes with masculine nouns, **une** with feminine ones. French uses **avoir** (to have) for age: **j'ai dix ans** = I am ten (I have ten years).",
+  w:[["un","one"],["deux","two"],["trois","three"],["quatre","four"],["cinq","five"],["six","six"],["sept","seven"],["huit","eight"],["neuf","nine"],["dix","ten"]],
+  s:[["I have two brothers.","J'ai deux frères."],["Three coffees, please.","Trois cafés, s'il vous plaît."],["She is ten years old.","Elle a dix ans."],["It's five euros.","C'est cinq euros."],["There are four of us.","Nous sommes quatre."]]},
+ {t:"Family", ico:"👪",
+  b:"Every noun is masculine (**le**) or feminine (**la**); use **l'** before a vowel and **les** for plurals. My = **mon** (masculine), **ma** (feminine), **mes** (plural).",
+  w:[["la mère","mother"],["le père","father"],["le frère","brother"],["la sœur","sister"],["le fils","son"],["la fille","daughter"],["les parents","parents"],["le mari","husband"],["la femme","wife"],["l'enfant","child"]],
+  s:[["My mother is a doctor.","Ma mère est médecin."],["This is my father.","C'est mon père."],["I have a sister.","J'ai une sœur."],["My parents are in Lyon.","Mes parents sont à Lyon."],["Her husband is nice.","Son mari est gentil."]]},
+ {t:"Food and drink", ico:"🥖",
+  b:"**Je voudrais** = I would like, the polite way to order. For 'some' use **du** (masculine), **de la** (feminine) or **de l'** (before a vowel): du pain, de l'eau.",
+  w:[["le pain","bread"],["le fromage","cheese"],["l'eau","water"],["le café","coffee"],["le vin","wine"],["la pomme","apple"],["le poulet","chicken"],["le lait","milk"],["manger","to eat"],["boire","to drink"]],
+  s:[["I would like some water, please.","Je voudrais de l'eau, s'il vous plaît."],["I eat bread and cheese.","Je mange du pain et du fromage."],["She drinks coffee.","Elle boit du café."],["Do you like chicken?","Tu aimes le poulet ?"],["The apple is red.","La pomme est rouge."]]},
+ {t:"Around town", ico:"🏙️",
+  b:"**Où est...?** = Where is...? **Il y a** = there is / there are. Directions: **à gauche** (left), **à droite** (right), **tout droit** (straight ahead).",
+  w:[["la gare","train station"],["l'hôtel","hotel"],["la rue","street"],["le restaurant","restaurant"],["la banque","bank"],["l'école","school"],["la plage","beach"],["à gauche","on the left"],["à droite","on the right"],["tout droit","straight ahead"]],
+  s:[["Where is the train station?","Où est la gare ?"],["The hotel is on the left.","L'hôtel est à gauche."],["Go straight ahead.","Allez tout droit."],["There is a bank here.","Il y a une banque ici."],["The school is on the right.","L'école est à droite."]]},
+ {t:"Days and time", ico:"📅",
+  b:"Days of the week aren't capitalized in French. **Aujourd'hui** = today, **demain** = tomorrow, **hier** = yesterday. **À demain !** = See you tomorrow!",
+  w:[["lundi","Monday"],["mardi","Tuesday"],["mercredi","Wednesday"],["jeudi","Thursday"],["vendredi","Friday"],["samedi","Saturday"],["dimanche","Sunday"],["aujourd'hui","today"],["demain","tomorrow"],["hier","yesterday"]],
+  s:[["Today is Monday.","Aujourd'hui, c'est lundi."],["See you tomorrow!","À demain !"],["I work on Saturday.","Je travaille samedi."],["Yesterday was Sunday.","Hier, c'était dimanche."],["What time is it?","Quelle heure est-il ?"]]},
+ {t:"Everyday verbs", ico:"🏃",
+  b:"Regular **-er** verbs: **je parle**, **tu parles**, **il parle**, **nous parlons**. Wrap the verb in **ne ... pas** for a negative: **je ne parle pas** = I don't speak.",
+  w:[["aimer","to like"],["vouloir","to want"],["avoir","to have"],["aller","to go"],["parler","to speak"],["faire","to do"],["comprendre","to understand"],["habiter","to live"],["travailler","to work"],["apprendre","to learn"]],
+  s:[["I speak a little French.","Je parle un peu français."],["I don't understand.","Je ne comprends pas."],["We live in Nashville.","Nous habitons à Nashville."],["Do you want to go to the beach?","Tu veux aller à la plage ?"],["I am learning French.","J'apprends le français."]]}
+]};

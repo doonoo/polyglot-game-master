@@ -23,7 +23,7 @@ Read this first in any new chat about this project. It is the short version of e
   2. Apply exact-string `rep()` patches, including the CSS blocks injected before `</style>`.
   3. Append every `src/*.js` module in the order of the `out = "\n".join([...])` line near the bottom of build.py.
 - All modules share one scope, an IIFE. Extend existing functions by wrapping them: `fn = (orig => function(...){ ...orig(...)... })(fn);`.
-- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
+- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js → world.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
 - A new feature module needs adding to that join list. A new CEFR content file needs adding to the `CEFR = [...]` list.
 - `www/native-tts.js` bridges the native Android text-to-speech plugin. The `www/` folder (with `index.html` built) is what Capacitor packages.
 - After changing npm Capacitor plugins, run `npx cap sync android` and commit the changed `android/` gradle files.
@@ -43,6 +43,11 @@ Read this first in any new chat about this project. It is the short version of e
   - Push lessons into `ES_A1…ES_B2` (Spanish course) or `EN_A1…EN_B2` (English course, for Spanish speakers). For the English course, titles and tips are written in Spanish.
 - **Island:** 15 items of `[en, es, clozeES, clozeEN]`. Files: `content_islands2.js` and `content_islands3.js`.
 - **Story:** `{id, lv, ico, t:{es,en}, p:[{s, es, en} | {q:{es,en}, o:[...], a}]}`, with at least 3 questions. Files: `stories*.js`.
+- **World Languages pack** (`src/lang_<code>.js`, taught through English only): `WL.<code> = {name, self, flag, tts, dir, typing, rom?, seg?, music, units:[{t, ico, b, w:[[target, english, rom?]], s:[[english, target, rom?]]}]}`.
+  - Sentence targets are split into words by spaces; those become the tiles. `seg:true` (Chinese) hides the spaces on screen.
+  - `rom` (pinyin / transliteration) needs one entry per word, separated by normal spaces; use a no-break space inside one entry (`Lǐ Míng`).
+  - Every word target and every English meaning must be unique within a pack; tips need a **bold** term. test12 checks all of this and plays every unit.
+  - A new pack needs adding to `WL_ORDER` in world.js, to the build.py join (before world.js) and a `music` track in chiptune.js.
 - **Grammar tips:** `src/tips.js` holds `TIP_ES` and `TIP_EN`, rules shaped `{id, re, en, es}`. test10 checks that 95% or more of items get a tip.
 
 ## Modes and systems
@@ -57,11 +62,12 @@ Read this first in any new chat about this project. It is the short version of e
   - `fx.js`: confetti watchdog.
   - `chiptune.js`: NES-style soundtrack. Replaces Music's methods; tracks live in `CHIP_TRACKS` (16 tokens per bar, notation at the top of the file); `syncMood()` picks the track per mode.
   - `juice.js`: arcade effects (pixel bursts, +XP, combo banners, shake, boss flash, beat pulses, now-playing tag). DOM + CSS only, off under `__PGM_TEST`, the Animations switch or reduced motion.
+  - `world.js`: World Languages (Mandarin, Arabic, French, Portuguese). Its own page, lesson path and mini-games, separate from the Spanish/English engine. Progress in localStorage `pgm-world`; answers count toward XP, streak and quests via `recordAnswer`.
   - `voice.js`: Speak Up game plus 🎤 dictation. Only where `SpeechRecognition` exists or the Android plugin `@capacitor-community/speech-recognition` is present.
 - **Challenge copying:** when a challenge is copied into `S.current`, only listed fields survive. The list is in a build.py rep ending with `strict, double, parts`. A new challenge field must be added there.
 
 ## Testing
-- Run `npm test`: test.js and test4–test11, all JSDOM. It takes a few minutes.
+- Run `npm test`: test.js and test4–test12, all JSDOM. It takes a few minutes.
   - Tests set `window.__PGM_TEST = true`, which exposes `window.__pgm` (S, setup, COURSE, variantsOf, gradeLocal, expand, tipsFor…).
   - Test pages keep timers running, so a new test file must end with `process.exit(0)`.
 - For real-browser checks, use Playwright with `/usr/bin/google-chrome`. Chrome has a native `SpeechRecognition`; override both `SpeechRecognition` and `webkitSpeechRecognition` when faking voice.
@@ -99,8 +105,9 @@ Read this first in any new chat about this project. It is the short version of e
 | 1.9.5–1.9.6 | Confetti freeze fix |
 | 2.0.0 | Voice exercises, idioms and slang lessons |
 | 2.1.0 | NES chiptune soundtrack, arcade animations |
+| 2.2.0 | World Languages: Mandarin, Arabic, French, Portuguese (A1) |
 
-Current version: 2.1.0, versionCode 21.
+Current version: 2.2.0, versionCode 22.
 
 ## Working with Emmanuel
 - He likes short, direct answers and wants Claude to take the initiative on scope.

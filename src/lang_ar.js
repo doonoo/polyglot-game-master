@@ -1,0 +1,37 @@
+/* ===================== World Languages: Arabic (Modern Standard, A1, taught through English) =====================
+   w: [arabic, english, transliteration]   s: [english, arabic words, transliteration with one entry per word] */
+var WL = WL || {};
+WL.ar = {code:"ar", name:"Arabic", self:"العربية", flag:"🇸🇦", tts:"ar-SA", dir:"rtl", typing:false, rom:"transliteration", music:"oasis", units:[
+ {t:"Greetings", ico:"👋",
+  b:"Arabic is written **right to left**. **السلام عليكم** (as-salāmu ʿalaykum, 'peace be upon you') is the classic greeting; the reply is **وعليكم السلام**. **شكرا** (shukran) = thank you. This course teaches Modern Standard Arabic, understood across the Arab world.",
+  w:[["مرحبا","hello","marḥaban"],["السلام عليكم","peace be upon you","as-salāmu ʿalaykum"],["صباح الخير","good morning","ṣabāḥ al-khayr"],["مساء الخير","good evening","masāʾ al-khayr"],["شكرا","thank you","shukran"],["عفوا","you're welcome","ʿafwan"],["من فضلك","please","min faḍlik"],["نعم","yes","naʿam"],["لا","no","lā"],["مع السلامة","goodbye","maʿa as-salāma"]],
+  s:[["Good morning, teacher.","صباح الخير يا أستاذ","ṣabāḥ al-khayr yā ustādh"],["Thank you very much.","شكرا جزيلا","shukran jazīlan"],["Hello, how are you?","مرحبا كيف حالك","marḥaban kayfa ḥāluk"],["I'm fine, thank God.","أنا بخير الحمد لله","anā bikhayr al-ḥamdu lillāh"],["Goodbye, my friend.","مع السلامة يا صديقي","maʿa as-salāma yā ṣadīqī"]]},
+ {t:"Me and you", ico:"🙋",
+  b:"There is no word for 'am / is / are' in the present: **أنا طالب** (anā ṭālib) = I (am a) student. 'You' depends on who you're talking to: **أنتَ** (anta) to a man, **أنتِ** (anti) to a woman. **هل** (hal) starts a yes/no question.",
+  w:[["أنا","I","anā"],["أنتَ","you (to a man)","anta"],["أنتِ","you (to a woman)","anti"],["هو","he","huwa"],["هي","she","hiya"],["نحن","we","naḥnu"],["اسمي","my name is","ismī"],["طالب","student (man)","ṭālib"],["طالبة","student (woman)","ṭāliba"],["مدرس","teacher","mudarris"]],
+  s:[["I am a student.","أنا طالب","anā ṭālib"],["My name is Sara.","اسمي سارة","ismī sāra"],["Are you a teacher?","هل أنتَ مدرس","hal anta mudarris"],["She is a student.","هي طالبة","hiya ṭāliba"],["We are friends.","نحن أصدقاء","naḥnu aṣdiqāʾ"]]},
+ {t:"Numbers 1–10", ico:"🔢",
+  b:"Arabic digits look like this: ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩ ١٠, and numbers are read **left to right** even inside right-to-left text. With 3 to 10 the noun is plural: **ثلاثة كتب** = three books.",
+  w:[["واحد","one","wāḥid"],["اثنان","two","ithnān"],["ثلاثة","three","thalātha"],["أربعة","four","arbaʿa"],["خمسة","five","khamsa"],["ستة","six","sitta"],["سبعة","seven","sabʿa"],["ثمانية","eight","thamāniya"],["تسعة","nine","tisʿa"],["عشرة","ten","ʿashara"]],
+  s:[["I have two brothers.","عندي أخوان","ʿindī akhawān"],["Three books.","ثلاثة كتب","thalāthat kutub"],["She is ten years old.","عمرها عشر سنوات","ʿumruhā ʿashr sanawāt"],["Five people.","خمسة أشخاص","khamsat ashkhāṣ"],["One coffee, please.","قهوة واحدة من فضلك","qahwa wāḥida min faḍlik"]]},
+ {t:"Family", ico:"👪",
+  b:"Add **ـي** (-ī) to a word for 'my': **أمي** (ummī) = my mother, **أبي** (abī) = my father. Add **ـه** (-hu) for 'his': **ابنه** = his son. **عندي** (ʿindī) = I have.",
+  w:[["أم","mother","umm"],["أب","father","ab"],["أخ","brother","akh"],["أخت","sister","ukht"],["ابن","son","ibn"],["بنت","daughter","bint"],["عائلة","family","ʿāʾila"],["زوج","husband","zawj"],["زوجة","wife","zawja"],["طبيبة","doctor (woman)","ṭabība"]],
+  s:[["My mother is a doctor.","أمي طبيبة","ummī ṭabība"],["This is my father.","هذا أبي","hādhā abī"],["I have a sister.","عندي أخت","ʿindī ukht"],["My family is big.","عائلتي كبيرة","ʿāʾilatī kabīra"],["His son is a student.","ابنه طالب","ibnuhu ṭālib"]]},
+ {t:"Food and drink", ico:"🫖",
+  b:"Verbs start with **أ** for 'I': **آكل** (ākul) = I eat, **أشرب** (ashrab) = I drink. To order, say **أريد** (urīd, I want) + the thing + **من فضلك**.",
+  w:[["خبز","bread","khubz"],["ماء","water","māʾ"],["قهوة","coffee","qahwa"],["شاي","tea","shāy"],["حليب","milk","ḥalīb"],["أرز","rice","aruzz"],["دجاج","chicken","dajāj"],["تفاحة","apple","tuffāḥa"],["آكل","I eat","ākul"],["أشرب","I drink","ashrab"]],
+  s:[["I want water, please.","أريد ماء من فضلك","urīd māʾ min faḍlik"],["I eat bread.","آكل خبزا","ākul khubzan"],["She drinks tea.","هي تشرب شايا","hiya tashrab shāyan"],["Do you want coffee?","هل تريد قهوة","hal turīd qahwa"],["The chicken is delicious.","الدجاج لذيذ","ad-dajāj ladhīdh"]]},
+ {t:"Around town", ico:"🏙️",
+  b:"**أين...?** (ayna) = Where is...? **على اليمين** = on the right, **على اليسار** = on the left. **ال** (al-) means 'the': **فندق** = a hotel, **الفندق** = the hotel.",
+  w:[["أين","where","ayna"],["هنا","here","hunā"],["هناك","there","hunāk"],["مدرسة","school","madrasa"],["مستشفى","hospital","mustashfā"],["فندق","hotel","funduq"],["محطة","station","maḥaṭṭa"],["سوق","market","sūq"],["يمين","right","yamīn"],["يسار","left","yasār"]],
+  s:[["Where is the station?","أين المحطة","ayna al-maḥaṭṭa"],["The hotel is here.","الفندق هنا","al-funduq hunā"],["The school is on the right.","المدرسة على اليمين","al-madrasa ʿalā al-yamīn"],["The market is on the left.","السوق على اليسار","as-sūq ʿalā al-yasār"],["Where is the hospital?","أين المستشفى","ayna al-mustashfā"]]},
+ {t:"Days and time", ico:"📅",
+  b:"The week starts on **الأحد** (Sunday, 'day one'), and **الجمعة** (Friday) is the weekend day in most Arab countries. Say **يوم** (yawm, day) before a day: **يوم السبت** = on Saturday.",
+  w:[["اليوم","today","al-yawm"],["غدا","tomorrow","ghadan"],["أمس","yesterday","ams"],["الاثنين","Monday","al-ithnayn"],["الثلاثاء","Tuesday","ath-thulāthāʾ"],["الأربعاء","Wednesday","al-arbiʿāʾ"],["الخميس","Thursday","al-khamīs"],["الجمعة","Friday","al-jumʿa"],["السبت","Saturday","as-sabt"],["الأحد","Sunday","al-aḥad"]],
+  s:[["Today is Monday.","اليوم الاثنين","al-yawm al-ithnayn"],["See you tomorrow!","إلى اللقاء غدا","ilā al-liqāʾ ghadan"],["I work on Saturday.","أعمل يوم السبت","aʿmal yawm as-sabt"],["What time is it?","كم الساعة","kam as-sāʿa"],["Yesterday was Friday.","أمس كان الجمعة","ams kāna al-jumʿa"]]},
+ {t:"Everyday verbs", ico:"🏃",
+  b:"**لا** before a verb makes it negative: **لا أفهم** (lā afham) = I don't understand. **أريد أن** + verb = I want to...: **أريد أن أذهب** = I want to go.",
+  w:[["أحب","I like","uḥibb"],["أريد","I want","urīd"],["عندي","I have","ʿindī"],["أذهب","I go","adhhab"],["أتكلم","I speak","atakallam"],["أفهم","I understand","afham"],["أسكن","I live","askun"],["أعمل","I work","aʿmal"],["أتعلم","I learn","ataʿallam"],["العربية","Arabic (language)","al-ʿarabiyya"]],
+  s:[["I speak a little Arabic.","أتكلم العربية قليلا","atakallam al-ʿarabiyya qalīlan"],["I don't understand.","لا أفهم","lā afham"],["We live in America.","نسكن في أمريكا","naskun fī amrīkā"],["Do you want to go?","هل تريد أن تذهب","hal turīd an tadhhab"],["I am learning Arabic.","أتعلم العربية","ataʿallam al-ʿarabiyya"]]}
+]};

@@ -13,11 +13,11 @@
 Object.assign(I18N.en, {track:"Soundtrack", trkAuto:"Auto (by mode)", nowPlaying:"Now playing",
   trk_title:"Polyglot Overture", trk_quest:"Sentence Quest", trk_brawl:"Street Grammar Brawl", trk_island:"Island Hopper Calypso",
   trk_boss:"Boss of the Verbs", trk_rush:"Beat the Clock", trk_dungeon:"Tricky Dungeon", trk_story:"Story Time", trk_arcade:"Word Arcade",
-  trk_victory:"Victory!", trk_gameover:"Game Over"});
+  trk_victory:"Victory!", trk_gameover:"Game Over", trk_cafe:"Paris Café", trk_samba:"Rio Samba", trk_lantern:"Lantern Festival", trk_oasis:"Desert Oasis"});
 Object.assign(I18N.es, {track:"Banda sonora", trkAuto:"Automática (según el modo)", nowPlaying:"Sonando",
   trk_title:"Obertura Políglota", trk_quest:"La búsqueda de frases", trk_brawl:"Pelea callejera de gramática", trk_island:"Calipso de las islas",
   trk_boss:"El jefe de los verbos", trk_rush:"Contra el reloj", trk_dungeon:"La mazmorra tramposa", trk_story:"Hora del cuento", trk_arcade:"Arcade de palabras",
-  trk_victory:"¡Victoria!", trk_gameover:"Fin del juego"});
+  trk_victory:"¡Victoria!", trk_gameover:"Fin del juego", trk_cafe:"Café de París", trk_samba:"Samba de Río", trk_lantern:"Festival de los faroles", trk_oasis:"Oasis del desierto"});
 
 const CHIP_TRACKS = {
   title:{bpm:126, lead:.25, loop:["A","B","A"], sec:{
@@ -104,6 +104,38 @@ const CHIP_TRACKS = {
        lead:["D6 - - - Bb5 - - - F5 - - - Bb5 - D6 -", "E6 - - - C6 - - - G5 - - - C6 - E6 -", "C6 - - - A5 - E5 - D6 - - - A5 - F5 -", "G5 - - - Bb5 - D6 - C6 - - - - - - -"],
        arp:"0 . 2 . 4 . 2 . 0 . 2 . 4 . 2 .", bass:"R . O . R . O . R . O . 5 . O .", drum:["k . h . s . h . k . h . s . h h", "k . h . s . h . k . s . s s s s"]}}},
 
+  cafe:{bpm:120, lead:.5, leadVol:.07, loop:["A","B"], sec:{
+    A:{ch:["C","Am","Dm G","C"],
+       lead:["E5 - - - G5 - E5 - C5 - - - E5 - D5 -", "C5 - - - A4 - C5 - E5 - - - A5 - G5 -", "F5 - - - E5 - D5 - B4 - - - D5 - G5 -", "E5 - - - - - - - C5 - - - . . . ."],
+       arp:". . 1 2 . . 1 2 . . 1 2 . . 1 2", bass:"R . . . 5 . . . R . . . 5 . . .", drum:["k . h . s . h . k . h . s . h ."]},
+    B:{ch:["F","C","D7","G7"],
+       lead:["A5 - - - G5 - F5 - C5 - - - F5 - A5 -", "G5 - - - E5 - C5 - G4 - - - C5 - E5 -", "F#5 - - - D5 - A4 - C5 - - - D5 - F#5 -", "G5 - - - F5 - D5 - B4 - - - D5 - . ."],
+       arp:". . 1 2 . . 1 2 . . 1 2 . . 1 2", bass:"R . . . 5 . . . R . . . 5 . . .", drum:["k . h . s . h . k . h . s . h .", "k . h . s . h . k . s . s s s s"]}}},
+
+  samba:{bpm:132, lead:.25, loop:["A","B"], sec:{
+    A:{ch:["C","Am","Dm","G"],
+       lead:["E5 . G5 - . E5 . C5 - . D5 - E5 . . .", "C5 . E5 - . C5 . A4 - . B4 - C5 . . .", "D5 . F5 - . A5 . F5 - . E5 - D5 . . .", "B4 - - - D5 - G5 - - - F5 - D5 - . ."],
+       arp:". 0 . 2 . 1 . 2 . 0 . 2 . 1 . 4", bass:"R . . R . . 5 . R . . R . . 5 .", drum:["k h r h k h r h k h r h k h r r"]},
+    B:{ch:["F","G","Em Am","Dm G"],
+       lead:["A5 . C6 - . A5 . F5 - . G5 - A5 . . .", "B5 . D6 - . B5 . G5 - . A5 - B5 . . .", "G5 - E5 - B4 - . . A5 - E5 - C5 - . .", "F5 - - - D5 - A4 - B4 - D5 - G5 - - -"],
+       arp:". 0 . 2 . 1 . 2 . 0 . 2 . 1 . 4", bass:"R . . R . . 5 . R . . R . . 5 .", drum:["k h r h k h r h k h r h k h r r", "k h r h k h r h k s k s s s s s"]}}},
+
+  lantern:{bpm:100, lead:.5, leadVol:.07, loop:["A","B"], sec:{
+    A:{ch:["D","Bm","G","A"],
+       lead:["F#5 - A5 - B5 - - - A5 - F#5 - E5 - - -", "D5 - - - E5 - F#5 - B4 - - - A4 - - -", "B4 - D5 - E5 - - - D5 - B4 - A4 - - -", "E5 - - - F#5 - E5 - D5 - - - . . . ."],
+       arp:"0 . 2 . 4 . 2 . 0 . 2 . 4 . 2 .", bass:"R . . . . . 5 . R . . . O . . .", drum:["k . . . r . . . k . r . r . . ."]},
+    B:{ch:["G","A","F#m Bm","G A"],
+       lead:["D6 - - - B5 - A5 - B5 - - - D6 - E6 -", "E6 - - - D6 - B5 - A5 - - - - - - -", "F#5 - A5 - E5 - - - F#5 - D5 - B4 - - -", "D5 - E5 - D5 - B4 - A4 - - - - - . ."],
+       arp:"0 . 2 . 4 . 2 . 0 . 2 . 4 . 2 .", bass:"R . . . . . 5 . R . . . O . . .", drum:["k . . . r . . . k . r . r . . .", "k . . . r . . . k . r . r r r r"]}}},
+
+  oasis:{bpm:112, lead:.25, leadVol:.08, loop:["A","B"], sec:{
+    A:{ch:["D","D","Gm","D"],
+       lead:["D5 - Eb5 - F#5 - - - G5 - F#5 - Eb5 - D5 -", "A5 - - - Bb5 - A5 - G5 - F#5 - Eb5 - D5 -", "G5 - - - Bb5 - A5 - G5 - - - F#5 - G5 -", "F#5 - Eb5 - D5 - - - - - - - . . . ."],
+       arp:"0 . . . 2 . . . 0 . . . 2 . . .", bass:"R . . R . . R . R . . . R . . .", drum:["k . r . . r k . k . r . . r r ."]},
+    B:{ch:["Cm","D","Gm","D"],
+       lead:["C6 - Bb5 - A5 - G5 - Eb5 - - - G5 - C6 -", "A5 - - - F#5 - - - D5 - Eb5 - F#5 - A5 -", "Bb5 - - - A5 - G5 - D5 - - - G5 - Bb5 -", "A5 - G5 - F#5 - Eb5 - D5 - - - . . . ."],
+       arp:"0 . . . 2 . . . 0 . . . 2 . . .", bass:"R . . R . . R . R . . . R . . .", drum:["k . r . . r k . k . r . . r r .", "k . r . . r k . k r k r r r r r"]}}},
+
   victory:{bpm:150, lead:.25, once:true, next:"title", loop:["A"], sec:{
     A:{ch:["C","G","C"],
        lead:["C5 - E5 - G5 - C6 - - - G5 - C6 - - -", "D6 - - - B5 - - - D6 - - - G6 - - -", "E6 - - - - - - - - - - - . . . ."],
@@ -116,7 +148,7 @@ const CHIP_TRACKS = {
        arp:"0 . . . . . . . . . . . . . . .", bass:"R . . . . . . . R . . . . . . .",
        drum:[". . . . . . . . . . . . . . . .", ". . . . . . . . . . . . . . . .", "k . . . . . . . . . . . . . . ."]}}}
 };
-const CHIP_JUKEBOX = ["title", "quest", "brawl", "island", "boss", "rush", "dungeon", "story", "arcade"];
+const CHIP_JUKEBOX = ["title", "quest", "brawl", "island", "boss", "rush", "dungeon", "story", "arcade", "cafe", "samba", "lantern", "oasis"];
 
 const Chip = (() => {
   const NOTE = {C:0, D:2, E:4, F:5, G:7, A:9, B:11};

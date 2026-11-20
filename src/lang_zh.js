@@ -1,0 +1,37 @@
+/* ===================== World Languages: Mandarin Chinese (A1, simplified + pinyin, taught through English) =====================
+   w: [hanzi, english, pinyin]   s: [english, hanzi words separated by spaces, pinyin with one entry per word] */
+var WL = WL || {};
+WL.zh = {code:"zh", name:"Mandarin Chinese", self:"中文", flag:"🇨🇳", tts:"zh-CN", dir:"ltr", typing:false, rom:"pinyin", seg:true, music:"lantern", units:[
+ {t:"Greetings", ico:"👋",
+  b:"Mandarin has four tones plus a light neutral one: **mā** (high and flat), **má** (rising), **mǎ** (dips then rises), **mà** (falling). The tone changes the meaning, so listen closely. **你好** (nǐ hǎo) = hello, **谢谢** (xièxie) = thank you.",
+  w:[["你好","hello","nǐ hǎo"],["您好","hello (polite)","nín hǎo"],["谢谢","thank you","xièxie"],["不客气","you're welcome","bú kèqi"],["再见","goodbye","zàijiàn"],["对不起","sorry","duìbuqǐ"],["没关系","it's OK","méi guānxi"],["请","please","qǐng"],["老师","teacher","lǎoshī"],["很","very","hěn"]],
+  s:[["Hello, teacher!","老师 好","lǎoshī hǎo"],["Thank you!","谢谢 你","xièxie nǐ"],["Goodbye, teacher.","老师 再见","lǎoshī zàijiàn"],["How are you?","你 好 吗","nǐ hǎo ma"],["I'm fine, thanks.","我 很 好 谢谢","wǒ hěn hǎo xièxie"]]},
+ {t:"Me and you", ico:"🙋",
+  b:"Verbs never change: **我是** (wǒ shì) = I am, **他是** (tā shì) = he is. Add **们** (men) for plural: **我们** = we. Put **吗** (ma) at the end of a sentence to make a yes/no question.",
+  w:[["我","I","wǒ"],["你","you","nǐ"],["他","he","tā"],["她","she","tā"],["我们","we","wǒmen"],["是","to be","shì"],["叫","to be called","jiào"],["学生","student","xuésheng"],["朋友","friend","péngyou"],["什么","what","shénme"]],
+  s:[["I am a student.","我 是 学生","wǒ shì xuésheng"],["My name is Li Ming.","我 叫 李明","wǒ jiào Lǐ Míng"],["Are you a teacher?","你 是 老师 吗","nǐ shì lǎoshī ma"],["She is not a student.","她 不 是 学生","tā bú shì xuésheng"],["We are friends.","我们 是 朋友","wǒmen shì péngyou"],["What is your name?","你 叫 什么 名字","nǐ jiào shénme míngzi"]]},
+ {t:"Numbers 1–10", ico:"🔢",
+  b:"Numbers build like blocks: **十一** (11) is 'ten-one' and **二十** (20) is 'two-ten'. When counting things, use **两** (liǎng) for two and a measure word, usually **个** (gè): **两个人** = two people.",
+  w:[["一","one","yī"],["二","two","èr"],["三","three","sān"],["四","four","sì"],["五","five","wǔ"],["六","six","liù"],["七","seven","qī"],["八","eight","bā"],["九","nine","jiǔ"],["十","ten","shí"]],
+  s:[["I have two older brothers.","我 有 两 个 哥哥","wǒ yǒu liǎng gè gēge"],["Three people.","三 个 人","sān gè rén"],["She is ten years old.","她 十 岁","tā shí suì"],["Five yuan.","五 块 钱","wǔ kuài qián"],["I have one cat.","我 有 一 只 猫","wǒ yǒu yì zhī māo"]]},
+ {t:"Family", ico:"👪",
+  b:"Chinese has separate words for older and younger siblings: **哥哥** older brother, **弟弟** younger brother, **姐姐** older sister, **妹妹** younger sister. **的** (de) shows possession: **她的女儿** = her daughter.",
+  w:[["妈妈","mom","māma"],["爸爸","dad","bàba"],["哥哥","older brother","gēge"],["姐姐","older sister","jiějie"],["弟弟","younger brother","dìdi"],["妹妹","younger sister","mèimei"],["儿子","son","érzi"],["女儿","daughter","nǚ'ér"],["家","family, home","jiā"],["医生","doctor","yīshēng"]],
+  s:[["My mom is a doctor.","我 妈妈 是 医生","wǒ māma shì yīshēng"],["This is my dad.","这 是 我 爸爸","zhè shì wǒ bàba"],["I have an older sister.","我 有 一 个 姐姐","wǒ yǒu yí gè jiějie"],["There are four people in my family.","我 家 有 四 口 人","wǒ jiā yǒu sì kǒu rén"],["Her daughter is a student.","她 的 女儿 是 学生","tā de nǚ'ér shì xuésheng"]]},
+ {t:"Food and drink", ico:"🍜",
+  b:"**我要...** (wǒ yào) = I want..., the easy way to order. **吃** (chī) = eat, **喝** (hē) = drink. **好吃** (hǎochī) = tasty, literally 'good to eat'. Adjectives usually take **很** (hěn): **很好吃**.",
+  w:[["米饭","rice","mǐfàn"],["面条","noodles","miàntiáo"],["水","water","shuǐ"],["茶","tea","chá"],["咖啡","coffee","kāfēi"],["鸡肉","chicken","jīròu"],["吃","to eat","chī"],["喝","to drink","hē"],["要","to want","yào"],["好吃","tasty","hǎochī"]],
+  s:[["I want a cup of tea.","我 要 一 杯 茶","wǒ yào yì bēi chá"],["I eat rice.","我 吃 米饭","wǒ chī mǐfàn"],["She drinks coffee.","她 喝 咖啡","tā hē kāfēi"],["The noodles are tasty.","面条 很 好吃","miàntiáo hěn hǎochī"],["Do you want water?","你 要 水 吗","nǐ yào shuǐ ma"]]},
+ {t:"Around town", ico:"🏙️",
+  b:"**在** (zài) says where something is: **学校在哪里?** = Where is the school? Question words stay where the answer would go, so **哪里** (where) comes at the end.",
+  w:[["哪里","where","nǎlǐ"],["这里","here","zhèlǐ"],["那里","there","nàlǐ"],["学校","school","xuéxiào"],["医院","hospital","yīyuàn"],["商店","shop","shāngdiàn"],["火车站","train station","huǒchēzhàn"],["银行","bank","yínháng"],["左边","left side","zuǒbian"],["右边","right side","yòubian"]],
+  s:[["Where is the train station?","火车站 在 哪里","huǒchēzhàn zài nǎlǐ"],["The school is here.","学校 在 这里","xuéxiào zài zhèlǐ"],["The shop is on the left.","商店 在 左边","shāngdiàn zài zuǒbian"],["I am at the hospital.","我 在 医院","wǒ zài yīyuàn"],["The bank is on the right.","银行 在 右边","yínháng zài yòubian"]]},
+ {t:"Days and time", ico:"📅",
+  b:"Days are numbered: **星期一** (week-one) is Monday, up to **星期六** Saturday; Sunday is **星期天**. Time words go before the verb: **我明天去** = I'm going tomorrow.",
+  w:[["今天","today","jīntiān"],["明天","tomorrow","míngtiān"],["昨天","yesterday","zuótiān"],["星期一","Monday","xīngqīyī"],["星期二","Tuesday","xīngqī'èr"],["星期三","Wednesday","xīngqīsān"],["星期六","Saturday","xīngqīliù"],["星期天","Sunday","xīngqītiān"],["现在","now","xiànzài"],["工作","to work","gōngzuò"]],
+  s:[["Today is Monday.","今天 星期一","jīntiān xīngqīyī"],["See you tomorrow!","明天 见","míngtiān jiàn"],["I work on Saturday.","我 星期六 工作","wǒ xīngqīliù gōngzuò"],["What time is it now?","现在 几 点","xiànzài jǐ diǎn"],["Yesterday was Sunday.","昨天 是 星期天","zuótiān shì xīngqītiān"]]},
+ {t:"Everyday verbs", ico:"🏃",
+  b:"**不** (bù) makes verbs negative, but **有** (to have) takes **没** (méi): **我没有钱** = I don't have money. **会** (huì) shows a skill: **我会说中文** = I can speak Chinese.",
+  w:[["喜欢","to like","xǐhuan"],["想","to want to","xiǎng"],["有","to have","yǒu"],["没有","not have","méiyǒu"],["去","to go","qù"],["说","to speak","shuō"],["学","to learn","xué"],["懂","to understand","dǒng"],["住","to live","zhù"],["中文","Chinese (language)","Zhōngwén"]],
+  s:[["I can speak a little Chinese.","我 会 说 一点儿 中文","wǒ huì shuō yìdiǎnr Zhōngwén"],["I don't understand.","我 不 懂","wǒ bù dǒng"],["We live in America.","我们 住 在 美国","wǒmen zhù zài Měiguó"],["Do you want to go?","你 想 去 吗","nǐ xiǎng qù ma"],["I like tea.","我 喜欢 茶","wǒ xǐhuan chá"]]}
+]};
