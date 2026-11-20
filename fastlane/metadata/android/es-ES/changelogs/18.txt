@@ -1,1 +1,1 @@
-Confeti corregido: ahora cae desde arriba en lugar de estallar en una franja plana en medio, así que ya no tapa el cuadro de respuesta ni los acentos, y no puede quedarse pegado al abrir o cerrar el teclado. Los botones del recordatorio ya no se parten.
+Corregida una franja de confeti congelado que podía quedarse en pantalla en Android al cambiar de app o abrir el teclado. El confeti ahora siempre termina y se borra. Los botones del recordatorio ya no ocupan dos líneas.
