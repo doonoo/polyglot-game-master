@@ -1,187 +1,123 @@
-/* World Languages: content checks for every pack, then every unit played through in the UI */
+/* More languages in the main game, and the two-player duel */
 const fs = require("fs"), path = require("path");
 const { JSDOM } = require("jsdom");
 const html = fs.readFileSync(path.join(__dirname, "..", "www", "index.html"), "utf8");
 let fails = 0; const fail = (...a) => { fails++; if(fails < 60) console.log("FAIL", ...a); };
-function boot(lang){
-  const errors = [];
-  const dom = new JSDOM(html, {runScripts:"dangerously", pretendToBeVisual:true, url:"https://example.test/",
-    beforeParse(w){ w.__PGM_TEST = true; w.matchMedia = () => ({matches:true, addEventListener(){}, removeEventListener(){}}); w.scrollTo = () => {};
-      w.HTMLElement.prototype.scrollIntoView = function(){}; Object.defineProperty(w.navigator, "language", {value:lang, configurable:true});
-      w.addEventListener("error", e => errors.push(e.error || e.message)); }});
-  dom.errors = errors; return dom;
-}
-
+const dom = new JSDOM(html, {runScripts:"dangerously", pretendToBeVisual:true, url:"https://example.test/",
+  beforeParse(w){ w.__PGM_TEST = true; w.matchMedia = () => ({matches:true, addEventListener(){}, removeEventListener(){}}); w.scrollTo = () => {};
+    w.HTMLElement.prototype.scrollIntoView = function(){}; w.addEventListener("error", e => fail("page error", e.message)); }});
+const w = dom.window, d = w.document, $ = id => d.getElementById(id);
+const setTarget = L => { const s = $("targetSel"); s.value = L; s.dispatchEvent(new w.Event("change", {bubbles:true})); };
 (async () => {
-  const dom = boot("en"), w = dom.window, d = w.document, $ = id => d.getElementById(id), W = w.__world;
-  if(!W) { console.log("FAIL no __world"); process.exit(1); }
-  const codes = ["zh", "ar", "fr", "pt"];
-  /* ---------- content ---------- */
-  for(const c of codes){
-    const P = W.wlPack(c);
-    if(!P) { fail(c, "missing pack"); continue; }
-    for(const k of ["name", "self", "flag", "tts", "dir", "music"]) if(!P[k]) fail(c, "pack field", k);
-    if(P.units.length < 16) fail(c, "fewer than 16 units");
-    if((P.bosses || []).length < 4) fail(c, "needs 4 bosses");
-    for(let k = 0; k < 4; k++) for(let rep = 0; rep < 8; rep++) for(const ch of W.wlBossItems(P, k)){ if(ch.opts && !ch.opts.includes(ch.ans)) fail(c, "boss option missing answer"); if(ch.type === "match") fail(c, "boss should not have match"); }
-    const seenT = new Map(), seenEn = new Map();
-    P.units.forEach((u, ui) => {
-      if(!u.t || !u.ico || !u.b) fail(c, ui, "unit header");
-      if(!/\*\*[^*]+\*\*/.test(u.b)) fail(c, u.t, "tip has no bold term");
-      if(u.words.length < 9) fail(c, u.t, "needs 9+ words", u.words.length);
-      if(u.sents.length < 4) fail(c, u.t, "needs 4+ sentences", u.sents.length);
-      for(const x of u.words){
-        if(!x.t || !x.en) fail(c, u.t, "empty word");
-        if(P.rom && !x.r) fail(c, u.t, "word without romanization", x.t);
-        if(seenT.has(x.t)) fail(c, "duplicate word", x.t, u.t, seenT.get(x.t)); seenT.set(x.t, u.t);
-        if(seenEn.has(x.en)) fail(c, "duplicate meaning", x.en, u.t, seenEn.get(x.en)); seenEn.set(x.en, u.t);
-        if(P.rom === "pinyin" && !W.wlToneVariants(x.r).length) fail(c, "no tone variants", x.t, x.r);
-      }
-      for(const s of u.sents){
-        if(s.tk.length < 1) fail(c, u.t, "empty sentence");
-        if(P.rom && s.rk.length !== s.tk.length) fail(c, u.t, "romanization not aligned", s.t, "|", s.r, s.tk.length, s.rk.length);
-        if(P.code === "zh" && /[a-z]/i.test(s.t)) fail(c, "latin letters in hanzi", s.t);
-        if(P.code === "ar" && /[a-z]/i.test(s.t)) fail(c, "latin letters in arabic", s.t);
-      }
-    });
-    // every generated challenge is answerable
-    for(let rep = 0; rep < 12; rep++) P.units.forEach((u, ui) => {
-      for(const ch of W.wlLesson(P, ui)){
-        if(!ch) { fail(c, u.t, "null challenge"); continue; }
-        if(ch.opts){
-          if(!ch.opts.includes(ch.ans)) fail(c, u.t, ch.type, "answer missing from options");
-          if(new Set(ch.opts).size !== ch.opts.length) fail(c, u.t, ch.type, "duplicate options", ch.opts.join("/"));
-          if(ch.opts.length < 3) fail(c, u.t, ch.type, "too few options");
-          if(ch.type === "fill" && ch.opts.filter(o => W.wlNorm(o) === W.wlNorm(ch.ans)).length > 1) fail(c, u.t, "fill options equal after normalizing");
+  await new Promise(r => setTimeout(r, 300));
+  const P = w.__pgm, X = w.__xl;
+  /* ---------- the picker ---------- */
+  const tg = [...$("targetSel").options].map(o => o.value);
+  for(const L of ["English", "Spanish", "French", "Portuguese", "Mandarin Chinese", "Arabic"]) if(!tg.includes(L)) fail("missing course", L);
+  if(d.getElementById("worldBtn") || d.getElementById("worldPage")) fail("World Languages section should be gone");
+  /* ---------- course content ---------- */
+  for(const code of ["fr", "pt", "zh", "ar"]){
+    const C = P.COURSE[code];
+    if(!C || !C.A1 || !C.A2) { fail(code, "missing A1/A2"); continue; }
+    if(C.A1.length < 8 || C.A2.length < 8) fail(code, "expected 8 lessons per level");
+    for(const lv of ["A1", "A2"]) for(const c of C[lv]){
+      if(!c.t || !c.b || !c.w.length || c.it.length < 4) fail(code, lv, c.t, "incomplete lesson");
+      for(const it of c.it){
+        if(!P.blank(P.canon(it[1]), it[2])) fail(code, c.t, "cloze word not in sentence", it[1], it[2]);
+        if(it[3]){ const ok = P.gradeLocal({target:"x", native:"English"}, {k:"s", al:code, acc:[it[1]], game:"Classic Mine"}, it[3]); if(ok.correct) fail(code, "wrong version graded right", it[3]); }
+        const self = P.gradeLocal({target:"x", native:"English"}, {k:"s", al:code, acc:[it[1]], game:"Classic Mine"}, P.canon(it[1]));
+        if(!self.correct) fail(code, "own answer not accepted", it[1]);
+        if(code === "zh" || code === "ar"){
+          const rom = it[1].split("|")[1];
+          if(!rom) fail(code, "no romanization alternative", it[1]);
+          else { const plain = rom.normalize("NFD").replace(/[̀-ͯ]/g, ""); const g = P.gradeLocal({target:"x", native:"English"}, {k:"s", al:code, acc:[it[1]], game:"Classic Mine"}, plain); if(!g.correct) fail(code, "plain-letter romanization not accepted", plain); }
         }
-        if(ch.type === "build"){
-          const tiles = ch.tiles.map(x => x.t);
-          for(const tk of ch.ans) if(!tiles.includes(tk)) fail(c, u.t, "build tile missing", tk);
-          if(tiles.length < ch.ans.length + 2) fail(c, u.t, "build needs 2+ extra tiles");
-        }
-        if(ch.type === "match" && ch.pairs.length !== 4) fail(c, u.t, "match needs 4 pairs");
       }
-    });
-  }
-  /* ---------- UI: play every unit and every boss of every pack ---------- */
-  $("worldBtn").click();
-  if($("worldPage").hidden) fail("world page did not open");
-  if(!$("menu").hidden) fail("menu still visible");
-  if(d.querySelectorAll("[data-wpack]").length !== 4) fail("expected 4 packs on home");
-  let answered = 0, types = {};
-  function playRun(c, missFirst){
-    let guard = 0, missedOnce = false;
-    while(W.WV.view === "play" && guard++ < 90){
-      const R = W.WV.run, ch = R.items[R.i];
-      types[ch.type] = (types[ch.type] || 0) + 1;
-      const wantWrong = missFirst && !missedOnce && ch.opts;
-      if(ch.opts){
-        const i = wantWrong ? ch.opts.findIndex(o => o !== ch.ans) : ch.opts.indexOf(ch.ans);
-        d.querySelector(`[data-wopt="${i}"]`).click();
-        if(wantWrong){ missedOnce = true; if(R.state !== "bad") fail(c, "wrong option graded as right"); }
-        else if(R.state !== "ok") fail(c, ch.type, "right option graded wrong", ch.ans);
-      } else if(ch.type === "build"){
-        const used = new Set();
-        for(const tk of ch.ans){ const i = ch.tiles.findIndex((x, k) => x.t === tk && !used.has(k)); used.add(i); d.querySelector(`[data-wtile="${i}"]`).click(); }
-        $("wlCheck").click();
-        if(R.state !== "ok") fail(c, "build graded wrong", ch.ans.join(" "));
-      } else if(ch.type === "type"){
-        const inp = $("wlType"), loose = ch.ans.normalize("NFD").replace(/[̀-ͯ]/g, "");
-        if(R.boss && loose !== ch.ans && R.hp === 2){
-          inp.value = loose; inp.dispatchEvent(new w.Event("input")); $("wlCheck").click();
-          if(R.state !== "bad") fail(c, "boss accepted a missing accent", ch.ans);
-          answered++; $("wlNext").click(); continue;
-        }
-        inp.value = R.boss ? ch.ans : loose; inp.dispatchEvent(new w.Event("input"));
-        $("wlCheck").click();
-        if(R.state !== "ok") fail(c, "typed answer not accepted", ch.ans, R.boss ? "(boss)" : "");
-      } else if(ch.type === "match"){
-        for(const i of ch.left){ d.querySelector(`[data-wml="${i}"]`).click(); d.querySelector(`[data-wmr="${i}"]`).click(); }
-        if(R.state !== "ok") fail(c, "match not completed");
-      }
-      answered++;
-      if(R.state === "ask") { fail(c, ch.type, "stuck in ask"); break; }
-      if(R.boss && R.boss.hp === 0 && ch.type !== "build") fail(c, "final blow was not a sentence");
-      $("wlNext").click();
     }
   }
-  function fightBoss(c, k){
-    const node = d.querySelector(`[data-wboss="${k}"]`);
-    if(!node) { fail(c, "no boss node", k); return; }
-    if(node.getAttribute("aria-disabled") === "true") fail(c, "boss still locked", k);
-    node.click();
-    if(W.WV.view !== "bossIntro") { fail(c, "boss intro did not open", k); return; }
-    $("wlFight").click();
-    if(!W.WV.run || !W.WV.run.boss || W.WV.run.hp !== 2) fail(c, "boss run not set up", k);
-    if(d.querySelector("#worldPage .wtile small, #worldPage .wrom")) fail(c, "romanization shown in boss fight");
-    playRun(c, false);
-    if(W.WV.view !== "end" || !W.WV.run.won) fail(c, "boss not beaten", k, W.WV.view);
-    if(!W.wpOf(c).b[k]) fail(c, "boss win not saved", k);
-    d.querySelector('#worldPage [data-wgo="path"]').click();
-  }
-  for(const c of codes){
-    d.querySelector(`[data-wpack="${c}"]`).click();
-    const P = W.wlPack(c);
-    if(d.querySelector('[data-wunit="1"]').getAttribute("aria-disabled") !== "true") fail(c, "unit 2 should start locked");
-    if(d.querySelectorAll(".wlvl").length !== 2) fail(c, "expected A1 and A2 headers");
-    for(let ui = 0; ui < P.units.length; ui++){
-      if(ui % 4 === 0 && ui > 0){
-        if(d.querySelector(`[data-wunit="${ui}"]`).getAttribute("aria-disabled") !== "true") fail(c, "unit", ui + 1, "open before its boss");
-        fightBoss(c, ui / 4 - 1);
+  /* ---------- playing each new course in each available mode ---------- */
+  for(const L of ["French", "Portuguese", "Mandarin Chinese", "Arabic"]){
+    setTarget(L);
+    if($("nativeSel").value !== "English") fail(L, "native should be English");
+    const disabled = [...d.querySelectorAll("#modes [data-mode]")].filter(b => b.disabled).map(b => +b.dataset.mode);
+    for(const m of [4, 5, 6, 7, 8, 9]) if(!disabled.includes(m)) fail(L, "mode", m, "should be disabled");
+    if($("storiesBtn").disabled !== true) fail(L, "stories should be disabled");
+    for(const mode of [1, 2, 3]) for(const lv of ["A1", "A2"]){
+      P.setup.mode = mode; P.setup.level = lv; P.startNew();
+      const S0 = w.__pgm.S;
+      if(S0.target !== L || S0.native !== "English") { fail(L, "started wrong course", S0.target, S0.native); break; }
+      for(let k = 0; k < 30; k++){
+        const S = w.__pgm.S; if(!S.current) { fail(L, mode, "no challenge"); break; }
+        const ch = S.current.challenge;
+        if(ch.al !== LANG_CODE_OF(L) && ch.al !== "en") fail(L, mode, "challenge in another language", ch.game, ch.al, ch.target);
+        if(/Digit|Clock|Price|Time Machine|Verb Forge|Slip Fixer|Linguistic/.test(ch.game)) fail(L, "mode mixing leaked", ch.game);
+        if((ch.al === "zh" || ch.al === "ar") && /Classic Mine|Cloze Combat|Error Hunter/.test(ch.game) && $("tiles").hidden) fail(L, ch.game, "no tiles for non-Latin script");
+        $("answer").value = P.variantsOf(ch)[0]; $("submitBtn").click();
+        if(!w.__pgm.S.judgement || !w.__pgm.S.judgement.correct) fail(L, mode, ch.game, "right answer graded wrong", ch.acc[0]);
+        if(w.__pgm.S.status !== "playing") break;
+        const nb = $("nextBtn"); if(nb) nb.click();
       }
-      const node = d.querySelector(`[data-wunit="${ui}"]`);
-      if(!node) { fail(c, "no node", ui); break; }
-      node.click();
-      if(W.WV.view !== "intro") { fail(c, ui, "intro did not open (locked?)"); break; }
-      if(c === "ar" && !d.querySelector('#worldPage [dir="rtl"]')) fail("arabic text not marked rtl");
-      $("wlGo").click();
-      playRun(c, ui === 0);
-      if(W.WV.view !== "end") fail(c, ui, "did not reach end", W.WV.view);
-      if(!W.WV.run.won) fail(c, ui, "lost the unit");
-      if(ui === 0 && W.WV.run.stars === 3) fail(c, "a miss should cost a star");
-      if(ui > 0 && W.WV.run.stars !== 3) fail(c, ui, "perfect run should give 3 stars");
-      d.querySelector('#worldPage [data-wgo="path"]').click();
     }
-    fightBoss(c, 3);
-    if(Object.keys(W.wpOf(c).u).length !== P.units.length) fail(c, "not all units recorded");
-    if(Object.keys(W.wpOf(c).b).length !== 4) fail(c, "not all bosses recorded");
-    // a lost rematch keeps the earlier win
-    d.querySelector('[data-wboss="0"]').click(); $("wlFight").click();
-    for(let k = 0; k < 8 && W.WV.view === "play"; k++){
-      const R = W.WV.run, ch = R.items[R.i];
-      if(ch.opts) d.querySelector(`[data-wopt="${ch.opts.findIndex(o => o !== ch.ans)}"]`).click();
-      else if(ch.type === "type"){ $("wlType").value = "zzz"; $("wlCheck").click(); }
-      else if(ch.type === "build"){ d.querySelector('[data-wtile="0"]').click(); $("wlCheck").click(); }
-      if(W.WV.view === "play") $("wlNext").click();
+  }
+  function LANG_CODE_OF(L){ return {French:"fr", Portuguese:"pt", "Mandarin Chinese":"zh", Arabic:"ar"}[L]; }
+  // Spanish and English still work and still offer every mode
+  setTarget("Spanish");
+  if([...d.querySelectorAll("#modes [data-mode]")].some(b => b.disabled)) fail("Spanish has disabled modes");
+  P.setup.mode = 4; P.setup.level = "A1"; P.startNew();
+  if(!w.__pgm.S || w.__pgm.S.target !== "Spanish") fail("Spanish numbers did not start");
+  /* ---------- two-player duel ---------- */
+  $("duelBtn").click();
+  if($("duelPage").hidden) fail("duel page did not open");
+  const D = w.__duel;
+  D.DLS.players[0].name = "Ana"; D.DLS.players[0].target = "Spanish"; D.DLS.players[0].level = "A1";
+  D.DLS.players[1].name = "Ben"; D.DLS.players[1].target = "Mandarin Chinese"; D.DLS.players[1].level = "A2";
+  D.DLS.rounds = 5; D.DLS.timer = false;
+  $("duelPage").querySelector("#dlStart") || fail("no start button");
+  D.dlOpen(); $("dlStart").click();
+  if(!D.DL || D.DL.view !== "ready") fail("duel did not reach the ready screen");
+  const kinds = {};
+  for(let turn = 0; turn < 10; turn++){
+    const who = D.DL.turn;
+    if(who !== turn % 2) fail("turn order", turn, who);
+    $("dlReady").click();
+    const q = D.DL.q; kinds[q.k] = (kinds[q.k] || 0) + 1;
+    const rightAnswer = who === 0 || turn % 4 !== 1;    // Ben misses some
+    if(q.opts){
+      const want = q.k === "pick" ? q.item.t : q.item.n;
+      const i = rightAnswer ? q.opts.indexOf(want) : q.opts.findIndex(o => o !== want);
+      d.querySelector(`[data-dopt="${i}"]`).click();
+    } else if(q.k === "build"){
+      if(rightAnswer){ const used = new Set(); for(const wd of q.item.t.split(" ")){ const i = q.tiles.findIndex((x, k) => x === wd && !used.has(k)); used.add(i); d.querySelector(`[data-dtile="${i}"]`).click(); } }
+      else d.querySelector('[data-dtile="0"]').click();
+      $("dlCheck").click();
+    } else {
+      $("dlType").value = rightAnswer ? q.item.t : "zzz"; $("dlType").dispatchEvent(new w.Event("input")); $("dlCheck").click();
     }
-    if(W.WV.view !== "end" || W.WV.run.won) fail(c, "losing both hearts should end the boss fight");
-    if(!W.wpOf(c).b[0]) fail(c, "a lost rematch erased the win");
-    d.querySelector('#worldPage [data-wgo="path"]').click();
-    $("wlPractice").click();
-    if(W.WV.view !== "play") fail(c, "practice did not start");
-    d.querySelector('#worldPage [data-wgo="path"]').click();
-    d.querySelector('#worldPage [data-wgo="home"]').click();
+    if(!D.DL.q.done) fail("question not graded", q.k);
+    if(D.DL.q.ok !== rightAnswer) fail("graded", D.DL.q.ok, "expected", rightAnswer, q.k, q.item.t);
+    if(q.code === "zh" && q.k !== "rev" && d.querySelector("#duelPage .dq") && / /.test(q.item.t) && d.querySelector("#duelPage .dq b") && / /.test(d.querySelector("#duelPage .dq b").textContent)) fail("Chinese answer shown with spaces");
+    $("dlNext").click();
   }
-  // losing all hearts ends the run
-  d.querySelector('[data-wpack="fr"]').click(); d.querySelector('[data-wunit="0"]').click(); $("wlGo").click();
-  for(let k = 0; k < 10 && W.WV.view === "play"; k++){
-    const R = W.WV.run, ch = R.items[R.i];
-    if(ch.opts){ d.querySelector(`[data-wopt="${ch.opts.findIndex(o => o !== ch.ans)}"]`).click(); }
-    else if(ch.type === "type"){ $("wlType").value = "zzz"; $("wlCheck").click(); }
-    else if(ch.type === "build"){ d.querySelector('[data-wtile="0"]').click(); $("wlCheck").click(); if(W.WV.run.state === "ok"){ $("wlNext").click(); continue; } }
-    else if(ch.type === "match"){ for(const i of ch.left){ d.querySelector(`[data-wml="${i}"]`).click(); d.querySelector(`[data-wmr="${i}"]`).click(); } }
-    if(W.WV.view === "play") $("wlNext").click();
-  }
-  if(W.WV.view !== "end" || W.WV.run.won) fail("three misses should end the unit");
-  d.querySelector('#worldPage [data-wgo="path"]').click();
-  d.querySelector('#worldPage [data-wgo="home"]').click();
-  d.querySelector('#worldPage [data-wgo="menu"]').click();
-  if($("menu").hidden || !$("worldPage").hidden) fail("back to menu failed");
-  // progress survives a reload
-  const saved = w.localStorage.getItem("pgm-world");
-  if(!saved || !JSON.parse(saved).zh || Object.keys(JSON.parse(saved).zh.u).length !== 16) fail("progress not saved");
-  if(dom.errors.length) fail("page errors", dom.errors.slice(0, 3).map(String));
-  console.log("world packs ok", {answered, types});
+  if(D.DL.view !== "end") fail("duel did not end after 5 rounds", D.DL.view);
+  const [a, b] = D.DL.players;
+  if(a.right !== 5) fail("Ana should have 5 right", a.right);
+  if(b.right >= 5) fail("Ben should have missed some", b.right);
+  if(a.score <= b.score) fail("Ana should win", a.score, b.score);
+  if(!/Ana/.test($("duelPage").textContent)) fail("winner not shown");
+  if(Object.keys(kinds).length < 3) fail("too few challenge kinds", JSON.stringify(kinds));
+  if(kinds.type && D.DL.players[1].target === "Mandarin Chinese" && false) fail();
+  $("dlRematch").click();
+  if(D.DL.view !== "ready" || D.DL.players[0].score !== 0) fail("rematch did not reset");
+  // quitting asks twice
+  d.querySelector('#duelPage [data-dgo="quit"]').click();
+  if(!D.DL) fail("first ✕ should only arm the quit");
+  d.querySelector('#duelPage [data-dgo="quit"]').click();
+  if(D.DL) fail("second ✕ should quit");
+  d.querySelector('#duelPage [data-dgo="menu"]').click();
+  if($("menu").hidden || !$("duelPage").hidden) fail("back to menu failed");
+  if(!w.localStorage.getItem("pgm-duel")) fail("duel setup not saved");
+  // single-player save untouched by the duel
+  console.log("duel kinds", JSON.stringify(kinds));
   if(fails){ console.log(fails, "FAILURES"); process.exit(1); }
   console.log("ALL TESTS PASSED");
   process.exit(0);

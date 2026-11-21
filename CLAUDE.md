@@ -3,7 +3,7 @@
 Read this first in any new chat about this project. It is the short version of everything learned while building it.
 
 ## What it is
-- A Spanish ↔ English language game (CEFR A1–B2) that started as Emmanuel's Gemini gem. Everything runs offline with built-in content and no AI at play time.
+- A language game: Spanish ↔ English (CEFR A1–B2) plus French, Portuguese, Mandarin Chinese and Arabic taught through English (A1–A2) that started as Emmanuel's Gemini gem. Everything runs offline with built-in content and no AI at play time.
 - Repo: github.com/doonoo/polyglot-game-master (open source).
 - Shipped three ways:
   1. **PWA on GitHub Pages**, from `.github/workflows/pages.yml`.
@@ -23,7 +23,7 @@ Read this first in any new chat about this project. It is the short version of e
   2. Apply exact-string `rep()` patches, including the CSS blocks injected before `</style>`.
   3. Append every `src/*.js` module in the order of the `out = "\n".join([...])` line near the bottom of build.py.
 - All modules share one scope, an IIFE. Extend existing functions by wrapping them: `fn = (orig => function(...){ ...orig(...)... })(fn);`.
-- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js → world.js → voiceprefs.js → sfx.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
+- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js → langs.js → voiceprefs.js → sfx.js → duel.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
 - A new feature module needs adding to that join list. A new CEFR content file needs adding to the `CEFR = [...]` list.
 - `www/native-tts.js` bridges the native Android text-to-speech plugin. The `www/` folder (with `index.html` built) is what Capacitor packages.
 - After changing npm Capacitor plugins, run `npx cap sync android` and commit the changed `android/` gradle files.
@@ -43,12 +43,11 @@ Read this first in any new chat about this project. It is the short version of e
   - Push lessons into `ES_A1…ES_B2` (Spanish course) or `EN_A1…EN_B2` (English course, for Spanish speakers). For the English course, titles and tips are written in Spanish.
 - **Island:** 15 items of `[en, es, clozeES, clozeEN]`. Files: `content_islands2.js` and `content_islands3.js`.
 - **Story:** `{id, lv, ico, t:{es,en}, p:[{s, es, en} | {q:{es,en}, o:[...], a}]}`, with at least 3 questions. Files: `stories*.js`.
-- **World Languages pack** (`src/lang_<code>.js`, taught through English only): `WL.<code> = {name, self, flag, tts, dir, typing, rom?, seg?, music, bosses:[[emoji, name]...], units:[{lv, t, ico, b, w:[[target, english, rom?]], s:[[english, target, rom?]]}]}`.
-  - Units come in blocks of 4; a boss (`bosses[k]`) follows each block and must be beaten to open the next unit. Bosses hide romanization, need exact accents, give 2 hearts, have 8 HP, and the final blow is always a sentence build.
-  - Sentence targets are split into words by spaces; those become the tiles. `seg:true` (Chinese) hides the spaces on screen.
-  - `rom` (pinyin / transliteration) needs one entry per word, separated by normal spaces; use a no-break space inside one entry (`Lǐ Míng`).
-  - Every word target and every English meaning must be unique within a pack; tips need a **bold** term. test12 checks all of this and plays every unit.
-  - A new pack needs adding to `WL_ORDER` in world.js, to the build.py join (before world.js) and a `music` track in chiptune.js.
+- **Extra-language pack** (`src/lang_<code>.js`, taught through English only): `WL.<code> = {name, self, flag, tts, dir, typing, rom?, seg?, music, bosses, units:[{lv, t, ico, b, w:[[target, english, rom?]], s:[[english, target, rom?]]}]}`. `langs.js` turns each unit into an ordinary CEFR lesson in `COURSE[code][lv]`.
+  - Sentence targets are split into words by spaces (they become tiles and Error Hunter swaps). Chinese is written with spaces between words in the data; `xlSpace()` hides them on screen and grading ignores them.
+  - `rom` (pinyin / transliteration) needs one entry per word, separated by normal spaces; use a no-break space inside one entry (`Lǐ Míng`). Mandarin and Arabic sentences get the romanization as a `|` alternative, so typing it in plain letters is accepted.
+  - Every word target and every English meaning must be unique within a pack; tips need a **bold** term. test12 checks the lessons and plays every new course.
+  - A new language: add a pack, add its code to `XL` / `XL_NAME` in langs.js, the file to the build.py join (before langs.js), and a `music` track in chiptune.js. `XL_MODES` lists the modes it can play (1, 2, 3 for now).
 - **Grammar tips:** `src/tips.js` holds `TIP_ES` and `TIP_EN`, rules shaped `{id, re, en, es}`. test10 checks that 95% or more of items get a tip.
 
 ## Modes and systems
@@ -63,8 +62,9 @@ Read this first in any new chat about this project. It is the short version of e
   - `fx.js`: confetti watchdog.
   - `chiptune.js`: NES-style soundtrack. Replaces Music's methods; tracks live in `CHIP_TRACKS` (16 tokens per bar, notation at the top of the file); `syncMood()` picks the track per mode.
   - `juice.js`: arcade effects (pixel bursts, +XP, combo banners, shake, boss flash, beat pulses, now-playing tag). DOM + CSS only, off under `__PGM_TEST`, the Animations switch or reduced motion.
-  - `world.js`: World Languages (Mandarin, Arabic, French, Portuguese). Its own page, lesson path and mini-games, separate from the Spanish/English engine. Progress in localStorage `pgm-world`; answers count toward XP, streak and quests via `recordAnswer`.
-  - `voiceprefs.js`: the 🔈 Audio sheet (main menu and World Languages path). Its switches drive the existing settings: listening = `#echoChk` / `pgm-echo` / `canEcho()`, speaking = `.voiceChk` / `pgm-voice`. Anything that plays audio or asks the player to listen should check `canEcho()`.
+  - `langs.js`: French, Portuguese, Mandarin, Arabic in the main engine. Native is always English for them; modes outside `XL_MODES` and Stories are disabled; `mixSources` returns nothing so no Spanish/English numbers or verb drills leak in; Mandarin/Arabic typed games get word tiles with romanization; `norm` drops spaces and tones for zh and vowel marks for ar.
+  - `duel.js`: two-player pass-the-phone duel (own page). Each player has their own course and level; questions come from `COURSE` items; grading uses `gradeLocal`. Setup saved in localStorage `pgm-duel`; it never touches the single-player save or stats.
+  - `voiceprefs.js`: the 🔈 Audio sheet. Its switches drive the existing settings: listening = `#echoChk` / `pgm-echo` / `canEcho()`, speaking = `.voiceChk` / `pgm-voice`. Anything that plays audio or asks the player to listen should check `canEcho()`.
   - `sfx.js`: 8-bit sound effects (its own small chip: pulse, triangle, noise). Every effect is a `Sound.<name>()` call: tap, select, start, correct, wrong, heart, combo(n), levelUp, stageClear, stageFail, star(i), unlocked, badge, loot, tile, untile, pick, match, bossIntro, bossHit, bossAttack, bossBlock, finalBlow, bossDefeat, timeUp, tick, page. It wraps `playOutcome` (base beeps muted, one sound per outcome) and respects the 🔊 switch. Off under `__PGM_TEST` unless `__SFX_FORCE`.
   - `voice.js`: Speak Up game plus 🎤 dictation. Only where `SpeechRecognition` exists or the Android plugin `@capacitor-community/speech-recognition` is present.
 - **Challenge copying:** when a challenge is copied into `S.current`, only listed fields survive. The list is in a build.py rep ending with `strict, double, parts`. A new challenge field must be added there.
@@ -112,8 +112,9 @@ Read this first in any new chat about this project. It is the short version of e
 | 2.3.0 | World Languages A2, boss battles |
 | 2.3.1 | Voice & audio switches (turn off listening / speaking rounds) |
 | 2.4.0 | 8-bit sound effects for every game event |
+| 2.5.0 | French, Portuguese, Mandarin, Arabic in the main game (World Languages section removed); two-player duel |
 
-Current version: 2.4.0, versionCode 25.
+Current version: 2.5.0, versionCode 26.
 
 ## Working with Emmanuel
 - He likes short, direct answers and wants Claude to take the initiative on scope.

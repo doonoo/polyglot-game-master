@@ -1,6 +1,6 @@
 /* ===================== Voice & audio quick settings =====================
-   One place, reachable from the main menu and from World Languages, to switch off the
-   rounds you can't do right now: listening (Echo Chamber, World Languages "What do you hear?")
+   One place, reachable from the main menu, to switch off the
+   rounds you can't do right now: listening (Echo Chamber)
    and speaking (Speak Up, 🎤 dictation). Both switches drive the existing settings
    (pgm-echo via #echoChk and pgm-voice via .voiceChk), so the in-game 🎛️ panel stays in sync. */
 Object.assign(I18N.en, {va_short:"Audio", va_btn:"Voice & audio", va_title:"Voice & audio", va_listen:"Listening challenges", va_listenSub:"Rounds where you hear a word or sentence and answer.",
@@ -68,7 +68,6 @@ function vaRefresh(){
   b.textContent = (off ? "🔇 " : "🔈 ") + t("va_short");
   b.setAttribute("aria-label", t("va_btn")); b.title = t("va_btn");
   b.classList.toggle("va-off", off);
-  const w = $("wlAudio"); if(w){ w.textContent = (off ? "🔇 " : "🔈 ") + t("va_btn"); w.classList.toggle("va-off", off); }
 }
 function vaSetListen(on){
   const chk = $("echoChk");
@@ -80,9 +79,9 @@ function vaSetSpeak(on){
   chk.dispatchEvent(new Event("change", {bubbles:true}));   // voice.js listens for .voiceChk changes
 }
 function vaOpen(){ vaRefresh(); $("vaSheet").hidden = false; setTimeout(() => { const f = $("vaListen").disabled ? $("vaDone") : $("vaListen"); f.focus(); }, 30); }
-function vaClose(){ $("vaSheet").hidden = true; vaRefresh(); if(WV && WV.view === "path" && !$("worldPage").hidden) wlRender(); }
+function vaClose(){ $("vaSheet").hidden = true; vaRefresh(); }
 document.addEventListener("click", e => {
-  if(e.target.closest("#menuAudioBtn") || e.target.closest("#wlAudio")){ Sound.tap(); return vaOpen(); }
+  if(e.target.closest("#menuAudioBtn")){ Sound.tap(); return vaOpen(); }
   if(e.target.id === "vaSheet" || e.target.closest("#vaDone")) return vaClose();
   if(e.target.closest("#vaQuiet")){
     if(!vaListenNA()) vaSetListen(false);
@@ -97,13 +96,5 @@ document.addEventListener("change", e => {
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("vaSheet").hidden) vaClose(); });
 applyI18n = (orig => function(){ const r = orig.apply(this, arguments); try{ vaRefresh(); }catch(e){} return r; })(applyI18n);
 
-/* World Languages: no "What do you hear?" rounds and no automatic audio when listening is off */
-wlSayCur = (orig => function(P, quiet){ if(quiet && !canEcho()) return; return orig.apply(this, arguments); })(wlSayCur);
-wlPath = (orig => function(el, P){
-  orig.apply(this, arguments);
-  const tools = el.querySelector(".wtools");
-  if(tools && !$("wlAudio")){ const b = document.createElement("button"); b.className = "chip"; b.id = "wlAudio"; b.type = "button"; tools.insertBefore(b, tools.lastElementChild); }
-  vaRefresh();
-})(wlPath);
 setTimeout(vaRefresh, 0);
 if(window.__PGM_TEST) window.__va = {vaOpen, vaClose, vaRefresh, get echoOn(){ return echoOn; }, get voiceOn(){ return voiceOn; }};

@@ -116,7 +116,7 @@ const SFX = (() => {
   Sound.unlock = function(){ try{ baseUnlock(); }catch(e){} try{ if(Sound.isOn()) SFX.ensure(); }catch(e){} };
   for(const n of SFX.names) Sound[n] = arg => SFX.play(n, arg);
   // these three also carry the arcade visuals juice.js used to add around the old beeps
-  Sound.bossIntro = () => { SFX.play("bossIntro"); try{ juFlash("#E5384F"); juShake($("worldPage") && !$("worldPage").hidden ? $("worldPage") : $("feed"), "jx-quake"); juBanner(t("ju_boss"), "boss"); }catch(e){} };
+  Sound.bossIntro = () => { SFX.play("bossIntro"); try{ juFlash("#E5384F"); juShake($("feed"), "jx-quake"); juBanner(t("ju_boss"), "boss"); }catch(e){} };
   Sound.badge = () => { SFX.play("badge"); try{ juBurst(window.innerWidth / 2, 96, 14, ["#FFD45C", "#9D91FF", "#FFFFFF"], 90); }catch(e){} };
   Sound.loot = () => { SFX.play("loot"); try{ juBurst(window.innerWidth / 2, 96, 14, ["#F2B01E", "#4FD195", "#FFFFFF"], 90); }catch(e){} };
 })();

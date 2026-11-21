@@ -33,9 +33,6 @@ function boot(withVoice){
   $("vaListen").checked = false; $("vaListen").dispatchEvent(new w.Event("change", {bubbles:true}));
   if(w.localStorage.getItem("pgm-echo") !== "off") fail("listening off not saved");
   if($("echoChk").checked) fail("in-game listening switch not synced");
-  // World Languages: no listen rounds and no auto-audio
-  const W = w.__world, P = W.wlPack("fr");
-  for(let k = 0; k < 20; k++) if(W.wlLesson(P, 0).some(c => c.type === "listen")) { fail("listen round with listening off"); break; }
   // speaking off
   $("vaSpeak").checked = false; $("vaSpeak").dispatchEvent(new w.Event("change", {bubbles:true}));
   await new Promise(r => setTimeout(r, 10));
@@ -51,18 +48,11 @@ function boot(withVoice){
   btn.click();
   if(!$("vaListen").checked || !$("vaSpeak").checked) fail("sheet out of sync with in-game switches");
   if(btn.classList.contains("va-off")) fail("menu button still shows off");
-  let sawListen = false;
-  for(let k = 0; k < 20 && !sawListen; k++) sawListen = W.wlLesson(P, 0).some(c => c.type === "listen");
-  if(!sawListen) fail("listen rounds should come back when listening is on");
   // quiet mode
   $("vaQuiet").click();
   await new Promise(r => setTimeout(r, 400));
   if(w.localStorage.getItem("pgm-echo") !== "off" || w.localStorage.getItem("pgm-voice") !== "off") fail("quiet mode did not turn both off");
   if(!$("vaSheet").hidden) fail("quiet mode should close the sheet");
-  // the button is on the World Languages path too
-  $("worldBtn").click(); d.querySelector('[data-wpack="zh"]').click();
-  if(!$("wlAudio")) fail("no voice & audio button on the World Languages path");
-  else { $("wlAudio").click(); if($("vaSheet").hidden) fail("world button did not open the sheet"); $("vaDone").click(); }
   // Spanish UI
   const sel = $("uiSel"); sel.value = "es"; sel.dispatchEvent(new w.Event("change", {bubbles:true}));
   await new Promise(r => setTimeout(r, 20));
