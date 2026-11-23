@@ -23,7 +23,7 @@ Read this first in any new chat about this project. It is the short version of e
   2. Apply exact-string `rep()` patches, including the CSS blocks injected before `</style>`.
   3. Append every `src/*.js` module in the order of the `out = "\n".join([...])` line near the bottom of build.py.
 - All modules share one scope, an IIFE. Extend existing functions by wrapping them: `fn = (orig => function(...){ ...orig(...)... })(fn);`.
-- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js → langs.js → voiceprefs.js → sfx.js → duel.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
+- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js → langs.js → voiceprefs.js → sfx.js → twoplayer.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
 - A new feature module needs adding to that join list. A new CEFR content file needs adding to the `CEFR = [...]` list.
 - `www/native-tts.js` bridges the native Android text-to-speech plugin. The `www/` folder (with `index.html` built) is what Capacitor packages.
 - After changing npm Capacitor plugins, run `npx cap sync android` and commit the changed `android/` gradle files.
@@ -63,14 +63,14 @@ Read this first in any new chat about this project. It is the short version of e
   - `chiptune.js`: NES-style soundtrack. Replaces Music's methods; tracks live in `CHIP_TRACKS` (16 tokens per bar, notation at the top of the file); `syncMood()` picks the track per mode.
   - `juice.js`: arcade effects (pixel bursts, +XP, combo banners, shake, boss flash, beat pulses, now-playing tag). DOM + CSS only, off under `__PGM_TEST`, the Animations switch or reduced motion.
   - `langs.js`: French, Portuguese, Mandarin, Arabic in the main engine. Native is always English for them; modes outside `XL_MODES` and Stories are disabled; `mixSources` returns nothing so no Spanish/English numbers or verb drills leak in; Mandarin/Arabic typed games get word tiles with romanization; `norm` drops spaces and tones for zh and vowel marks for ar.
-  - `duel.js`: two-player pass-the-phone duel (own page). Each player has their own course and level; questions come from `COURSE` items; grading uses `gradeLocal`. Setup saved in localStorage `pgm-duel`; it never touches the single-player save or stats.
+  - `twoplayer.js`: two players (hot seat) in every mode. Menu toggle 1/2 players (settings in localStorage `pgm-2p`). Each player has a full state in `TP.states`; after an answer the player sees feedback, then `tpGo()` swaps the other state into `S` (their question was already generated). Wraps `save` and `recordAnswer` (off in 2P, so the single-player save and stats stay untouched; `loadSave()` restores S afterwards), `runTurn`, `showOver`, `renderGame`, `showMenu`, `ckPaused`. End rules: practice-style = N turns each; Survivor/Time Attack = last one standing (ends when the survivor passes the eliminated player); Island Hopper = race. Between turns all keys except Enter are blocked so the hidden question can't be answered.
   - `voiceprefs.js`: the 🔈 Audio sheet. Its switches drive the existing settings: listening = `#echoChk` / `pgm-echo` / `canEcho()`, speaking = `.voiceChk` / `pgm-voice`. Anything that plays audio or asks the player to listen should check `canEcho()`.
   - `sfx.js`: 8-bit sound effects (its own small chip: pulse, triangle, noise). Every effect is a `Sound.<name>()` call: tap, select, start, correct, wrong, heart, combo(n), levelUp, stageClear, stageFail, star(i), unlocked, badge, loot, tile, untile, pick, match, bossIntro, bossHit, bossAttack, bossBlock, finalBlow, bossDefeat, timeUp, tick, page. It wraps `playOutcome` (base beeps muted, one sound per outcome) and respects the 🔊 switch. Off under `__PGM_TEST` unless `__SFX_FORCE`.
   - `voice.js`: Speak Up game plus 🎤 dictation. Only where `SpeechRecognition` exists or the Android plugin `@capacitor-community/speech-recognition` is present.
 - **Challenge copying:** when a challenge is copied into `S.current`, only listed fields survive. The list is in a build.py rep ending with `strict, double, parts`. A new challenge field must be added there.
 
 ## Testing
-- Run `npm test`: test.js and test4–test13, all JSDOM. It takes a few minutes.
+- Run `npm test`: test.js and test4–test14, all JSDOM. test14 plays a 2-player game in every mode. It takes a few minutes.
   - Tests set `window.__PGM_TEST = true`, which exposes `window.__pgm` (S, setup, COURSE, variantsOf, gradeLocal, expand, tipsFor…).
   - Test pages keep timers running, so a new test file must end with `process.exit(0)`.
 - For real-browser checks, use Playwright with `/usr/bin/google-chrome`. Chrome has a native `SpeechRecognition`; override both `SpeechRecognition` and `webkitSpeechRecognition` when faking voice.
@@ -113,8 +113,9 @@ Read this first in any new chat about this project. It is the short version of e
 | 2.3.1 | Voice & audio switches (turn off listening / speaking rounds) |
 | 2.4.0 | 8-bit sound effects for every game event |
 | 2.5.0 | French, Portuguese, Mandarin, Arabic in the main game (World Languages section removed); two-player duel |
+| 2.6.0 | Two players built into every mode (duel page removed), PC layout |
 
-Current version: 2.5.0, versionCode 26.
+Current version: 2.6.0, versionCode 27.
 
 ## Working with Emmanuel
 - He likes short, direct answers and wants Claude to take the initiative on scope.

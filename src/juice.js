@@ -240,7 +240,6 @@ document.addEventListener("pgm-beat", e => {
 let juNp = null;
 document.addEventListener("pgm-track", e => {
   if(!e.detail || !Music.isOn()) return;
-  { const dp = document.getElementById("duelPage"); if(dp && !dp.hidden) return; }
   if(juNp) juNp.remove();
   const n = document.createElement("div"); n.className = "jx-np"; n.setAttribute("role", "status");
   n.innerHTML = `<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span><small>♪ ${esc(t("nowPlaying"))}</small><b>${esc(e.detail.name)}</b></span>`;

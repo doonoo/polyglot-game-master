@@ -1,0 +1,6 @@
+Dos jugadores en todos los modos.
+• Cambia el menú a 👥 2 jugadores y juega cualquier modo por turnos: Práctica, Supervivencia, Números, Islas, Conjugación, jefes y más.
+• Cada jugador elige su idioma y nivel.
+• Supervivencia: gana el último en pie; Islas: es una carrera.
+• En el móvil hay pantalla para pasar el teléfono; en PC los marcadores van a los lados e Intro avanza.
+• Pantalla de ganador con revancha.

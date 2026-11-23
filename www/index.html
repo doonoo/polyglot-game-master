@@ -14716,7 +14716,6 @@ document.addEventListener("pgm-beat", e => {
 let juNp = null;
 document.addEventListener("pgm-track", e => {
   if(!e.detail || !Music.isOn()) return;
-  { const dp = document.getElementById("duelPage"); if(dp && !dp.hidden) return; }
   if(juNp) juNp.remove();
   const n = document.createElement("div"); n.className = "jx-np"; n.setAttribute("role", "status");
   n.innerHTML = `<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span><span><small>♪ ${esc(t("nowPlaying"))}</small><b>${esc(e.detail.name)}</b></span>`;
@@ -15466,354 +15465,361 @@ syncMood = (orig => function(){
 
 if(window.__PGM_TEST) window.__sfx = {SFX, Sound};
 
-/* ===================== Two-player duel (pass the phone) =====================
-   Two players on one device take turns. Each player picks their own course and level, so a
-   Spanish learner and an English learner can play each other. Rounds mix four challenge
-   types built from the regular lessons: pick the translation, what does it mean, build the
-   sentence from tiles and type it. Points for right answers, a speed bonus with the timer on,
-   and a streak bonus. Nothing here touches the single-player save or stats. */
+/* ===================== Two players (hot seat) =====================
+   Part of the normal game, not a separate mode: switch the menu to 👥 2 players and every
+   mode is played by two people taking turns on one phone or one computer.
+   Each player has a full game state of their own (course, level, hearts, streak, XP, boss
+   fights, island, clock), kept in TP.states. After a player answers they see their feedback;
+   then the turn passes and the other player's state is swapped into S. Their next question
+   was generated with their answer, so the engine runs unchanged.
+   Modes: rounds-based for practice-style modes; Survivor, Island Hopper and Time Attack run
+   until both players are out. Nothing is saved over the single-player game or counted in the
+   single-player stats. */
 Object.assign(I18N.en, {
-  dl_btn:"2 Players", dl_btnSub:"Pass-the-phone duel", dl_title:"Two-player duel", dl_sub:"Take turns on one phone. Each player can learn a different language.",
-  dl_p:"Player {n}", dl_name:"Name", dl_learning:"Learning", dl_level:"Level", dl_rounds:"Rounds each", dl_timer:"20-second timer",
-  dl_start:"Start duel", dl_pass:"Pass the phone to", dl_ready:"I'm ready", dl_turn:"{name}'s turn", dl_round:"Round {r} of {n}",
-  dl_pick:"Pick the {lang} translation", dl_rev:"What does this mean?", dl_build:"Build it in {lang}", dl_type:"Type it in {lang}",
-  dl_check:"Check", dl_next:"Next: {name}", dl_results:"See who won", dl_right:"Right!", dl_wrong:"Not quite", dl_answer:"Answer:",
-  dl_pts:"+{n}", dl_wins:"{name} wins!", dl_tie:"It's a tie!", dl_rematch:"Rematch", dl_menu:"Menu", dl_quit:"Quit duel",
-  dl_timeUp:"Time's up!", dl_speed:"speed", dl_streak:"streak", dl_correct:"{n} right", dl_best:"best streak {n}", dl_quitAsk:"Tap ✕ again to quit the duel"
+  tp_players:"Players", tp_one:"1 player", tp_two:"2 players", tp_p1:"Player 1", tp_p2:"Player 2", tp_name:"Name",
+  tp_p1note:"Uses the course and level chosen above.", tp_learning:"Learning", tp_level:"Level", tp_rounds:"Turns each", tp_untilOut:"Until both are out",
+  tp_handoff:"Hide the next question between turns (pass-the-phone screen)", tp_turnOf:"{name}'s turn", tp_pass:"Pass to", tp_passKb:"Your turn,",
+  tp_ready:"I'm ready", tp_next:"Next: {name}", tp_again:"Next turn", tp_results:"See who won", tp_out:"{name} is out!", tp_wins:"{name} wins!", tp_tie:"It's a tie!",
+  tp_rematch:"Rematch", tp_menu:"Menu", tp_leave:"Tap ☰ again to leave the 2-player game", tp_turn:"Turn {n} of {m}", tp_turnInf:"Turn {n}",
+  tp_xp:"XP", tp_right:"right", tp_best:"best streak", tp_reached:"reached", tp_badMode:"{name}'s language can't play this mode yet.", tp_first:"{name} goes first",
+  tp_keys:"Enter ↵"
 });
 Object.assign(I18N.es, {
-  dl_btn:"2 jugadores", dl_btnSub:"Duelo pasando el teléfono", dl_title:"Duelo de dos jugadores", dl_sub:"Turnaos en un mismo teléfono. Cada jugador puede aprender un idioma distinto.",
-  dl_p:"Jugador {n}", dl_name:"Nombre", dl_learning:"Aprende", dl_level:"Nivel", dl_rounds:"Rondas cada uno", dl_timer:"Temporizador de 20 segundos",
-  dl_start:"Empezar duelo", dl_pass:"Pasa el teléfono a", dl_ready:"Estoy listo", dl_turn:"Turno de {name}", dl_round:"Ronda {r} de {n}",
-  dl_pick:"Elige la traducción en {lang}", dl_rev:"¿Qué significa?", dl_build:"Constrúyelo en {lang}", dl_type:"Escríbelo en {lang}",
-  dl_check:"Comprobar", dl_next:"Ahora: {name}", dl_results:"Ver quién ganó", dl_right:"¡Bien!", dl_wrong:"No exactamente", dl_answer:"Respuesta:",
-  dl_pts:"+{n}", dl_wins:"¡Gana {name}!", dl_tie:"¡Empate!", dl_rematch:"Revancha", dl_menu:"Menú", dl_quit:"Salir del duelo",
-  dl_timeUp:"¡Se acabó el tiempo!", dl_speed:"rapidez", dl_streak:"racha", dl_correct:"{n} aciertos", dl_best:"mejor racha {n}", dl_quitAsk:"Toca ✕ otra vez para salir"
+  tp_players:"Jugadores", tp_one:"1 jugador", tp_two:"2 jugadores", tp_p1:"Jugador 1", tp_p2:"Jugador 2", tp_name:"Nombre",
+  tp_p1note:"Usa el curso y el nivel elegidos arriba.", tp_learning:"Aprende", tp_level:"Nivel", tp_rounds:"Turnos cada uno", tp_untilOut:"Hasta que los dos queden fuera",
+  tp_handoff:"Ocultar la siguiente pregunta entre turnos (pantalla para pasar el teléfono)", tp_turnOf:"Turno de {name}", tp_pass:"Pasa a", tp_passKb:"Te toca,",
+  tp_ready:"Estoy listo", tp_next:"Ahora: {name}", tp_again:"Siguiente turno", tp_results:"Ver quién ganó", tp_out:"¡{name} queda fuera!", tp_wins:"¡Gana {name}!", tp_tie:"¡Empate!",
+  tp_rematch:"Revancha", tp_menu:"Menú", tp_leave:"Toca ☰ otra vez para salir de la partida a dos", tp_turn:"Turno {n} de {m}", tp_turnInf:"Turno {n}",
+  tp_xp:"XP", tp_right:"aciertos", tp_best:"mejor racha", tp_reached:"llegó a", tp_badMode:"El idioma de {name} aún no tiene este modo.", tp_first:"Empieza {name}",
+  tp_keys:"Intro ↵"
 });
 
-const DL_COLORS = ["#2B7FFF", "#FF4D6D"];
-let DLS = {players:[{name:"", target:"Spanish", level:"A1"}, {name:"", target:"English", level:"A1"}], rounds:5, timer:false};
-try{ const sv = JSON.parse(localStorage.getItem("pgm-duel") || "null"); if(sv && sv.players && sv.players.length === 2) DLS = Object.assign(DLS, sv); }catch(e){}
-const dlSaveSetup = () => { try{ localStorage.setItem("pgm-duel", JSON.stringify(DLS)); }catch(e){} };
-let DL = null;   // the running duel
+const TP_COLORS = ["#2B7FFF", "#FF4D6D"], TP_ICON = ["🔵", "🔴"];
+const tpFinePointer = (() => { try{ return matchMedia("(pointer: fine)").matches && !matchMedia("(pointer: coarse)").matches; }catch(e){ return false; } })();
+let TPS = {on:false, names:["", ""], p2:{target:"English", level:"A1"}, rounds:10, handoff:!tpFinePointer};
+try{ const sv = JSON.parse(localStorage.getItem("pgm-2p") || "null"); if(sv && sv.names) TPS = Object.assign(TPS, sv, {p2:Object.assign({}, TPS.p2, sv.p2 || {})}); }catch(e){}
+const tpSaveSet = () => { try{ localStorage.setItem("pgm-2p", JSON.stringify(TPS)); }catch(e){} };
+let TP = {on:false};
 
-const dlNative = target => target === "English" ? "Spanish" : "English";
-const dlLangName = name => (LN[LANG_CODE[UI.code === "es" ? "Spanish" : "English"]] || LN.en)[name] || name;
-const dlLevels = target => Object.keys(COURSE[LANG_CODE[target]] || {});
-const dlShuf = a => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-const dlShow = (code, s) => code === "zh" && typeof xlSpace === "function" ? xlSpace(s) : s;
-const dlRom = (code, s) => (code === "zh" || code === "ar") && typeof XL_ROM !== "undefined" ? XL_ROM[xlKey(s)] || "" : "";
-function dlPool(target, level){
-  const code = LANG_CODE[target], lessons = (COURSE[code] || {})[level] || [];
-  const out = [], seen = new Set();
-  for(const c of lessons) for(const it of (c.it || [])){
-    const t = canon(it[1]), n = canon(it[0]), len = t.split(" ").length;
-    if(!t || !n || len < 2 || len > 9 || seen.has(t)) continue;
-    seen.add(t); out.push({t, n, p:it[1]});
-  }
-  return out;
-}
-function dlQuestion(pl){
-  const code = LANG_CODE[pl.target], nonLatin = code === "zh" || code === "ar";
-  if(!pl.bag || pl.bag.length < 4) pl.bag = dlShuf(dlPool(pl.target, pl.level));
-  const item = pl.bag.pop(), others = pl.pool.filter(x => x.t !== item.t);
-  const kinds = nonLatin ? ["pick", "rev", "build", "build"] : ["pick", "rev", "build", "type"];
-  let k = kinds[(pl.qn + Math.floor(Math.random() * 2)) % kinds.length];
-  if(k === pl.lastK) k = kinds[(kinds.indexOf(k) + 1) % kinds.length];
-  pl.lastK = k; pl.qn++;
-  const q = {k, item, code};
-  if(k === "pick") q.opts = dlShuf([item.t, ...dlShuf(others).slice(0, 3).map(x => x.t)]);
-  if(k === "rev") q.opts = dlShuf([item.n, ...dlShuf(others).slice(0, 3).map(x => x.n)]);
-  if(k === "build"){
-    const words = item.t.split(" "), extra = dlShuf([...new Set(others.flatMap(x => x.t.split(" ")))].filter(w => !words.includes(w))).slice(0, 3);
-    q.tiles = dlShuf(words.concat(extra)); q.picked = [];
-  }
-  return q;
-}
+const tpNative = target => target === "English" ? "Spanish" : "English";
+const tpEndless = mode => mode === 3 || mode === 6 || (typeof setup !== "undefined" && setup.clock === "attack");
+const tpName = i => (TPS.names[i] || "").trim() || t(i ? "tp_p2" : "tp_p1");
+function tpModeOk(target, mode){ return !(typeof xlIs === "function" && xlIs(target) && !XL_MODES.includes(mode)); }
 
-/* ---------- page and menu button ---------- */
+/* ---------- menu ---------- */
 (() => {
   const css = document.createElement("style");
   css.textContent = `
-.duelcard{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-radius:20px;padding:14px 18px;margin:0 0 18px;color:#fff;cursor:pointer;
-  background:linear-gradient(110deg,${DL_COLORS[0]} 0%,#7B5CFF 50%,${DL_COLORS[1]} 100%);box-shadow:0 5px 0 #3A2A8A,0 14px 30px -18px rgba(91,75,214,.9);position:relative;overflow:hidden}
-.duelcard:active{transform:translateY(3px);box-shadow:0 2px 0 #3A2A8A}
-.duelcard .ic{font-size:2.1rem;line-height:1}
-.duelcard b{display:block;font:800 1.2rem/1.15 "Bricolage Grotesque",sans-serif}
-.duelcard small{display:block;opacity:.92}
-.duelcard .vs{margin-left:auto;font:800 1.1rem "Bricolage Grotesque",sans-serif;background:rgba(0,0,0,.2);border-radius:10px;padding:4px 9px}
-#duelPage .dtop{display:flex;align-items:center;gap:10px;margin:4px 0 12px}
-#duelPage .dtop h1{margin:0;font-size:1.5rem;flex:1}
-.dsetup{display:grid;gap:12px}
-.dplayer{background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);border-left:6px solid var(--pc)}
-.dplayer h3{margin:0 0 8px;color:var(--pc);font-size:1.05rem}
-.dplayer .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.dplayer input,.dplayer select,.dopts select{width:100%}
-.dopts{background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);display:grid;gap:10px}
-.dopts label.tog{display:flex;align-items:center;gap:10px}
-.dscore{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:12px}
-.dpill{background:var(--card);border-radius:14px;padding:8px 10px;box-shadow:var(--shadow);border:3px solid transparent;text-align:center;transition:transform .2s,border-color .2s}
-.dpill.on{border-color:var(--pc);transform:scale(1.04)}
-.dpill .nm{display:block;font-weight:800;color:var(--pc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dpill .sc{display:block;font:800 1.5rem/1.1 "Bricolage Grotesque",sans-serif}
-.dpill .sc.bump{animation:jxBeatBig .4s ease-out}
-.dvs{font:800 1rem "Bricolage Grotesque",sans-serif;color:var(--muted)}
-.dround{text-align:center;color:var(--muted);font-size:.9rem;margin:-4px 0 10px}
-.dready{text-align:center;padding:40px 18px;border-radius:24px;color:#fff;background:var(--pc);box-shadow:0 8px 0 rgba(0,0,0,.18)}
-.dready .who{font:800 2.2rem/1.1 "Bricolage Grotesque",sans-serif;margin:8px 0 6px}
-.dready .lang{opacity:.92;margin-bottom:22px}
-.dready button{background:#fff;color:#1C1A33;border:0;border-radius:14px;padding:14px 30px;font:800 1.2rem "Bricolage Grotesque",sans-serif;box-shadow:0 5px 0 rgba(0,0,0,.2)}
-.dq{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow);border-top:6px solid var(--pc)}
-.dq .ask{font:800 1.1rem/1.3 "Bricolage Grotesque",sans-serif;margin:0 0 10px}
-.dq .prompt{font-size:1.5rem;font-weight:700;text-align:center;margin:6px 0 4px}
-.dq .rom{text-align:center;color:var(--violet);margin-bottom:8px}
-.dq .timer{height:8px;border-radius:9px;background:var(--violet-soft);overflow:hidden;margin-bottom:12px}
-.dq .timer i{display:block;height:100%;background:var(--pc);transition:width 1s linear}
-.dopt{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-bottom-width:4px;border-radius:14px;padding:12px 14px;font-size:1.05rem;margin-top:8px}
-.dopt .k{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;font-size:.75rem;color:var(--muted)}
-.dopt.ok{border-color:var(--green);background:var(--green-soft)}
-.dopt.bad{border-color:var(--red);background:var(--red-soft);animation:jxShake .42s}
-.dans{min-height:52px;border-bottom:2px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;padding:6px 0;margin-bottom:12px}
-.dtiles{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
-.dtile{background:var(--card);border:2px solid var(--line);border-bottom-width:4px;border-radius:12px;padding:7px 12px;font-size:1.1rem}
-.dtile.used{visibility:hidden}
-.dtype{width:100%;font-size:1.15rem;padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--field)}
-.dfeed{margin-top:12px;padding:14px;border-radius:16px}
-.dfeed.ok{background:var(--green-soft)}.dfeed.bad{background:var(--red-soft)}
-.dfeed .msg{font-weight:800;font-size:1.1rem;margin-bottom:6px}
-.dfeed.ok .msg{color:var(--green)}.dfeed.bad .msg{color:var(--red)}
-.dfeed .bon{color:var(--muted);font-size:.9rem}
-.dbtn{width:100%;margin-top:12px}
-.dend{text-align:center;padding:10px 0}
-.dend .crown{font-size:4.5rem;line-height:1;display:inline-block;animation:jxDropL .7s cubic-bezier(.2,1.4,.4,1) backwards}
-.dend h2{font-size:2rem;margin:8px 0 14px}
-.dend .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.dend .col{background:var(--card);border-radius:16px;padding:12px;box-shadow:var(--shadow);border-top:6px solid var(--pc)}
-.dend .col b{display:block;color:var(--pc);font-size:1.1rem}
-.dend .col .big{font:800 2rem/1.1 "Bricolage Grotesque",sans-serif}
-.dend .col small{display:block;color:var(--muted)}
-.dend .col.win{transform:scale(1.04);box-shadow:0 0 0 3px var(--pc),var(--shadow)}
-[dir=rtl].dtiles,[dir=rtl].dans{direction:rtl}
+.tpbox{background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);margin:0 0 14px}
+.tpseg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--field);border-radius:14px;padding:4px}
+.tpseg button{border:0;border-radius:11px;padding:10px;font-weight:800;background:transparent;color:var(--ink)}
+.tpseg button[aria-pressed=true]{background:var(--violet);color:#fff;box-shadow:0 3px 0 var(--violet-deep)}
+.tpcfg{display:grid;gap:10px;margin-top:12px}
+.tprow{border-left:5px solid var(--pc);padding:6px 0 6px 10px}
+.tprow h4{margin:0 0 6px;color:var(--pc)}
+.tprow .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.tprow input,.tprow select,.tpcfg select{width:100%}
+.tpcfg label.tog{display:flex;gap:10px;align-items:flex-start;font-size:.92rem}
+.tpwarn{color:var(--red);font-weight:700;font-size:.9rem}
+#tpBar{position:sticky;top:calc(var(--hud-h, 58px) + 4px);z-index:5;display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:0 0 12px}
+.tppill{background:var(--card);border-radius:14px;padding:7px 10px;box-shadow:var(--shadow);border:3px solid transparent;text-align:center;transition:transform .2s,border-color .2s,opacity .2s;min-width:0}
+.tppill.on{border-color:var(--pc);transform:scale(1.04)}
+.tppill.out{opacity:.45;filter:grayscale(.6)}
+.tppill .nm{display:block;font-weight:800;color:var(--pc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tppill .sc{display:block;font:800 1.35rem/1.1 "Bricolage Grotesque",sans-serif}
+.tppill .sub{display:block;font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tppill .dots{display:flex;gap:3px;justify-content:center;margin-top:3px;min-height:8px}
+.tppill .dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.tppill .dots i.y{background:var(--green)}.tppill .dots i.n{background:var(--red)}
+.tpmid{font-size:.78rem;color:var(--muted);text-align:center;font-weight:700;line-height:1.2}
+.tpmid b{display:block;font:800 1rem "Bricolage Grotesque",sans-serif;color:var(--ink)}
+body.tp-on #feed{box-shadow:inset 0 0 0 0 transparent}
+body.tp-on[data-tp="0"] .hud{box-shadow:0 3px 0 ${TP_COLORS[0]}}
+body.tp-on[data-tp="1"] .hud{box-shadow:0 3px 0 ${TP_COLORS[1]}}
+body.tp-on[data-tp="0"] #challengeCard{border-top:5px solid ${TP_COLORS[0]}}
+body.tp-on[data-tp="1"] #challengeCard{border-top:5px solid ${TP_COLORS[1]}}
+#tpNext{display:block;width:100%;margin:12px 0 18px;font-size:1.1rem;background:var(--pc);box-shadow:0 5px 0 rgba(0,0,0,.25)}
+#tpNext kbd,.tpready kbd{font:inherit;font-size:.75em;font-weight:700;color:inherit;background:rgba(255,255,255,.18);margin-left:10px;border:1px solid currentColor;border-radius:6px;padding:1px 7px;box-shadow:none}
+.tpwho{position:relative}
+.tpov{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--pc);color:#fff;animation:aFade .2s ease-out}
+.tpov[hidden]{display:none}
+.tpov .in{text-align:center;max-width:460px}
+.tpov .big{font:800 clamp(2.2rem,9vw,3.6rem)/1.05 "Bricolage Grotesque",sans-serif;margin:10px 0 8px}
+.tpov .lang{opacity:.92;margin-bottom:26px;font-size:1.05rem}
+.tpov .tpready{background:#fff;color:#1C1A33;border:0;border-radius:16px;padding:15px 34px;font:800 1.25rem "Bricolage Grotesque",sans-serif;box-shadow:0 6px 0 rgba(0,0,0,.22)}
+.tpov .tpready kbd{border-color:#1C1A33}
+.tpres{position:fixed;inset:0;z-index:30;overflow:auto;background:var(--bg);padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.tpres[hidden]{display:none}
+.tpres .in{max-width:640px;margin:0 auto;text-align:center}
+.tpres .crown{font-size:4.5rem;line-height:1;display:inline-block;animation:jxDropL .7s cubic-bezier(.2,1.4,.4,1) backwards}
+.tpres h2{font-size:2.1rem;margin:8px 0 16px}
+.tpres .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.tpres .col{background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);border-top:6px solid var(--pc)}
+.tpres .col.win{box-shadow:0 0 0 3px var(--pc),var(--shadow);transform:scale(1.03)}
+.tpres .col b{display:block;color:var(--pc);font-size:1.15rem}
+.tpres .col .big{display:block;font:800 2.2rem/1.1 "Bricolage Grotesque",sans-serif}
+.tpres .col small{display:block;color:var(--muted);margin-top:2px}
+.tpres .btns{display:grid;gap:10px}
+@media (min-width:1100px){
+  body.tp-on #tpBar{position:fixed;top:120px;left:0;right:0;display:block;pointer-events:none;margin:0;z-index:4}
+  body.tp-on #tpBar .tppill{position:absolute;width:210px;padding:16px 14px;pointer-events:auto}
+  body.tp-on #tpBar .tppill:first-child{left:max(16px, calc(50% - 320px - 250px))}
+  body.tp-on #tpBar .tppill:last-child{right:max(16px, calc(50% - 320px - 250px))}
+  body.tp-on #tpBar .tppill .sc{font-size:2.2rem}
+  body.tp-on #tpBar .tppill .nm{font-size:1.15rem}
+  body.tp-on #tpBar .tppill .dots i{width:9px;height:9px}
+  body.tp-on #tpBar .tpmid{position:absolute;left:50%;top:-56px;transform:translateX(-50%);display:none}
+  body.tp-on #tpBar .tppill.on{transform:scale(1.06)}
+}
 `;
   document.head.appendChild(css);
-  const page = document.createElement("main");
-  page.id = "duelPage"; page.className = "wrap"; page.hidden = true;
-  $("menu").after(page);
-  const card = document.createElement("button");
-  card.id = "duelBtn"; card.className = "duelcard";
-  card.innerHTML = `<span class="ic" aria-hidden="true">👥</span><span><b data-i18n="dl_btn">${esc(t("dl_btn"))}</b><small data-i18n="dl_btnSub">${esc(t("dl_btnSub"))}</small></span><span class="vs" aria-hidden="true">VS</span>`;
-  $("continueBtn").after(card);
-  card.addEventListener("click", () => { Sound.unlock(); Sound.start(); dlOpen(); });
+  const box = document.createElement("div");
+  box.className = "tpbox"; box.id = "tpBox";
+  $("startBtn").before(box);
+  const ov = document.createElement("div"); ov.className = "tpov"; ov.id = "tpOv"; ov.hidden = true; document.body.appendChild(ov);
+  const rs = document.createElement("div"); rs.className = "tpres"; rs.id = "tpRes"; rs.hidden = true; document.body.appendChild(rs);
 })();
 
-showOnly = (orig => function(id){
-  const pg = $("duelPage"); if(pg) pg.hidden = id !== "duelPage";
+function tpMenu(){
+  const box = $("tpBox"); if(!box) return;
+  const mode = setup.mode, lv = levelsFor(mode, TPS.p2.target);
+  if(!lv.includes(TPS.p2.level)) TPS.p2.level = lv.includes(setup.level) ? setup.level : lv[0];
+  const bad = [setup.target, TPS.p2.target].map((tg, i) => !tpModeOk(tg, mode) ? tpName(i) : null).filter(Boolean);
+  const endless = tpEndless(mode);
+  box.innerHTML = `<div class="f" style="margin-bottom:6px">👥 ${esc(t("tp_players"))}</div>
+    <div class="tpseg" role="group" aria-label="${esc(t("tp_players"))}"><button type="button" data-tpn="1" aria-pressed="${!TPS.on}">👤 ${esc(t("tp_one"))}</button><button type="button" data-tpn="2" aria-pressed="${TPS.on}">👥 ${esc(t("tp_two"))}</button></div>
+    ${TPS.on ? `<div class="tpcfg">
+      <div class="tprow" style="--pc:${TP_COLORS[0]}"><h4>${TP_ICON[0]} ${esc(t("tp_p1"))}</h4><input id="tpName0" data-tpname="0" maxlength="16" value="${esc(TPS.names[0])}" placeholder="${esc(t("tp_p1"))}" aria-label="${esc(t("tp_name"))}" autocomplete="off"><small class="note">${esc(t("tp_p1note"))} ${esc(langLabel(setup.target))}</small></div>
+      <div class="tprow" style="--pc:${TP_COLORS[1]}"><h4>${TP_ICON[1]} ${esc(t("tp_p2"))}</h4><input id="tpName1" data-tpname="1" maxlength="16" value="${esc(TPS.names[1])}" placeholder="${esc(t("tp_p2"))}" aria-label="${esc(t("tp_name"))}" autocomplete="off">
+        <div class="two"><div><label class="f" for="tpLang">${esc(t("tp_learning"))}</label><select id="tpLang">${LANGS.map(l => `<option value="${esc(l)}" ${l === TPS.p2.target ? "selected" : ""}>${esc(langLabel(l))}</option>`).join("")}</select></div>
+        <div><label class="f" for="tpLv">${esc(t("tp_level"))}</label><select id="tpLv" ${mode === 3 || mode === 6 ? "disabled" : ""}>${lv.map(l => `<option ${l === TPS.p2.level ? "selected" : ""}>${l}</option>`).join("")}</select></div></div></div>
+      ${endless ? `<small class="note">⏳ ${esc(t("tp_untilOut"))}</small>` : `<div><label class="f" for="tpRounds">${esc(t("tp_rounds"))}</label><select id="tpRounds">${[5, 10, 15, 20, 30].map(n => `<option ${n === TPS.rounds ? "selected" : ""}>${n}</option>`).join("")}</select></div>`}
+      <label class="tog"><input type="checkbox" id="tpHand" ${TPS.handoff ? "checked" : ""}> ${esc(t("tp_handoff"))}</label>
+      ${bad.length ? `<div class="tpwarn">⚠️ ${esc(t("tp_badMode", {name:bad.join(", ")}))}</div>` : ""}</div>` : ""}`;
+  $("startBtn").disabled = TPS.on && bad.length > 0;
+}
+renderMenu = (orig => function(){ const r = orig.apply(this, arguments); try{ tpMenu(); }catch(e){} return r; })(renderMenu);
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-tpn]");
+  if(b){ TPS.on = b.dataset.tpn === "2"; tpSaveSet(); Sound.tap(); renderMenu(); }
+});
+document.addEventListener("change", e => {
+  const el = e.target;
+  if(el.id === "tpLang"){ TPS.p2.target = el.value; tpSaveSet(); renderMenu(); }
+  if(el.id === "tpLv"){ TPS.p2.level = el.value; tpSaveSet(); }
+  if(el.id === "tpRounds"){ TPS.rounds = +el.value; tpSaveSet(); }
+  if(el.id === "tpHand"){ TPS.handoff = el.checked; tpSaveSet(); }
+});
+document.addEventListener("input", e => { const el = e.target; if(el.dataset && el.dataset.tpname !== undefined){ TPS.names[+el.dataset.tpname] = el.value; tpSaveSet(); } });
+
+/* ---------- starting a 2-player game ---------- */
+$("startBtn").addEventListener("click", e => {
+  if(!TPS.on) return;
+  e.stopImmediatePropagation(); e.preventDefault();
+  tpStart();
+}, true);
+function tpStart(){
+  if(!tpModeOk(setup.target, setup.mode) || !tpModeOk(TPS.p2.target, setup.mode)){ renderMenu(); return; }
+  const mode = setup.mode;
+  const cfg = [
+    {target:setup.target, native:setup.native, level:mode === 3 ? "A1" : setup.level},
+    {target:TPS.p2.target, native:tpNative(TPS.p2.target), level:mode === 3 ? "A1" : TPS.p2.level}
+  ];
+  if(typeof xlIs === "function") cfg.forEach(c => { if(xlIs(c.target)) c.native = "English"; });
+  TP = {on:true, cur:0, states:[null, null], turns:[0, 0], out:[false, false], names:[tpName(0), tpName(1)], cfg, mode,
+    rounds:tpEndless(mode) ? Infinity : TPS.rounds, handoff:TPS.handoff, phase:"play", hist:[[], []], inTurn:false};
+  $("startNote").textContent = "";
+  for(const i of [1, 0]){
+    S = freshState({mode, target:cfg[i].target, native:cfg[i].native, level:cfg[i].level, islandId:i === 0 ? setup.island : ""});
+    S.tp = i; TP.states[i] = S;
+    if(i === 0) showGame();
+    TP.inTurn = true; try{ runTurn(null); } finally { TP.inTurn = false; }
+    TP.states[i] = S;
+  }
+  S = TP.states[0];
+  document.body.classList.add("tp-on");
+  Sound.start();
+  tpShowTurn(0, true);
+}
+
+/* ---------- hooks into the engine ---------- */
+ckPaused = (orig => function(){ return orig.apply(this, arguments) || (TP.on && (!$("tpOv").hidden || !$("tpRes").hidden || TP.phase !== "play")); })(ckPaused);
+save = (orig => function(){ if(TP.on) return; return orig.apply(this, arguments); })(save);
+recordAnswer = (orig => function(){ if(TP.on) return; return orig.apply(this, arguments); })(recordAnswer);
+runTurn = (orig => function(answer, force){
+  if(!TP.on || TP.inTurn) return orig.apply(this, arguments);
+  const answering = !!(S && S.current && S.current.plan), me = TP.cur;
+  TP.inTurn = true;
+  try{ orig.apply(this, arguments); } finally { TP.inTurn = false; }
+  undo = null;
+  TP.states[me] = S;
+  if(!answering) return;
+  TP.turns[me]++;
+  if(S.judgement) TP.hist[me].push(!!S.judgement.correct);
+  if(S.status !== "playing") TP.out[me] = true;
+  tpAfterAnswer();
+})(runTurn);
+showOver = (orig => function(){
+  if(!TP.on) return orig.apply(this, arguments);
+  TP.out[TP.cur] = true;
+  if(!TP.inTurn){ TP.states[TP.cur] = S; tpAfterAnswer(); }   // e.g. Time Attack ran out of time
+})(showOver);
+renderGame = (orig => function(){
   const r = orig.apply(this, arguments);
-  if(id === "duelPage") try{ syncMood(); }catch(e){}
+  if(TP.on) try{ tpDecorate(); }catch(e){}
   return r;
-})(showOnly);
-showMenu = (orig => function(){ const pg = $("duelPage"); if(pg) pg.hidden = true; dlStopTimer(); return orig.apply(this, arguments); })(showMenu);
+})(renderGame);
+showMenu = (orig => function(){
+  if(TP.on) tpEnd(false);
+  return orig.apply(this, arguments);
+})(showMenu);
+// leaving a 2-player game takes two taps on ☰
+$("menuBtn").addEventListener("click", e => {
+  if(!TP.on || TP.phase === "done") return;
+  if(!TP.leaveArmed){ e.stopImmediatePropagation(); TP.leaveArmed = true; toast(t("tp_leave")); setTimeout(() => { TP.leaveArmed = false; }, 2500); }
+}, true);
 syncMood = (orig => function(){
-  const pg = $("duelPage");
-  if(pg && !pg.hidden){ Music.setMood(DL && DL.view === "end" ? "title" : "brawl"); return; }
+  if(TP.on && !$("tpRes").hidden){ Music.setMood("title"); return; }
   return orig.apply(this, arguments);
 })(syncMood);
 
-function dlOpen(){ DL = null; showOnly("duelPage"); dlRender(); window.scrollTo(0, 0); }
-function dlStart(){
-  DLS.players.forEach((p, i) => { if(!p.name.trim()) p.name = t("dl_p", {n:i + 1}); if(!dlLevels(p.target).includes(p.level)) p.level = dlLevels(p.target)[0]; });
-  dlSaveSetup();
-  DL = {view:"ready", turn:0, round:1, players:DLS.players.map((p, i) => ({name:p.name.trim(), target:p.target, level:p.level, color:DL_COLORS[i], score:0, right:0, streak:0, best:0, qn:0,
-    pool:dlPool(p.target, p.level), bag:null})), q:null, timer:DLS.timer, rounds:DLS.rounds};
-  dlRender(); try{ syncMood(); }catch(e){}
+/* ---------- turn flow ---------- */
+const tpKind = () => TP.mode === 3 || (TP.states[0] && TP.states[0].clock === "attack") ? "elim" : TP.mode === 6 ? "race" : "score";
+function tpNextIdx(){
+  const me = TP.cur, other = 1 - me, st = TP.states;
+  const doneFor = i => TP.out[i] || TP.turns[i] >= TP.rounds;
+  if(doneFor(0) && doneFor(1)) return -1;
+  const kind = tpKind(), won = i => st[i].status === "conquered";
+  // last one standing: once someone is out, the other wins as soon as they pass them
+  if(kind === "elim") for(const i of [0, 1]) if(TP.out[i] && !TP.out[1 - i] && st[1 - i].stats.correct > st[i].stats.correct) return -1;
+  // race: the first to finish wins, once both have had the same number of turns
+  if(kind === "race" && (won(0) || won(1)) && TP.turns[0] === TP.turns[1]) return -1;
+  if(!doneFor(other)) return other;
+  return me;
 }
-function dlSetupView(){
-  const lvOpts = p => dlLevels(p.target).map(l => `<option ${l === p.level ? "selected" : ""}>${l}</option>`).join("");
-  const langOpts = p => LANGS.map(l => `<option value="${esc(l)}" ${l === p.target ? "selected" : ""}>${esc(langLabel(l))}</option>`).join("");
-  return `<div class="dtop"><button class="iconbtn" data-dgo="menu" aria-label="${esc(t("dl_menu"))}">←</button><div><h1 class="display">👥 ${esc(t("dl_title"))}</h1></div></div>
-  <p class="lede" style="margin-top:0">${esc(t("dl_sub"))}</p>
-  <div class="dsetup">${DLS.players.map((p, i) => `<div class="dplayer" style="--pc:${DL_COLORS[i]}"><h3>${i ? "🔴" : "🔵"} ${esc(t("dl_p", {n:i + 1}))}</h3>
-    <label class="f" for="dlName${i}">${esc(t("dl_name"))}</label><input id="dlName${i}" data-dp="${i}" data-df="name" maxlength="16" value="${esc(p.name)}" placeholder="${esc(t("dl_p", {n:i + 1}))}" autocomplete="off">
-    <div class="row2"><div><label class="f" for="dlLang${i}">${esc(t("dl_learning"))}</label><select id="dlLang${i}" data-dp="${i}" data-df="target">${langOpts(p)}</select></div>
-    <div><label class="f" for="dlLv${i}">${esc(t("dl_level"))}</label><select id="dlLv${i}" data-dp="${i}" data-df="level">${lvOpts(p)}</select></div></div></div>`).join("")}
-    <div class="dopts"><div><label class="f" for="dlRounds">${esc(t("dl_rounds"))}</label><select id="dlRounds">${[3, 5, 10, 15].map(n => `<option ${n === DLS.rounds ? "selected" : ""}>${n}</option>`).join("")}</select></div>
-    <label class="tog"><input type="checkbox" id="dlTimer" ${DLS.timer ? "checked" : ""}> ⏱️ ${esc(t("dl_timer"))}</label></div>
-    <button class="primary" id="dlStart">⚔️ ${esc(t("dl_start"))}</button></div>`;
+function tpAfterAnswer(){
+  TP.next = tpNextIdx();
+  TP.phase = TP.next < 0 ? "done" : "wait";
+  if(TP.out[TP.cur]) setTimeout(() => { try{ juBanner(t("tp_out", {name:TP.names[TP.cur]}), "boss"); }catch(e){} }, 500);
+  renderGame();
+  const b = $("tpNext"); if(b) setTimeout(() => b.scrollIntoView({block:"nearest", behavior:"smooth"}), 120);
 }
-function dlScore(){
-  return `<div class="dscore">${DL.players.map((p, i) => `<div class="dpill ${DL.turn === i && DL.view !== "end" ? "on" : ""}" style="--pc:${p.color}"><span class="nm">${i ? "🔴" : "🔵"} ${esc(p.name)}</span><span class="sc" id="dlSc${i}">${p.score}</span></div>`).join(`<span class="dvs">VS</span>`)}</div>
-    <div class="dround">${esc(t("dl_round", {r:Math.min(DL.round, DL.rounds), n:DL.rounds}))}</div>`;
+function tpGo(){
+  if(TP.phase === "done") return tpResults();
+  if(TP.phase !== "wait") return;
+  const me = TP.cur, nx = TP.next;
+  TP.states[me] = S;
+  S = TP.states[nx]; TP.cur = nx;
+  S.judgement = null; S.event = null;
+  TP.phase = "play";
+  tpShowTurn(nx, nx !== me);
 }
-function dlRender(){
-  const el = $("duelPage");
-  if(!DL){ el.innerHTML = dlSetupView(); return; }
-  const top = `<div class="dtop"><button class="iconbtn" data-dgo="quit" aria-label="${esc(t("dl_quit"))}">✕</button><div><h1 class="display">👥 ${esc(t("dl_title"))}</h1></div></div>`;
-  const pl = DL.players[DL.turn];
-  if(DL.view === "ready"){
-    el.innerHTML = top + dlScore() + `<div class="dready" style="--pc:${pl.color}"><div>${esc(t("dl_pass"))}</div><div class="who">${DL.turn ? "🔴" : "🔵"} ${esc(pl.name)}</div>
-      <div class="lang">${esc(langLabel(pl.target))} · ${esc(pl.level)}</div><button id="dlReady">${esc(t("dl_ready"))} ▶</button></div>`;
+function tpShowTurn(i, switched){
+  const pl = TP.cfg[i];
+  if(switched && TP.handoff){
+    const ov = $("tpOv");
+    ov.style.setProperty("--pc", TP_COLORS[i]);
+    ov.innerHTML = `<div class="in"><div>${esc(t(tpFinePointer ? "tp_passKb" : "tp_pass"))}</div><div class="big">${TP_ICON[i]} ${esc(TP.names[i])}</div>
+      <div class="lang">${esc(langLabel(pl.target))} · ${esc(S.level || pl.level)}${TP.rounds !== Infinity ? " · " + esc(t("tp_turn", {n:TP.turns[i] + 1, m:TP.rounds})) : ""}</div>
+      <button class="tpready" id="tpReady">${esc(t("tp_ready"))} ▶${tpFinePointer ? `<kbd>${esc(t("tp_keys"))}</kbd>` : ""}</button></div>`;
+    ov.hidden = false;
+    $("game").setAttribute("aria-hidden", "true");
+    renderGame(true);
+    setTimeout(() => { const r = $("tpReady"); if(r) r.focus(); }, 30);
     return;
   }
-  if(DL.view === "end") return dlEnd(el, top);
-  const q = DL.q, code = q.code, L = dlLangName(pl.target), dirA = code === "ar" ? ` dir="rtl" lang="ar"` : code ? ` lang="${code}"` : "";
-  let body = "";
-  const opt = (o, i, tgt) => `<button class="dopt" data-dopt="${i}"><span class="k">${i + 1}</span><span${tgt ? dirA : ""}>${esc(tgt ? dlShow(code, o) : o)}</span></button>`;
-  if(q.k === "pick") body = `<p class="ask">${esc(t("dl_pick", {lang:L}))}</p><div class="prompt">“${esc(q.item.n)}”</div>${q.opts.map((o, i) => opt(o, i, true)).join("")}`;
-  else if(q.k === "rev") body = `<p class="ask">${esc(t("dl_rev"))}</p><div class="prompt"${dirA}>${esc(dlShow(code, q.item.t))}</div>${dlRom(code, q.item.t) ? `<div class="rom">${esc(dlRom(code, q.item.t))}</div>` : ""}${q.opts.map((o, i) => opt(o, i, false)).join("")}`;
-  else if(q.k === "build") body = `<p class="ask">${esc(t("dl_build", {lang:L}))}</p><div class="prompt">“${esc(q.item.n)}”</div>
-    <div class="dans"${dirA}>${q.picked.map(i => `<button class="dtile" data-dun="${i}">${esc(q.tiles[i])}</button>`).join("")}</div>
-    <div class="dtiles"${dirA}>${q.tiles.map((w, i) => `<button class="dtile ${q.picked.includes(i) ? "used" : ""}" data-dtile="${i}">${esc(w)}${code && (code === "zh" || code === "ar") && XL_TOKROM[code][w] ? `<small style="display:block;font-size:.68em;color:var(--violet)" dir="ltr">${esc(XL_TOKROM[code][w])}</small>` : ""}</button>`).join("")}</div>`;
-  else body = `<p class="ask">${esc(t("dl_type", {lang:L}))}</p><div class="prompt">“${esc(q.item.n)}”</div><input class="dtype" id="dlType" autocomplete="off" autocapitalize="off" spellcheck="false" lang="${code}" value="${esc(q.typed || "")}">`;
-  let foot = "";
-  if(q.done){
-    const ok = q.ok, sol = q.k === "rev" ? q.item.n : dlShow(code, q.item.t), rom = q.k !== "rev" ? dlRom(code, q.item.t) : "";
-    const last = DL.turn === 1 && DL.round >= DL.rounds, nextName = DL.players[1 - DL.turn].name;
-    foot = `<div class="dfeed ${ok ? "ok" : "bad"}"><div class="msg">${ok ? "✅ " + esc(t("dl_right")) + " " + esc(t("dl_pts", {n:q.pts})) : "❌ " + esc(q.timeUp ? t("dl_timeUp") : t("dl_wrong"))}</div>
-      ${ok && q.bonus ? `<div class="bon">${esc(q.bonus)}</div>` : ""}
-      ${!ok || q.k === "build" || q.k === "type" ? `<div>${ok ? "" : esc(t("dl_answer")) + " "}<b${q.k !== "rev" ? dirA : ""}>${esc(sol)}</b>${rom ? `<br><small style="color:var(--violet)">${esc(rom)}</small>` : ""}</div>` : ""}</div>
-      <button class="primary dbtn" id="dlNext">${esc(last ? t("dl_results") : t("dl_next", {name:nextName}))} ▶</button>`;
-  } else if(q.k === "build" || q.k === "type"){
-    foot = `<button class="primary dbtn" id="dlCheck" ${q.k === "build" && !q.picked.length ? "disabled" : ""}>${esc(t("dl_check"))}</button>`;
-  }
-  el.innerHTML = top + dlScore() + `<div class="dq" id="dlCard" style="--pc:${pl.color}">${DL.timer && !q.done ? `<div class="timer"><i id="dlBar" style="width:${Math.round(100 * q.left / 20)}%"></i></div>` : ""}${body}${foot}</div>`;
-  if(q.k === "type" && !q.done){ const inp = $("dlType"); inp.focus(); inp.addEventListener("input", () => { q.typed = inp.value; }); }
+  renderGame(true);
+  try{ syncMood(); }catch(e){}
+  if(switched) setTimeout(() => { try{ juBanner(t("tp_turnOf", {name:TP.names[i]}), i ? "boss" : "lvl"); }catch(e){} }, 60);
+  tpFocus();
 }
-function dlEnd(el, top){
-  const [a, b] = DL.players, tie = a.score === b.score, w = tie ? null : a.score > b.score ? a : b;
-  el.innerHTML = top + `<div class="dend"><div class="crown">${tie ? "🤝" : "👑"}</div><h2 class="display" style="${w ? `color:${w.color}` : ""}">${esc(tie ? t("dl_tie") : t("dl_wins", {name:w.name}))}</h2>
-    <div class="cols">${DL.players.map(p => `<div class="col ${p === w ? "win" : ""}" style="--pc:${p.color}"><b>${esc(p.name)}</b><span class="big">${p.score}</span>
-      <small>${esc(t("dl_correct", {n:p.right}))} / ${DL.rounds}</small><small>🔥 ${esc(t("dl_best", {n:p.best}))}</small><small>${esc(langLabel(p.target))} · ${esc(p.level)}</small></div>`).join("")}</div>
-    <button class="primary dbtn" id="dlRematch">🔁 ${esc(t("dl_rematch"))}</button><button class="ghost dbtn" data-dgo="setup">⚙️ ${esc(t("dl_title"))}</button><button class="ghost dbtn" data-dgo="menu">${esc(t("dl_menu"))}</button></div>`;
+function tpReady(){
+  $("tpOv").hidden = true; $("game").removeAttribute("aria-hidden");
+  Sound.select();
+  renderGame(true);
+  try{ syncMood(); }catch(e){}
+  tpFocus();
+}
+function tpFocus(){ setTimeout(() => { const a = $("answer"); if(a && !a.closest("[hidden]") && a.offsetParent) a.focus(); window.scrollTo({top:0}); }, 40); }
+
+function tpDecorate(){
+  document.body.dataset.tp = TP.cur;
+  let bar = $("tpBar");
+  if(!bar){ bar = document.createElement("div"); bar.id = "tpBar"; $("feed").prepend(bar); }
+  const pill = i => {
+    const st = TP.states[i] || {}, s = st.stats || {}, hp = st.mode === 3 ? " · " + "❤️".repeat(Math.max(0, st.hp || 0)) : "";
+    const dots = TP.hist[i].slice(-10).map(v => `<i class="${v ? "y" : "n"}"></i>`).join("");
+    return `<div class="tppill ${TP.cur === i && TP.phase !== "done" ? "on" : ""} ${TP.out[i] ? "out" : ""}" style="--pc:${TP_COLORS[i]}">
+      <span class="nm">${TP_ICON[i]} ${esc(TP.names[i])}</span><span class="sc">${st.xp || 0}</span>
+      <span class="sub">${esc(t("tp_xp"))} · ${s.correct || 0}/${s.answered || 0}${hp}</span><span class="sub">${esc(langLabel(TP.cfg[i].target))} · ${esc(st.level || "")}</span><span class="dots">${dots}</span></div>`;
+  };
+  const n = Math.max(TP.turns[0], TP.turns[1]) + (TP.phase === "play" ? 1 : 0);
+  bar.innerHTML = pill(0) + `<div class="tpmid"><b>VS</b>${esc(TP.rounds === Infinity ? t("tp_turnInf", {n:Math.max(1, n)}) : t("tp_turn", {n:Math.min(Math.max(1, n), TP.rounds), m:TP.rounds}))}</div>` + pill(1);
+  // waiting for the hand-off: show only this player's feedback, keep the next question hidden
+  let nb = $("tpNext");
+  const wait = TP.phase === "wait" || TP.phase === "done";
+  if(wait){
+    for(const id of ["lessonCard", "challengeCard", "cheatPanel", "thinkCard"]){ const el = $(id); if(el) el.hidden = true; }
+    $("tiles") && ($("tiles").hidden = true);
+    if(!nb){ nb = document.createElement("button"); nb.id = "tpNext"; nb.className = "primary"; }
+    const jc = $("judgeCard"), anchor = jc && !jc.hidden ? jc : $("eventCard");
+    (anchor && !anchor.hidden ? anchor : bar).after(nb);
+    const nx = TP.next;
+    nb.style.setProperty("--pc", TP_COLORS[nx < 0 ? TP.cur : nx]);
+    nb.innerHTML = esc(TP.phase === "done" ? "🏆 " + t("tp_results") : nx === TP.cur ? t("tp_again") : t("tp_next", {name:TP.names[nx]})) + " ▶" + (tpFinePointer ? `<kbd>${esc(t("tp_keys"))}</kbd>` : "");
+    nb.hidden = false;
+  } else if(nb) nb.hidden = true;
 }
 
-/* ---------- turn flow ---------- */
-function dlAsk(){
-  const pl = DL.players[DL.turn];
-  DL.q = dlQuestion(pl); DL.q.left = 20; DL.q.t0 = Date.now();
-  DL.view = "q"; dlRender();
-  if(DL.timer) dlRunTimer();
-  if(DL.q.k === "rev" && typeof canEcho === "function" && canEcho()) try{ Narrator.say([{text:dlShow(DL.q.code, DL.q.item.t), lang:DL.q.code}]); }catch(e){}
+/* ---------- results ---------- */
+function tpResults(){
+  TP.phase = "done";
+  const P = TP.states.map((st, i) => ({i, name:TP.names[i], xp:st.xp || 0, right:st.stats.correct, n:st.stats.answered, best:st.stats.best, level:st.level, target:TP.cfg[i].target}));
+  const kind = tpKind();
+  P.forEach(p => { p.won = TP.states[p.i].status === "conquered"; });
+  const cmp = kind === "elim" ? (a, b) => b.right - a.right || b.xp - a.xp
+    : kind === "race" ? (a, b) => (b.won - a.won) || b.xp - a.xp
+    : (a, b) => b.xp - a.xp || b.right - a.right;
+  const sorted = P.slice().sort(cmp), tie = cmp(P[0], P[1]) === 0, w = tie ? null : sorted[0];
+  const rs = $("tpRes");
+  rs.innerHTML = `<div class="in"><div class="crown">${tie ? "🤝" : "👑"}</div><h2 class="display" style="${w ? `color:${TP_COLORS[w.i]}` : ""}">${esc(tie ? t("tp_tie") : t("tp_wins", {name:w.name}))}</h2>
+    <div class="cols">${P.map(p => `<div class="col ${w && w.i === p.i ? "win" : ""}" style="--pc:${TP_COLORS[p.i]}"><b>${TP_ICON[p.i]} ${esc(p.name)}</b><span class="big">${p.xp}</span><small>${esc(t("tp_xp"))}</small>
+      <small>✅ ${p.right}/${p.n} ${esc(t("tp_right"))}${p.n ? ` · ${Math.round(100 * p.right / p.n)}%` : ""}</small><small>🔥 ${esc(t("tp_best"))} ${p.best}</small><small>${esc(langLabel(p.target))} · ${esc(p.level)}</small></div>`).join("")}</div>
+    <div class="btns"><button class="primary" id="tpRematch">🔁 ${esc(t("tp_rematch"))}${tpFinePointer ? `<kbd style="font:inherit;font-size:.75em;margin-left:8px;opacity:.8">${esc(t("tp_keys"))}</kbd>` : ""}</button><button class="ghost" id="tpMenuBtn">${esc(t("tp_menu"))}</button></div></div>`;
+  rs.hidden = false;
+  try{ syncMood(); }catch(e){}
+  if(tie) Sound.levelUp(); else { Sound.stageClear(); try{ confetti(180); }catch(e){} }
+  setTimeout(() => { const b = $("tpRematch"); if(b) b.focus(); }, 50);
 }
-function dlRunTimer(){
-  dlStopTimer();
-  DL.tick = setInterval(() => {
-    if(!DL || !DL.q || DL.q.done || DL.view !== "q"){ dlStopTimer(); return; }
-    DL.q.left--;
-    const bar = $("dlBar"); if(bar) bar.style.width = Math.max(0, Math.round(100 * DL.q.left / 20)) + "%";
-    if(DL.q.left <= 3 && DL.q.left > 0) Sound.tick();
-    if(DL.q.left <= 0){ DL.q.timeUp = true; Sound.timeUp(); dlGrade(false); }
-  }, 1000);
-}
-function dlStopTimer(){ if(DL && DL.tick){ clearInterval(DL.tick); DL.tick = null; } }
-function dlGrade(ok){
-  const q = DL.q, pl = DL.players[DL.turn];
-  if(q.done) return;
-  dlStopTimer();
-  q.done = true; q.ok = ok;
-  if(ok){
-    pl.right++; pl.streak++; pl.best = Math.max(pl.best, pl.streak);
-    let pts = 100; const bon = [];
-    if(DL.timer){ const sp = Math.max(0, Math.round(q.left * 2.5)); if(sp){ pts += sp; bon.push(`⚡ +${sp} ${t("dl_speed")}`); } }
-    if(pl.streak >= 2){ const sb = Math.min(50, (pl.streak - 1) * 10); pts += sb; bon.push(`🔥 +${sb} ${t("dl_streak")}`); }
-    q.pts = pts; q.bonus = bon.join(" · "); pl.score += pts;
-    if(pl.streak === 3 || pl.streak === 5) Sound.combo(pl.streak); else Sound.correct();
-    try{ const p = juHere(); juBurst(p.x, p.y, 16, [pl.color, "#FFD45C", "#FFFFFF"]); juFloat(p.x, p.y - 10, "+" + pts, pl.color); }catch(e){}
-  } else {
-    pl.streak = 0;
-    if(!q.timeUp) Sound.wrong();
-    try{ juVignette(); }catch(e){}
-  }
-  dlRender();
-  const sc = $("dlSc" + DL.turn); if(sc && ok) sc.classList.add("bump");
-  if(!ok) try{ juShake($("dlCard")); }catch(e){}
-}
-function dlNext(){
-  if(DL.turn === 1){
-    if(DL.round >= DL.rounds){ DL.view = "end"; dlRender(); dlCelebrate(); try{ syncMood(); }catch(e){} return; }
-    DL.round++;
-  }
-  DL.turn = 1 - DL.turn; DL.view = "ready"; DL.q = null; dlRender();
-  window.scrollTo(0, 0);
-}
-function dlCelebrate(){
-  const [a, b] = DL.players;
-  if(a.score === b.score){ Sound.levelUp(); return; }
-  Sound.stageClear();
-  try{ confetti(180); juBanner(t("dl_wins", {name:(a.score > b.score ? a : b).name}), "ok"); }catch(e){}
-}
-function dlCheck(){
-  const q = DL.q; if(!q || q.done) return;
-  const pl = DL.players[DL.turn], code = q.code;
-  let ans = "";
-  if(q.k === "build") ans = q.picked.map(i => q.tiles[i]).join(" ");
-  if(q.k === "type") ans = (($("dlType") || {}).value || q.typed || "").trim();
-  if(!ans) return;
-  const res = gradeLocal({target:pl.target, native:dlNative(pl.target)}, {k:"s", al:code, acc:[q.item.p], game:"Classic Mine"}, ans);
-  dlGrade(!!(res && res.correct));
+function tpEnd(toMenu){
+  TP = {on:false};
+  document.body.classList.remove("tp-on"); delete document.body.dataset.tp;
+  $("tpOv").hidden = true; $("tpRes").hidden = true; $("game").removeAttribute("aria-hidden");
+  const bar = $("tpBar"); if(bar) bar.remove();
+  const nb = $("tpNext"); if(nb) nb.remove();
+  S = loadSave();   // the single-player game comes back untouched
+  if(toMenu) showMenu();
 }
 
 document.addEventListener("click", e => {
-  const pg = $("duelPage"); if(!pg || pg.hidden || !pg.contains(e.target)) return;
-  const go = e.target.closest("[data-dgo]");
-  if(go){
-    const v = go.dataset.dgo; Sound.tap();
-    if(v === "menu"){ dlStopTimer(); DL = null; return showMenu(); }
-    if(v === "setup"){ DL = null; dlRender(); try{ syncMood(); }catch(e){} return; }
-    if(v === "quit"){
-      if(DL && DL.view !== "end" && !DL.quitArmed){ DL.quitArmed = true; toast(t("dl_quitAsk")); setTimeout(() => { if(DL) DL.quitArmed = false; }, 2500); return; }
-      dlStopTimer(); DL = null; dlRender(); try{ syncMood(); }catch(e){} return;
-    }
-  }
-  if(e.target.closest("#dlStart")){ Sound.unlock(); Sound.start(); return dlStart(); }
-  if(e.target.closest("#dlReady")){ Sound.unlock(); Sound.select(); return dlAsk(); }
-  if(e.target.closest("#dlNext")){ Sound.tap(); return dlNext(); }
-  if(e.target.closest("#dlRematch")){ Sound.start(); return dlStart(); }
-  if(!DL || !DL.q) return;
-  const q = DL.q;
-  const op = e.target.closest("[data-dopt]");
-  if(op && !q.done){
-    const i = +op.dataset.dopt, want = q.k === "pick" ? q.item.t : q.item.n, ok = q.opts[i] === want;
-    dlGrade(ok);
-    document.querySelectorAll("#duelPage [data-dopt]").forEach(b => { b.disabled = true; const o = q.opts[+b.dataset.dopt]; if(o === want) b.classList.add("ok"); else if(+b.dataset.dopt === i) b.classList.add("bad"); });
-    return;
-  }
-  const tl = e.target.closest("[data-dtile]");
-  if(tl && !q.done){ const i = +tl.dataset.dtile; if(!q.picked.includes(i)){ q.picked.push(i); Sound.tile(); dlRender(); } return; }
-  const ut = e.target.closest("[data-dun]");
-  if(ut && !q.done){ q.picked = q.picked.filter(x => x !== +ut.dataset.dun); Sound.untile(); return dlRender(); }
-  if(e.target.closest("#dlCheck")) return dlCheck();
+  if(e.target.closest("#tpNext")){ Sound.tap(); return tpGo(); }
+  if(e.target.closest("#tpReady")) return tpReady();
+  if(e.target.closest("#tpRematch")){ Sound.start(); tpEnd(false); return tpStart(); }
+  if(e.target.closest("#tpMenuBtn")){ Sound.tap(); return tpEnd(true); }
 });
-document.addEventListener("change", e => {
-  const pg = $("duelPage"); if(!pg || pg.hidden || DL) return;
-  const el = e.target, i = el.dataset ? el.dataset.dp : undefined;
-  if(i !== undefined){
-    const p = DLS.players[+i], f = el.dataset.df; p[f] = el.value;
-    if(f === "target"){ const lv = dlLevels(p.target); if(!lv.includes(p.level)) p.level = lv[0]; dlSaveSetup(); return dlRender(); }
-    dlSaveSetup(); return;
-  }
-  if(el.id === "dlRounds"){ DLS.rounds = +el.value; dlSaveSetup(); }
-  if(el.id === "dlTimer"){ DLS.timer = el.checked; dlSaveSetup(); }
-});
-document.addEventListener("input", e => {
-  const el = e.target; if(!el.dataset || el.dataset.df !== "name") return;
-  DLS.players[+el.dataset.dp].name = el.value; dlSaveSetup();
-});
-document.addEventListener("keydown", e => {
-  const pg = $("duelPage"); if(!pg || pg.hidden || !DL) return;
-  if(e.key === "Enter"){
-    if(DL.view === "ready"){ e.preventDefault(); return dlAsk(); }
-    if(DL.view === "q" && DL.q.done){ e.preventDefault(); return dlNext(); }
-    if(DL.view === "q"){ e.preventDefault(); return dlCheck(); }
-  }
-  if(e.target && e.target.id === "dlType") return;
-  const n = parseInt(e.key, 10);
-  if(DL.view === "q" && DL.q && !DL.q.done && n >= 1 && n <= 9){
-    const b = document.querySelector(DL.q.opts ? `#duelPage [data-dopt="${n - 1}"]` : null);
-    if(b){ e.preventDefault(); b.click(); return; }
-    if(DL.q.k === "build"){ const free = DL.q.tiles.map((x, i) => i).filter(i => !DL.q.picked.includes(i)); if(free[n - 1] !== undefined){ e.preventDefault(); DL.q.picked.push(free[n - 1]); dlRender(); } }
-  }
-});
-if(window.__PGM_TEST) window.__duel = {get DL(){ return DL; }, DLS, dlStart, dlAsk, dlGrade, dlNext, dlCheck, dlPool, dlQuestion, dlOpen};
+// keyboard (PC): Enter moves the game along between turns; the normal game keys work during a turn.
+// Between turns every other key is held back so nobody can answer the hidden question.
+window.addEventListener("keydown", e => {
+  if(!TP.on || e.isComposing) return;
+  const between = !$("tpRes").hidden || !$("tpOv").hidden || TP.phase === "wait" || TP.phase === "done";
+  if(!between) return;
+  if(e.key !== "Enter"){ if(e.key !== "Tab" && !(e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName) && e.target.closest(".tpres"))) e.stopImmediatePropagation(); return; }
+  if(!$("tpRes").hidden){ e.preventDefault(); e.stopImmediatePropagation(); Sound.start(); tpEnd(false); return tpStart(); }
+  if(!$("tpOv").hidden){ e.preventDefault(); e.stopImmediatePropagation(); return tpReady(); }
+  if(TP.phase === "wait" || TP.phase === "done"){ e.preventDefault(); e.stopImmediatePropagation(); Sound.tap(); return tpGo(); }
+}, true);
+setTimeout(() => { try{ tpMenu(); }catch(e){} }, 0);
+if(window.__PGM_TEST) window.__tp = {get TP(){ return TP; }, TPS, tpStart, tpGo, tpReady, tpResults, tpEnd};
 
 function sail(id){
   const old = S;

@@ -1,4 +1,4 @@
-/* More languages in the main game, and the two-player duel */
+/* More languages in the main game */
 const fs = require("fs"), path = require("path");
 const { JSDOM } = require("jsdom");
 const html = fs.readFileSync(path.join(__dirname, "..", "www", "index.html"), "utf8");
@@ -65,59 +65,6 @@ const setTarget = L => { const s = $("targetSel"); s.value = L; s.dispatchEvent(
   if([...d.querySelectorAll("#modes [data-mode]")].some(b => b.disabled)) fail("Spanish has disabled modes");
   P.setup.mode = 4; P.setup.level = "A1"; P.startNew();
   if(!w.__pgm.S || w.__pgm.S.target !== "Spanish") fail("Spanish numbers did not start");
-  /* ---------- two-player duel ---------- */
-  $("duelBtn").click();
-  if($("duelPage").hidden) fail("duel page did not open");
-  const D = w.__duel;
-  D.DLS.players[0].name = "Ana"; D.DLS.players[0].target = "Spanish"; D.DLS.players[0].level = "A1";
-  D.DLS.players[1].name = "Ben"; D.DLS.players[1].target = "Mandarin Chinese"; D.DLS.players[1].level = "A2";
-  D.DLS.rounds = 5; D.DLS.timer = false;
-  $("duelPage").querySelector("#dlStart") || fail("no start button");
-  D.dlOpen(); $("dlStart").click();
-  if(!D.DL || D.DL.view !== "ready") fail("duel did not reach the ready screen");
-  const kinds = {};
-  for(let turn = 0; turn < 10; turn++){
-    const who = D.DL.turn;
-    if(who !== turn % 2) fail("turn order", turn, who);
-    $("dlReady").click();
-    const q = D.DL.q; kinds[q.k] = (kinds[q.k] || 0) + 1;
-    const rightAnswer = who === 0 || turn % 4 !== 1;    // Ben misses some
-    if(q.opts){
-      const want = q.k === "pick" ? q.item.t : q.item.n;
-      const i = rightAnswer ? q.opts.indexOf(want) : q.opts.findIndex(o => o !== want);
-      d.querySelector(`[data-dopt="${i}"]`).click();
-    } else if(q.k === "build"){
-      if(rightAnswer){ const used = new Set(); for(const wd of q.item.t.split(" ")){ const i = q.tiles.findIndex((x, k) => x === wd && !used.has(k)); used.add(i); d.querySelector(`[data-dtile="${i}"]`).click(); } }
-      else d.querySelector('[data-dtile="0"]').click();
-      $("dlCheck").click();
-    } else {
-      $("dlType").value = rightAnswer ? q.item.t : "zzz"; $("dlType").dispatchEvent(new w.Event("input")); $("dlCheck").click();
-    }
-    if(!D.DL.q.done) fail("question not graded", q.k);
-    if(D.DL.q.ok !== rightAnswer) fail("graded", D.DL.q.ok, "expected", rightAnswer, q.k, q.item.t);
-    if(q.code === "zh" && q.k !== "rev" && d.querySelector("#duelPage .dq") && / /.test(q.item.t) && d.querySelector("#duelPage .dq b") && / /.test(d.querySelector("#duelPage .dq b").textContent)) fail("Chinese answer shown with spaces");
-    $("dlNext").click();
-  }
-  if(D.DL.view !== "end") fail("duel did not end after 5 rounds", D.DL.view);
-  const [a, b] = D.DL.players;
-  if(a.right !== 5) fail("Ana should have 5 right", a.right);
-  if(b.right >= 5) fail("Ben should have missed some", b.right);
-  if(a.score <= b.score) fail("Ana should win", a.score, b.score);
-  if(!/Ana/.test($("duelPage").textContent)) fail("winner not shown");
-  if(Object.keys(kinds).length < 3) fail("too few challenge kinds", JSON.stringify(kinds));
-  if(kinds.type && D.DL.players[1].target === "Mandarin Chinese" && false) fail();
-  $("dlRematch").click();
-  if(D.DL.view !== "ready" || D.DL.players[0].score !== 0) fail("rematch did not reset");
-  // quitting asks twice
-  d.querySelector('#duelPage [data-dgo="quit"]').click();
-  if(!D.DL) fail("first ✕ should only arm the quit");
-  d.querySelector('#duelPage [data-dgo="quit"]').click();
-  if(D.DL) fail("second ✕ should quit");
-  d.querySelector('#duelPage [data-dgo="menu"]').click();
-  if($("menu").hidden || !$("duelPage").hidden) fail("back to menu failed");
-  if(!w.localStorage.getItem("pgm-duel")) fail("duel setup not saved");
-  // single-player save untouched by the duel
-  console.log("duel kinds", JSON.stringify(kinds));
   if(fails){ console.log(fails, "FAILURES"); process.exit(1); }
   console.log("ALL TESTS PASSED");
   process.exit(0);
