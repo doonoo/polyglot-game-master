@@ -1,0 +1,1 @@
+New: Multiple choice answer mode. Pick Type or Multiple choice on the menu; it works in every mode, every language and in 2-player games (tap an answer or press 1-4). New: Display size (🔍 on the menu, A-/A+ in the game settings) makes everything bigger or smaller. Small typos now count, except in Survivor, Tricky Pairs and boss fights.
