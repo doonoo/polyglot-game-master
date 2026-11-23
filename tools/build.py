@@ -29,6 +29,7 @@ E = seg(987, 1566)   # absorb, rendering, sound, music, fun layer, narrator, act
 F = seg(1600, 1603)
 
 # ---- head / CSS / HTML ----
+A = rep(A, ".topbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:2px 0 0}", ".topbar{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:8px;margin:2px 0 0;max-width:100%}\n.topbar label{margin-left:auto}\n.topbar .chip{flex:none}\n.topbar select{max-width:100%}")
 A = rep(A, "</style>", """.lv:disabled{opacity:.38;cursor:not-allowed}
 .lv:disabled::after{content:"🔒";font-size:.6em;margin-left:2px;vertical-align:middle}
 .judge .ans .listen + .listen{margin-left:6px}

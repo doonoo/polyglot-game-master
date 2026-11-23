@@ -1,0 +1,1 @@
+Fix: the Music, Audio and keyboard buttons at the top of the menu no longer slide off the left edge on phones with large text. The top bar now wraps onto two lines when it doesn't fit.

@@ -55,7 +55,10 @@ button{cursor:pointer}
 .wrap{max-width:640px;margin:0 auto;padding:16px 16px 56px}
 [hidden]{display:none!important}
 
-.topbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:2px 0 0}
+.topbar{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:8px;margin:2px 0 0;max-width:100%}
+.topbar label{margin-left:auto}
+.topbar .chip{flex:none}
+.topbar select{max-width:100%}
 .topbar label{font-size:.9rem;color:var(--muted);font-weight:700}
 .topbar select{width:auto;padding:6px 10px;border-radius:999px;font-weight:700;background:var(--card)}
 .ui-status{font-size:.9rem;color:var(--muted);text-align:right;margin:4px 0 0}

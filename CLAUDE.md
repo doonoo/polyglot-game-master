@@ -114,10 +114,11 @@ Read this first in any new chat about this project. It is the short version of e
 | 2.4.0 | 8-bit sound effects for every game event |
 | 2.5.0 | French, Portuguese, Mandarin, Arabic in the main game (World Languages section removed); two-player duel |
 | 2.6.0 | Two players built into every mode (duel page removed), PC layout |
+| 2.6.1 | Menu top bar wraps instead of overflowing off-screen with large text |
 
-Current version: 2.6.0, versionCode 27.
+Current version: 2.6.1, versionCode 28.
 
 ## Working with Emmanuel
 - He likes short, direct answers and wants Claude to take the initiative on scope.
 - He often sends phone screenshots of bugs.
-- He tests the Android app on his phone.
+- He tests the Android app on his phone, which uses a large system text size: check layouts with a bigger root font (e.g. 160%) so nothing overflows.

@@ -1,0 +1,1 @@
+Arreglo: los botones de Música, Audio y teclado de arriba del menú ya no se salen por la izquierda en teléfonos con letra grande. La barra superior pasa a dos líneas si no cabe.
