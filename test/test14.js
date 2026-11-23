@@ -68,8 +68,8 @@ function answer(P, right){
       if(!S.current){ fail(mode, "no question for", me); break; }
       order.push(me);
       const a0 = S.stats.answered;
-      // Ana always right; Ben right most of the time (and always wrong in Survivor so he goes out)
-      answer(P, me === 0 ? true : (mode === 3 ? false : order.length % 3 !== 0));
+      // Ana always right; Ben right only now and then (always wrong in Survivor so he goes out)
+      answer(P, me === 0 ? true : (mode === 3 ? false : order.length % 4 === 0));
       if(T.TP.states[me].stats.answered !== a0 + 1) { fail(mode, "answer not counted", me, P.S.current && P.S.current.challenge.game); break; }
     }
     if($("tpRes").hidden) { fail(mode, "no results screen", T.TP.phase, JSON.stringify(T.TP.turns), JSON.stringify(T.TP.out)); T.tpEnd(true); d.querySelector('[data-tpn="2"]').click(); continue; }
