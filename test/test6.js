@@ -77,7 +77,7 @@ for(const lang of ["en", "es"]){
   for(let i = 0; i < 60 && P.S.status === "playing"; i++){
     const ch = P.S.current.challenge, v = P.variantsOf(ch)[0];
     const plain = v.normalize("NFD").replace(/[̀-ͯ]/g, "");
-    if(plain !== v && ch.k === "s"){
+    if(plain !== v && ch.k === "s" && ch.al === ({Spanish:"es", English:"en"})[P.S.target]){   // strict accents are about the language being learned
       const j = P.gradeLocal(P.S, ch, plain, false);
       if(j.correct) fail(lang, "strict accents not applied", v);
       const S2 = Object.assign({}, P.S, {custom:Object.assign({}, P.S.custom, {strict:false})});

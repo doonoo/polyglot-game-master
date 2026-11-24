@@ -21,7 +21,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
         const good = i % 3 !== 0, want = good ? right[0] : ch.opts.find(x => x !== right[0]);
         tiles[ch.opts.indexOf(want)].click(); await sleep(200);
         const j = P.S.judgement; if(j.correct !== good) fail("graded", k, want, j.correct);
-        if(ch.game === "Right or Wrong" || ch.game === "Spot the Mistake"){
+        if((ch.game === "Right or Wrong" || ch.game === "Spot the Mistake") && P.S.status === "playing"){   // a wrong answer can end a Survivor run
           const card = $("judgeCard").querySelector(".ans"), fix = card && card.querySelector(".fbfix");
           if(!j.rw || !j.rw.fix || !fix) fail("correction missing", k, JSON.stringify(j.rw));
           else if(j.rw.had && !card.querySelector(".dx")) fail("correction not highlighted", k, card.textContent);

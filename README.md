@@ -2,7 +2,7 @@
 
 <img src="www/icons/icon-192.png" alt="Leo the lion, the Polyglot Game Master mascot" width="110" align="right">
 
-Learn **Spanish** (for English speakers) or **English** (for Spanish speakers) with games.
+Learn **Spanish** (for English speakers), **English** (for Spanish speakers), or **French**, **Portuguese**, **Mandarin Chinese** and **Arabic** (for English speakers) with mini-games.
 Free, open source, works offline. No account, no ads, no tracking.
 
 **▶ Play now: https://doonoo.github.io/polyglot-game-master/** · **📱 [Android app (APK)](https://github.com/doonoo/polyglot-game-master/releases/download/latest/PolyglotGameMaster.apk)**

@@ -56,7 +56,7 @@ const JUDGE = new Set(["Meaning Check", "Who's Doing It?", "Tense Detective"]);
         const good = i % 3 !== 0, want = good ? right[0] : ch.opts.find(x => x !== right[0]);
         tiles[ch.opts.indexOf(want)].click(); await sleep(200);
         const j = P.S.judgement; if(!j || j.correct !== good) fail("graded", k, want, j && j.correct);
-        if(JUDGE.has(ch.game)){
+        if(JUDGE.has(ch.game) && P.S.status === "playing"){
           const card = $("judgeCard").querySelector(".ans");
           if(!card || !card.querySelector(".fbfix")) fail("card missing the answer row", k, card && card.textContent);
           if(card && /What went wrong|Qué falló/.test(card.textContent)) fail("word diff on labels", k);
