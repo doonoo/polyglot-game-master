@@ -71,8 +71,9 @@ const bare = s => s.toLowerCase().replace(/[¿¡?!.,;:]/g, "").replace(/\s+/g, "
       else { $("answer").value = good; $("submitBtn").click(); }
       if($("continueBtn") && !$("continueBtn").hidden) $("continueBtn").click();
     }
-    if(stat.speak < 8) fail(lang, "Speak Up rarely appears", stat.speak);
-    if(!stat.read || !stat.talk) fail(lang, "need both read-aloud and say-it rounds", stat);
+    // 2.10.1: Speak Up rounds were removed; the 🎤 dictation button stays
+    if(stat.speak) fail(lang, "Speak Up should not appear any more", stat.speak);
+    if(!stat.dict) fail(lang, "dictation should still work", stat);
     if(!stat.dict) fail(lang, "dictation never used");
     // skip button swaps for a typing round
     let guard = 0;

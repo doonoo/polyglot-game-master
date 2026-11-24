@@ -20,7 +20,8 @@ NUMSYL.B2 = [
 /* ===================== Listening game (Echo Chamber) ===================== */
 let echoOn = true;
 try{ echoOn = localStorage.getItem("pgm-echo") !== "off"; }catch(e){}
-const canEcho = () => echoOn && typeof Narrator !== "undefined" && Narrator.available();
+// 2.10.1: listening rounds (Echo Chamber) were removed at Emmanuel's request; everything that offered one checks this
+const canEcho = () => false;
 function echoPlay(slow){
   const c = S && S.current; if(!c) return;
   const text = c.challenge.target, lang = LANG_CODE[S.target];

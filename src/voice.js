@@ -5,7 +5,7 @@
    - "Speak Up": read a sentence out loud, or hear it in your language and say it.
    - 🎤 button next to the answer box: dictate any typed answer. */
 Object.assign(I18N.en, {
-  "game.Speak Up":"Speak Up", vToggle:"Voice exercises", vToggleSub:"Speak Up rounds and a 🎤 button to dictate answers. Uses your device's speech recognition (may need internet).",
+  "game.Speak Up":"Speak Up", vToggle:"🎤 Dictation", vToggleSub:"A 🎤 button to say your answers instead of typing them. Uses your device's speech recognition (may need internet).",
   vTap:"Tap and speak", vListening:"Listening… speak now", vStop:"Tap to stop", vHear:"Hear it", vSkip:"Can't talk now", vMic:"Dictate your answer",
   vHeard:"I heard: {s}", vClose:"Close enough! I heard: {s}", vNoSpeech:"I didn't catch that. Tap the mic and try again.",
   vDenied:"Microphone access is blocked, so voice exercises are off for now. You can allow it in your browser or phone settings.",
@@ -13,7 +13,7 @@ Object.assign(I18N.en, {
   vSkipped:"No problem, here's a typing round instead.", kbMic:"Speak (voice exercises)"
 });
 Object.assign(I18N.es, {
-  "game.Speak Up":"¡Habla!", vToggle:"Ejercicios de voz", vToggleSub:"Rondas de «¡Habla!» y un botón 🎤 para dictar respuestas. Usa el reconocimiento de voz de tu dispositivo (puede necesitar internet).",
+  "game.Speak Up":"¡Habla!", vToggle:"🎤 Dictado", vToggleSub:"Un botón 🎤 para decir tus respuestas en vez de escribirlas. Usa el reconocimiento de voz de tu dispositivo (puede necesitar internet).",
   vTap:"Toca y habla", vListening:"Escuchando… habla ahora", vStop:"Toca para parar", vHear:"Escuchar", vSkip:"No puedo hablar ahora", vMic:"Dicta tu respuesta",
   vHeard:"Escuché: {s}", vClose:"¡Casi perfecto! Escuché: {s}", vNoSpeech:"No te entendí. Toca el micrófono e inténtalo otra vez.",
   vDenied:"El micrófono está bloqueado, así que los ejercicios de voz se desactivan por ahora. Puedes permitirlo en los ajustes del navegador o del teléfono.",
@@ -82,8 +82,8 @@ profile.voice = profile.voice || 0;
 
 /* ---------- Rotation: Speak Up joins the sentence games ---------- */
 gamesFor = (orig => function(st){
-  const g = orig(st);
-  return canSpeak() && SPEAK_MODES.has(st.mode) && !g.includes("Speak Up") ? g.concat("Speak Up") : g;
+  // 2.10.1: Speak Up rounds were removed at Emmanuel's request; the 🎤 dictation button stays
+  return orig(st).filter(g => g !== "Speak Up");
 })(gamesFor);
 
 genSentence = (orig => function(st, plan, c, review, res){

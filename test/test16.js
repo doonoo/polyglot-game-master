@@ -31,5 +31,6 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   if(!seen["Ma1 Quick Pick"] && !seen["Ma1 Meaning Match"]) fail("no option games in Mandarin");
   // quiz screens (typing) never get the option games
   if(w.__mcg.gamesFor({mode:1}).filter(g => MC.includes(g)).length !== 4) fail("rotation", w.__mcg.gamesFor({mode:1}));
+  for(const m of [1,2,3,5,6,8]) if(w.__mcg.gamesFor({mode:m}).some(g => g === "Echo Chamber" || g === "Speak Up")) fail("listening / speaking rounds should be gone", m);
   console.log(bad ? bad + " failures" : "mini-games ok: " + JSON.stringify(seen)); process.exit(bad ? 1 : 0);
 })();

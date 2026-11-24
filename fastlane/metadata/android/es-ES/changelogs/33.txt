@@ -1,0 +1,1 @@
+Se quitaron las rondas de escucha (Cámara de eco) y de voz (¡Habla!): todas las rondas son de leer, escribir o tocar. Aún puedes oír cualquier frase con el altavoz y dictar respuestas con el micrófono.

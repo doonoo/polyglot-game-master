@@ -10,7 +10,7 @@ const CSRC = [
   {id:"g", mode:2, strand:"g", ico:"📐"}, {id:"t", mode:2, strand:"t", ico:"🏷️"}, {id:"f", mode:2, strand:"f", ico:"💬"},
   {id:"verbs", mode:7, ico:"🔨"}, {id:"tricky", mode:8, ico:"⚖️"}, {id:"numbers", mode:4, ico:"🔢"}, {id:"vocab", mode:5, ico:"📚"}
 ];
-const VOCAB_GAMES = ["Classic Mine","Reverse Mine","Syntax Scramble","Odd One Out","Match Madness","Echo Chamber"];
+const VOCAB_GAMES = ["Classic Mine","Reverse Mine","Syntax Scramble","Odd One Out","Match Madness"];
 function srcGames(src){
   if(src.mode === 5) return VOCAB_GAMES.filter(g => g !== "Echo Chamber" || canEcho());
   return gamesFor({mode:src.mode});
@@ -172,7 +172,6 @@ const CPRESETS = [
   {id:"verbs", ico:"🔨", cfg:{sources:{g:false, t:false, f:false, verbs:true, tricky:false, numbers:false, vocab:false}}},
   {id:"talk", ico:"💬", cfg:{sources:{g:false, t:true, f:true, verbs:false, tricky:false, numbers:false, vocab:false}}},
   {id:"tricky", ico:"⚖️", cfg:{sources:{g:false, t:false, f:false, verbs:false, tricky:true, numbers:false, vocab:false}, rounds:20, strict:true}},
-  {id:"ear", ico:"👂", cfg:{onlyGame:"Echo Chamber"}},
   {id:"speed", ico:"⏱️", cfg:{timer:15, rounds:20}},
   {id:"hard", ico:"💀", cfg:{hearts:1, strict:true, hints:false, review:false}}
 ];
