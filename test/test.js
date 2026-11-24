@@ -279,10 +279,12 @@ for(const lang of ["en", "es"]){
   for(const m of [1,2,4,5]){ d.querySelector(`[data-mode="${m}"]`).click(); if(d.querySelectorAll("#levels .lv:disabled").length) fail("locked level in mode", m); if(d.getElementById("levelNote").textContent.trim() && m !== 2) fail("level note", m); }
   d.querySelector('[data-mode="1"]').click();
   d.getElementById("startBtn").click();
-  for(let i = 0; i < 60; i++){
+  for(let i = 0, missed = 0; i < 80; i++){
     const ch = P.S.current.challenge;
-    if(ch.game === "Match Madness") break;
-    d.getElementById("answer").value = i % 4 ? P.variantsOf(ch)[0] : "zzz";
+    if(ch.game === "Match Madness"){ if(missed >= 6) break; d.getElementById("giveUpBtn").click(); continue; }   // need a few misses for the tricky filter
+    const wrong = !(i % 4) && ch.k === "s";
+    if(wrong) missed++;
+    d.getElementById("answer").value = wrong ? "zzz" : P.variantsOf(ch)[0];
     d.getElementById("submitBtn").click();
   }
   if(dom.errors.length) fail("script error", dom.errors[0]);
