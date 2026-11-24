@@ -64,7 +64,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       const ch = S.current.challenge; tot++;
       if(!(Array.isArray(ch.opts) && ch.game !== "Word Duel")){ $("answer").value = P.variantsOf(ch)[0] || "x"; $("submitBtn").click(); continue; }
       mc++;
-      if(ch.opts.length < (ch.game === "Right or Wrong" ? 2 : 3)) fail(mode, tgt, ch.game, "too few options");
+      if(ch.opts.length < (ch.game === "Right or Wrong" || ch.game === "Meaning Check" ? 2 : 3)) fail(mode, tgt, ch.game, "too few options");
       const right = ch.opts.filter(o => P.gradeLocal(S, ch, o, false).correct);
       if(right.length !== 1) fail(mode, tgt, ch.game, "options must have exactly one right answer", JSON.stringify(ch.opts));
       const tiles = [...d.querySelectorAll("#tiles .tile[data-i]")];

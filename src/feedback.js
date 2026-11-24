@@ -93,7 +93,7 @@ function renderFeedback(){
   const j = S && S.judgement, box = $("judgeCard").querySelector(".ans");
   if(!j || !box || box.dataset.fb === "1") return;
   box.dataset.fb = "1";
-  if(j.rw && j.rw.fix){ renderCorrection(j, box); return; }
+  if(j.rw && (j.rw.fix || Array.isArray(j.rw.rows))){ renderCorrection(j, box); return; }
   const q = j.question && j.qgame !== "Match Madness" ? `<div class="fbq"><b>${esc(t("fbQ"))}</b> ${esc(j.question)}</div>` : "";
   let you = j.gaveUp ? "" : `<div><b>${esc(t("you"))}</b> ${esc(j.yours)}</div>`, best = `<div><b>${esc(t("best"))}</b> ${esc(j.answer)}</div>`, notes = "";
   const lang = j.qal || (S.target === "English" ? "en" : "es");
@@ -123,7 +123,10 @@ function renderCorrection(j, box){
   const html = list => list.map(x => x.c === "ok" ? esc(x.w) : `<span class="dx dx-${x.c}">${esc(x.w)}</span>`).join(sep);
   const plain = s => lang === "zh" ? String(s).replace(/ /g, "") : String(s);
   let rows = j.gaveUp ? "" : `<div><b>${esc(t("fbPick"))}</b> ${esc(j.yours)}</div>`, notes = "";
-  if(r.had && r.shown){
+  if(Array.isArray(r.rows)){
+    // ✏️ rows are the answer (green box); "del" rows are crossed out
+    rows += r.rows.map(([l, v, c]) => `<div class="${/^✏️/.test(l) ? "fbfix" : "fbq"}"><b>${esc(l)}</b> ${c === "del" ? `<span class="dx dx-del">${esc(plain(v))}</span>` : esc(plain(v))}</div>`).join("");
+  } else if(r.had && r.shown){
     const al = fbAlign(r.shown, r.fix), changed = al.ya.some(x => x.c !== "ok") || al.ba.some(x => x.c !== "ok");
     rows += `<div class="fbq"><b>${esc(t("fbSent"))}</b> ${changed ? html(al.ya) : esc(plain(r.shown))}</div>`;
     rows += `<div class="fbfix"><b>${esc(t("fbFix"))}</b> ${changed ? html(al.ba) : `<span class="dx dx-add">${esc(plain(r.fix))}</span>`}</div>`;
