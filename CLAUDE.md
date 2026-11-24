@@ -107,7 +107,7 @@ Read this first in any new chat about this project. It is the short version of e
    - Remove the manifest link, theme and app-capable metas, the icon links and the `native-tts.js` script tag.
    - Swap `fonts/fonts.css` for the Google Fonts links (Atkinson Hyperlegible plus Bricolage Grotesque).
    - Remove the service-worker register script.
-   - Publish with the artifact tool's `publish_files` to the slug above, using the current `base_version`.
+   - Publish with the artifact tool's `publish_files` to the slug above, using the current `base_version`. Keep the copy under `/home/claude` (files under `/tmp` are refused).
 
 ## History
 | Version | Change |
