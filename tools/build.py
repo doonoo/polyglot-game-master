@@ -293,7 +293,7 @@ E = rep(E, "  renderPanels();\n  if(fresh){", "  renderPanels();\n  renderExtras
 E = rep(E, "if(Array.isArray(res.syllabus) && res.syllabus.length >= 10){\n      S.syllabus = res.syllabus.slice(0, 15).map(String);", "if(Array.isArray(res.syllabus) && res.syllabus.length >= 1){\n      S.syllabus = res.syllabus.slice(0, 40).map(String);")
 E = rep(E, '$("game").hidden = true; $("over").hidden = true; $("menu").hidden = false;', '$("game").hidden = true; $("over").hidden = true; $("book").hidden = true; $("quiz").hidden = true; $("statsPage").hidden = true; ["storiesPage","storyPage","notifyPage"].forEach(x => $(x).hidden = true); $("menu").hidden = false;')
 E = rep(E, "refreshContinue(); window.scrollTo(0,0);", "refreshContinue(); renderDaily(); window.scrollTo(0,0);")
-E = rep(E, 'yours: answer, gaveUp: answer === null};', 'yours: answer, gaveUp: answer === null, al: j.al || "", question: prevCh ? String(prevCh.target || "") : "", qgame: prevCh ? String(prevCh.game || "") : "", qal: prevCh ? String(prevCh.al || "") : ""};')
+E = rep(E, 'yours: answer, gaveUp: answer === null};', 'yours: answer, gaveUp: answer === null, al: j.al || "", question: prevCh ? String(prevCh.target || "") : "", qgame: prevCh ? String(prevCh.game || "") : "", qal: prevCh ? String(prevCh.al || "") : "", rw: j.rw || null};')
 E = rep(E, 'L.push({text: j.answer, lang: tgt});', 'L.push({text: j.answer, lang: LANG_CODE[S.native] === j.al ? nat : tgt});')
 E = rep(E, '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</button>` : ""}</div>`;',
         '<button class="listen" data-say="judge">🔊 ${esc(t("listen"))}</button>` : ""}${canOverride() ? `<button class="listen" data-act="override">✋ ${esc(t("override"))}</button>` : ""}</div>`;')

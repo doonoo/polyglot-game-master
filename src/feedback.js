@@ -1,6 +1,7 @@
 /* ===================== Clearer feedback: the question, your mistakes marked, what went wrong ===================== */
 Object.assign(I18N.en, {
   fbQ:"Question:", fbWhat:"What went wrong", fbTip:"Grammar tip",
+  fbPick:"You picked:", fbSent:"The sentence:", fbFix:"✏️ Correct version:", fbNoFix:"✓ Nothing to fix: it was already correct.",
   fbLook:"“{y}” is not “{b}”. They look alike, but they are different words.",
   fbLookM:"“{y}” ({ym}) is not “{b}” ({bm}). They look alike, but they mean different things.",
   fbSwap:"You wrote “{y}” where the answer has “{b}”.",
@@ -11,6 +12,7 @@ Object.assign(I18N.en, {
 });
 Object.assign(I18N.es, {
   fbQ:"Pregunta:", fbWhat:"Qué falló", fbTip:"Consejo de gramática",
+  fbPick:"Elegiste:", fbSent:"La frase:", fbFix:"✏️ Versión correcta:", fbNoFix:"✓ No hay nada que corregir: ya estaba bien.",
   fbLook:"«{y}» no es «{b}». Se parecen, pero son palabras distintas.",
   fbLookM:"«{y}» ({ym}) no es «{b}» ({bm}). Se parecen, pero significan cosas distintas.",
   fbSwap:"Escribiste «{y}» donde la respuesta tiene «{b}».",
@@ -91,6 +93,7 @@ function renderFeedback(){
   const j = S && S.judgement, box = $("judgeCard").querySelector(".ans");
   if(!j || !box || box.dataset.fb === "1") return;
   box.dataset.fb = "1";
+  if(j.rw && j.rw.fix){ renderCorrection(j, box); return; }
   const q = j.question && j.qgame !== "Match Madness" ? `<div class="fbq"><b>${esc(t("fbQ"))}</b> ${esc(j.question)}</div>` : "";
   let you = j.gaveUp ? "" : `<div><b>${esc(t("you"))}</b> ${esc(j.yours)}</div>`, best = `<div><b>${esc(t("best"))}</b> ${esc(j.answer)}</div>`, notes = "";
   const lang = j.qal || (S.target === "English" ? "en" : "es");
@@ -114,4 +117,24 @@ function renderFeedback(){
   box.innerHTML = q + you + best + notes;
   btns.forEach(b => box.appendChild(b));
 }
+/* Right or Wrong / Spot the Mistake: the sentence with its mistake crossed out, then the correct version */
+function renderCorrection(j, box){
+  const lang = j.qal || (S.target === "English" ? "en" : "es"), r = j.rw, sep = lang === "zh" ? "" : " ";
+  const html = list => list.map(x => x.c === "ok" ? esc(x.w) : `<span class="dx dx-${x.c}">${esc(x.w)}</span>`).join(sep);
+  const plain = s => lang === "zh" ? String(s).replace(/ /g, "") : String(s);
+  let rows = j.gaveUp ? "" : `<div><b>${esc(t("fbPick"))}</b> ${esc(j.yours)}</div>`, notes = "";
+  if(r.had && r.shown){
+    const al = fbAlign(r.shown, r.fix), changed = al.ya.some(x => x.c !== "ok") || al.ba.some(x => x.c !== "ok");
+    rows += `<div class="fbq"><b>${esc(t("fbSent"))}</b> ${changed ? html(al.ya) : esc(plain(r.shown))}</div>`;
+    rows += `<div class="fbfix"><b>${esc(t("fbFix"))}</b> ${changed ? html(al.ba) : `<span class="dx dx-add">${esc(plain(r.fix))}</span>`}</div>`;
+    const tips = tipsFor(r.fix, r.shown, lang, al.segs, new Set());
+    if(tips.length) notes = `<div class="fbnotes fbtips"><b>💡 ${esc(t("fbTip"))}</b><ul>${tips.map(n => `<li>${esc(n)}</li>`).join("")}</ul></div>`;
+  } else {
+    rows += `<div class="fbq"><b>${esc(t("fbSent"))}</b> ${esc(plain(r.fix))}</div><div class="fbfix">${esc(t("fbNoFix"))}</div>`;
+  }
+  const btns = [...box.querySelectorAll("button")];
+  box.innerHTML = rows + notes;
+  btns.forEach(b => box.appendChild(b));
+}
+(() => { const c = document.createElement("style"); c.textContent = ".ans .fbfix{margin-top:4px;padding:6px 8px;border-radius:10px;background:rgba(46,196,140,.10)}"; document.head.appendChild(c); })();
 renderExtras = (orig => function(fresh){ orig(fresh); renderFeedback(); })(renderExtras);

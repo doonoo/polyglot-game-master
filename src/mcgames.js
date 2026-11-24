@@ -14,17 +14,13 @@ Object.assign(GAME_ICO, {"Quick Pick":"🔘", "Meaning Match":"💡", "Right or 
 const MCT = {
   en:{qp:T => `Pick the right ${T} translation.`, qpw:T => `Pick the ${T} word.`, qpc:"Pick the right verb form.", mm:N => `What does it mean in ${N}?`,
       rw:T => `Is this ${T} sentence correct?`, rwM:(N, T) => `Is this a correct way to say “${N}” in ${T}?`, rwY:"✓ Correct", rwN:"✗ Has a mistake", sm:"One sentence has a mistake. Which one?", smQ:"🔎 Find the sentence with the mistake",
-      okRight:"Yes, it's correct:", okWrong:"Right, it has a mistake. Fixed:", badRight:"It was correct as written:", badWrong:"It has a mistake. Fixed:",
-      okSpot:"You found it. Fixed:", badSpot:"The mistake was here:", fixed:"Fixed:"},
+      rOkR:"Yes, it was correct.", rOkW:"Right, it has a mistake.", rBadR:"It was correct as written.", rBadW:"It had a mistake.", sOk:"You found the mistake.", sBad:"Not that one. The mistake was in another sentence."},
   es:{qp:T => `Elige la traducción correcta al ${T}.`, qpw:T => `Elige la palabra en ${T}.`, qpc:"Elige la forma verbal correcta.", mm:N => `¿Qué significa en ${N}?`,
       rw:T => `¿Esta frase en ${T} está bien?`, rwM:(N, T) => `¿Así se dice bien «${N}» en ${T}?`, rwY:"✓ Correcta", rwN:"✗ Tiene un error", sm:"Una frase tiene un error. ¿Cuál?", smQ:"🔎 Encuentra la frase con el error",
-      okRight:"Sí, está bien:", okWrong:"Exacto, tiene un error. Corregida:", badRight:"Estaba bien así:", badWrong:"Tiene un error. Corregida:",
-      okSpot:"¡La encontraste! Corregida:", badSpot:"El error estaba aquí:", fixed:"Corregida:"}
+      rOkR:"Sí, estaba bien.", rOkW:"Exacto, tiene un error.", rBadR:"Estaba bien así.", rBadW:"Tenía un error.", sOk:"¡Encontraste el error!", sBad:"Esa no. El error estaba en otra frase."}
 };
 const mcT = st => MCT[LANG_CODE[st.native]] || MCT.en;
 const mcStrict = st => !!(st && (st.mode === 3 || st.mode === 8));   // accents count there, so an accent slip is a real mistake
-// the fixed sentence with the changed words in bold (all of it when only the word order changed)
-const mcFix = (st, T, W, ch) => { const d = boldDiff(T, W, Object.assign({}, ch, {acc:[T]}), mcStrict(st)); return /\*\*/.test(d) ? d : `**${T}**`; };
 const MCG_BASE = {"Quick Pick":"Classic Mine", "Meaning Match":"Reverse Mine", "Right or Wrong":"Error Hunter", "Spot the Mistake":"Error Hunter"};
 const MCG_MODES = {1:["Quick Pick", "Meaning Match", "Right or Wrong", "Spot the Mistake"], 2:["Quick Pick", "Meaning Match", "Right or Wrong", "Spot the Mistake"],
   3:["Quick Pick", "Right or Wrong", "Spot the Mistake"], 6:["Quick Pick", "Meaning Match"], 5:["Quick Pick", "Meaning Match"], 7:["Quick Pick"], 8:["Right or Wrong", "Spot the Mistake"]};
@@ -105,19 +101,16 @@ genSentence = mcgWrap(genSentence);
 genVocab = mcgWrap(genVocab);
 genConj = (w => function(){ return w.apply("conj", arguments); })(mcgWrap(genConj));
 
-/* feedback for the two judging games: show the fixed sentence */
+/* feedback for the two judging games: a short verdict; the card shows the sentence and its correction */
 gradeLocal = (orig => function(st, ch, answer, force){
   const j = orig.apply(this, arguments);
   try{
     if(!ch || !st || (ch.game !== "Right or Wrong" && ch.game !== "Spot the Mistake") || answer === null) return j;
     const L = mcT(st), T = ch.acc[1];
-    let fb;
-    if(ch.game === "Right or Wrong"){
-      const wasRight = ch.answerKey === L.rwY;
-      fb = j.correct ? (wasRight ? `${L.okRight} **${T}**` : `${L.okWrong} ${mcFix(st, T, ch.target, ch)}`)
-                     : (wasRight ? `${L.badRight} **${T}**` : `${L.badWrong} ${mcFix(st, T, ch.target, ch)}`);
-    } else fb = j.correct ? `${L.okSpot} ${mcFix(st, T, ch.answerKey, ch)}` : `${L.badSpot} ${ch.answerKey} → ${mcFix(st, T, ch.answerKey, ch)}`;
-    return Object.assign({}, j, {feedback:fb, struggled:[]});
+    // the answer card shows the sentence with its mistake crossed out and the corrected version (feedback.js)
+    const shown = ch.game === "Right or Wrong" ? ch.target : ch.answerKey, had = ch.game === "Spot the Mistake" || ch.answerKey === L.rwN;
+    const fb = ch.game === "Spot the Mistake" ? (j.correct ? L.sOk : L.sBad) : j.correct ? (had ? L.rOkW : L.rOkR) : (had ? L.rBadW : L.rBadR);
+    return Object.assign({}, j, {feedback:fb, struggled:[], rw:{shown:String(shown || ""), fix:String(T || ""), had}});
   }catch(e){ return j; }
 })(gradeLocal);
 if(window.__PGM_TEST) window.__mcg = {gamesFor:st => gamesFor(st), MCG};

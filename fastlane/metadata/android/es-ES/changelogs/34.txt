@@ -1,0 +1,1 @@
+¿Bien o mal? y Encuentra el error ahora muestran la corrección después de cada respuesta: la frase con el error tachado, la versión correcta con la palabra corregida resaltada y un consejo de gramática. Si la frase ya estaba bien, la tarjeta lo dice.

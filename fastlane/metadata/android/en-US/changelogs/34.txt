@@ -1,0 +1,1 @@
+Right or Wrong and Spot the Mistake now show the correction after every answer: the sentence with the mistake crossed out, the correct version with the fixed word highlighted, and a grammar tip. When the sentence was already correct, the card says so.
