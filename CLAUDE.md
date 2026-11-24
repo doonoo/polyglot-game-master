@@ -23,7 +23,7 @@ Read this first in any new chat about this project. It is the short version of e
   2. Apply exact-string `rep()` patches, including the CSS blocks injected before `</style>`.
   3. Append every `src/*.js` module in the order of the `out = "\n".join([...])` line near the bottom of build.py.
 - All modules share one scope, an IIFE. Extend existing functions by wrapping them: `fn = (orig => function(...){ ...orig(...)... })(fn);`.
-- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js → langs.js → typo.js → mc.js → uisize.js → voiceprefs.js → sfx.js → twoplayer.js → mascot.js → leo.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
+- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js → langs.js → typo.js → mc.js → mcgames.js → uisize.js → voiceprefs.js → sfx.js → twoplayer.js → mascot.js → leo.js → boot.js. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
 - A new feature module needs adding to that join list. A new CEFR content file needs adding to the `CEFR = [...]` list.
 - `www/native-tts.js` bridges the native Android text-to-speech plugin. The `www/` folder (with `index.html` built) is what Capacitor packages.
 - After changing npm Capacitor plugins, run `npx cap sync android` and commit the changed `android/` gradle files.
@@ -54,6 +54,7 @@ Read this first in any new chat about this project. It is the short version of e
 - **Grammar tips:** `src/tips.js` holds `TIP_ES` and `TIP_EN`, rules shaped `{id, re, en, es}`. test10 checks that 95% or more of items get a tip.
 
 ## Modes and systems
+- **Mini-games** (rotation): Classic Mine, Reverse Mine, Syntax Scramble, Cloze Combat, Error Hunter, Echo Chamber, Speak Up, Word Duel, Odd One Out, Match Madness, Verb Forge, Time Machine, Slip Fixer, the number games, plus Quick Pick, Meaning Match, Right or Wrong, Spot the Mistake.
 - **Modes:** 1 Practice, 2 Level Select, 3 Survivor, 4 Numbers, 5 Vocab, 6 Island Hopper, 7 Conjugation, 8 Tricky Pairs, 9 Custom.
 - **Mini-games** come from `gamesFor(st)`; sentence challenges are built in `genSentence` in gm.js.
 - **Systems by file:**
@@ -71,6 +72,7 @@ Read this first in any new chat about this project. It is the short version of e
   - `sfx.js`: 8-bit sound effects (its own small chip: pulse, triangle, noise). Every effect is a `Sound.<name>()` call: tap, select, start, correct, wrong, heart, combo(n), levelUp, stageClear, stageFail, star(i), unlocked, badge, loot, tile, untile, pick, match, bossIntro, bossHit, bossAttack, bossBlock, finalBlow, bossDefeat, timeUp, tick, page. It wraps `playOutcome` (base beeps muted, one sound per outcome) and respects the 🔊 switch. Off under `__PGM_TEST` unless `__SFX_FORCE`.
   - `typo.js`: typo allowance, wrapping `gradeLocal`. One word may be 1 letter off (2 in 6+ word answers; 2 letters for 8+ letter words) if the typed word isn't a real word (lexicon from all course content and verb tables), isn't in a planted mistake (`it[3]`), isn't in the question, and the slip isn't in the last two letters (endings are grammar). Off in Survivor, Tricky Pairs, bosses, strict Custom, conjugation drills and letter scrambles; es/en/fr/pt only. Sets `j.typo`.
   - `mc.js`: Multiple choice answer mode (menu toggle Type / Multiple choice, localStorage `pgm-mc`, kept per run in `S.mc`). Generators stash candidates in `ch.mcx`; the outer `generate` wrapper builds `ch.opts` = right answer + up to 3 wrong ones, each checked with `gradeLocal` so exactly one is accepted (fewer than 2 honest wrong options → stays a typing round). Uses `opts` because it already survives every challenge copy. A tap (or keys 1-4) answers at once; the text box, accent keys and Check are hidden. Skips Match Madness, Odd One Out, Word Duel and two-sentence final blows.
+  - `mcgames.js`: four multiple-choice mini-games in the rotation (also in typing mode): Quick Pick 🔘 (from Classic Mine / Verb Forge), Meaning Match 💡 (from Reverse Mine), Right or Wrong ✅ and Spot the Mistake 🔎 (from Error Hunter; need a planted mistake, so not in the new languages). `MCG_MODES` says which modes get which. `mcgWrap` asks the generator for the base game with `plan.mcg` so mc.js stashes candidates, then converts; if it can't get honest options it stays the base typing round. The judging games keep the fixed sentence in `acc[1]` and rewrite feedback to show it. `MCG` (in mc.js) is filtered out of the typed review quiz (features3).
   - `uisize.js`: Display size 70–150% (root font size, all type is rem), localStorage `pgm-size`. 🔍 chip in the menu top bar opens a sheet; A−/A+ row in the 🎛️ panel.
   - `mascot.js`: `lionSVG(mood, {crown, title, cls})` draws Leo the lion (viewBox 200×200; moods happy, cheer, sad, think, wow, wink). No app globals, so `tools/icons.js` can render it too. The build checks for exactly one closing title tag in the page, so never write that tag literally in a module.
   - `leo.js`: Leo in the app: menu hero (tap = hello in a course language), the answer card stamp (cheer / wink for a typo / sad / think when giving up) and the end-screen emoji (cheer, sad for 💀, wow for ⏱️).
@@ -78,7 +80,7 @@ Read this first in any new chat about this project. It is the short version of e
 - **Challenge copying:** when a challenge is copied into `S.current`, only listed fields survive. The list is in a build.py rep ending with `strict, double, parts`. A new challenge field must be added there.
 
 ## Testing
-- Run `npm test`: test.js and test4–test15, all JSDOM. test14 plays a 2-player game in every mode; test15 covers multiple choice, display size and the typo allowance. It takes a few minutes.
+- Run `npm test`: test.js and test4–test15, all JSDOM. test14 plays a 2-player game in every mode; test15 covers multiple choice, display size and the typo allowance; test16 the multiple-choice mini-games. Tests that type answers must answer option rounds with the right option (see test.js `optRound`). It takes a few minutes.
   - anim.js skips its MutationObserver under `__PGM_TEST`: tests play thousands of turns in one synchronous loop, and undelivered mutation records kept every old node alive (test.js used to peak near 6 GB and get killed; now about 2 GB). test.js also closes each simulated page.
   - Tests set `window.__PGM_TEST = true`, which exposes `window.__pgm` (S, setup, COURSE, variantsOf, gradeLocal, expand, tipsFor…).
   - Test pages keep timers running, so a new test file must end with `process.exit(0)`.
@@ -126,8 +128,9 @@ Read this first in any new chat about this project. It is the short version of e
 | 2.6.1 | Menu top bar wraps instead of overflowing off-screen with large text |
 | 2.7.0 | Multiple choice answer mode, display size setting, typo allowance |
 | 2.8.0 | Leo the lion: mascot, app icon and in-game reactions; test memory fix |
+| 2.9.0 | Multiple-choice mini-games: Quick Pick, Meaning Match, Right or Wrong, Spot the Mistake |
 
-Current version: 2.8.0, versionCode 30.
+Current version: 2.9.0, versionCode 31.
 
 ## Working with Emmanuel
 - He likes short, direct answers and wants Claude to take the initiative on scope.

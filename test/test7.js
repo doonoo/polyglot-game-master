@@ -46,7 +46,8 @@ for(const lang of ["en", "es"]){
   if(P.S.stats.answered !== before + 1 || !P.S.judgement || !P.S.judgement.gaveUp) fail(lang, "Shift+Enter twice did not give up");
   if(d.activeElement !== $("answer")) fail(lang, "focus lost after turn");
 
-  // typing a letter from nowhere lands in the answer box
+  // typing a letter from nowhere lands in the answer box (on a typing round: option rounds hide the box)
+  for(let k = 0; k < 20 && $("answer").hidden; k++) $("giveUpBtn").click();
   a.blur(); d.body.focus();
   key("h", {}, d.body);
   if(d.activeElement !== $("answer")) fail(lang, "letter did not focus answer");

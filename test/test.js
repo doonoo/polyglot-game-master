@@ -203,9 +203,15 @@ function play(lang, mode, level, turns, wrongRate, opts){
     const wrong = Math.random() < wrongRate;
     const before = S.stats.answered;
     d.getElementById("answer").value = wrong ? "zzz qqq" : good[Math.floor(Math.random() * good.length)];
-    const tilesEl = d.getElementById("tiles"), isTile = ch.game === "Syntax Scramble" || ch.game === "Odd One Out" || ch.game === "Word Duel";
+    const tilesEl = d.getElementById("tiles"), isTile = ch.game === "Syntax Scramble" || ch.game === "Odd One Out" || ch.game === "Word Duel" || Array.isArray(ch.opts);
     if(isTile === tilesEl.hidden) fail(tag, "tiles visibility", ch.game);
-    if(isTile && !wrong){
+    const optRound = Array.isArray(ch.opts) && ch.game !== "Word Duel" && ch.game !== "Odd One Out";
+    if(optRound && !wrong){   // multiple-choice mini-games: answer with the one right option (a tap would submit on a timer)
+      const right = ch.opts.filter(o => P.gradeLocal(S, ch, o, false).correct);
+      if(right.length !== 1) fail(tag, "options need exactly one right answer", ch.game, JSON.stringify(ch.opts));
+      d.getElementById("answer").value = right[0] || "";
+    }
+    else if(isTile && !wrong){
       const bare = x => x.toLowerCase().replace(/[.,!?¿¡;:"“”]/g, "");
       const btns = [...tilesEl.querySelectorAll(".tile[data-i]")], used = new Set();
       let seq;

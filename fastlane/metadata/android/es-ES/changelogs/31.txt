@@ -1,0 +1,1 @@
+4 minijuegos nuevos de opción múltiple entran en la rotación, como Revoltijo de sintaxis: Elección rápida (elige la traducción), ¿Qué significa?, ¿Bien o mal? (¿la frase está bien?) y Encuentra el error. Aparecen en Práctica, Nivel, Supervivencia, Vocabulario, Conjugación, Palabras trampa y Personalizado. Toca una respuesta o pulsa 1-4.

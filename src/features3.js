@@ -51,7 +51,7 @@ function buildDaily(){
       if(m === 5) plan = {kind:"vocab", swarm:true, game:pick(["Classic Mine","Reverse Mine","Syntax Scramble"])};
       else {
         st.syllabus = syllabusFor(st); st.done = st.syllabus.map(() => false);
-        const games = gamesFor(st).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && g !== "Speak Up");
+        const games = gamesFor(st).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && g !== "Speak Up" && !MCG.has(g));
         plan = {kind:"syllabus", idx:Math.floor(Math.random() * st.syllabus.length), game:pick(games)};
       }
       let res = null;

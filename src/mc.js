@@ -9,6 +9,9 @@
 Object.assign(I18N.en, {mc_label:"Answer mode", mc_type:"Type", mc_pick:"Multiple choice", mc_note:"Tap one of 4 answers instead of typing. Works in every mode."});
 Object.assign(I18N.es, {mc_label:"Forma de responder", mc_type:"Escribir", mc_pick:"Opción múltiple", mc_note:"Toca una de 4 respuestas en vez de escribir. Funciona en todos los modos."});
 
+// multiple-choice mini-games (mcgames.js): always options, whatever the answer mode
+const MCG = new Set(["Quick Pick", "Meaning Match", "Right or Wrong", "Spot the Mistake"]);
+const mcWant = (st, plan) => !!(st && (st.mc || (plan && plan.mcg)));
 let MCS = false;
 try{ MCS = localStorage.getItem("pgm-mc") === "1"; }catch(e){}
 const mcSave = () => { try{ localStorage.setItem("pgm-mc", MCS ? "1" : "0"); }catch(e){} };
@@ -22,7 +25,7 @@ genSentence = (orig => function(st, plan, c){
   const res = orig.apply(this, arguments);
   try{
     const ch = res && res.challenge;
-    if(st && st.mc && ch && c && Array.isArray(c.it)){
+    if(mcWant(st, plan) && ch && c && Array.isArray(c.it)){
       const rev = ch.game === "Reverse Mine", cz = ch.game === "Cloze Combat";
       const it = c.it.find(x => rev ? x[0] === ch.acc[0] : cz ? x[1] === ch.acc[1] : x[1] === ch.acc[0]);
       const others = shuffle(c.it.filter(x => x !== it));
@@ -54,7 +57,7 @@ genVocab = (orig => function(st, plan){
   const res = orig.apply(this, arguments);
   try{
     const ch = res && res.challenge;
-    if(st && st.mc && ch && ch.k === "w"){
+    if(mcWant(st, plan) && ch && ch.k === "w"){
       const nat = LANG_CODE[st.native], tgt = LANG_CODE[st.target];
       const list = VLIST[st.level] || VLIST.A1, entry = VMAP[tgt][String(ch.wk || "").toLowerCase()];
       const side = ch.al === tgt ? tgt : nat;
@@ -89,7 +92,7 @@ genConj = (orig => function(st, plan, c){
   const res = orig.apply(this, arguments);
   try{
     const ch = res && res.challenge, q = mcLastQ;
-    if(st && st.mc && ch && q){
+    if(mcWant(st, plan) && ch && q){
       const tgt = LANG_CODE[st.target], w = shuffle([...conjWrongs(tgt, q)]), s = [];
       if(tgt === "es") for(const tn of shuffle(c.ten || [])) if(tn !== q.ten){ try{ const f = esForm(q.inf, tn, q.p); if(f && f[0]) s.push(f[0]); }catch(e){} }
       ch.mcx = {w, s};
@@ -106,7 +109,7 @@ function mcPerturb(right, ch, pool){
   const join = a => a.join(" ") + end;
   if(toks.length >= 3){
     const i = 1 + Math.floor(Math.random() * (toks.length - 2)), a = toks.slice();
-    [a[i], a[i + 1]] = [a[i + 1], a[i]]; out.push(join(a));
+    if(!/[,;:]$/.test(a[i]) && !/[,;:]$/.test(a[i + 1])){ [a[i], a[i + 1]] = [a[i + 1], a[i]]; out.push(join(a)); }
   }
   // swap an article for its partner (el ↔ la, un ↔ una…)
   const ai = toks.findIndex(x => MC_SWAP[x.toLowerCase()] !== undefined);
@@ -175,7 +178,7 @@ generate = (orig => function(st){
 })(generate);
 
 /* ---------- playing: options instead of the text box ---------- */
-const mcLive = () => !!(S && S.mc && S.current && S.current.challenge && Array.isArray(S.current.challenge.opts) && S.current.challenge.game !== "Word Duel");
+const mcLive = () => { const ch = S && S.current && S.current.challenge; return !!(ch && Array.isArray(ch.opts) && ch.game !== "Word Duel" && (S.mc || MCG.has(ch.game))); };
 tileItems = (orig => function(ch){
   if(ch && S && S.current && ch === S.current.challenge && mcLive()) return {mode:"pick", items:ch.opts, keepScreen:true, mc:true};
   return orig.apply(this, arguments);

@@ -1,0 +1,1 @@
+4 new multiple-choice mini-games join the rotation, like Syntax Scramble: Quick Pick (pick the right translation), Meaning Match (pick what it means), Right or Wrong (is this sentence correct?) and Spot the Mistake (find the sentence with the error). They appear in Practice, Level Select, Survivor, Vocab, Conjugation, Tricky Pairs and Custom. Tap an answer or press 1-4.
