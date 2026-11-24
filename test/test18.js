@@ -24,6 +24,7 @@ const JUDGE = new Set(["Meaning Check", "Who's Doing It?", "Tense Detective"]);
       const k = `${tgt.slice(0,3)} ${mode} ${name}`; made[k] = made[k] || [0, 0];
       for(let i = 0; i < 12; i++){
         const plan = Object.assign({}, S.current.plan || {kind:"syllabus", idx:0}, {game:name, boss:false});
+        if(plan.kind === "syllabus" && Array.isArray(S.syllabus) && S.syllabus.length) plan.idx = i % S.syllabus.length;   // islands teach one phrase per step: try several
         let res; try{ res = M.gen(JSON.parse(JSON.stringify(S)), plan); }catch(e){ fail("crash", k, e.message); break; }
         const ch = res && res.challenge; made[k][1]++;
         if(!ch) { fail("no challenge", k); continue; }
