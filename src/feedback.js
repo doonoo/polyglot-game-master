@@ -35,7 +35,7 @@ function fbMeaning(w, lang){
   const m = VMAP[lang] || {}, k = w.toLowerCase().replace(/[^\p{L}' ]/gu, "");
   const e = m[k] || m["el " + k] || m["la " + k] || m["to " + k] || m[k.replace(/a$/, "o")];
   if(!e) return "";
-  return first(lang === "es" ? e.en : e.es);
+  return first(lang === "en" ? e.es : e.en);   // the new languages keep their meaning in e.en
 }
 
 /* Align your words with the best answer (longest common subsequence on letters only) */

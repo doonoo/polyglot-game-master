@@ -17,6 +17,7 @@ const right = (P, it) => P.canon(it.ch.acc[0]);
   const P = boot("en").window.__pgm;
   if(P.STORIES.length < 8) fail("stories", P.STORIES.length);
   for(const s of P.STORIES){
+    if(s.lang) continue;   // stories for the new languages are checked in test17
     if(!P.LEVELS.includes(s.lv) || !s.t.es || !s.t.en) fail("story head", s.id);
     let q = 0;
     for(const p of s.p){

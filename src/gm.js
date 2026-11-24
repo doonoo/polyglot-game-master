@@ -437,7 +437,7 @@ function findConcept(st, key){
   if(st.mode === 8){ for(const lv in TRICKY[tgt]) for(const c of TRICKY[tgt][lv]) if(c.t.toLowerCase() === k) return c; return null; }
   if(st.mode === 4){ for(const lv in NUMSYL) for(const c of NUMSYL[lv]) if(c[nat].toLowerCase() === k) return c; return null; }
   if(st.mode === 6){
-    for(const isl of ISLANDS) for(let i = 0; i < isl.it.length; i++){ const c = islandConcept(st, isl, i); if(c.t.toLowerCase() === k) return c; }
+    for(const isl of (typeof islandsFor === "function" ? islandsFor(st.target) : ISLANDS)) for(let i = 0; i < isl.it.length; i++){ const c = islandConcept(st, isl, i); if(c.t.toLowerCase() === k) return c; }
     return null;
   }
   for(const lv in COURSE[tgt]) for(const c of COURSE[tgt][lv]) if(c.t.toLowerCase() === k) return c;

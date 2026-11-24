@@ -10,15 +10,16 @@ var WL = WL || {};
 const XL = ["fr", "pt", "zh", "ar"];
 const XL_NAME = {fr:"French", pt:"Portuguese", zh:"Mandarin Chinese", ar:"Arabic"};
 const XL_BY_NAME = {French:"fr", Portuguese:"pt", "Mandarin Chinese":"zh", Arabic:"ar"};
-const XL_MODES = [1, 2, 3];                       // modes with content in the new languages
+const XL_MODES = [1, 2, 3, 4, 5, 6, 7, 8, 9];     // every mode now has content in the new languages (langmodes.js)
+const XL_AUTO_WRONG = new Set();                  // Error Hunter slips made by swapping two words (not real learner mistakes)
 const XL_ROM = {};                                // target sentence or word -> romanization
 const XL_TOKROM = {zh:{}, ar:{}};                 // single word -> romanization
 const XL_TOKENS = {};                             // every word in a course, for tile distractors
 Object.assign(LN.en, {French:"French", Portuguese:"Portuguese", "Mandarin Chinese":"Mandarin Chinese", Arabic:"Arabic"});
 Object.assign(LN.es, {French:"francés", Portuguese:"portugués", "Mandarin Chinese":"chino mandarín", Arabic:"árabe"});
-Object.assign(I18N.en, {xl_onlyEn:"Taught through English", xl_soon:"Not available in {lang} yet", xl_modesNote:"In {lang}: Practice, Level Select and Survivor. More modes are coming.",
+Object.assign(I18N.en, {xl_onlyEn:"Taught through English", xl_soon:"Not available in {lang} yet", xl_modesNote:"{lang} is taught through English.",
   xl_storiesNA:"Stories are in Spanish and English for now."});
-Object.assign(I18N.es, {xl_onlyEn:"Se enseña en inglés", xl_soon:"Aún no está disponible en {lang}", xl_modesNote:"En {lang}: Práctica, Elegir nivel y Supervivencia. Pronto habrá más modos.",
+Object.assign(I18N.es, {xl_onlyEn:"Se enseña en inglés", xl_soon:"Aún no está disponible en {lang}", xl_modesNote:"{lang} se enseña a través del inglés.",
   xl_storiesNA:"Por ahora las historias están en español e inglés."});
 
 const xlCode = name => XL_BY_NAME[name] || null;
@@ -37,8 +38,9 @@ const xlSpace = s => String(s).replace(/([㐀-鿿，。])\s+(?=[㐀-鿿，。])/
     P.units.forEach(u => {
       const lv = u.lv || "A1";
       const unitWords = new Set(u.w.map(w => w[0]));
-      const it = u.s.map(([en, tgt, rom]) => {
-        const tk = toks(tgt);
+      const it = u.s.map(([en, tgt, rom, planted]) => {
+        const disp = /[|[\]()]/.test(tgt) ? canon(tgt) : tgt;   // a pattern with alternatives: words come from its first reading
+        const tk = toks(disp);
         tk.forEach(x => all.add(x));
         if(rom){
           const rk = String(rom).split(/ +/).map(x => x.replace(PUN, ""));
@@ -51,10 +53,10 @@ const xlSpace = s => String(s).replace(/([㐀-鿿，。])\s+(?=[㐀-鿿，。])/
         let pat = tgt.replace(/\s*[.!?。！？]$/, "");
         if(rom) pat += "|" + rom.replace(/ /g, " ").replace(/[.!?]$/, "");
         // a word-order slip for Error Hunter: two neighbouring words swapped
-        let wrong;
-        if(tk.length >= 3){
+        let wrong = planted || null;
+        if(!wrong && tk.length >= 3){
           const i = Math.max(0, Math.floor(tk.length / 2) - 1), w2 = tk.slice(); [w2[i], w2[i + 1]] = [w2[i + 1], w2[i]];
-          if(w2.join(" ").toLowerCase() !== tk.join(" ").toLowerCase()) wrong = w2.join(" ");
+          if(w2.join(" ").toLowerCase() !== tk.join(" ").toLowerCase()){ wrong = w2.join(" "); XL_AUTO_WRONG.add(wrong); }
         }
         return wrong ? [en, pat, cz, wrong] : [en, pat, cz];
       });
@@ -92,7 +94,7 @@ renderMenu = (orig => function(){
   if(!note){ note = document.createElement("p"); note.id = "xlNote"; note.className = "note"; $("modes").after(note); }
   note.hidden = !x;
   if(x) note.textContent = "🌍 " + t("xl_modesNote", {lang:LN[LANG_CODE[setup.native] || "en"][setup.target]});
-  const sb = $("storiesBtn"); if(sb){ sb.disabled = x; sb.title = x ? t("xl_storiesNA") : ""; }
+  const sb = $("storiesBtn"); if(sb){ const none = x && !storiesFor(LANG_CODE[setup.target]).length; sb.disabled = none; sb.title = none ? t("xl_storiesNA") : ""; }
   return r;
 })(renderMenu);
 startNew = (orig => function(){
@@ -150,7 +152,7 @@ function xlDecorate(){
   // Chinese is written without spaces
   const tgtEl = $("chTarget");
   if(code === "zh" && ch.game !== "Syntax Scramble") tgtEl.childNodes.forEach(n => { if(n.nodeType === 3) n.textContent = xlSpace(n.textContent); });
-  tgtEl.dir = code === "ar" && ch.al === "ar" ? "rtl" : "auto";
+  tgtEl.dir = code === "ar" && ch.al === "ar" ? (ch.k === "c" && ch.game === "Verb Forge" ? "ltr" : "rtl") : "auto";
   if((code === "zh" || code === "ar") && ch.game === "Reverse Mine" && !tgtEl.querySelector(".xlrom")){
     const r = XL_ROM[xlKey(ch.target)];
     if(r){ const s = document.createElement("div"); s.className = "xlrom"; s.textContent = r; s.dir = "ltr"; tgtEl.appendChild(s); }
@@ -192,4 +194,4 @@ syncMood = (orig => function(){
   return r;
 })(syncMood);
 setTimeout(() => { try{ fillLangSelects(); renderMenu(); }catch(e){} }, 0);
-if(window.__PGM_TEST) window.__xl = {XL, XL_ROM, XL_TOKROM, XL_TOKENS, xlSpace, xlCode};
+if(window.__PGM_TEST) window.__xl = {XL, XL_ROM, XL_TOKROM, XL_TOKENS, XL_AUTO_WRONG, xlSpace, xlCode};

@@ -974,14 +974,16 @@ function renderMenu(){
   renderIslandChips();
   renderDaily();
 }
+// each course has its own islands (the new languages' islands carry lang)
+function islandsFor(target){ const c = typeof xlCode === "function" ? xlCode(target) : null; return ISLANDS.filter(i => (i.lang || null) === c); }
 function renderIslandChips(){
   const nat = LANG_CODE[setup.native] || "en";
   $("islandChips").innerHTML = `<button class="chip ${setup.island === "" ? "on" : ""}" data-isl="">🎲 ${esc(t("surpriseMe"))}</button>` +
-    ISLANDS.map(i => `<button class="chip ${setup.island === i.id ? "on" : ""}" data-isl="${i.id}">${esc(i[nat])}</button>`).join("");
+    islandsFor(setup.target).map(i => `<button class="chip ${setup.island === i.id ? "on" : ""}" data-isl="${i.id}">${esc(i[nat])}</button>`).join("");
 }
 function renderNextChips(){
   const nat = LANG_CODE[S.native] || "en";
-  $("nextChips").innerHTML = ISLANDS.filter(i => i.id !== S.islandId).map(i => `<button class="chip" data-isl="${i.id}">${esc(i[nat])}</button>`).join("");
+  $("nextChips").innerHTML = islandsFor(S.target).filter(i => i.id !== S.islandId).map(i => `<button class="chip" data-isl="${i.id}">${esc(i[nat])}</button>`).join("");
 }
 function initMenu(){
   fillLangSelects();
@@ -1045,9 +1047,10 @@ function freshState(o){
   if(!hasLevel(st.mode, st.target, st.level)) st.level = levelsFor(st.mode, st.target)[0];
   if(o.mode === 6){
     let id = o.islandId;
-    if(!ISLANDS.some(i => i.id === id)){
-      let pool = ISLANDS.filter(i => !st.pastIslands.includes(i.id));
-      if(!pool.length){ pool = ISLANDS; st.pastIslands = []; }
+    const mine = islandsFor(o.target);
+    if(!mine.some(i => i.id === id)){
+      let pool = mine.filter(i => !st.pastIslands.includes(i.id));
+      if(!pool.length){ pool = mine; st.pastIslands = []; }
       id = pool[Math.floor(Math.random() * pool.length)].id;
     }
     st.islandId = id;
@@ -4432,7 +4435,7 @@ function findConcept(st, key){
   if(st.mode === 8){ for(const lv in TRICKY[tgt]) for(const c of TRICKY[tgt][lv]) if(c.t.toLowerCase() === k) return c; return null; }
   if(st.mode === 4){ for(const lv in NUMSYL) for(const c of NUMSYL[lv]) if(c[nat].toLowerCase() === k) return c; return null; }
   if(st.mode === 6){
-    for(const isl of ISLANDS) for(let i = 0; i < isl.it.length; i++){ const c = islandConcept(st, isl, i); if(c.t.toLowerCase() === k) return c; }
+    for(const isl of (typeof islandsFor === "function" ? islandsFor(st.target) : ISLANDS)) for(let i = 0; i < isl.it.length; i++){ const c = islandConcept(st, isl, i); if(c.t.toLowerCase() === k) return c; }
     return null;
   }
   for(const lv in COURSE[tgt]) for(const c of COURSE[tgt][lv]) if(c.t.toLowerCase() === k) return c;
@@ -11350,10 +11353,12 @@ recordTurn = (orig => function(prevCh, j){
 /* ---------- Stories ---------- */
 let SP = null;
 const spk = (s, tgt) => Array.isArray(s) ? s[tgt === "es" ? 0 : 1] : s;
+// stories for the language being learned (Spanish and English stories have no lang)
+function storiesFor(tgt){ return STORIES.filter(s => s.lang ? s.lang === tgt : (tgt === "es" || tgt === "en")); }
 function openStories(){ showOnly("storiesPage"); renderStories(); }
 function renderStories(){
   const tgt = TL(), nat = NL();
-  $("storiesList").innerHTML = STORIES.map(s => `<button class="word story ${profile.stories[s.id] ? "sdone" : ""}" data-sid="${s.id}"><span class="sico">${s.ico}</span><span><b>${esc(s.t[tgt])}</b><small>${esc(s.t[nat])} · ${s.lv}</small></span>${profile.stories[s.id] ? `<em>✓</em>` : ""}</button>`).join("");
+  $("storiesList").innerHTML = storiesFor(tgt).map(s => `<button class="word story ${profile.stories[s.id] ? "sdone" : ""}" data-sid="${s.id}"><span class="sico">${s.ico}</span><span><b>${esc(s.t[tgt])}</b><small>${esc(s.t[nat])} · ${s.lv}</small></span>${profile.stories[s.id] ? `<em>✓</em>` : ""}</button>`).join("");
 }
 function openStory(id){
   const s = STORIES.find(x => x.id === id); if(!s) return;
@@ -11373,7 +11378,7 @@ function advanceStory(){
   const who = spk(p.s, SP.tgt), text = p[SP.tgt], tr = p[SP.nat];
   const div = document.createElement("div");
   div.className = "sline " + (who ? "talk" : "narr");
-  div.innerHTML = `${who ? `<small class="who">${esc(who)}</small>` : ""}<span class="stext">${esc(text)}</span><button class="say" data-say-line="${esc(text)}" aria-label="${esc(t("listen"))}">🔊</button><span class="str" hidden>${esc(tr)}</span>`;
+  div.innerHTML = `${who ? `<small class="who">${esc(who)}</small>` : ""}<span class="stext" dir="auto">${esc(text)}</span>${p.r ? `<small class="srom" dir="ltr">${esc(p.r)}</small>` : ""}<button class="say" data-say-line="${esc(text)}" aria-label="${esc(t("listen"))}">🔊</button><span class="str" hidden>${esc(tr)}</span>`;
   $("storyFeed").appendChild(div);
   if(typeof autoRead !== "undefined" && autoRead) Narrator.say([{text, lang:SP.tgt}]);
   SP.i++; storyBar();
@@ -11539,7 +11544,8 @@ function buildSchedule(now){
     const tl = TL(), live = typeof S !== "undefined" && S && S.cefr && S.syllabus && S.target === setup.target ? S : null;
     if(live){ const i = live.done.findIndex(d => !d); next = i >= 0 ? live.syllabus[i] : null; }
     const lv = live ? live.level : (setup.level || "A1");
-    const s = STORIES.find(x => !profile.stories[x.id] && x.lv === lv) || STORIES.find(x => !profile.stories[x.id]);
+    const pool = typeof storiesFor === "function" ? storiesFor(tl) : STORIES;
+    const s = pool.find(x => !profile.stories[x.id] && x.lv === lv) || pool.find(x => !profile.stories[x.id]);
     story = s ? s.t[tl] : null;
   }catch(e){}
   const add = (d, hh, mm, kind, title, body) => {
@@ -11898,6 +11904,8 @@ const CDEF = () => ({sources:{g:true, t:true, f:true, verbs:true, tricky:true, n
 profile.custom = null; profile.customPresets = [];
 const curCfg = () => { const d = CDEF(); const c = profile.custom || {}; return Object.assign(d, c, {sources:Object.assign(d.sources, c.sources || {}), games:Object.assign(d.games, c.games || {})}); };
 
+// the word list for a level (the new languages have their own, built from the course)
+function customVocab(tgt, lv){ return typeof XLV !== "undefined" && XLV[tgt] ? XLV[tgt][lv] : VLIST[lv]; }
 // every (source, level) pair that has content and at least one chosen mini-game
 function customCombos(cfg, target){
   const tgt = LANG_CODE[target], out = [];
@@ -11910,8 +11918,8 @@ function customCombos(cfg, target){
       if(s.mode === 2) idxs = (COURSE[tgt][lv] || []).map((c, i) => (c.k || "g") === s.strand ? i : -1).filter(i => i >= 0);
       else if(s.mode === 7) idxs = ((CONJ[tgt] || {})[lv] || []).map((_, i) => i);
       else if(s.mode === 8) idxs = ((TRICKY[tgt] || {})[lv] || []).map((_, i) => i);
-      else if(s.mode === 4) idxs = (NUMSYL[lv] || []).map((_, i) => i);
-      else if(s.mode === 5) idxs = (VLIST[lv] || []).map((_, i) => i);
+      else if(s.mode === 4) idxs = (typeof xlNumSyl === "function" && XLM_CODES.includes(tgt) ? (XLNUM[lv] ? xlNumSyl(tgt, lv) : []) : (NUMSYL[lv] || [])).map((_, i) => i);
+      else if(s.mode === 5) idxs = (customVocab(tgt, lv) || []).map((_, i) => i);
       if(idxs.length) out.push({src:s.id, mode:s.mode, lv, idxs, games});
     }
   }
@@ -11953,7 +11961,7 @@ generate = (orig => function(st, plan){
   if(plan.mode === 5){
     // pretend a handful of the level's words were already taught so Odd One Out and
     // Match Madness have material, and retry until the chosen mini-game fits a word
-    const list = VLIST[plan.lv] || VLIST.A1, tgt = LANG_CODE[st.target];
+    const tgt = LANG_CODE[st.target], list = customVocab(tgt, plan.lv) || customVocab(tgt, "A1") || VLIST.A1;
     m.seenW = list.slice(0, 240).map(e => first(e[tgt]));
     let e = list[plan.idx] || pick(list);
     for(let k = 0; k < 15; k++){
@@ -12748,7 +12756,7 @@ function fbMeaning(w, lang){
   const m = VMAP[lang] || {}, k = w.toLowerCase().replace(/[^\p{L}' ]/gu, "");
   const e = m[k] || m["el " + k] || m["la " + k] || m["to " + k] || m[k.replace(/a$/, "o")];
   if(!e) return "";
-  return first(lang === "es" ? e.en : e.es);
+  return first(lang === "en" ? e.es : e.en);   // the new languages keep their meaning in e.en
 }
 
 /* Align your words with the best answer (longest common subsequence on letters only) */
@@ -13559,7 +13567,7 @@ function absorb(res, answer, rolls, prevPlan){
   S.current = {
     plan,
     lesson:{title:String(lesson.title||""), body:String(lesson.body||""), words:Array.isArray(lesson.words) ? lesson.words.filter(w => w && w.w).slice(0,12) : []},
-    challenge:{game:String(ch.game || (plan && plan.game) || ""), boss: plan && plan.boss ? String(ch.boss || "") : "", task:String(ch.task||""), target:String(ch.target), hint: S.mode === 3 ? "" : String(ch.hint||""), answerKey:String(ch.answerKey||""), speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double, parts:Array.isArray(ch.parts) ? ch.parts : null}
+    challenge:{game:String(ch.game || (plan && plan.game) || ""), boss: plan && plan.boss ? String(ch.boss || "") : "", task:String(ch.task||""), target:String(ch.target), hint: S.mode === 3 ? "" : String(ch.hint||""), answerKey:String(ch.answerKey||""), speak:String(ch.speak||""), acc:ch.acc||[], al:ch.al||"", k:ch.k||"s", nn:!!ch.nn, why:String(ch.why||""), cw:ch.cw||[], wk:ch.wk||"", wm:ch.wm||"", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, optm:Array.isArray(ch.optm) ? ch.optm : null, strict:!!ch.strict, double:!!ch.double, parts:Array.isArray(ch.parts) ? ch.parts : null}
   };
   S.lastGame = S.current.challenge.game;
   if(plan && plan.scene) S.recentScenes = (S.recentScenes || []).concat(plan.scene).slice(-20);
@@ -14796,6 +14804,228 @@ WL.zh = {code:"zh", name:"Mandarin Chinese", self:"中文", flag:"🇨🇳", tts
   s:[["I ate noodles this morning.","我 今天 早上 吃 了 面条","wǒ jīntiān zǎoshang chī le miàntiáo"],["We saw a film last night.","我们 昨天 晚上 看 了 电影","wǒmen zuótiān wǎnshang kàn le diànyǐng"],["She went to Beijing last week.","她 上 个 星期 去 了 北京","tā shàng gè xīngqī qù le Běijīng"],["I have been to China.","我 去 过 中国","wǒ qù guo Zhōngguó"],["I didn't go yesterday.","我 昨天 没 去","wǒ zuótiān méi qù"]]}
 ]};
 
+/* ===================== Mandarin: B1 units, Tricky Pairs, measure words, stories, islands =====================
+   s: [english, chinese (words separated by spaces), pinyin (one entry per word), planted mistake].
+   tricky / measure items: [english, chinese, cloze, mistake, options or null, pinyin]. */
+WL.zh.units.push(
+ {lv:"B1", t:"Work and jobs", ico:"💼",
+  b:"Place comes **before** the verb with **在**: 我**在**公司工作 (I work at a company), never 我工作在公司. Time words come before the verb too: 我们九点开会. **上班 / 下班** = start / finish work.",
+  w:[["公司","company","gōngsī"],["办公室","office","bàngōngshì"],["老板","boss","lǎobǎn"],["同事","colleague","tóngshì"],["开会","to have a meeting","kāihuì"],["工资","salary","gōngzī"],["找","to look for","zhǎo"],["上班","to go to work","shàngbān"],["下班","to finish work","xiàbān"],["忙","busy","máng"]],
+  s:[["I work at a company.","我 在 公司 工作","wǒ zài gōngsī gōngzuò","我 工作 在 公司"],
+     ["My boss is very busy.","我 的 老板 很 忙","wǒ de lǎobǎn hěn máng","我 的 老板 是 很 忙"],
+     ["We have a meeting at nine.","我们 九 点 开会","wǒmen jiǔ diǎn kāihuì","我们 开会 九 点"],
+     ["I'm looking for a job.","我 在 找 工作","wǒ zài zhǎo gōngzuò","我 找 在 工作"],
+     ["He finishes work at six.","他 六 点 下班","tā liù diǎn xiàbān","他 下班 六 点"],
+     ["My colleagues are all very nice.","我 的 同事 都 很 好","wǒ de tóngshì dōu hěn hǎo","我 的 同事 很 都 好"]]},
+ {lv:"B1", t:"Free time", ico:"🎨",
+  b:"**喜欢** + verb = to like doing: 我喜欢游泳. Time words go **before** the verb: 我**周末**打球. **得** links a verb to how well it's done: 她唱**得**很好.",
+  w:[["看书","to read","kànshū"],["打球","to play ball","dǎqiú"],["游泳","to swim","yóuyǒng"],["唱歌","to sing","chànggē"],["跳舞","to dance","tiàowǔ"],["音乐","music","yīnyuè"],["周末","weekend","zhōumò"],["爱好","hobby","àihào"],["运动","sport","yùndòng"],["电视","TV","diànshì"]],
+  s:[["I like swimming.","我 喜欢 游泳","wǒ xǐhuan yóuyǒng","我 游泳 喜欢"],
+     ["What is your hobby?","你 的 爱好 是 什么","nǐ de àihào shì shénme","你 的 爱好 是 什么 吗"],
+     ["On weekends I play ball.","我 周末 打球","wǒ zhōumò dǎqiú","我 打球 周末"],
+     ["She sings very well.","她 唱 得 很 好","tā chàng de hěn hǎo","她 唱 的 很 好"],
+     ["We watch TV in the evening.","我们 晚上 看 电视","wǒmen wǎnshang kàn diànshì","我们 看 电视 晚上"],
+     ["Do you like music?","你 喜欢 音乐 吗","nǐ xǐhuan yīnyuè ma","你 吗 喜欢 音乐"]]},
+ {lv:"B1", t:"Travel", ico:"🧳",
+  b:"**过** after a verb = you have done it at some point: 我去**过**法国 (I have been to France). Countries need a measure word: **几个**国家. Adjectives take **很**, not 是: 机场**很**远.",
+  w:[["护照","passport","hùzhào"],["酒店","hotel","jiǔdiàn"],["机场","airport","jīchǎng"],["行李","luggage","xíngli"],["预订","to book","yùdìng"],["国家","country","guójiā"],["地图","map","dìtú"],["钥匙","key","yàoshi"],["放假","to be on holiday","fàngjià"],["外国","foreign country","wàiguó"]],
+  s:[["I have been to France.","我 去 过 法国","wǒ qù guo Fǎguó","我 去 法国 过"],
+     ["Where is my passport?","我 的 护照 在 哪里","wǒ de hùzhào zài nǎlǐ","我 的 护照 是 哪里"],
+     ["I booked a hotel.","我 预订 了 酒店","wǒ yùdìng le jiǔdiàn","我 了 预订 酒店"],
+     ["The airport is far.","机场 很 远","jīchǎng hěn yuǎn","机场 是 远"],
+     ["How many countries have you been to?","你 去 过 几 个 国家","nǐ qù guo jǐ ge guójiā","你 去 过 几 国家"],
+     ["My luggage is very heavy.","我 的 行李 很 重","wǒ de xíngli hěn zhòng","我 的 行李 重 很"]]},
+ {lv:"B1", t:"At the restaurant", ico:"🍽️",
+  b:"Call the waiter **服务员**, order with **点菜**, pay with **买单**. **请给我…** = please give me…; **不要太辣** = not too spicy. **会** + verb = can (a learned skill): 我会用筷子.",
+  w:[["菜单","menu","càidān"],["服务员","waiter","fúwùyuán"],["点菜","to order food","diǎncài"],["买单","to pay the bill","mǎidān"],["菜","dish","cài"],["鱼","fish","yú"],["肉","meat","ròu"],["蔬菜","vegetables","shūcài"],["筷子","chopsticks","kuàizi"],["辣","spicy","là"]],
+  s:[["Waiter, please give me the menu.","服务员 请 给 我 菜单","fúwùyuán qǐng gěi wǒ càidān","服务员 请 给 菜单 我"],
+     ["Not too spicy, please.","请 不要 太 辣","qǐng búyào tài là","请 太 不要 辣"],
+     ["I don't eat meat.","我 不 吃 肉","wǒ bù chī ròu","我 吃 不 肉"],
+     ["This fish is delicious.","这 条 鱼 很 好吃","zhè tiáo yú hěn hǎochī","这 鱼 条 很 好吃"],
+     ["I can use chopsticks.","我 会 用 筷子","wǒ huì yòng kuàizi","我 用 会 筷子"],
+     ["We want to order.","我们 要 点菜","wǒmen yào diǎncài","我们 点菜 要"]]},
+ {lv:"B1", t:"Feelings and opinions", ico:"😊",
+  b:"Adjectives take **很**, never 是: 我**很**高兴. **觉得** = to think / to feel (for opinions): 我**觉得**很有意思. **别** + verb = don't: **别担心**.",
+  w:[["高兴","happy","gāoxìng"],["难过","sad","nánguò"],["生气","angry","shēngqì"],["担心","to worry","dānxīn"],["觉得","to think, to feel","juéde"],["怕","to be afraid of","pà"],["累","tired","lèi"],["同意","to agree","tóngyì"],["开心","cheerful","kāixīn"],["有意思","interesting","yǒu yìsi"]],
+  s:[["I'm very happy.","我 很 高兴","wǒ hěn gāoxìng","我 是 高兴"],
+     ["I think it's very interesting.","我 觉得 很 有意思","wǒ juéde hěn yǒu yìsi","我 很 觉得 有意思"],
+     ["Don't worry.","别 担心","bié dānxīn","担心 别"],
+     ["She is afraid of dogs.","她 怕 狗","tā pà gǒu","她 狗 怕"],
+     ["Why are you angry?","你 为什么 生气","nǐ wèishénme shēngqì","你 为什么 生气 吗"],
+     ["I don't agree.","我 不 同意","wǒ bù tóngyì","我 同意 不"]]},
+ {lv:"B1", t:"Plans and the future", ico:"🔮",
+  b:"**会** + verb = will: 明天**会**下雨. **打算** = to plan to. Time words come first: 我**明年**去中国. **一定** = definitely; **可能** = maybe.",
+  w:[["明年","next year","míngnián"],["将来","the future","jiānglái"],["打算","to plan to","dǎsuàn"],["会","will, can","huì"],["可能","maybe","kěnéng"],["以后","later","yǐhòu"],["计划","plan","jìhuà"],["希望","to hope","xīwàng"],["一定","definitely","yídìng"],["下个月","next month","xià ge yuè"]],
+  s:[["I will go to China next year.","我 明年 去 中国","wǒ míngnián qù Zhōngguó","我 去 中国 明年"],
+     ["It will rain tomorrow.","明天 会 下雨","míngtiān huì xiàyǔ","明天 下雨 会"],
+     ["What do you plan to do?","你 打算 做 什么","nǐ dǎsuàn zuò shénme","你 打算 做 什么 吗"],
+     ["I hope you can come.","我 希望 你 能 来","wǒ xīwàng nǐ néng lái","我 希望 能 你 来"],
+     ["Maybe he won't come.","他 可能 不 来","tā kěnéng bù lái","他 可能 来 不"],
+     ["I will definitely go.","我 一定 去","wǒ yídìng qù","我 去 一定"]]},
+ {lv:"B1", t:"Comparing things", ico:"⚖️",
+  b:"**A 比 B + adjective** = A is more … than B: 我**比**他高. Never add 很 after 比. **最** = most: **最**便宜. **一样** = the same; use **两**, not 二, before a measure word: 这**两**个一样.",
+  w:[["比","than","bǐ"],["更","even more","gèng"],["最","most","zuì"],["一样","the same","yíyàng"],["大","big","dà"],["小","small","xiǎo"],["高","tall","gāo"],["快","fast","kuài"],["慢","slow","màn"],["新","new","xīn"]],
+  s:[["I am taller than him.","我 比 他 高","wǒ bǐ tā gāo","我 比 他 很 高"],
+     ["The train is faster than the bus.","火车 比 公共汽车 快","huǒchē bǐ gōnggòngqìchē kuài","火车 快 比 公共汽车"],
+     ["This one is the cheapest.","这个 最 便宜","zhège zuì piányi","这个 便宜 最"],
+     ["Beijing is bigger than Shanghai.","北京 比 上海 大","Běijīng bǐ Shànghǎi dà","北京 大 比 上海"],
+     ["These two are the same.","这 两 个 一样","zhè liǎng ge yíyàng","这 二 个 一样"],
+     ["He runs even faster.","他 跑 得 更 快","tā pǎo de gèng kuài","他 跑 的 更 快"]]},
+ {lv:"B1", t:"Phones and the internet", ico:"📱",
+  b:"**给** + person + verb = do something for / to someone: 我**给**你打电话. **了** after a verb = done: 我忘**了**密码. **坏了** = broken.",
+  w:[["手机","mobile phone","shǒujī"],["电脑","computer","diànnǎo"],["密码","password","mìmǎ"],["发","to send","fā"],["短信","text message","duǎnxìn"],["上网","to go online","shàngwǎng"],["下载","to download","xiàzài"],["打电话","to make a phone call","dǎ diànhuà"],["微信","WeChat","Wēixìn"],["照片","photo","zhàopiàn"]],
+  s:[["I'll call you.","我 给 你 打电话","wǒ gěi nǐ dǎ diànhuà","我 你 给 打电话"],
+     ["I forgot the password.","我 忘 了 密码","wǒ wàng le mìmǎ","我 了 忘 密码"],
+     ["Please send me a text.","请 给 我 发 短信","qǐng gěi wǒ fā duǎnxìn","请 发 给 短信 我"],
+     ["My phone is broken.","我 的 手机 坏 了","wǒ de shǒujī huài le","我 的 手机 了 坏"],
+     ["I go online every day.","我 每天 上网","wǒ měitiān shàngwǎng","我 上网 每天"],
+     ["Is the computer new?","电脑 是 新 的 吗","diànnǎo shì xīn de ma","电脑 新 是 的 吗"]]}
+);
+
+WL.zh.tricky = {
+A1:[
+ {t:"不 or 没", o:["不","没","没有"],
+  b:"**不** (bù) = don't / not, for habits, wishes and the future, and always with 是. **没** (méi) = didn't / haven't, for the past, and **没有** = don't have.",
+  w:[["不","not (habit, future)","bù"],["没","didn't, haven't","méi"]],
+  it:[["I don't drink coffee.","我 不 喝 咖啡","不","我 没 喝 咖啡",null,"wǒ bù hē kāfēi"],
+      ["I didn't go yesterday.","我 昨天 没 去","没","我 昨天 不 去",null,"wǒ zuótiān méi qù"],
+      ["I don't have money.","我 没有 钱","没有","我 不有 钱",["没有","不有"],"wǒ méiyǒu qián"],
+      ["He is not a teacher.","他 不 是 老师","不","他 没 是 老师",null,"tā bú shì lǎoshī"],
+      ["She hasn't eaten yet.","她 还 没 吃","没","她 还 不 吃",null,"tā hái méi chī"]]},
+ {t:"二 or 两", o:["二","两"],
+  b:"Counting and in bigger numbers say **二** (èr): 十二, 第二. Before a measure word say **两** (liǎng): **两**个人, **两**本书, **两**点.",
+  w:[["二","two (counting)","èr"],["两","two (with a measure word)","liǎng"]],
+  it:[["two people","两 个 人","两","二 个 人",null,"liǎng ge rén"],
+      ["two books","两 本 书","两","二 本 书",null,"liǎng běn shū"],
+      ["the second day","第 二 天","二","第 两 天",null,"dì èr tiān"],
+      ["two o'clock","两 点","两","二 点",null,"liǎng diǎn"],
+      ["I am twelve.","我 十二 岁","十二","我 十两 岁",["十二","十两"],"wǒ shí'èr suì"]]},
+ {t:"的 or 得", o:["的","得"],
+  b:"**的** (de) links a describing word to a noun: 我**的**书, 红色**的**车. **得** (de) links a verb to how it's done: 他跑**得**很快. Same sound, different job.",
+  w:[["的","'s / of (before a noun)","de"],["得","(how a verb is done)","de"]],
+  it:[["my book","我 的 书","的","我 得 书",null,"wǒ de shū"],
+      ["He runs fast.","他 跑 得 很 快","得","他 跑 的 很 快",null,"tā pǎo de hěn kuài"],
+      ["a red car","红色 的 车","的","红色 得 车",null,"hóngsè de chē"],
+      ["She speaks Chinese very well.","她 中文 说 得 很 好","得","她 中文 说 的 很 好",null,"tā Zhōngwén shuō de hěn hǎo"],
+      ["my friend's dog","我 朋友 的 狗","的","我 朋友 得 狗",null,"wǒ péngyou de gǒu"]]}
+],
+A2:[
+ {t:"在 or 再", o:["在","再"],
+  b:"**在** (zài) = at / in, or 'in the middle of doing': 我**在**家, 他**在**看书. **再** (zài) = again / then: **再**说一遍, 明天**再**来. Same sound, different character.",
+  w:[["在","at, -ing","zài"],["再","again","zài"]],
+  it:[["Please say it again.","请 再 说 一 遍","再","请 在 说 一 遍",null,"qǐng zài shuō yí biàn"],
+      ["I'm at home.","我 在 家","在","我 再 家",null,"wǒ zài jiā"],
+      ["Let's eat first, then go.","我们 先 吃饭 再 走","再","我们 先 吃饭 在 走",null,"wǒmen xiān chīfàn zài zǒu"],
+      ["He is reading.","他 在 看书","在","他 再 看书",null,"tā zài kànshū"],
+      ["Come again tomorrow.","明天 再 来","再","明天 在 来",null,"míngtiān zài lái"]]},
+ {t:"那 or 哪", o:["那","哪","那里","哪里"],
+  b:"**那** (nà) = that, **那里** = there. **哪** (nǎ) = which, **哪里** = where. Only the tone and one stroke differ, so watch the question.",
+  w:[["那","that","nà"],["哪","which","nǎ"]],
+  it:[["Which one do you want?","你 要 哪 个","哪","你 要 那 个",null,"nǐ yào nǎ ge"],
+      ["That one is mine.","那 个 是 我 的","那","哪 个 是 我 的",null,"nà ge shì wǒ de"],
+      ["Where are you?","你 在 哪里","哪里","你 在 那里",["哪里","那里"],"nǐ zài nǎlǐ"],
+      ["I live there.","我 住 在 那里","那里","我 住 在 哪里",["那里","哪里"],"wǒ zhù zài nàlǐ"],
+      ["Which country are you from?","你 是 哪 国 人","哪","你 是 那 国 人",null,"nǐ shì nǎ guó rén"]]},
+ {t:"还是 or 或者", o:["还是","或者"],
+  b:"Both mean 'or'. **还是** (háishi) asks a question: 茶**还是**咖啡? **或者** (huòzhě) is for statements: 今天**或者**明天去.",
+  w:[["还是","or (in questions)","háishi"],["或者","or (in statements)","huòzhě"]],
+  it:[["Do you want tea or coffee?","你 要 茶 还是 咖啡","还是","你 要 茶 或者 咖啡",null,"nǐ yào chá háishi kāfēi"],
+      ["I'll go today or tomorrow.","我 今天 或者 明天 去","或者","我 今天 还是 明天 去",null,"wǒ jīntiān huòzhě míngtiān qù"],
+      ["Is he a teacher or a student?","他 是 老师 还是 学生","还是","他 是 老师 或者 学生",null,"tā shì lǎoshī háishi xuésheng"],
+      ["You can take the bus or the train.","你 可以 坐 公共汽车 或者 火车","或者","你 可以 坐 公共汽车 还是 火车",null,"nǐ kěyǐ zuò gōnggòngqìchē huòzhě huǒchē"],
+      ["Are you coming or not?","你 来 还是 不 来","还是","你 来 或者 不 来",null,"nǐ lái háishi bù lái"]]}
+]};
+
+/* Mode 7 in Mandarin: verbs don't conjugate, so this mode drills measure words and particles. */
+WL.zh.measure = {
+A1:[
+ {t:"个: the everyday measure word", o:["个","本","张","杯"],
+  b:"Between a number (or 这 / 那 / 几) and a noun, Chinese needs a **measure word**. **个** (ge) works for people and most things: 三**个**苹果, 这**个**学生.",
+  w:[["个","(general measure word)","ge"]],
+  it:[["one person","一 个 人","个","一 人",null,"yí ge rén"],
+      ["three apples","三 个 苹果","个","三 苹果",null,"sān ge píngguǒ"],
+      ["two friends","两 个 朋友","个","两 本 朋友",null,"liǎng ge péngyou"],
+      ["this student","这 个 学生","个","这 张 学生",null,"zhè ge xuésheng"],
+      ["How many children?","几 个 孩子","个","几 孩子",null,"jǐ ge háizi"]]},
+ {t:"本, 张, 杯", o:["本","张","杯"],
+  b:"**本** (běn) for books, **张** (zhāng) for flat things like tickets, paper and tables, **杯** (bēi) for a cup or glass of something.",
+  w:[["本","(for books)","běn"],["张","(for flat things)","zhāng"],["杯","a cup of","bēi"]],
+  it:[["a book","一 本 书","本","一 张 书",null,"yì běn shū"],
+      ["two tickets","两 张 票","张","两 本 票",null,"liǎng zhāng piào"],
+      ["a cup of tea","一 杯 茶","杯","一 张 茶",null,"yì bēi chá"],
+      ["three tables","三 张 桌子","张","三 杯 桌子",null,"sān zhāng zhuōzi"],
+      ["two cups of coffee","两 杯 咖啡","杯","两 本 咖啡",null,"liǎng bēi kāfēi"],
+      ["this dictionary","这 本 词典","本","这 杯 词典",null,"zhè běn cídiǎn"]]},
+ {t:"口 and 位: counting people", o:["口","位","个"],
+  b:"Count family members with **口** (kǒu): 我家有四**口**人. **位** (wèi) is the polite way to count people: 这**位**老师, 两**位**客人.",
+  w:[["口","(for family members)","kǒu"],["位","(polite, for people)","wèi"]],
+  it:[["There are four people in my family.","我 家 有 四 口 人","口","我 家 有 四 张 人",["口","张"],"wǒ jiā yǒu sì kǒu rén"],
+      ["this teacher (polite)","这 位 老师","位","这 杯 老师",["位","杯"],"zhè wèi lǎoshī"],
+      ["How many people are in your family?","你 家 有 几 口 人","口","你 家 有 几 本 人",["口","本"],"nǐ jiā yǒu jǐ kǒu rén"],
+      ["two guests","两 位 客人","位","两 本 客人",["位","本"],"liǎng wèi kèrén"],
+      ["Which doctor?","哪 位 医生","位","哪 张 医生",["位","张"],"nǎ wèi yīshēng"]]}
+],
+A2:[
+ {t:"件, 条, 只", o:["件","条","只"],
+  b:"**件** (jiàn) for clothes and matters, **条** (tiáo) for long thin things like trousers, fish and streets, **只** (zhī) for most animals.",
+  w:[["件","(for clothes)","jiàn"],["条","(for long things)","tiáo"],["只","(for animals)","zhī"]],
+  it:[["a piece of clothing","一 件 衣服","件","一 条 衣服",null,"yí jiàn yīfu"],
+      ["a pair of trousers","一 条 裤子","条","一 件 裤子",null,"yì tiáo kùzi"],
+      ["a dog","一 只 狗","只","一 件 狗",null,"yì zhī gǒu"],
+      ["two cats","两 只 猫","只","两 条 猫",null,"liǎng zhī māo"],
+      ["a fish","一 条 鱼","条","一 件 鱼",null,"yì tiáo yú"],
+      ["this street","这 条 街","条","这 只 街",null,"zhè tiáo jiē"]]},
+ {t:"了: it's done", o:["了","的"],
+  b:"**了** (le) right after a verb, or at the end of the sentence, shows that something happened or changed: 我吃**了**, 下雨**了**. It never goes before the verb.",
+  w:[["了","(done / changed)","le"]],
+  it:[["I ate.","我 吃 了","了","我 了 吃",null,"wǒ chī le"],
+      ["He went home.","他 回家 了","了","他 了 回家",null,"tā huíjiā le"],
+      ["I bought a book.","我 买 了 一 本 书","了","我 了 买 一 本 书",null,"wǒ mǎi le yì běn shū"],
+      ["It's raining now.","下雨 了","了","了 下雨",null,"xiàyǔ le"],
+      ["She has arrived.","她 到 了","了","她 了 到",null,"tā dào le"]]},
+ {t:"过: have you ever?", o:["过","了"],
+  b:"**过** (guo) after a verb = you've done it at least once: 我去**过**北京. With **没**, use 过, not 了: 我没看**过**.",
+  w:[["过","(ever done)","guo"]],
+  it:[["I have been to Beijing.","我 去 过 北京","过","我 过 去 北京",null,"wǒ qù guo Běijīng"],
+      ["Have you ever eaten Peking duck?","你 吃 过 北京 烤鸭 吗","过","你 过 吃 北京 烤鸭 吗",null,"nǐ chī guo Běijīng kǎoyā ma"],
+      ["I have never seen this film.","我 没 看 过 这 个 电影","过","我 没 看 了 这 个 电影",null,"wǒ méi kàn guo zhè ge diànyǐng"],
+      ["She has studied Chinese.","她 学 过 中文","过","她 过 学 中文",null,"tā xué guo Zhōngwén"],
+      ["We have never been to China.","我们 没 去 过 中国","过","我们 不 去 过 中国",null,"wǒmen méi qù guo Zhōngguó"]]}
+]};
+
+WL.zh.stories = [
+ {id:"zh-fruit", lv:"A1", ico:"🍎", t:{zh:"买水果", en:"Buying fruit", es:"Comprar fruta"}, p:[
+  {s:"", zh:"小明去商店买水果。", r:"Xiǎo Míng qù shāngdiàn mǎi shuǐguǒ.", en:"Xiao Ming goes to the shop to buy fruit."},
+  {s:"老板", zh:"你好！你要什么？", r:"Nǐ hǎo! Nǐ yào shénme?", en:"Hello! What would you like?"},
+  {s:"小明", zh:"我要三个苹果。多少钱？", r:"Wǒ yào sān ge píngguǒ. Duōshao qián?", en:"I want three apples. How much?"},
+  {s:"老板", zh:"十块钱。", r:"Shí kuài qián.", en:"Ten yuan."},
+  {q:{en:"How many apples does Xiao Ming want?", es:"¿Cuántas manzanas quiere Xiao Ming?"}, ol:"t", o:[{zh:"三个 (sān ge)", en:"Three"},{zh:"两个 (liǎng ge)", en:"Two"},{zh:"十个 (shí ge)", en:"Ten"}], a:0},
+  {s:"小明", zh:"太贵了！八块，可以吗？", r:"Tài guì le! Bā kuài, kěyǐ ma?", en:"Too expensive! Eight yuan, OK?"},
+  {s:"老板", zh:"好吧，八块。", r:"Hǎo ba, bā kuài.", en:"All right, eight yuan."},
+  {q:{en:"How much does he pay in the end?", es:"¿Cuánto paga al final?"}, ol:"t", o:[{zh:"八块 (bā kuài)", en:"Eight yuan"},{zh:"十块 (shí kuài)", en:"Ten yuan"},{zh:"三块 (sān kuài)", en:"Three yuan"}], a:0},
+  {s:"小明", zh:"谢谢！再见！", r:"Xièxie! Zàijiàn!", en:"Thanks! Goodbye!"},
+  {q:{en:"What did Xiao Ming think of the first price?", es:"¿Qué le pareció el primer precio?"}, ol:"t", o:[{zh:"太贵了 (tài guì le)", en:"Too expensive"},{zh:"很便宜 (hěn piányi)", en:"Very cheap"},{zh:"很好 (hěn hǎo)", en:"Very good"}], a:0}]},
+ {id:"zh-beijing", lv:"A2", ico:"🏯", t:{zh:"去北京", en:"A trip to Beijing", es:"Un viaje a Pekín"}, p:[
+  {s:"", zh:"上个周末，李红和朋友去了北京。", r:"Shàng ge zhōumò, Lǐ Hóng hé péngyou qù le Běijīng.", en:"Last weekend, Li Hong went to Beijing with friends."},
+  {s:"", zh:"他们坐火车去，坐了两个小时。", r:"Tāmen zuò huǒchē qù, zuò le liǎng ge xiǎoshí.", en:"They went by train; the ride took two hours."},
+  {s:"李红", zh:"我们去了长城，太累了！", r:"Wǒmen qù le Chángchéng, tài lèi le!", en:"We went to the Great Wall. So tiring!"},
+  {q:{en:"How did they get to Beijing?", es:"¿Cómo fueron a Pekín?"}, ol:"t", o:[{zh:"坐火车 (zuò huǒchē)", en:"By train"},{zh:"坐飞机 (zuò fēijī)", en:"By plane"},{zh:"开车 (kāichē)", en:"By car"}], a:0},
+  {s:"", zh:"晚上，他们吃了北京烤鸭。", r:"Wǎnshang, tāmen chī le Běijīng kǎoyā.", en:"In the evening, they ate Peking duck."},
+  {s:"李红", zh:"烤鸭很好吃，但是有点儿贵。", r:"Kǎoyā hěn hǎochī, dànshì yǒudiǎnr guì.", en:"The duck was delicious, but a bit expensive."},
+  {q:{en:"What did they eat?", es:"¿Qué comieron?"}, ol:"t", o:[{zh:"北京烤鸭 (Běijīng kǎoyā)", en:"Peking duck"},{zh:"面条 (miàntiáo)", en:"Noodles"},{zh:"米饭 (mǐfàn)", en:"Rice"}], a:0},
+  {s:"", zh:"星期天，他们回家了。李红说下次还想去。", r:"Xīngqītiān, tāmen huíjiā le. Lǐ Hóng shuō xià cì hái xiǎng qù.", en:"On Sunday they went home. Li Hong says she wants to go again next time."},
+  {q:{en:"Does Li Hong want to go again?", es:"¿Quiere volver Li Hong?"}, ol:"t", o:[{zh:"想 (xiǎng)", en:"Yes, she does"},{zh:"不想 (bù xiǎng)", en:"No, she doesn't"},{zh:"不知道 (bù zhīdào)", en:"She doesn't know"}], a:0}]}
+];
+
+WL.zh.islands = [
+ {id:"zh-town", en:"First day in Beijing", es:"Primer día en Pekín", ico:"🏮", units:["Greetings","Me and you","Around town"]},
+ {id:"zh-food", en:"Eating out", es:"Comer fuera", ico:"🥟", units:["Food and drink","At the restaurant","Shopping"]},
+ {id:"zh-trip", en:"On the road", es:"De viaje", ico:"🚄", units:["Getting around","Travel","Weather and seasons"]},
+ {id:"zh-home", en:"Life at home", es:"La vida en casa", ico:"🏠", units:["Family","At home","Daily routine"]},
+ {id:"zh-work", en:"Work and play", es:"Trabajo y ocio", ico:"💼", units:["Work and jobs","Free time","Phones and the internet"]},
+ {id:"zh-mind", en:"Big ideas", es:"Grandes ideas", ico:"💭", units:["Feelings and opinions","Plans and the future","Comparing things"]}
+];
+
 /* ===================== World Languages: Arabic (Modern Standard, A1, taught through English) =====================
    w: [arabic, english, transliteration]   s: [english, arabic words, transliteration with one entry per word] */
 var WL = WL || {};
@@ -14865,6 +15095,171 @@ WL.ar = {code:"ar", name:"Arabic", self:"العربية", flag:"🇸🇦", tts:"
   w:[["أكلت","I ate","akaltu"],["شربت","I drank","sharibtu"],["رأيت","I saw","raʾaytu"],["ذهبت","I went","dhahabtu"],["اشتريت","I bought","ishtaraytu"],["وصلت","I arrived","waṣaltu"],["الأسبوع الماضي","last week","al-usbūʿ al-māḍī"],["أمس مساء","last night","ams masāʾan"],["فعلت","I did","faʿaltu"],["فيلم","film","fīlm"]],
   s:[["I ate bread this morning.","أكلت خبزا هذا الصباح","akaltu khubzan hādhā aṣ-ṣabāḥ"],["We saw a film last night.","رأينا فيلما أمس مساء","raʾaynā fīlman ams masāʾan"],["She went to Cairo last week.","ذهبت إلى القاهرة الأسبوع الماضي","dhahabat ilā al-qāhira al-usbūʿ al-māḍī"],["I bought the tickets.","اشتريت التذاكر","ishtaraytu at-tadhākir"],["What did you do yesterday?","ماذا فعلت أمس","mādhā faʿalta ams"]]}
 ]};
+
+/* ===================== Arabic (MSA): B1 units, Tricky Pairs, stories, islands =====================
+   s: [english, arabic (words separated by spaces), transliteration (one entry per word), planted mistake].
+   tricky items: [english, arabic, cloze, mistake, options or null, transliteration]. */
+WL.ar.units.push(
+ {lv:"B1", t:"Work and jobs", ico:"💼",
+  b:"Adjectives come **after** the noun and agree with it: **شركة كبيرة** (a big company). There is no 'is' in the present: **المدير مشغول** = the manager (is) busy. **أبحث عن** = I look for.",
+  w:[["عمل","work","ʿamal"],["مكتب","office","maktab"],["مدير","manager","mudīr"],["زميل","colleague","zamīl"],["اجتماع","meeting","ijtimāʿ"],["راتب","salary","rātib"],["شركة","company","sharika"],["أبحث عن","I look for","abḥath ʿan"],["وظيفة","job","waẓīfa"],["مشغول","busy","mashghūl"]],
+  s:[["I work in a big company.","أعمل في شركة كبيرة","aʿmal fī sharika kabīra","أعمل في كبيرة شركة"],
+     ["The manager is busy today.","المدير مشغول اليوم","al-mudīr mashghūl al-yawm","المدير مشغولة اليوم"],
+     ["I'm looking for a job.","أبحث عن وظيفة","abḥath ʿan waẓīfa","أبحث وظيفة عن"],
+     ["The meeting is at nine o'clock.","الاجتماع في الساعة التاسعة","al-ijtimāʿ fī as-sāʿa at-tāsiʿa","الاجتماع في الساعة التاسع"],
+     ["My colleague is from Egypt.","زميلي من مصر","zamīlī min miṣr","زميلي من المصر"],
+     ["My office is small.","مكتبي صغير","maktabī ṣaghīr","مكتبي صغيرة"]]},
+ {lv:"B1", t:"Free time", ico:"🎨",
+  b:"Things you like take **ال**: أحب **الموسيقى**. In a pair of nouns like **كرة القدم** (football, lit. 'ball of the foot') only the last word takes ال. **ما** + noun = what…?: **ما هوايتك؟**",
+  w:[["كرة القدم","football","kurat al-qadam"],["أقرأ","I read","aqraʾ"],["ألعب","I play","alʿab"],["أسبح","I swim","asbaḥ"],["كتاب","book","kitāb"],["موسيقى","music","mūsīqā"],["سينما","cinema","sīnimā"],["هواية","hobby","hiwāya"],["نهاية الأسبوع","weekend","nihāyat al-usbūʿ"],["رياضة","sport","riyāḍa"]],
+  s:[["I play football on Friday.","ألعب كرة القدم يوم الجمعة","alʿab kurat al-qadam yawm al-jumʿa","ألعب الكرة القدم يوم الجمعة"],
+     ["I love music.","أحب الموسيقى","uḥibb al-mūsīqā","أحب موسيقى"],
+     ["What is your hobby?","ما هوايتك","mā hiwāyatuk","ماذا هوايتك"],
+     ["She reads a book every day.","هي تقرأ كتابا كل يوم","hiya taqraʾ kitāban kull yawm","هي يقرأ كتابا كل يوم"],
+     ["We go to the cinema at the weekend.","نذهب إلى السينما في نهاية الأسبوع","nadhhab ilā as-sīnimā fī nihāyat al-usbūʿ","نذهب إلى السينما في النهاية الأسبوع"],
+     ["I swim in the summer.","أسبح في الصيف","asbaḥ fī aṣ-ṣayf","أنا يسبح في الصيف"]]},
+ {lv:"B1", t:"Travel", ico:"🧳",
+  b:"**إلى** = to (a place): أسافر **إلى** مصر. Plurals of things (not people) take a **feminine singular** adjective: **أمتعتي ثقيلة** (my luggage is heavy). **هذا** for masculine nouns, **هذه** for feminine.",
+  w:[["جواز السفر","passport","jawāz as-safar"],["مطار","airport","maṭār"],["أسافر","I travel","usāfir"],["حجز","reservation","ḥajz"],["بلد","country","balad"],["خريطة","map","kharīṭa"],["مفتاح","key","miftāḥ"],["عطلة","holiday","ʿuṭla"],["أمتعة","luggage","amtiʿa"],["بعيد","far","baʿīd"]],
+  s:[["I'm traveling to Egypt in the summer.","أسافر إلى مصر في الصيف","usāfir ilā miṣr fī aṣ-ṣayf","أسافر على مصر في الصيف"],
+     ["Where is my passport?","أين جواز سفري","ayna jawāz safarī","أين جوازي السفر"],
+     ["The airport is far.","المطار بعيد","al-maṭār baʿīd","المطار بعيدة"],
+     ["This is my key.","هذا مفتاحي","hādhā miftāḥī","هذه مفتاحي"],
+     ["We are on holiday.","نحن في عطلة","naḥnu fī ʿuṭla","نحن عطلة في"],
+     ["My luggage is heavy.","أمتعتي ثقيلة","amtiʿatī thaqīla","أمتعتي ثقيلون"]]},
+ {lv:"B1", t:"At the restaurant", ico:"🍽️",
+  b:"**الحساب من فضلك** = the bill, please. **لا** + present verb = don't: **لا آكل اللحم**. In **قائمة الطعام** (the menu) only the second word takes ال.",
+  w:[["قائمة الطعام","menu","qāʾimat aṭ-ṭaʿām"],["الحساب","the bill","al-ḥisāb"],["نادل","waiter","nādil"],["أطلب","I order","aṭlub"],["طبق","dish","ṭabaq"],["حلوى","dessert","ḥalwā"],["لحم","meat","laḥm"],["سمك","fish","samak"],["خضار","vegetables","khuḍār"],["لذيذ","delicious","ladhīdh"]],
+  s:[["The bill, please.","الحساب من فضلك","al-ḥisāb min faḍlik","من الحساب فضلك"],
+     ["I want fish, please.","أريد سمكا من فضلك","urīd samakan min faḍlik","أنا يريد سمكا من فضلك"],
+     ["I don't eat meat.","لا آكل اللحم","lā ākul al-laḥm","لا أكلت اللحم"],
+     ["The food is delicious.","الطعام لذيذ","aṭ-ṭaʿām ladhīdh","الطعام لذيذة"],
+     ["Give me the menu, please.","أعطني قائمة الطعام من فضلك","aʿṭinī qāʾimat aṭ-ṭaʿām min faḍlik","أعطني القائمة الطعام من فضلك"],
+     ["The vegetables are fresh.","الخضار طازجة","al-khuḍār ṭāzija","الخضار طازجون"]]},
+ {lv:"B1", t:"Feelings and opinions", ico:"😊",
+  b:"Feelings agree with the person: **أنا سعيد** (said by a man), **أنا سعيدة** (by a woman), **نحن متعبون** (we). **في رأيي** = in my opinion. **لا تخف** = don't be afraid.",
+  w:[["سعيد","happy","saʿīd"],["حزين","sad","ḥazīn"],["غاضب","angry","ghāḍib"],["قلق","worried","qaliq"],["أظن","I think","aẓunn"],["رأي","opinion","raʾy"],["خائف","afraid","khāʾif"],["متعب","tired","mutʿab"],["فخور","proud","fakhūr"],["جدا","very","jiddan"]],
+  s:[["I am very happy.","أنا سعيد جدا","anā saʿīd jiddan","أنا جدا سعيد"],
+     ["She is sad today.","هي حزينة اليوم","hiya ḥazīna al-yawm","هي حزين اليوم"],
+     ["In my opinion, this is expensive.","في رأيي هذا غالي","fī raʾyī hādhā ghālī","في رأي أنا هذا غالي"],
+     ["Why are you angry?","لماذا أنت غاضب","limādhā anta ghāḍib","لماذا أنت غاضبون"],
+     ["Don't be afraid.","لا تخف","lā takhaf","لا تخاف"],
+     ["We are tired.","نحن متعبون","naḥnu mutʿabūn","نحن متعب"]]},
+ {lv:"B1", t:"Plans and the future", ico:"🔮",
+  b:"For the future put **سـ** (sa-) or **سوف** before the present verb: **سأسافر** = I will travel, **سنذهب** = we will go. Never add a past ending to it.",
+  w:[["سوف","will","sawfa"],["السنة القادمة","next year","as-sana al-qādima"],["ربما","maybe","rubbamā"],["خطة","plan","khuṭṭa"],["المستقبل","the future","al-mustaqbal"],["بعد ذلك","after that","baʿda dhālik"],["قريبا","soon","qarīban"],["أتمنى","I hope","atamannā"],["الشهر القادم","next month","ash-shahr al-qādim"],["البحر","the sea","al-baḥr"]],
+  s:[["I will travel next year.","سأسافر في السنة القادمة","sa-usāfir fī as-sana al-qādima","سأسافرت في السنة القادمة"],
+     ["Maybe it will rain tomorrow.","ربما ستمطر غدا","rubbamā sa-tumṭir ghadan","ربما ستمطرت غدا"],
+     ["We will go to the sea.","سنذهب إلى البحر","sa-nadhhab ilā al-baḥr","سنذهبنا إلى البحر"],
+     ["I hope to see you soon.","أتمنى أن أراك قريبا","atamannā an arāka qarīban","أتمنى أن أرى أنت قريبا"],
+     ["What will you do tomorrow?","ماذا ستفعل غدا","mādhā sa-tafʿal ghadan","ماذا سوف ستفعل غدا"],
+     ["She will be a doctor.","ستكون طبيبة","sa-takūn ṭabība","ستكون طبيب"]]},
+ {lv:"B1", t:"Comparing things", ico:"⚖️",
+  b:"Comparatives follow the pattern **أفعل** + **من**: **أكبر من** = bigger than, **أسرع من** = faster than. 'Than me' is **مني**, not من أنا. **أفضل** + noun = the best …",
+  w:[["أكبر","bigger","akbar"],["أصغر","smaller","aṣghar"],["أفضل","better, best","afḍal"],["أسرع","faster","asraʿ"],["أطول","taller","aṭwal"],["أرخص","cheaper","arkhaṣ"],["من","than, from","min"],["مثل","like","mithl"],["أقدم","older","aqdam"],["مطعم","restaurant","maṭʿam"]],
+  s:[["Cairo is bigger than Amman.","القاهرة أكبر من عمان","al-qāhira akbar min ʿammān","القاهرة أكبر عن عمان"],
+     ["The train is faster than the bus.","القطار أسرع من الحافلة","al-qiṭār asraʿ min al-ḥāfila","القطار أكثر سريع من الحافلة"],
+     ["This is the best restaurant.","هذا أفضل مطعم","hādhā afḍal maṭʿam","هذا الأفضل مطعم"],
+     ["My brother is taller than me.","أخي أطول مني","akhī aṭwal minnī","أخي أطول من أنا"],
+     ["This shirt is cheaper.","هذا القميص أرخص","hādhā al-qamīṣ arkhaṣ","هذه القميص أرخص"],
+     ["Your car is like my car.","سيارتك مثل سيارتي","sayyāratuk mithl sayyāratī","سيارتك مثل سيارة أنا"]]},
+ {lv:"B1", t:"Phones and the internet", ico:"📱",
+  b:"Possession is an ending: **هاتفي** = my phone, **هاتفك** = your phone. **أتصل بـ** + person = I call someone: أتصل **ب**أمي. **سأرسل لك** = I'll send you.",
+  w:[["هاتف","phone","hātif"],["حاسوب","computer","ḥāsūb"],["كلمة السر","password","kalimat as-sirr"],["أرسل","I send","ursil"],["رسالة","message","risāla"],["شاشة","screen","shāsha"],["إنترنت","internet","intarnit"],["بريد إلكتروني","email","barīd iliktrūnī"],["أتصل","I call","attaṣil"],["جديد","new","jadīd"]],
+  s:[["I call my mother every day.","أتصل بأمي كل يوم","attaṣil bi-ummī kull yawm","أتصل أمي كل يوم"],
+     ["I forgot the password.","نسيت كلمة السر","nasītu kalimat as-sirr","نسيت الكلمة السر"],
+     ["I'll send you a message.","سأرسل لك رسالة","sa-ursil laka risāla","سأرسل أنت رسالة"],
+     ["My phone is new.","هاتفي جديد","hātifī jadīd","هاتف أنا جديد"],
+     ["The screen is big.","الشاشة كبيرة","ash-shāsha kabīra","الشاشة كبير"],
+     ["Do you have internet?","هل عندك إنترنت","hal ʿindak intarnit","عندك هل إنترنت"]]}
+);
+
+WL.ar.tricky = {
+A1:[
+ {t:"هذا or هذه", o:["هذا","هذه"],
+  b:"**هذا** (hādhā) = this, for masculine nouns. **هذه** (hādhihi) = this, for feminine nouns, which usually end in **ة**: **هذه سيارتي**.",
+  w:[["هذا","this (masculine)","hādhā"],["هذه","this (feminine)","hādhihi"]],
+  it:[["This is my book.","هذا كتابي","هذا","هذه كتابي",null,"hādhā kitābī"],
+      ["This is my car.","هذه سيارتي","هذه","هذا سيارتي",null,"hādhihi sayyāratī"],
+      ["This house is big.","هذا البيت كبير","هذا","هذه البيت كبير",null,"hādhā al-bayt kabīr"],
+      ["This girl is my sister.","هذه البنت أختي","هذه","هذا البنت أختي",null,"hādhihi al-bint ukhtī"],
+      ["This school is new.","هذه المدرسة جديدة","هذه","هذا المدرسة جديدة",null,"hādhihi al-madrasa jadīda"]]},
+ {t:"You: to a man or a woman", o:["تسكن","تسكنين","تعمل","تعملين"],
+  b:"Talking to a woman, present verbs end in **ـين**: **تسكنين** (taskunīn), **تعملين**. To a man there's no ending: **تسكن** (taskun).",
+  w:[["تسكن","you live (to a man)","taskun"],["تسكنين","you live (to a woman)","taskunīn"]],
+  it:[["(to a man) Where do you live?","أين تسكن","تسكن","أين تسكنين",["تسكن","تسكنين"],"ayna taskun"],
+      ["(to a woman) Where do you work?","أين تعملين","تعملين","أين تعمل",["تعملين","تعمل"],"ayna taʿmalīn"],
+      ["(to a man) What do you want?","ماذا تريد","تريد","ماذا تريدين",["تريد","تريدين"],"mādhā turīd"],
+      ["(to a woman) Do you understand?","هل تفهمين","تفهمين","هل تفهم",["تفهمين","تفهم"],"hal tafhamīn"],
+      ["(to a woman) Do you speak Arabic?","هل تتكلمين العربية","تتكلمين","هل تتكلم العربية",["تتكلمين","تتكلم"],"hal tatakallamīn al-ʿarabiyya"]]},
+ {t:"Masculine or feminine adjective", o:["كبير","كبيرة","طويل","طويلة","حار","حارة","نظيف","نظيفة"],
+  b:"An adjective takes **ة** when its noun is feminine: **البيت كبير** but **السيارة كبيرة**. Most feminine nouns end in ة themselves.",
+  w:[["كبير","big (masculine)","kabīr"],["كبيرة","big (feminine)","kabīra"]],
+  it:[["The house is big.","البيت كبير","كبير","البيت كبيرة",["كبير","كبيرة"],"al-bayt kabīr"],
+      ["The car is big.","السيارة كبيرة","كبيرة","السيارة كبير",["كبيرة","كبير"],"as-sayyāra kabīra"],
+      ["My sister is tall.","أختي طويلة","طويلة","أختي طويل",["طويلة","طويل"],"ukhtī ṭawīla"],
+      ["The tea is hot.","الشاي حار","حار","الشاي حارة",["حار","حارة"],"ash-shāy ḥārr"],
+      ["The room is clean.","الغرفة نظيفة","نظيفة","الغرفة نظيف",["نظيفة","نظيف"],"al-ghurfa naẓīfa"]]}
+],
+A2:[
+ {t:"Plurals of things", o:["جديدة","جديدون","غالية","غالي","كبيرة","كبيرون","متعبون","متعبة","مغلقة","مغلقون"],
+  b:"Plurals of **things** take a **feminine singular** adjective: **الكتب جديدة** (the books are new). Plurals of **people** take a plural adjective: **الطلاب متعبون**.",
+  w:[["الكتب جديدة","the books are new","al-kutub jadīda"],["الطلاب متعبون","the students are tired","aṭ-ṭullāb mutʿabūn"]],
+  it:[["The books are new.","الكتب جديدة","جديدة","الكتب جديدون",["جديدة","جديدون"],"al-kutub jadīda"],
+      ["The cars are expensive.","السيارات غالية","غالية","السيارات غالي",["غالية","غالي"],"as-sayyārāt ghāliya"],
+      ["The rooms are big.","الغرف كبيرة","كبيرة","الغرف كبيرون",["كبيرة","كبيرون"],"al-ghuraf kabīra"],
+      ["The students are tired.","الطلاب متعبون","متعبون","الطلاب متعبة",["متعبون","متعبة"],"aṭ-ṭullāb mutʿabūn"],
+      ["The shops are closed.","المحلات مغلقة","مغلقة","المحلات مغلقون",["مغلقة","مغلقون"],"al-maḥallāt mughlaqa"]]},
+ {t:"ما, ماذا or لماذا", o:["ما","ماذا","لماذا"],
+  b:"**ما** (mā) = what, before a noun: **ما اسمك؟** **ماذا** (mādhā) = what, before a verb: **ماذا تريد؟** **لماذا** (limādhā) = why.",
+  w:[["ما","what (before a noun)","mā"],["ماذا","what (before a verb)","mādhā"],["لماذا","why","limādhā"]],
+  it:[["What is your name?","ما اسمك","ما","ماذا اسمك",null,"mā ismuk"],
+      ["What do you want?","ماذا تريد","ماذا","لماذا تريد",null,"mādhā turīd"],
+      ["Why are you sad?","لماذا أنت حزين","لماذا","ماذا أنت حزين",null,"limādhā anta ḥazīn"],
+      ["What is this?","ما هذا","ما","ماذا هذا",null,"mā hādhā"],
+      ["What are you doing?","ماذا تفعل","ماذا","لماذا تفعل",null,"mādhā tafʿal"]]},
+ {t:"في, إلى or من", o:["في","إلى","من"],
+  b:"**في** (fī) = in / at, **إلى** (ilā) = to (a destination), **من** (min) = from. Movement verbs like أذهب and نسافر take **إلى**.",
+  w:[["في","in, at","fī"],["إلى","to","ilā"]],
+  it:[["I'm going to school.","أذهب إلى المدرسة","إلى","أذهب في المدرسة",null,"adhhab ilā al-madrasa"],
+      ["I live in Cairo.","أسكن في القاهرة","في","أسكن إلى القاهرة",null,"askun fī al-qāhira"],
+      ["I am from Morocco.","أنا من المغرب","من","أنا في المغرب",null,"anā min al-maghrib"],
+      ["I came back from work.","رجعت من العمل","من","رجعت إلى العمل",null,"rajaʿtu min al-ʿamal"],
+      ["We travel to Jordan.","نسافر إلى الأردن","إلى","نسافر في الأردن",null,"nusāfir ilā al-urdunn"]]}
+]};
+
+WL.ar.stories = [
+ {id:"ar-souq", lv:"A1", ico:"🍎", t:{ar:"في السوق", en:"At the market", es:"En el mercado"}, p:[
+  {s:"", ar:"تذهب ليلى إلى السوق صباح يوم السبت.", r:"tadhhab laylā ilā as-sūq ṣabāḥ yawm as-sabt.", en:"Layla goes to the market on Saturday morning."},
+  {s:"البائع", ar:"صباح الخير! ماذا تريدين؟", r:"ṣabāḥ al-khayr! mādhā turīdīn?", en:"Good morning! What would you like?"},
+  {s:"ليلى", ar:"أريد كيلو تفاح من فضلك. بكم؟", r:"urīd kīlū tuffāḥ min faḍlik. bikam?", en:"I want a kilo of apples, please. How much?"},
+  {s:"البائع", ar:"بعشرة دراهم.", r:"bi-ʿasharat darāhim.", en:"Ten dirhams."},
+  {q:{en:"What does Layla want?", es:"¿Qué quiere Layla?"}, ol:"t", o:[{ar:"تفاح (tuffāḥ)", en:"Apples"},{ar:"خبز (khubz)", en:"Bread"},{ar:"حليب (ḥalīb)", en:"Milk"}], a:0},
+  {s:"ليلى", ar:"هذا غالي! بثمانية؟", r:"hādhā ghālī! bi-thamāniya?", en:"That's expensive! For eight?"},
+  {s:"البائع", ar:"طيب، بثمانية.", r:"ṭayyib, bi-thamāniya.", en:"OK, for eight."},
+  {q:{en:"How much does she pay in the end?", es:"¿Cuánto paga al final?"}, ol:"t", o:[{ar:"ثمانية دراهم (thamāniyat darāhim)", en:"Eight dirhams"},{ar:"عشرة دراهم (ʿasharat darāhim)", en:"Ten dirhams"},{ar:"خمسة دراهم (khamsat darāhim)", en:"Five dirhams"}], a:0},
+  {s:"ليلى", ar:"شكرا، مع السلامة!", r:"shukran, maʿa as-salāma!", en:"Thank you, goodbye!"},
+  {q:{en:"When does Layla go to the market?", es:"¿Cuándo va Layla al mercado?"}, ol:"t", o:[{ar:"صباح يوم السبت", en:"Saturday morning"},{ar:"مساء يوم الجمعة", en:"Friday evening"},{ar:"يوم الأحد", en:"On Sunday"}], a:0}]},
+ {id:"ar-aqaba", lv:"A2", ico:"🌊", t:{ar:"رحلة إلى البحر", en:"A trip to the sea", es:"Un viaje al mar"}, p:[
+  {s:"", ar:"في الأسبوع الماضي سافر عمر مع عائلته إلى العقبة.", r:"fī al-usbūʿ al-māḍī sāfara ʿumar maʿa ʿāʾilatihi ilā al-ʿaqaba.", en:"Last week Omar traveled with his family to Aqaba."},
+  {s:"", ar:"سافروا بالسيارة لمدة أربع ساعات.", r:"sāfarū bis-sayyāra li-muddat arbaʿ sāʿāt.", en:"They traveled by car for four hours."},
+  {s:"عمر", ar:"كان الجو حارا جدا، فسبحنا في البحر كل يوم.", r:"kāna al-jaww ḥārran jiddan, fa-sabaḥnā fī al-baḥr kull yawm.", en:"The weather was very hot, so we swam in the sea every day."},
+  {q:{en:"How did they travel?", es:"¿Cómo viajaron?"}, ol:"t", o:[{ar:"بالسيارة (bis-sayyāra)", en:"By car"},{ar:"بالطائرة (biṭ-ṭāʾira)", en:"By plane"},{ar:"بالقطار (bil-qiṭār)", en:"By train"}], a:0},
+  {s:"", ar:"في المساء أكلوا السمك في مطعم قريب.", r:"fī al-masāʾ akalū as-samak fī maṭʿam qarīb.", en:"In the evening they ate fish in a nearby restaurant."},
+  {s:"عمر", ar:"كان السمك لذيذا جدا!", r:"kāna as-samak ladhīdhan jiddan!", en:"The fish was really delicious!"},
+  {q:{en:"What did they eat in the evening?", es:"¿Qué comieron por la noche?"}, ol:"t", o:[{ar:"السمك (as-samak)", en:"Fish"},{ar:"الدجاج (ad-dajāj)", en:"Chicken"},{ar:"اللحم (al-laḥm)", en:"Meat"}], a:0},
+  {s:"", ar:"رجعوا إلى البيت متعبين لكن سعداء.", r:"rajaʿū ilā al-bayt mutʿabīn lākin suʿadāʾ.", en:"They came back home tired but happy."},
+  {q:{en:"How long was the drive?", es:"¿Cuánto duró el viaje en coche?"}, ol:"t", o:[{ar:"أربع ساعات (arbaʿ sāʿāt)", en:"Four hours"},{ar:"ساعتان (sāʿatān)", en:"Two hours"},{ar:"عشر ساعات (ʿashr sāʿāt)", en:"Ten hours"}], a:0}]}
+];
+
+WL.ar.islands = [
+ {id:"ar-town", en:"First day in Cairo", es:"Primer día en El Cairo", ico:"🕌", units:["Greetings","Me and you","Around town"]},
+ {id:"ar-food", en:"Eating out", es:"Comer fuera", ico:"🫓", units:["Food and drink","At the restaurant","Shopping"]},
+ {id:"ar-trip", en:"On the road", es:"De viaje", ico:"🐪", units:["Getting around","Travel","Weather and seasons"]},
+ {id:"ar-home", en:"Life at home", es:"La vida en casa", ico:"🏠", units:["Family","At home","Daily routine"]},
+ {id:"ar-work", en:"Work and play", es:"Trabajo y ocio", ico:"💼", units:["Work and jobs","Free time","Phones and the internet"]},
+ {id:"ar-mind", en:"Big ideas", es:"Grandes ideas", ico:"💭", units:["Feelings and opinions","Plans and the future","Comparing things"]}
+];
 
 /* ===================== World Languages: French (A1–A2, taught through English) =====================
    w: [target, english]   s: [english, target]   Sentences: words separated by spaces (tiles). */
@@ -14936,6 +15331,174 @@ WL.fr = {code:"fr", name:"French", self:"Français", flag:"🇫🇷", tts:"fr-FR
   s:[["I ate a croissant this morning.","J'ai mangé un croissant ce matin."],["We saw a film last night.","Nous avons vu un film hier soir."],["She went to Paris last week.","Elle est allée à Paris la semaine dernière."],["I already bought the tickets.","J'ai déjà acheté les billets."],["What did you do yesterday?","Qu'est-ce que tu as fait hier ?"]]}
 ]};
 
+/* ===================== French: B1 units, Tricky Pairs, stories, islands =====================
+   s: [english, french, null, planted mistake]. The mistake is a real learner error (gender, word
+   order, wrong auxiliary…) used by Error Hunter, Right or Wrong and Spot the Mistake.
+   tricky items: [english, french, cloze, mistake, options?]. */
+WL.fr.units.push(
+ {lv:"B1", t:"Work and jobs", ico:"💼",
+  b:"Jobs take **no article** after être: **elle est infirmière**, not *une infirmière*. **Chercher** already means 'to look for', so there's no 'pour': **je cherche un emploi**.",
+  w:[["le travail","work"],["le bureau","office"],["le patron","boss"],["le collègue","colleague"],["la réunion","meeting"],["le salaire","salary"],["chercher","to look for"],["l'emploi","job"],["l'entreprise","company"],["en retard","late"]],
+  s:[["I work in an office.","Je travaille dans un bureau.",null,"Je travaille dans une bureau."],
+     ["She is a nurse.","Elle est infirmière.",null,"Elle est une infirmière."],
+     ["The meeting starts at nine.","La réunion commence à neuf heures.",null,"Le réunion commence à neuf heures."],
+     ["I am looking for a job.","Je cherche un emploi.",null,"Je cherche pour un emploi."],
+     ["My boss is never late.","Mon patron n'est jamais en retard.",null,"Mon patron n'est pas jamais en retard."],
+     ["We work for a big company.","Nous travaillons pour une grande entreprise.",null,"Nous travaillons pour un grande entreprise."]]},
+ {lv:"B1", t:"Free time", ico:"🎨",
+  b:"**Jouer au** + sport (je joue au foot), **jouer du** + instrument (elle joue du piano). **Faire du sport**. **Écouter** takes no preposition: **j'écoute de la musique**.",
+  w:[["le temps libre","free time"],["le sport","sport"],["la musique","music"],["lire","to read"],["jouer","to play"],["nager","to swim"],["le livre","book"],["le cinéma","cinema"],["la chanson","song"],["le week-end","weekend"]],
+  s:[["I play football on Saturdays.","Je joue au foot le samedi.",null,"Je joue le foot le samedi."],
+     ["She plays the piano.","Elle joue du piano.",null,"Elle joue le piano."],
+     ["Do you like reading?","Tu aimes lire ?",null,"Tu aimes de lire ?"],
+     ["We go to the cinema on the weekend.","Nous allons au cinéma le week-end.",null,"Nous allons à le cinéma le week-end."],
+     ["I do sport every day.","Je fais du sport tous les jours.",null,"Je fais le sport tous les jours."],
+     ["He listens to music.","Il écoute de la musique.",null,"Il écoute à la musique."]]},
+ {lv:"B1", t:"Travel", ico:"🧳",
+  b:"Countries: **en** + feminine country (**en France**), **au** + masculine (**au Canada**), **aux** + plural (**aux États-Unis**). Most countries ending in -e are feminine.",
+  w:[["la réservation","reservation"],["le passeport","passport"],["les vacances","holidays"],["la clé","key"],["l'aéroport","airport"],["voyager","to travel"],["réserver","to book"],["le pays","country"],["la carte","map"],["une chambre double","double room"]],
+  s:[["I am going to France in July.","Je vais en France en juillet.",null,"Je vais à la France en juillet."],
+     ["He lives in Canada.","Il habite au Canada.",null,"Il habite en Canada."],
+     ["I booked a double room.","J'ai réservé une chambre double.",null,"J'ai réservé une double chambre."],
+     ["Where is my passport?","Où est mon passeport ?",null,"Où est ma passeport ?"],
+     ["We are on holiday.","Nous sommes en vacances.",null,"Nous sommes en vacance."],
+     ["The key, please.","La clé, s'il vous plaît.",null,"Le clé, s'il vous plaît."]]},
+ {lv:"B1", t:"At the restaurant", ico:"🍽️",
+  b:"Order with **je vais prendre** or **je voudrais**. After a negative, 'some' becomes **de**: je mange **de la** viande → je ne mange **pas de** viande. Ask for **l'addition**.",
+  w:[["le menu","set menu"],["l'addition","the bill"],["le serveur","waiter"],["commander","to order"],["le plat","dish"],["le dessert","dessert"],["la viande","meat"],["le poisson","fish"],["les légumes","vegetables"],["sympa","nice"]],
+  s:[["The bill, please.","L'addition, s'il vous plaît.",null,"La addition, s'il vous plaît."],
+     ["I'll have the fish.","Je vais prendre le poisson.",null,"Je vais prends le poisson."],
+     ["We would like a table for two.","Nous voudrions une table pour deux.",null,"Nous voudrions un table pour deux."],
+     ["Is the dessert good?","Le dessert est bon ?",null,"Le dessert est bonne ?"],
+     ["I don't eat meat.","Je ne mange pas de viande.",null,"Je ne mange pas de la viande."],
+     ["The waiter is very nice.","Le serveur est très sympa.",null,"Le serveur est beaucoup sympa."]]},
+ {lv:"B1", t:"Feelings and opinions", ico:"😊",
+  b:"Some feelings use **avoir**: **avoir peur** (to be afraid), **avoir raison** (to be right). Adjectives agree: il est **content**, elle est **contente**. **À mon avis** = in my opinion.",
+  w:[["content","happy"],["triste","sad"],["en colère","angry"],["inquiet","worried"],["je pense que","I think that"],["à mon avis","in my opinion"],["d'accord","agreed"],["avoir peur","to be afraid"],["fier","proud"],["avoir raison","to be right"]],
+  s:[["I am afraid of dogs.","J'ai peur des chiens.",null,"Je suis peur des chiens."],
+     ["She is very happy.","Elle est très contente.",null,"Elle est très content."],
+     ["I think that you are right.","Je pense que tu as raison.",null,"Je pense que tu es raison."],
+     ["In my opinion, it's too expensive.","À mon avis, c'est trop cher.",null,"Dans mon avis, c'est trop cher."],
+     ["We are worried.","Nous sommes inquiets.",null,"Nous sommes inquiet."],
+     ["I agree with you.","Je suis d'accord avec toi.",null,"J'ai d'accord avec toi."]]},
+ {lv:"B1", t:"Plans and the future", ico:"🔮",
+  b:"**Futur simple** = infinitive + **-ai, -as, -a, -ons, -ez, -ont**: je parlerai. Irregular stems: **ir-** (aller), **ser-** (être), **aur-** (avoir), **fer-** (faire): j'irai, je serai.",
+  w:[["l'année prochaine","next year"],["bientôt","soon"],["peut-être","maybe"],["le projet","plan"],["j'irai","I will go"],["je serai","I will be"],["j'aurai","I will have"],["je ferai","I will do"],["plus tard","later"],["un jour","one day"]],
+  s:[["Next year, I will go to Paris.","L'année prochaine, j'irai à Paris.",null,"L'année prochaine, j'allerai à Paris."],
+     ["We will be at home.","Nous serons à la maison.",null,"Nous serez à la maison."],
+     ["It will maybe rain tomorrow.","Il pleuvra peut-être demain.",null,"Il pleuvoira peut-être demain."],
+     ["I will call you later.","Je t'appellerai plus tard.",null,"Je te appellerai plus tard."],
+     ["She will have a car one day.","Elle aura une voiture un jour.",null,"Elle avra une voiture un jour."],
+     ["What will you do this summer?","Qu'est-ce que tu feras cet été ?",null,"Qu'est-ce que tu feras ce été ?"]]},
+ {lv:"B1", t:"Comparing things", ico:"⚖️",
+  b:"**plus … que** (more … than), **moins … que** (less … than), **aussi … que** (as … as). Irregular: **bon → meilleur**, **bien → mieux**. Never *plus bon*.",
+  w:[["plus","more"],["moins","less"],["aussi … que","as … as"],["meilleur","better (adjective)"],["mieux","better (adverb)"],["plus grand","bigger"],["plus petit","smaller"],["vieux","old"],["jeune","young"],["rapide","fast"]],
+  s:[["Paris is bigger than Lyon.","Paris est plus grand que Lyon.",null,"Paris est plus grand de Lyon."],
+     ["This film is better.","Ce film est meilleur.",null,"Ce film est plus bon."],
+     ["She speaks better than me.","Elle parle mieux que moi.",null,"Elle parle meilleur que moi."],
+     ["The train is faster than the bus.","Le train est plus rapide que le bus.",null,"Le train est plus rapide comme le bus."],
+     ["I am as tall as my brother.","Je suis aussi grand que mon frère.",null,"Je suis aussi grand comme mon frère."],
+     ["It's the best restaurant in town.","C'est le meilleur restaurant de la ville.",null,"C'est le plus bon restaurant de la ville."]]},
+ {lv:"B1", t:"Phones and the internet", ico:"📱",
+  b:"Object pronouns go **before** the verb: **je t'envoie** un message (I send you). **ne … plus** = not anymore. **Mon / ma** follow the noun's gender, not the owner's: **sa mère** (his or her mother).",
+  w:[["le portable","mobile phone"],["l'ordinateur","computer"],["le mot de passe","password"],["envoyer","to send"],["le message","text message"],["l'écran","screen"],["télécharger","to download"],["en ligne","online"],["le courriel","email"],["appeler","to call"]],
+  s:[["I'm sending you a message.","Je t'envoie un message.",null,"J'envoie toi un message."],
+     ["My phone doesn't work anymore.","Mon portable ne marche plus.",null,"Mon portable ne marche pas plus."],
+     ["I forgot my password.","J'ai oublié mon mot de passe.",null,"J'ai oublié ma mot de passe."],
+     ["She calls her mother every day.","Elle appelle sa mère tous les jours.",null,"Elle appelle son mère tous les jours."],
+     ["The computer is on the table.","L'ordinateur est sur la table.",null,"Le ordinateur est sur la table."],
+     ["Can you download the file?","Tu peux télécharger le fichier ?",null,"Tu peux télécharges le fichier ?"]]}
+);
+
+WL.fr.tricky = {
+A1:[
+ {t:"Tu or vous", o:["tu","vous"],
+  b:"**tu** for a friend, a child or family; **vous** for a stranger, your boss, or more than one person. The verb changes too: **tu es**, **vous êtes**.",
+  w:[["tu es","you are (a friend)"],["vous êtes","you are (polite / plural)"]],
+  it:[["(to a friend) Are you tired?","Tu es fatigué ?","tu","Tu êtes fatigué ?"],
+      ["(to a stranger) Are you French?","Vous êtes français ?","vous","Vous es français ?"],
+      ["(to a child) What's your name?","Comment tu t'appelles ?","tu","Comment tu vous appelles ?"],
+      ["(to a teacher) Do you speak English?","Vous parlez anglais ?","vous","Vous parles anglais ?"],
+      ["(to two friends) Are you coming?","Vous venez ?","vous","Vous viens ?"]]},
+ {t:"C'est or il est", o:["c'est","il est","elle est"],
+  b:"**C'est** + a noun with its article (**c'est un bon film**, **c'est mon frère**). **Il est / elle est** + a job or an adjective (**il est médecin**, **elle est gentille**).",
+  w:[["c'est","it's / this is"],["il est","he is"],["elle est","she is"]],
+  it:[["It's a good film.","C'est un bon film.","c'est","Il est un bon film."],
+      ["He is a doctor.","Il est médecin.","il est","C'est médecin."],
+      ["She is very kind.","Elle est très gentille.","elle est","C'est très gentille."],
+      ["This is my brother.","C'est mon frère.","c'est","Il est mon frère."],
+      ["He is a teacher.","Il est professeur.","il est","C'est professeur."]]},
+ {t:"Savoir or connaître", o:["sais","connais","sait","connaît"],
+  b:"**savoir** = to know a fact or how to do something (**je sais nager**). **connaître** = to know a person or a place (**je connais Paris**).",
+  w:[["je sais","I know (a fact)"],["je connais","I know (a person, a place)"]],
+  it:[["I know Paris well.","Je connais bien Paris.","connais","Je sais bien Paris."],
+      ["I know how to swim.","Je sais nager.","sais","Je connais nager."],
+      ["Do you know Marie?","Tu connais Marie ?","connais","Tu sais Marie ?"],
+      ["She knows where he lives.","Elle sait où il habite.","sait","Elle connaît où il habite."],
+      ["We know this restaurant.","Nous connaissons ce restaurant.","connaissons","Nous savons ce restaurant.",["savons","connaissons"]]]}
+],
+A2:[
+ {t:"Depuis, pendant, il y a", o:["depuis","pendant","il y a"],
+  b:"**depuis** + present tense = something that started and is still going (**j'habite ici depuis deux ans**). **pendant** = for a finished stretch of time. **il y a** = ago.",
+  w:[["depuis","since / for (still going)"],["pendant","for (finished)"],["il y a","ago"]],
+  it:[["I have lived here for two years.","J'habite ici depuis deux ans.","depuis","J'habite ici pendant deux ans."],
+      ["I worked there for three months.","J'ai travaillé là-bas pendant trois mois.","pendant","J'ai travaillé là-bas depuis trois mois."],
+      ["I arrived two days ago.","Je suis arrivé il y a deux jours.","il y a","Je suis arrivé deux jours il y a."],
+      ["She has been waiting for an hour.","Elle attend depuis une heure.","depuis","Elle attend pour une heure."],
+      ["We slept for eight hours.","Nous avons dormi pendant huit heures.","pendant","Nous avons dormi depuis huit heures."]]},
+ {t:"Passé composé: avoir or être", o:["ai","suis","a","est","avons","sommes","ont","sont"],
+  b:"Most verbs use **avoir** (**j'ai mangé**). Verbs of movement and change like **aller, venir, arriver, partir, rester** use **être**, and the participle agrees: **elle est arrivée**.",
+  w:[["j'ai mangé","I ate"],["je suis allé","I went (être)"]],
+  it:[["I went to the cinema.","Je suis allé au cinéma.","suis","J'ai allé au cinéma.",["suis","ai"]],
+      ["She arrived late.","Elle est arrivée en retard.","est","Elle a arrivée en retard.",["est","a"]],
+      ["We stayed at home.","Nous sommes restés à la maison.","sommes","Nous avons restés à la maison.",["sommes","avons"]],
+      ["He came yesterday.","Il est venu hier.","est","Il a venu hier.",["est","a"]],
+      ["They watched TV.","Ils ont regardé la télé.","ont","Ils sont regardé la télé.",["ont","sont"]]]},
+ {t:"Bon or bien", o:["bon","bonne","bien"],
+  b:"**bon / bonne** is an adjective and describes a noun (**un bon livre**, **une bonne idée**). **bien** is an adverb and describes a verb (**elle chante bien**, **je vais bien**).",
+  w:[["bon","good"],["bien","well"]],
+  it:[["It's a good book.","C'est un bon livre.","bon","C'est un bien livre."],
+      ["She sings well.","Elle chante bien.","bien","Elle chante bon."],
+      ["I'm doing well.","Je vais bien.","bien","Je vais bon."],
+      ["It's a good idea.","C'est une bonne idée.","bonne","C'est une bien idée."],
+      ["You speak French well.","Tu parles bien français.","bien","Tu parles bon français."]]}
+]};
+
+WL.fr.stories = [
+ {id:"fr-cafe", lv:"A1", ico:"☕", t:{fr:"Au café", en:"At the café", es:"En el café"}, p:[
+  {s:"", fr:"Lucie entre dans un café à Paris.", en:"Lucie walks into a café in Paris."},
+  {s:"Le serveur", fr:"Bonjour, madame ! Vous désirez ?", en:"Hello, madam! What would you like?"},
+  {s:"Lucie", fr:"Bonjour ! Je voudrais un café, s'il vous plaît.", en:"Hello! I would like a coffee, please."},
+  {s:"Le serveur", fr:"Avec du lait ?", en:"With milk?"},
+  {s:"Lucie", fr:"Non, merci. Et un croissant, s'il vous plaît.", en:"No, thank you. And a croissant, please."},
+  {q:{en:"What does Lucie order?", es:"¿Qué pide Lucie?"}, ol:"t", o:[{fr:"Un café et un croissant", en:"A coffee and a croissant"},{fr:"Un thé et du pain", en:"A tea and some bread"},{fr:"Un café au lait", en:"A coffee with milk"}], a:0},
+  {s:"Le serveur", fr:"Voilà ! Ça fait quatre euros.", en:"Here you go! That's four euros."},
+  {s:"Lucie", fr:"Je peux payer par carte ?", en:"Can I pay by card?"},
+  {s:"Le serveur", fr:"Bien sûr. Merci et bonne journée !", en:"Of course. Thank you and have a nice day!"},
+  {q:{en:"How much does it cost?", es:"¿Cuánto cuesta?"}, ol:"t", o:[{fr:"Quatre euros", en:"Four euros"},{fr:"Deux euros", en:"Two euros"},{fr:"Dix euros", en:"Ten euros"}], a:0},
+  {q:{en:"How does Lucie want to pay?", es:"¿Cómo quiere pagar Lucie?"}, ol:"t", o:[{fr:"Par carte", en:"By card"},{fr:"En espèces", en:"In cash"},{fr:"Elle ne paie pas", en:"She doesn't pay"}], a:0}]},
+ {id:"fr-weekend", lv:"A2", ico:"🏖️", t:{fr:"Le week-end de Karim", en:"Karim's weekend", es:"El fin de semana de Karim"}, p:[
+  {s:"", fr:"Samedi dernier, Karim est allé à la plage avec ses amis.", en:"Last Saturday, Karim went to the beach with his friends."},
+  {s:"", fr:"Il faisait beau et chaud.", en:"The weather was nice and hot."},
+  {s:"Karim", fr:"On a nagé et on a joué au volley.", en:"We swam and played volleyball."},
+  {s:"", fr:"À midi, ils ont mangé des sandwichs.", en:"At noon, they ate sandwiches."},
+  {q:{en:"Where did Karim go on Saturday?", es:"¿Adónde fue Karim el sábado?"}, ol:"t", o:[{fr:"À la plage", en:"To the beach"},{fr:"Au cinéma", en:"To the cinema"},{fr:"À la montagne", en:"To the mountains"}], a:0},
+  {s:"", fr:"Dimanche, il a plu toute la journée.", en:"On Sunday, it rained all day."},
+  {s:"Karim", fr:"Je suis resté à la maison et j'ai lu un livre.", en:"I stayed at home and read a book."},
+  {q:{en:"What was the weather like on Sunday?", es:"¿Qué tiempo hizo el domingo?"}, ol:"t", o:[{fr:"Il a plu", en:"It rained"},{fr:"Il a neigé", en:"It snowed"},{fr:"Il faisait chaud", en:"It was hot"}], a:0},
+  {s:"", fr:"Lundi, il est retourné au travail, un peu fatigué mais content.", en:"On Monday, he went back to work, a little tired but happy."},
+  {q:{en:"How did Karim feel on Monday?", es:"¿Cómo se sentía Karim el lunes?"}, ol:"t", o:[{fr:"Fatigué mais content", en:"Tired but happy"},{fr:"Malade", en:"Sick"},{fr:"Triste", en:"Sad"}], a:0}]}
+];
+
+WL.fr.islands = [
+ {id:"fr-town", en:"First day in Paris", es:"Primer día en París", ico:"🗼", units:["Greetings","Me and you","Around town"]},
+ {id:"fr-food", en:"Eating out", es:"Comer fuera", ico:"🥐", units:["Food and drink","At the restaurant","Shopping"]},
+ {id:"fr-trip", en:"On the road", es:"De viaje", ico:"🚆", units:["Getting around","Travel","Weather and seasons"]},
+ {id:"fr-home", en:"Life at home", es:"La vida en casa", ico:"🏠", units:["Family","At home","Daily routine"]},
+ {id:"fr-work", en:"Work and play", es:"Trabajo y ocio", ico:"💼", units:["Work and jobs","Free time","Phones and the internet"]},
+ {id:"fr-mind", en:"Big ideas", es:"Grandes ideas", ico:"💭", units:["Feelings and opinions","Plans and the future","Comparing things"]}
+];
+
 /* ===================== World Languages: Portuguese (Brazil, A1, taught through English) ===================== */
 var WL = WL || {};
 WL.pt = {code:"pt", name:"Portuguese", self:"Português", flag:"🇧🇷", tts:"pt-BR", dir:"ltr", typing:true, music:"samba", bosses:[["🐊","O Jacaré-Açu"],["🧜","A Iara"],["🔥","O Boitatá"],["🌪️","O Saci"]], units:[
@@ -15005,6 +15568,170 @@ WL.pt = {code:"pt", name:"Portuguese", self:"Português", flag:"🇧🇷", tts:"
   s:[["I ate a pastel this morning.","Eu comi um pastel hoje de manhã."],["We saw a film last night.","Nós vimos um filme ontem à noite."],["She went to Rio last week.","Ela foi para o Rio na semana passada."],["I already bought the tickets.","Eu já comprei as passagens."],["What did you do yesterday?","O que você fez ontem?"]]}
 ]};
 
+/* ===================== Portuguese (Brazil): B1 units, Tricky Pairs, stories, islands =====================
+   s: [english, portuguese, null, planted mistake]. tricky items: [english, portuguese, cloze, mistake, options?]. */
+WL.pt.units.push(
+ {lv:"B1", t:"Work and jobs", ico:"💼",
+  b:"Use **estar** for temporary states: **estou atrasado** (I'm late). **Procurar** already means 'to look for', so no 'para': **estou procurando um emprego**. In Brazil the gerund is everywhere: **estou trabalhando**.",
+  w:[["o trabalho","work"],["o escritório","office"],["o chefe","boss"],["o colega","colleague"],["a reunião","meeting"],["o salário","salary"],["procurar","to look for"],["o emprego","job"],["a empresa","company"],["atrasado","late"]],
+  s:[["I work in an office.","(Eu) trabalho [num|em um] escritório.",null,"Eu trabalho numa escritório."],
+     ["She is a nurse.","Ela é enfermeira.",null,"Ela é enfermeiro."],
+     ["The meeting starts at nine.","A reunião começa às nove.",null,"O reunião começa às nove."],
+     ["I'm looking for a job.","(Eu) estou procurando (um) emprego.|(Eu) procuro (um) emprego.",null,"Estou procurando para um emprego."],
+     ["My boss is never late.","Meu chefe nunca está atrasado.|Meu chefe nunca chega atrasado.",null,"Meu chefe nunca é atrasado."],
+     ["We work for a big company.","(Nós) trabalhamos para uma [empresa grande|grande empresa].",null,"Nós trabalhamos para um empresa grande."]]},
+ {lv:"B1", t:"Free time", ico:"🎨",
+  b:"**Jogar** for games and sports (**jogo futebol**), **tocar** for instruments (**ela toca violão**). **Gostar** always takes **de**: **você gosta de ler?**",
+  w:[["o tempo livre","free time"],["o esporte","sport"],["a música","music"],["ler","to read"],["jogar","to play (a game)"],["tocar","to play (an instrument)"],["nadar","to swim"],["o livro","book"],["o cinema","cinema"],["o fim de semana","weekend"]],
+  s:[["I play football on Saturdays.","(Eu) jogo futebol [aos sábados|no sábado].",null,"Eu toco futebol aos sábados."],
+     ["She plays the guitar.","Ela toca [violão|guitarra].",null,"Ela joga violão."],
+     ["Do you like reading?","Você gosta de ler?",null,"Você gosta ler?"],
+     ["We go to the cinema on the weekend.","(Nós) vamos [ao|no] cinema no fim de semana.",null,"Nós vamos ao cinema na fim de semana."],
+     ["He listens to music every day.","Ele [escuta|ouve] música todos os dias.|Ele [escuta|ouve] música todo dia.",null,"Ele escuta música todos as dias."],
+     ["I swim in the morning.","(Eu) nado de manhã.",null,"Eu nado na manhã."]]},
+ {lv:"B1", t:"Travel", ico:"🧳",
+  b:"**Em** joins the article: **no Brasil**, **na França**, **em Portugal** (no article). For a destination use **para**: **vou para a França**.",
+  w:[["a reserva","reservation"],["o passaporte","passport"],["as férias","holidays"],["a chave","key"],["o aeroporto","airport"],["viajar","to travel"],["reservar","to book"],["o país","country"],["o mapa","map"],["o quarto de casal","double room"]],
+  s:[["I'm going to France in July.","(Eu) vou [para a|à] França em julho.",null,"Eu vou em França em julho."],
+     ["He lives in Brazil.","Ele mora no Brasil.",null,"Ele mora em Brasil."],
+     ["I booked a double room.","(Eu) reservei um quarto de casal.",null,"Eu reservei uma quarto de casal."],
+     ["Where is my passport?","Onde está (o) meu passaporte?|Cadê (o) meu passaporte?",null,"Onde está minha passaporte?"],
+     ["We are on vacation.","(Nós) estamos de férias.",null,"Nós somos de férias."],
+     ["The key, please.","A chave, por favor.",null,"O chave, por favor."]]},
+ {lv:"B1", t:"At the restaurant", ico:"🍽️",
+  b:"Order politely with **eu queria** or **vou querer**. Ask for **a conta** to pay. Adjectives agree with the noun: **a sobremesa está deliciosa**.",
+  w:[["o cardápio","menu"],["a conta","the bill"],["o garçom","waiter"],["pedir","to order"],["o prato","dish"],["a sobremesa","dessert"],["a carne","meat"],["o peixe","fish"],["os legumes","vegetables"],["a gorjeta","tip"]],
+  s:[["The bill, please.","A conta, por favor.",null,"O conta, por favor."],
+     ["I'll have the fish.","(Eu) vou querer o peixe.",null,"Eu vou quero o peixe."],
+     ["We would like a table for two.","(Nós) queríamos uma mesa para dois.",null,"Nós queríamos um mesa para dois."],
+     ["The dessert is delicious.","A sobremesa está deliciosa.",null,"A sobremesa está delicioso."],
+     ["I don't eat meat.","(Eu) não como carne.",null,"Eu não comer carne."],
+     ["Can I see the menu?","Posso ver o cardápio?",null,"Posso ver a cardápio?"]]},
+ {lv:"B1", t:"Feelings and opinions", ico:"😊",
+  b:"Feelings use **estar**: **estou triste**, **ela está feliz hoje**. **Ter medo de** = to be afraid of. **Eu acho que** = I think that; **ter razão** = to be right.",
+  w:[["feliz","happy"],["triste","sad"],["bravo","angry"],["preocupado","worried"],["eu acho que","I think that"],["na minha opinião","in my opinion"],["concordo","I agree"],["ter medo","to be afraid"],["orgulhoso","proud"],["cansado","tired"]],
+  s:[["I'm afraid of dogs.","(Eu) tenho medo de cachorros.",null,"Eu sou medo de cachorros."],
+     ["She is very happy today.","Ela está muito feliz hoje.",null,"Ela é muito feliz hoje."],
+     ["I think you are right.","(Eu) acho que você tem razão.",null,"Eu acho que você está razão."],
+     ["In my opinion, it's too expensive.","Na minha opinião, é [caro demais|muito caro].",null,"Na meu opinião, é caro demais."],
+     ["We are worried.","(Nós) estamos preocupados.",null,"Nós estamos preocupado."],
+     ["I agree with you.","(Eu) concordo com você.",null,"Eu estou concordo com você."]]},
+ {lv:"B1", t:"Plans and the future", ico:"🔮",
+  b:"Everyday future = **ir + infinitive**: **vou viajar** (I'm going to travel). After **talvez** (maybe) use the subjunctive: **talvez chova**. The simple future (**viajarei**) is more formal.",
+  w:[["o ano que vem","next year"],["logo","soon"],["talvez","maybe"],["o plano","plan"],["vou viajar","I'm going to travel"],["um dia","one day"],["depois","later"],["próximo","next"],["vou ser","I'm going to be"],["farei","I will do"]],
+  s:[["Next year I'm going to travel to Portugal.","No ano que vem, (eu) vou viajar para Portugal.",null,"No ano que vem, eu vou viajo para Portugal."],
+     ["We are going to be at home.","(Nós) vamos estar em casa.",null,"Nós vamos estamos em casa."],
+     ["Maybe it will rain tomorrow.","Talvez chova amanhã.",null,"Talvez chove amanhã."],
+     ["I'll call you later.","(Eu) te ligo depois.",null,"Eu ligo te depois."],
+     ["She is going to buy a car one day.","Ela vai comprar um carro um dia.",null,"Ela vai compra um carro um dia."],
+     ["What are you going to do this summer?","O que você vai fazer [neste|nesse] verão?",null,"O que você vai faz neste verão?"]]},
+ {lv:"B1", t:"Comparing things", ico:"⚖️",
+  b:"**mais … (do) que** = more … than, **menos … (do) que** = less … than, **tão … quanto** = as … as. Irregular: **melhor** (better), **pior** (worse), **maior** (bigger). Never *mais bom*.",
+  w:[["mais","more"],["menos","less"],["tão … quanto","as … as"],["melhor","better"],["pior","worse"],["maior","bigger"],["menor","smaller"],["velho","old"],["jovem","young"],["rápido","fast"]],
+  s:[["São Paulo is bigger than Rio.","São Paulo é maior (do) que o Rio.",null,"São Paulo é mais grande do que o Rio."],
+     ["This film is better.","Este filme é melhor.|Esse filme é melhor.",null,"Este filme é mais bom."],
+     ["The train is faster than the bus.","O trem é mais rápido (do) que o ônibus.",null,"O trem é mais rápido como o ônibus."],
+     ["I am as tall as my brother.","(Eu) sou tão alto quanto (o) meu irmão.",null,"Eu sou tanto alto quanto meu irmão."],
+     ["Today is worse than yesterday.","Hoje está pior (do) que ontem.",null,"Hoje está mais mau do que ontem."],
+     ["It's the best restaurant in the city.","É o melhor restaurante da cidade.",null,"É o mais bom restaurante da cidade."]]},
+ {lv:"B1", t:"Phones and the internet", ico:"📱",
+  b:"In Brazil object pronouns usually go **before** the verb: **te ligo**, **me manda**. **Não … mais** = not anymore. **Ligar para** someone = to call someone.",
+  w:[["o celular","mobile phone"],["o computador","computer"],["a senha","password"],["mandar","to send"],["a mensagem","message"],["a tela","screen"],["baixar","to download"],["na internet","online"],["o e-mail","email"],["ligar","to call"]],
+  s:[["I'll send you a message.","(Eu) te mando uma mensagem.",null,"Eu mando você uma mensagem."],
+     ["My phone doesn't work anymore.","Meu celular não funciona mais.",null,"Meu celular não funciona más."],
+     ["I forgot my password.","(Eu) esqueci (a) minha senha.",null,"Eu esqueci o meu senha."],
+     ["She calls her mother every day.","Ela liga para a mãe [todo dia|todos os dias].",null,"Ela liga a mãe todo dia."],
+     ["The computer is on the table.","O computador está [na mesa|em cima da mesa].",null,"O computador é na mesa."],
+     ["Can you download the file?","Você pode baixar o arquivo?",null,"Você pode baixa o arquivo?"]]}
+);
+
+WL.pt.tricky = {
+A1:[
+ {t:"Ser or estar", o:["é","está","sou","estou","somos","estamos"],
+  b:"**ser** for who or what something is (job, nationality, character): **ela é professora**. **estar** for states, feelings and where something is: **estou cansado**, **estou em casa**.",
+  w:[["ela é","she is (permanent)"],["ela está","she is (right now)"]],
+  it:[["She is a teacher.","Ela é professora.","é","Ela está professora.",["é","está"]],
+      ["I am at home.","(Eu) estou em casa.","estou","Eu sou em casa.",["estou","sou"]],
+      ["He is Brazilian.","Ele é brasileiro.","é","Ele está brasileiro.",["é","está"]],
+      ["We are tired today.","(Nós) estamos cansados hoje.","estamos","Nós somos cansados hoje.",["estamos","somos"]],
+      ["I am a student.","(Eu) sou estudante.","sou","Eu estou estudante.",["sou","estou"]]]},
+ {t:"Por or para", o:["por","para"],
+  b:"**para** = for (a person or a goal) and to (a destination): **é para você**, **vou para o Rio**. **por** = per, thanks for, through: **obrigado por tudo**, **uma vez por dia**.",
+  w:[["para","for / to"],["por","by / per / for (thanks)"]],
+  it:[["This gift is for you.","Este presente é para você.","para","Este presente é por você."],
+      ["Thanks for everything.","Obrigado por tudo.|Obrigada por tudo.","por","Obrigado para tudo."],
+      ["I'm going to Rio tomorrow.","(Eu) vou para o Rio amanhã.","para","Eu vou por o Rio amanhã."],
+      ["I study to learn.","(Eu) estudo para aprender.","para","Eu estudo por aprender."],
+      ["Once a day.","Uma vez por dia.","por","Uma vez para dia."]]},
+ {t:"Muito, muita, muitos", o:["muito","muita","muitos","muitas"],
+  b:"Before a noun, **muito** agrees: **muitos amigos**, **muita gente**, **muitas casas**. Before an adjective or after a verb it never changes: **muito simpática**, **trabalho muito**.",
+  w:[["muito","very / a lot"],["muitos","many"]],
+  it:[["I have many friends.","(Eu) tenho muitos amigos.","muitos","Eu tenho muito amigos."],
+      ["She is very nice.","Ela é muito simpática.","muito","Ela é muita simpática."],
+      ["There are a lot of people here.","Tem muita gente aqui.","muita","Tem muito gente aqui."],
+      ["I work a lot.","(Eu) trabalho muito.","muito","Eu trabalho muitos."],
+      ["Many houses are old.","Muitas casas são velhas.","muitas","Muitos casas são velhas."]]}
+],
+A2:[
+ {t:"Perfeito or imperfeito", o:["comi","comia","era","fui","morei","morava","estava","esteve","íamos","fomos"],
+  b:"**Pretérito perfeito** for something finished (**ontem comi pizza**, **morei lá por dois anos**). **Imperfeito** for the background, habits and descriptions (**quando eu era criança**, **estava chovendo**).",
+  w:[["comi","I ate (once)"],["comia","I used to eat"]],
+  it:[["Yesterday I ate pizza.","Ontem (eu) comi pizza.","comi","Ontem eu comia pizza.",["comi","comia"]],
+      ["When I was a child, I played a lot.","Quando eu era criança, (eu) brincava muito.","era","Quando eu fui criança, eu brincava muito.",["era","fui"]],
+      ["I lived in Lisbon for two years.","(Eu) morei em Lisboa por dois anos.","morei","Eu morava em Lisboa por dois anos.",["morei","morava"]],
+      ["It was raining when I left.","Estava chovendo quando (eu) saí.","estava","Esteve chovendo quando eu saí.",["estava","esteve"]],
+      ["Every summer we went to the beach.","Todo verão (nós) íamos à praia.","íamos","Todo verão nós fomos à praia.",["íamos","fomos"]]]},
+ {t:"Mas or mais", o:["mas","mais"],
+  b:"**mas** = but. **mais** = more. They sound alike in Brazil, so the meaning decides: **quero mais café**, **cansado, mas feliz**.",
+  w:[["mas","but"],["mais","more"]],
+  it:[["I want more coffee.","(Eu) quero mais café.","mais","Eu quero mas café."],
+      ["I'm tired, but happy.","(Eu) estou cansado, mas feliz.","mas","Estou cansado, mais feliz."],
+      ["She is taller.","Ela é mais alta.","mais","Ela é mas alta."],
+      ["It's expensive, but it's good.","É caro, mas é bom.","mas","É caro, mais é bom."],
+      ["Never again.","Nunca mais.","mais","Nunca mas."]]},
+ {t:"Por que or porque", o:["por que","porque","por quê"],
+  b:"In Brazil, **por que** (two words) asks why: **por que você não veio?** **porque** (one word) answers: **porque eu estava doente**. At the end of a sentence it's **por quê**.",
+  w:[["por que","why"],["porque","because"]],
+  it:[["Why didn't you come?","Por que você não veio?","por que","Porque você não veio?"],
+      ["Because I was sick.","Porque (eu) estava doente.","porque","Por que eu estava doente."],
+      ["Why are you sad?","Por que você está triste?","por que","Porque você está triste?"],
+      ["I'm studying because I have a test.","(Eu) estou estudando porque tenho prova.","porque","Estou estudando por que tenho prova."],
+      ["I don't know why.","(Eu) não sei por quê.","por quê","Eu não sei porque.",["por quê","porque"]]]}
+]};
+
+WL.pt.stories = [
+ {id:"pt-padaria", lv:"A1", ico:"🥖", t:{pt:"Na padaria", en:"At the bakery", es:"En la panadería"}, p:[
+  {s:"", pt:"Pedro vai à padaria todas as manhãs.", en:"Pedro goes to the bakery every morning."},
+  {s:"A atendente", pt:"Bom dia! O que você vai querer?", en:"Good morning! What will you have?"},
+  {s:"Pedro", pt:"Bom dia! Cinco pães e um café, por favor.", en:"Good morning! Five rolls and a coffee, please."},
+  {s:"A atendente", pt:"Mais alguma coisa?", en:"Anything else?"},
+  {s:"Pedro", pt:"Não, obrigado. Quanto é?", en:"No, thank you. How much is it?"},
+  {q:{en:"How many rolls does Pedro buy?", es:"¿Cuántos panes compra Pedro?"}, ol:"t", o:[{pt:"Cinco", en:"Five"},{pt:"Dois", en:"Two"},{pt:"Dez", en:"Ten"}], a:0},
+  {s:"A atendente", pt:"São doze reais.", en:"That's twelve reais."},
+  {s:"Pedro", pt:"Aqui está. Tchau, até amanhã!", en:"Here you are. Bye, see you tomorrow!"},
+  {q:{en:"How much does he pay?", es:"¿Cuánto paga?"}, ol:"t", o:[{pt:"Doze reais", en:"Twelve reais"},{pt:"Dez reais", en:"Ten reais"},{pt:"Vinte reais", en:"Twenty reais"}], a:0},
+  {q:{en:"When will Pedro come back?", es:"¿Cuándo vuelve Pedro?"}, ol:"t", o:[{pt:"Amanhã", en:"Tomorrow"},{pt:"Hoje à noite", en:"Tonight"},{pt:"Na semana que vem", en:"Next week"}], a:0}]},
+ {id:"pt-ferias", lv:"A2", ico:"🌴", t:{pt:"Férias em Salvador", en:"A holiday in Salvador", es:"Vacaciones en Salvador"}, p:[
+  {s:"", pt:"No mês passado, Ana viajou para Salvador com a irmã.", en:"Last month, Ana traveled to Salvador with her sister."},
+  {s:"", pt:"Elas ficaram num hotel perto da praia.", en:"They stayed in a hotel near the beach."},
+  {s:"Ana", pt:"Fazia muito calor, então a gente nadava todos os dias.", en:"It was very hot, so we swam every day."},
+  {q:{en:"Where did Ana travel?", es:"¿Adónde viajó Ana?"}, ol:"t", o:[{pt:"Para Salvador", en:"To Salvador"},{pt:"Para São Paulo", en:"To São Paulo"},{pt:"Para Lisboa", en:"To Lisbon"}], a:0},
+  {s:"", pt:"Uma noite, elas comeram acarajé num restaurante típico.", en:"One night, they ate acarajé in a traditional restaurant."},
+  {s:"Ana", pt:"Estava delicioso, mas muito picante!", en:"It was delicious, but very spicy!"},
+  {q:{en:"How was the acarajé?", es:"¿Cómo estaba el acarajé?"}, ol:"t", o:[{pt:"Delicioso, mas picante", en:"Delicious, but spicy"},{pt:"Frio", en:"Cold"},{pt:"Sem gosto", en:"Tasteless"}], a:0},
+  {s:"", pt:"Elas voltaram para casa cansadas, mas muito felizes.", en:"They came back home tired, but very happy."},
+  {q:{en:"Who did Ana travel with?", es:"¿Con quién viajó Ana?"}, ol:"t", o:[{pt:"Com a irmã", en:"With her sister"},{pt:"Com a mãe", en:"With her mother"},{pt:"Sozinha", en:"Alone"}], a:0}]}
+];
+
+WL.pt.islands = [
+ {id:"pt-town", en:"First day in Rio", es:"Primer día en Río", ico:"🏖️", units:["Greetings","Me and you","Around town"]},
+ {id:"pt-food", en:"Eating out", es:"Comer fuera", ico:"🍲", units:["Food and drink","At the restaurant","Shopping"]},
+ {id:"pt-trip", en:"On the road", es:"De viaje", ico:"🚌", units:["Getting around","Travel","Weather and seasons"]},
+ {id:"pt-home", en:"Life at home", es:"La vida en casa", ico:"🏠", units:["Family","At home","Daily routine"]},
+ {id:"pt-work", en:"Work and play", es:"Trabajo y ocio", ico:"💼", units:["Work and jobs","Free time","Phones and the internet"]},
+ {id:"pt-mind", en:"Big ideas", es:"Grandes ideas", ico:"💭", units:["Feelings and opinions","Plans and the future","Comparing things"]}
+];
+
 /* ===================== More languages in the main game =====================
    French, Portuguese, Mandarin Chinese and Arabic as full courses next to Spanish and English,
    always taught through English. Their content lives in lang_*.js (WL.<code> packs) and is
@@ -15017,15 +15744,16 @@ var WL = WL || {};
 const XL = ["fr", "pt", "zh", "ar"];
 const XL_NAME = {fr:"French", pt:"Portuguese", zh:"Mandarin Chinese", ar:"Arabic"};
 const XL_BY_NAME = {French:"fr", Portuguese:"pt", "Mandarin Chinese":"zh", Arabic:"ar"};
-const XL_MODES = [1, 2, 3];                       // modes with content in the new languages
+const XL_MODES = [1, 2, 3, 4, 5, 6, 7, 8, 9];     // every mode now has content in the new languages (langmodes.js)
+const XL_AUTO_WRONG = new Set();                  // Error Hunter slips made by swapping two words (not real learner mistakes)
 const XL_ROM = {};                                // target sentence or word -> romanization
 const XL_TOKROM = {zh:{}, ar:{}};                 // single word -> romanization
 const XL_TOKENS = {};                             // every word in a course, for tile distractors
 Object.assign(LN.en, {French:"French", Portuguese:"Portuguese", "Mandarin Chinese":"Mandarin Chinese", Arabic:"Arabic"});
 Object.assign(LN.es, {French:"francés", Portuguese:"portugués", "Mandarin Chinese":"chino mandarín", Arabic:"árabe"});
-Object.assign(I18N.en, {xl_onlyEn:"Taught through English", xl_soon:"Not available in {lang} yet", xl_modesNote:"In {lang}: Practice, Level Select and Survivor. More modes are coming.",
+Object.assign(I18N.en, {xl_onlyEn:"Taught through English", xl_soon:"Not available in {lang} yet", xl_modesNote:"{lang} is taught through English.",
   xl_storiesNA:"Stories are in Spanish and English for now."});
-Object.assign(I18N.es, {xl_onlyEn:"Se enseña en inglés", xl_soon:"Aún no está disponible en {lang}", xl_modesNote:"En {lang}: Práctica, Elegir nivel y Supervivencia. Pronto habrá más modos.",
+Object.assign(I18N.es, {xl_onlyEn:"Se enseña en inglés", xl_soon:"Aún no está disponible en {lang}", xl_modesNote:"{lang} se enseña a través del inglés.",
   xl_storiesNA:"Por ahora las historias están en español e inglés."});
 
 const xlCode = name => XL_BY_NAME[name] || null;
@@ -15044,8 +15772,9 @@ const xlSpace = s => String(s).replace(/([㐀-鿿，。])\s+(?=[㐀-鿿，。])/
     P.units.forEach(u => {
       const lv = u.lv || "A1";
       const unitWords = new Set(u.w.map(w => w[0]));
-      const it = u.s.map(([en, tgt, rom]) => {
-        const tk = toks(tgt);
+      const it = u.s.map(([en, tgt, rom, planted]) => {
+        const disp = /[|[\]()]/.test(tgt) ? canon(tgt) : tgt;   // a pattern with alternatives: words come from its first reading
+        const tk = toks(disp);
         tk.forEach(x => all.add(x));
         if(rom){
           const rk = String(rom).split(/ +/).map(x => x.replace(PUN, ""));
@@ -15058,10 +15787,10 @@ const xlSpace = s => String(s).replace(/([㐀-鿿，。])\s+(?=[㐀-鿿，。])/
         let pat = tgt.replace(/\s*[.!?。！？]$/, "");
         if(rom) pat += "|" + rom.replace(/ /g, " ").replace(/[.!?]$/, "");
         // a word-order slip for Error Hunter: two neighbouring words swapped
-        let wrong;
-        if(tk.length >= 3){
+        let wrong = planted || null;
+        if(!wrong && tk.length >= 3){
           const i = Math.max(0, Math.floor(tk.length / 2) - 1), w2 = tk.slice(); [w2[i], w2[i + 1]] = [w2[i + 1], w2[i]];
-          if(w2.join(" ").toLowerCase() !== tk.join(" ").toLowerCase()) wrong = w2.join(" ");
+          if(w2.join(" ").toLowerCase() !== tk.join(" ").toLowerCase()){ wrong = w2.join(" "); XL_AUTO_WRONG.add(wrong); }
         }
         return wrong ? [en, pat, cz, wrong] : [en, pat, cz];
       });
@@ -15099,7 +15828,7 @@ renderMenu = (orig => function(){
   if(!note){ note = document.createElement("p"); note.id = "xlNote"; note.className = "note"; $("modes").after(note); }
   note.hidden = !x;
   if(x) note.textContent = "🌍 " + t("xl_modesNote", {lang:LN[LANG_CODE[setup.native] || "en"][setup.target]});
-  const sb = $("storiesBtn"); if(sb){ sb.disabled = x; sb.title = x ? t("xl_storiesNA") : ""; }
+  const sb = $("storiesBtn"); if(sb){ const none = x && !storiesFor(LANG_CODE[setup.target]).length; sb.disabled = none; sb.title = none ? t("xl_storiesNA") : ""; }
   return r;
 })(renderMenu);
 startNew = (orig => function(){
@@ -15157,7 +15886,7 @@ function xlDecorate(){
   // Chinese is written without spaces
   const tgtEl = $("chTarget");
   if(code === "zh" && ch.game !== "Syntax Scramble") tgtEl.childNodes.forEach(n => { if(n.nodeType === 3) n.textContent = xlSpace(n.textContent); });
-  tgtEl.dir = code === "ar" && ch.al === "ar" ? "rtl" : "auto";
+  tgtEl.dir = code === "ar" && ch.al === "ar" ? (ch.k === "c" && ch.game === "Verb Forge" ? "ltr" : "rtl") : "auto";
   if((code === "zh" || code === "ar") && ch.game === "Reverse Mine" && !tgtEl.querySelector(".xlrom")){
     const r = XL_ROM[xlKey(ch.target)];
     if(r){ const s = document.createElement("div"); s.className = "xlrom"; s.textContent = r; s.dir = "ltr"; tgtEl.appendChild(s); }
@@ -15199,7 +15928,639 @@ syncMood = (orig => function(){
   return r;
 })(syncMood);
 setTimeout(() => { try{ fillLangSelects(); renderMenu(); }catch(e){} }, 0);
-if(window.__PGM_TEST) window.__xl = {XL, XL_ROM, XL_TOKROM, XL_TOKENS, xlSpace, xlCode};
+if(window.__PGM_TEST) window.__xl = {XL, XL_ROM, XL_TOKROM, XL_TOKENS, XL_AUTO_WRONG, xlSpace, xlCode};
+
+/* ===================== The new languages in every mode =====================
+   French, Portuguese, Mandarin and Arabic get every mode, each fitted to the language:
+   - Numbers: each language's own number words (French 70/80/90, Brazilian Portuguese, Chinese
+     characters + pinyin, Arabic units-before-tens), with its own clock and money.
+   - Vocab: the course words, grouped by unit.
+   - Island Hopper: themed islands made from the course units (WL.<code>.islands).
+   - Conjugation: real verb tables for French, Portuguese and Arabic (past / present / future
+     by person). Chinese verbs don't change, so mode 7 drills measure words and particles there.
+   - Tricky Pairs: each language's classic confusions (WL.<code>.tricky).
+   - Stories: two per language (WL.<code>.stories).
+   Mandarin and Arabic rounds that would need a new keyboard come with tap options; typing
+   pinyin / transliteration always works. */
+const XLM_CODES = ["fr", "pt", "zh", "ar"];
+const xlmCode = name => (typeof xlCode === "function" ? xlCode(name) : null);
+function xlmReg(code, tgt, rom){
+  if(!rom || !(code === "zh" || code === "ar")) return;
+  XL_ROM[xlKey(tgt)] = rom.replace(/ /g, " ");
+  const tk = String(tgt).split(/\s+/).map(x => xlKey(x)).filter(Boolean), rk = String(rom).split(/ +/).map(x => xlKey(x));
+  if(tk.length === rk.length) tk.forEach((x, i) => { if(rk[i]) XL_TOKROM[code][x] = rk[i].replace(/ /g, " "); });
+}
+const xlmW = w => w.map(([t, en, r]) => [r ? `${t} (${r})` : t, en]);
+const xlmItem = (code, [en, tgt, cz, wrong, opts, rom]) => {
+  xlmReg(code, tgt, rom);
+  (XL_TOKENS[code] = XL_TOKENS[code] || []).push(...String(tgt).split(/\s+/).filter(x => !XL_TOKENS[code].includes(x)));
+  const pat = tgt + (rom ? "|" + rom.replace(/ /g, " ") : "");
+  return opts ? [en, pat, cz, wrong, opts] : [en, pat, cz, wrong];
+};
+const xlmConcepts = (code, lv) => lv.map(c => ({t:c.t, b:c.b, w:xlmW(c.w || []), o:c.o, it:c.it.map(x => xlmItem(code, x)), xl:code}));
+
+/* ---------- Tricky Pairs ---------- */
+for(const code of XLM_CODES){
+  const P = WL[code]; if(!P || !P.tricky) continue;
+  TRICKY[code] = {};
+  for(const lv in P.tricky) TRICKY[code][lv] = xlmConcepts(code, P.tricky[lv]);
+}
+
+/* ---------- Stories ---------- */
+for(const code of XLM_CODES){ const P = WL[code]; if(P && P.stories) for(const s of P.stories) STORIES.push(Object.assign({lang:code}, s)); }
+
+/* ---------- Island Hopper: islands made of course units ---------- */
+for(const code of XLM_CODES){
+  const P = WL[code]; if(!P || !P.islands) continue;
+  const lessons = []; for(const lv in COURSE[code]) lessons.push(...COURSE[code][lv]);
+  for(const isl of P.islands){
+    const it = [];
+    for(const name of isl.units){ const L = lessons.find(l => l.t === name); if(L) it.push(...L.it.slice(0, 5).map(x => [x[0], x[1], null, x[2]])); }
+    if(it.length >= 6) ISLANDS.push({id:isl.id, en:(isl.ico ? isl.ico + " " : "") + isl.en, es:(isl.ico ? isl.ico + " " : "") + isl.es, nav:[], it:it.slice(0, 15), lang:code});
+  }
+}
+
+/* ---------- Vocab: the course words, by unit ---------- */
+const XLV = {};
+for(const code of XLM_CODES){
+  const P = WL[code]; if(!P) continue;
+  XLV[code] = {}; VMAP[code] = VMAP[code] || {};
+  P.units.forEach((u, i) => {
+    const cat = "xl_" + code + "_" + i;
+    CATS[cat] = {en:(u.ico ? u.ico + " " : "") + u.t, es:(u.ico ? u.ico + " " : "") + u.t};
+    const lv = u.lv || "A1";
+    for(const [t, en, r] of u.w){
+      const e = {en:String(en).replace(/\s*\(([^)]*)\)/g, ", $1").replace(/\|/g, "/"), cat, lv};
+      e[code] = r ? `${t}|${r}` : t;
+      (XLV[code][lv] = XLV[code][lv] || []).push(e);
+      VMAP[code][first(e[code]).toLowerCase()] = e;
+    }
+  });
+}
+genVocab = (orig => function(st){
+  const code = xlmCode(st && st.target);
+  if(!code || !XLV[code]) return orig.apply(this, arguments);
+  const saved = {};
+  for(const lv of LEVELS){ saved[lv] = VLIST[lv]; VLIST[lv] = XLV[code][lv] || XLV[code].A1; }
+  try{ return orig.apply(this, arguments); }
+  finally{ for(const lv of LEVELS){ if(saved[lv] === undefined) delete VLIST[lv]; else VLIST[lv] = saved[lv]; } }
+})(genVocab);
+// French and Portuguese nouns are taught with their article; the bare word counts too
+wordForms = (orig => function(v, lang){
+  const out = orig.apply(this, arguments);
+  if(lang === "fr"){ const m = String(v).trim().match(/^(le |la |les |l'|l’|un |une )(.+)$/i); if(m) out.push(m[2]); }
+  if(lang === "pt"){ const m = String(v).trim().match(/^(o |a |os |as |um |uma )(.+)$/i); if(m) out.push(m[2]); }
+  return out;
+})(wordForms);
+
+/* ---------- Numbers ---------- */
+const FR_U = ["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize","dix-sept","dix-huit","dix-neuf"];
+const FR_T = {2:"vingt", 3:"trente", 4:"quarante", 5:"cinquante", 6:"soixante"};
+function fr100(n, be){
+  if(n < 20) return FR_U[n];
+  const t = Math.floor(n / 10), u = n % 10;
+  if(t <= 6) return FR_T[t] + (u === 0 ? "" : u === 1 ? " et un" : "-" + FR_U[u]);
+  if(be && (t === 7 || t === 9)){ const w = t === 7 ? "septante" : "nonante"; return w + (u === 0 ? "" : u === 1 ? " et un" : "-" + FR_U[u]); }
+  if(t === 7){ const r = n - 60; return "soixante" + (r === 11 ? " et onze" : "-" + FR_U[r]); }
+  const r = n - 80; return r === 0 ? "quatre-vingts" : "quatre-vingt-" + FR_U[r];
+}
+function frNum(n, be){
+  if(n < 100) return fr100(n, be);
+  if(n < 1000){ const h = Math.floor(n / 100), r = n % 100, hs = h === 1 ? "cent" : FR_U[h] + (r ? " cent" : " cents"); return r ? hs + " " + fr100(r, be) : hs; }
+  const k = Math.floor(n / 1000), r = n % 1000;
+  const ks = k === 1 ? "mille" : frNum(k, be).replace(/cents$/, "cent").replace(/quatre-vingts$/, "quatre-vingt") + " mille";
+  return r ? ks + " " + frNum(r, be) : ks;
+}
+const PT_U = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove","dez","onze","doze","treze","catorze","quinze","dezesseis","dezessete","dezoito","dezenove"];
+const PT_T = ["","","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"];
+const PT_H = ["","cento","duzentos","trezentos","quatrocentos","quinhentos","seiscentos","setecentos","oitocentos","novecentos"];
+const pt100 = n => n < 20 ? PT_U[n] : PT_T[Math.floor(n / 10)] + (n % 10 ? " e " + PT_U[n % 10] : "");
+const pt1000 = n => n < 100 ? pt100(n) : n === 100 ? "cem" : PT_H[Math.floor(n / 100)] + (n % 100 ? " e " + pt100(n % 100) : "");
+function ptNum(n, joinE){
+  if(n < 1000) return pt1000(n);
+  const k = Math.floor(n / 1000), r = n % 1000, ks = k === 1 ? "mil" : pt1000(k) + " mil";
+  if(!r) return ks;
+  return ks + (joinE || r < 100 || r % 100 === 0 ? " e " : " ") + pt1000(r);
+}
+const ZH_D = "零一二三四五六七八九";
+const ZPY = {"零":"líng","一":"yī","二":"èr","三":"sān","四":"sì","五":"wǔ","六":"liù","七":"qī","八":"bā","九":"jiǔ","十":"shí","百":"bǎi","千":"qiān","万":"wàn","两":"liǎng",
+  "点":"diǎn","钟":"zhōng","半":"bàn","分":"fēn","刻":"kè","差":"chà","块":"kuài","钱":"qián","元":"yuán","加":"jiā","减":"jiǎn","乘":"chéng","除":"chú","以":"yǐ","等":"děng","于":"yú"};
+const zhPin = s => [...String(s)].map(c => ZPY[c] || c).join(" ");
+function zhNum(n, liang){   // liang: say 两 before 百 / 千 / 万
+  if(n < 10) return ZH_D[n];
+  let out = "", started = false, zero = false;
+  for(const [v, c] of [[10000, "万"], [1000, "千"], [100, "百"], [10, "十"]]){
+    const d = Math.floor(n / v) % 10;
+    if(d){
+      if(zero){ out += "零"; zero = false; }
+      if(!(v === 10 && d === 1 && !started)) out += d === 2 && liang && v >= 100 ? "两" : ZH_D[d];
+      out += c; started = true;
+    } else if(started) zero = true;
+  }
+  const u = n % 10;
+  if(u){ if(zero) out += "零"; out += ZH_D[u]; }
+  return out;
+}
+const AR_U = ["صفر","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة","عشرة"];
+const AR_UR = ["ṣifr","wāḥid","ithnān","thalātha","arbaʿa","khamsa","sitta","sabʿa","thamāniya","tisʿa","ʿashara"];
+const AR_T = ["","","عشرون","ثلاثون","أربعون","خمسون","ستون","سبعون","ثمانون","تسعون"];
+const AR_TR = ["","","ʿishrūn","thalāthūn","arbaʿūn","khamsūn","sittūn","sabʿūn","thamānūn","tisʿūn"];
+const AR_H = ["","مئة","مئتان","ثلاثمئة","أربعمئة","خمسمئة","ستمئة","سبعمئة","ثمانمئة","تسعمئة"];
+const AR_HR = ["","miʾa","miʾatān","thalāthumiʾa","arbaʿumiʾa","khamsumiʾa","sittumiʾa","sabʿumiʾa","thamānimiʾa","tisʿumiʾa"];
+function ar100(n){
+  if(n <= 10) return [AR_U[n], AR_UR[n]];
+  if(n === 11) return ["أحد عشر", "aḥada ʿashar"];
+  if(n === 12) return ["اثنا عشر", "ithnā ʿashar"];
+  if(n < 20) return [AR_U[n - 10] + " عشر", AR_UR[n - 10] + "ta ʿashar"];
+  const t = Math.floor(n / 10), u = n % 10;
+  return u ? [AR_U[u] + " و" + AR_T[t], AR_UR[u] + " wa-" + AR_TR[t]] : [AR_T[t], AR_TR[t]];
+}
+function ar1000(n){
+  if(n < 100) return ar100(n);
+  const h = Math.floor(n / 100), r = n % 100;
+  if(!r) return [AR_H[h], AR_HR[h]];
+  const x = ar100(r); return [AR_H[h] + " و" + x[0], AR_HR[h] + " wa-" + x[1]];
+}
+function arNum(n){
+  if(n < 1000) return ar1000(n);
+  const k = Math.floor(n / 1000), r = n % 1000;
+  const ks = k === 1 ? ["ألف", "alf"] : k === 2 ? ["ألفان", "alfān"] : [AR_U[k] + " آلاف", AR_UR[k] + "t ālāf"];
+  if(!r) return ks;
+  const x = ar1000(r); return [ks[0] + " و" + x[0], ks[1] + " wa-" + x[1]];
+}
+const AR_DIG = "٠١٢٣٤٥٦٧٨٩";
+const arDigits = n => String(n).replace(/\d/g, d => AR_DIG[+d]);
+const uniq = a => [...new Set(a.filter(Boolean))];
+// every accepted way to say n (the first one is shown as the answer)
+function xlNumWords(code, n){
+  if(code === "fr"){ const a = frNum(n), b = frNum(n, true); return uniq([a, a.replace(/ /g, "-"), b, b.replace(/ /g, "-")]); }
+  if(code === "pt"){
+    const a = ptNum(n), b = ptNum(n, true), alt = s => s.replace(/catorze/g, "quatorze"), eu = s => s.replace(/dezesseis/g, "dezasseis").replace(/dezessete/g, "dezassete").replace(/dezenove/g, "dezanove");
+    return uniq([a, b, alt(a), alt(b), eu(a), eu(b)]);
+  }
+  if(code === "zh"){ const a = zhNum(n, n >= 1000), b = zhNum(n, false), c = zhNum(n, true); return uniq([a, b, c, zhPin(a), zhPin(b), zhPin(c), n === 2 ? "两" : "", n === 2 ? "liǎng" : ""]); }
+  if(code === "ar"){ const [w, r] = arNum(n); return uniq([w, w.replace(/مئة/g, "مائة"), w.replace(/ و/g, " و "), r, r.replace(/-/g, " "), r.replace(/-/g, "")]); }
+  return [String(n)];
+}
+const xlNumMain = (code, n) => xlNumWords(code, n)[0];
+const XL_OPW = {fr:{"+":"plus","-":"moins","x":"fois","/":"divisé par"}, pt:{"+":"mais","-":"menos","x":"vezes","/":"dividido por"},
+  zh:{"+":"加","-":"减","x":"乘","/":"除以"}, ar:{"+":"زائد","-":"ناقص","x":"ضرب","/":"قسمة على"}};
+const XL_OPM = {"+":"+","-":"−","x":"×","/":"÷"};
+const AR_ORDF = ["","الواحدة","الثانية","الثالثة","الرابعة","الخامسة","السادسة","السابعة","الثامنة","التاسعة","العاشرة","الحادية عشرة","الثانية عشرة"];
+const AR_ORDFR = ["","al-wāḥida","ath-thāniya","ath-thālitha","ar-rābiʿa","al-khāmisa","as-sādisa","as-sābiʿa","ath-thāmina","at-tāsiʿa","al-ʿāshira","al-ḥādiya ʿashra","ath-thāniya ʿashra"];
+function xlTime(code, h, m){
+  const h2 = h % 12 + 1;
+  if(code === "fr"){
+    const H = x => x === 1 ? "une heure" : x === 12 ? "douze heures" : frNum(x) + " heures";
+    const N = x => x === 12 ? "midi" : H(x);
+    let a = m === 0 ? [H(h), N(h)] : m === 30 ? [H(h) + " et demie", N(h) + " et demie", H(h) + " trente"]
+      : m === 15 ? [H(h) + " et quart", N(h) + " et quart", H(h) + " quinze"] : [N(h2) + " moins le quart", H(h2) + " moins le quart", H(h) + " quarante-cinq"];
+    return uniq(a.concat(a.map(x => "il est " + x)));
+  }
+  if(code === "pt"){
+    const H = x => x === 1 ? "uma" : x === 2 ? "duas" : ptNum(x);
+    const hr = x => x === 1 ? "uma hora" : H(x) + " horas";
+    let a = m === 0 ? [hr(h), H(h) + " em ponto", h === 12 ? "meio-dia" : ""]
+      : m === 30 ? [H(h) + " e meia", H(h) + " e trinta", h === 12 ? "meio-dia e meia" : ""]
+      : m === 15 ? [H(h) + " e quinze", hr(h) + " e quinze"]
+      : ["quinze para " + (h2 === 1 ? "a uma" : "as " + H(h2)), H(h) + " e quarenta e cinco"];
+    a = a.filter(Boolean);
+    return uniq(a.concat(a.map(x => (h === 1 && !/^quinze/.test(x) ? "é " : "são ") + x)));
+  }
+  if(code === "zh"){
+    const H = x => x === 2 ? "两" : zhNum(x);
+    let a = m === 0 ? [H(h) + "点", H(h) + "点钟"] : m === 30 ? [H(h) + "点半", H(h) + "点三十", H(h) + "点三十分"]
+      : m === 15 ? [H(h) + "点一刻", H(h) + "点十五", H(h) + "点十五分"] : [H(h) + "点三刻", H(h) + "点四十五", H(h) + "点四十五分", "差一刻" + H(h2) + "点"];
+    return uniq(a.concat(a.map(zhPin)));
+  }
+  if(code === "ar"){
+    const H = x => "الساعة " + AR_ORDF[x], HR = x => "as-sāʿa " + AR_ORDFR[x];
+    const a = m === 0 ? [[H(h), HR(h)]] : m === 30 ? [[H(h) + " والنصف", HR(h) + " wa-n-niṣf"]] : m === 15 ? [[H(h) + " والربع", HR(h) + " wa-r-rubʿ"]] : [[H(h2) + " إلا ربعا", HR(h2) + " illā rubʿan"]];
+    const w = a[0][0], r = a[0][1];
+    return uniq([w, w.replace(/^الساعة /, ""), r, r.replace(/^as-sāʿa /, ""), r.replace(/-/g, " ")]);
+  }
+}
+function xlPrice(code, n){
+  if(code === "fr") return n === 1 ? ["un euro"] : xlNumWords("fr", n).map(w => w + " euros");
+  if(code === "pt") return n === 1 ? ["um real"] : xlNumWords("pt", n).map(w => w + " reais");
+  if(code === "zh"){
+    const ws = n === 2 ? ["两"] : uniq([zhNum(n, false), zhNum(n, true)]);
+    const a = []; for(const w of ws) a.push(w + "块", w + "块钱", w + "元");
+    return uniq(a.concat(a.map(zhPin)));
+  }
+  return xlNumWords(code, n);
+}
+const XLNUM = {
+A1:[
+ {ty:"int", a:0, b:10, en:"Numbers 0 to 10", es:"Números del 0 al 10", tip:"small"},
+ {ty:"int", a:11, b:20, en:"Numbers 11 to 20", es:"Números del 11 al 20", tip:"teens"},
+ {ty:"int", a:21, b:99, en:"Numbers 21 to 99", es:"Números del 21 al 99", tip:"tens"},
+ {ty:"math", ops:"+-", b:20, en:"Adding and subtracting", es:"Sumar y restar", tip:"math"},
+ {ty:"time", m:"hour", en:"Time: on the hour", es:"La hora en punto", tip:"time"}
+],
+A2:[
+ {ty:"int", a:100, b:999, en:"Hundreds", es:"Centenas", tip:"hundreds"},
+ {ty:"int", a:1000, b:9999, en:"Thousands", es:"Millares", tip:"thousands"},
+ {ty:"math", ops:"x/", b:12, en:"Times and divided by", es:"Multiplicar y dividir", tip:"math"},
+ {ty:"time", m:"half", en:"Half and quarter hours", es:"Medias y cuartos de hora", tip:"time"},
+ {ty:"price", a:2, b:99, en:"Prices", es:"Precios", tip:"price"}
+]};
+const xlNumSyl = (code, lv) => (XLNUM[lv] || XLNUM.A1).filter(c => !(code === "ar" && c.ty === "price"));
+const XNT = {
+fr:{small:"**un, deux, trois…** Learn 0 to 16 by heart; **dix-sept, dix-huit, dix-neuf** are 'ten-seven, ten-eight, ten-nine'.",
+  teens:"11 to 16 are single words: **onze, douze, treize, quatorze, quinze, seize**. Then **dix-sept**, **dix-huit**, **dix-neuf** and **vingt** (20).",
+  tens:"Join tens and units with a hyphen (**vingt-deux**) but say **et un** for 21 to 71: **vingt et un**. 70 = **soixante-dix** (60 + 10), 80 = **quatre-vingts** (4 × 20), 90 = **quatre-vingt-dix**. In Belgium and Switzerland: **septante, nonante**.",
+  hundreds:"**cent** = 100, **deux cents** = 200 (with s), but **deux cent un** = 201 (no s when a number follows).",
+  thousands:"**mille** never takes an s or 'un': 1,000 = **mille**, 3,000 = **trois mille**.",
+  math:"**plus** = plus, **moins** = minus, **fois** = times, **divisé par** = divided by.",
+  time:"**Il est trois heures** = it's three o'clock. **et quart** = quarter past, **et demie** = half past, **moins le quart** = quarter to. 12:00 can be **midi**.",
+  price:"Say the number, then **euros**: **douze euros**. One euro = **un euro**."},
+pt:{small:"**um, dois, três…** 1 and 2 have feminine forms (**uma, duas**) used before feminine nouns, like **duas horas**.",
+  teens:"**onze, doze, treze, catorze** (or quatorze), **quinze**, then in Brazil **dezesseis, dezessete, dezoito, dezenove**.",
+  tens:"Join tens and units with **e**: **vinte e um**, **trinta e cinco**. Watch **sessenta** (60) against **setenta** (70).",
+  hundreds:"100 is **cem**; from 101 it's **cento**: **cento e um**. Then **duzentos, trezentos, quatrocentos, quinhentos**…, with **e** before the rest: **duzentos e dez**.",
+  thousands:"**mil** never takes 'um': 1,000 = **mil**, 2,000 = **dois mil**. Use **e** after mil when the rest is under 100 or a round hundred: **mil e cem**.",
+  math:"**mais** = plus, **menos** = minus, **vezes** = times, **dividido por** = divided by.",
+  time:"**São três horas** = it's three o'clock (but **é uma hora**). **e meia** = half past, **e quinze** = quarter past, **quinze para as…** = quarter to.",
+  price:"Brazil's money is the **real**, plural **reais**: **doze reais**, **um real**."},
+zh:{small:"**一 二 三 四 五 六 七 八 九 十** (yī èr sān sì wǔ liù qī bā jiǔ shí). 0 is **零** (líng). You can tap the answer or type it in pinyin.",
+  teens:"11 to 19 are 'ten-one' to 'ten-nine': **十一** (shíyī), **十五**, **十九**. 20 is **二十** (two tens).",
+  tens:"Numbers are built like a calculator: **三十五** = 3 × 10 + 5. **九十九** = 99.",
+  hundreds:"**百** (bǎi) = hundred: **三百**. A zero inside is read as **零**: 105 = **一百零五**. 110 = **一百一十**.",
+  thousands:"**千** (qiān) = thousand: **两千** (2,000). Each gap of zeros is one **零**: 1,005 = **一千零五**.",
+  math:"**加** (jiā) = plus, **减** (jiǎn) = minus, **乘** (chéng) = times, **除以** (chúyǐ) = divided by.",
+  time:"**点** (diǎn) = o'clock: **三点**. Say **两点** for 2:00. **半** (bàn) = half past, **一刻** (yí kè) = quarter past, **三刻** = quarter to the next hour.",
+  price:"Prices use **块** (kuài) in speech or **元** (yuán) in writing: **十块** (钱) = ten yuan. 2 yuan is **两块**."},
+ar:{small:"**واحد، اثنان، ثلاثة…** (wāḥid, ithnān, thalātha). Arabic digits look different: ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩. You can tap the answer or type the transliteration.",
+  teens:"11 is **أحد عشر**, 12 is **اثنا عشر**; 13 to 19 are 'three ten': **ثلاثة عشر** (thalāthata ʿashar).",
+  tens:"Arabic says the units **first**, then **و** (wa, and) and the tens: 25 = **خمسة وعشرون** ('five and twenty').",
+  hundreds:"**مئة** (miʾa) = 100, **مئتان** = 200, then **ثلاثمئة, أربعمئة**… Join the rest with **و**: 125 = **مئة وخمسة وعشرون**.",
+  thousands:"**ألف** (alf) = 1,000, **ألفان** = 2,000, then **ثلاثة آلاف** (3,000) up to **عشرة آلاف** (10,000).",
+  math:"**زائد** (zāʾid) = plus, **ناقص** (nāqiṣ) = minus, **ضرب** (ḍarb) = times, **قسمة على** (qismat ʿalā) = divided by.",
+  time:"**الساعة** (as-sāʿa) + a feminine ordinal: **الساعة الثالثة** = 3:00. **والنصف** = half past, **والربع** = quarter past, **إلا ربعا** = quarter to.",
+  price:""}
+};
+const xlNumShow = (code, n) => code === "ar" ? `${fmt(n)}  (${arDigits(n)})` : fmt(n);
+function xlNumQ(c, code, lastGame, plain){
+  const W = n => xlNumWords(code, n), OP = XL_OPW[code], sp = code === "zh" ? "" : " ";
+  const say = n => xlNumMain(code, n);
+  switch(c.ty){
+    case "int": {
+      const n = rnd(c.a, c.b);
+      if(!plain && c.b <= 100 && lastGame === "Digit Dictation" && n >= 2){
+        const x = rnd(1, n - 1);
+        return {game:"Linguistic Math", target:say(x) + sp + OP["+"] + sp + say(n - x), acc:W(n), n};
+      }
+      return {game:!plain && c.b > 100 && lastGame === "Digit Dictation" ? "Real-World Numbers" : "Digit Dictation", target:xlNumShow(code, n), acc:W(n), n};
+    }
+    case "math": {
+      const op = pick(c.ops.split("")); let x, y, r;
+      if(op === "+"){ x = rnd(0, c.b); y = rnd(0, c.b - x); r = x + y; }
+      else if(op === "-"){ x = rnd(0, c.b); y = rnd(0, x); r = x - y; }
+      else if(op === "x"){ x = rnd(2, 12); y = rnd(2, 12); r = x * y; }
+      else { y = rnd(2, 12); r = rnd(2, 12); x = y * r; }
+      return {game:"Linguistic Math", target:say(x) + sp + OP[op] + sp + say(y), acc:W(r), n:r};
+    }
+    case "time": {
+      const h = rnd(1, 12), m = c.m === "half" ? pick([15, 30, 45]) : 0;
+      return {game:"Clock Watcher", target:`${h}:${String(m).padStart(2, "0")}`, acc:xlTime(code, h, m), n:h * 100 + m};
+    }
+    default: {
+      const n = rnd(c.a, c.b);
+      return {game:"Real-World Numbers", target:code === "fr" ? `${n} €` : code === "pt" ? `R$ ${n}` : code === "zh" ? `¥${n}` : String(n), acc:xlPrice(code, n), n};
+    }
+  }
+}
+numChallenge = (orig => function(c, tgt, lastGame, plain){
+  return XLM_CODES.includes(tgt) && c && c.tip ? xlNumQ(c, tgt, lastGame, plain) : orig.apply(this, arguments);
+})(numChallenge);
+function xlGenNumber(st, plan, c, review, res){
+  const nat = LANG_CODE[st.native], code = LANG_CODE[st.target], L = GMT[nat], T = LN[nat][st.target];
+  const q = xlNumQ(c, code, st.lastGame, false);
+  if(q.game === st.lastGame && (q.game === "Real-World Numbers" || q.game === "Digit Dictation") && c.ty !== "price") q.game = q.game === "Digit Dictation" ? "Real-World Numbers" : "Digit Dictation";
+  const taskBy = {"Digit Dictation":L.nDD, "Linguistic Math":L.nLM, "Real-World Numbers":L.nRW, "Clock Watcher":L.nCW, "Price Check":L.nPC};
+  const why = XNT[code][c.tip] || "";
+  const ch = {game:q.game, target:q.target, al:code, k:"n", nn:false, acc:q.acc, answerKey:q.acc[0], tests:c[nat], speak:"", cw:[], why,
+    hint:plan.boss || code === "zh" || code === "ar" ? "" : L.hStart(q.acc[0].split(" ")[0], q.acc[0].split(" ").length)};
+  Object.assign(ch, bossWrap(L, plan, taskBy[q.game](T)));
+  // Mandarin and Arabic: tap the answer from four (typing pinyin / transliteration also works)
+  if(code === "zh" || code === "ar"){
+    const romOf = x => x.acc.find(a => /[a-zāīūʿ]/i.test(a));
+    const opts = [q.acc[0]], seen = new Set([q.target]), rom = {[q.acc[0]]:romOf(q)};
+    for(let i = 0; i < 40 && opts.length < 4; i++){ const o = xlNumQ(c, code, "", true); if(!seen.has(o.target) && !opts.includes(o.acc[0])){ seen.add(o.target); opts.push(o.acc[0]); rom[o.acc[0]] = romOf(o); } }
+    if(opts.length >= 3) ch.opts = shuffle(opts);
+    for(const o of opts) if(rom[o]){ XL_ROM[xlKey(o)] = rom[o]; XL_TOKROM[code][o] = rom[o]; }
+  }
+  let words = [];
+  if(!review){
+    if(c.ty === "math") words = c.ops.split("").map(o => ({w:XL_OPW[code][o], m:XL_OPM[o]}));
+    else if(c.ty === "int" && c.b - c.a <= 11) for(let n = c.a; n <= c.b; n++) words.push({w:xlNumMain(code, n), m:fmt(n)});
+    else { const seen = new Set(); for(let i = 0; i < 8 && words.length < 3; i++){ const s = xlNumQ(c, code, "", true); if(!seen.has(s.target)){ seen.add(s.target); words.push({w:s.acc[0], m:s.target}); } } }
+  }
+  res.lesson = {title:c[nat], body:why, words};
+  res.challenge = ch;
+  res.spotlight = null;
+  return res;
+}
+genNumber = (orig => function(st, plan, c, review, res){
+  const code = xlmCode(st && st.target);
+  return code && c && c.tip ? xlGenNumber(st, plan, c, review, res) : orig.apply(this, arguments);
+})(genNumber);
+// Arabic number words get their transliteration under the tiles and on the answer card
+for(let n = 0; n <= 100; n++){ const [w, r] = arNum(n); XL_ROM[xlKey(w)] = r; if(!/\s/.test(w)) XL_TOKROM.ar[w] = r; }
+for(let n = 0; n <= 100; n++){ const w = zhNum(n); XL_ROM[xlKey(w)] = zhPin(w); }
+
+/* ---------- Conjugation: French, Portuguese, Arabic verb tables ---------- */
+const XCT = {fr:{pres:"présent", pc:"passé composé", fut:"futur simple", imp:"imparfait", fp:"futur proche"},
+  pt:{pres:"presente", pp:"pretérito perfeito", imp:"pretérito imperfeito", fut:"futuro simples", fi:"futuro com ir"},
+  ar:{past:"past (\u2068الماضي\u2069)", pres:"present (\u2068المضارع\u2069)", fut:"future (\u2068المستقبل\u2069)"}};   // isolates keep the Arabic from flipping the line
+// French
+const FR_PRON = ["je","tu","il","elle","nous","vous","ils"], FR_SLOT = [0,1,2,2,3,4,5];
+const FRV = {parler:"to speak", aimer:"to like", habiter:"to live", travailler:"to work", regarder:"to watch", écouter:"to listen", jouer:"to play", manger:"to eat", arriver:"to arrive", rester:"to stay",
+  finir:"to finish", choisir:"to choose", vendre:"to sell", attendre:"to wait", répondre:"to answer",
+  être:"to be", avoir:"to have", aller:"to go", faire:"to do", prendre:"to take", vouloir:"to want", pouvoir:"can", venir:"to come", partir:"to leave"};
+const FR_IRR = {
+  être:["suis","es","est","sommes","êtes","sont"], avoir:["ai","as","a","avons","avez","ont"], aller:["vais","vas","va","allons","allez","vont"],
+  faire:["fais","fais","fait","faisons","faites","font"], prendre:["prends","prends","prend","prenons","prenez","prennent"],
+  vouloir:["veux","veux","veut","voulons","voulez","veulent"], pouvoir:["peux","peux","peut","pouvons","pouvez","peuvent"],
+  venir:["viens","viens","vient","venons","venez","viennent"], partir:["pars","pars","part","partons","partez","partent"]};
+const FR_PP = {être:"été", avoir:"eu", aller:"allé", faire:"fait", prendre:"pris", vouloir:"voulu", pouvoir:"pu", venir:"venu", partir:"parti"};
+const FR_FUT = {être:"ser", avoir:"aur", aller:"ir", faire:"fer", vouloir:"voudr", pouvoir:"pourr", venir:"viendr"};
+const FR_ETRE = new Set(["aller","venir","arriver","rester","partir"]);
+const frGroup = v => FR_IRR[v] ? "irr" : /er$/.test(v) ? "er" : /ir$/.test(v) ? "ir" : "re";
+function frPres(v, s){
+  if(FR_IRR[v]) return FR_IRR[v][s];
+  const g = frGroup(v), st = v.slice(0, -2);
+  const end = g === "er" ? ["e","es","e","ons","ez","ent"][s] : g === "ir" ? ["is","is","it","issons","issez","issent"][s] : ["s","s","","ons","ez","ent"][s];
+  return (/g$/.test(st) && /^[oa]/.test(end) ? st + "e" : st) + end;
+}
+const frPP = v => FR_PP[v] || (frGroup(v) === "er" ? v.slice(0, -2) + "é" : frGroup(v) === "ir" ? v.slice(0, -2) + "i" : v.slice(0, -2) + "u");
+function frForm(v, ten, p){
+  const s = FR_SLOT[p];
+  if(ten === "pres") return [frPres(v, s)];
+  if(ten === "fp") return [FR_IRR.aller[s] + " " + v];
+  if(ten === "fut"){ const st = FR_FUT[v] || (frGroup(v) === "re" ? v.slice(0, -1) : v); return [st + ["ai","as","a","ons","ez","ont"][s]]; }
+  if(ten === "imp"){
+    let st = v === "être" ? "ét" : frPres(v, 3).replace(/ons$/, "");
+    const end = ["ais","ais","ait","ions","iez","aient"][s];
+    if(/ge$/.test(st) && end[0] === "i") st = st.slice(0, -1);
+    return [st + end];
+  }
+  // passé composé
+  const pp = frPP(v);
+  if(!FR_ETRE.has(v)) return [FR_IRR.avoir[s] + " " + pp];
+  const aux = FR_IRR.être[s] + " ";
+  if(p === 3) return [aux + pp + "e"];
+  if(p === 4 || p === 5) return [aux + pp + "s", aux + pp + "es", ...(p === 5 ? [aux + pp, aux + pp + "e"] : [])];
+  if(p === 6) return [aux + pp + "s"];
+  return [aux + pp, aux + pp + "e"];
+}
+const frWithPron = (p, f) => p === 0 && /^[aeéèêiouyhâîô]/i.test(f) ? "j'" + f : FR_PRON[p] + " " + f;
+// Portuguese (Brazil)
+const PT_PRON = ["eu","você","ele","ela","nós","vocês","eles"], PT_SLOT = [0,1,1,1,2,3,3];
+const PTV = {falar:"to speak", morar:"to live", trabalhar:"to work", estudar:"to study", comprar:"to buy", gostar:"to like", chegar:"to arrive", viajar:"to travel",
+  comer:"to eat", beber:"to drink", aprender:"to learn", vender:"to sell", abrir:"to open", partir:"to leave", assistir:"to watch",
+  ser:"to be (permanent)", estar:"to be (state)", ter:"to have", ir:"to go", fazer:"to do", poder:"can", querer:"to want"};
+const PT_IRR = {
+  pres:{ser:["sou","é","somos","são"], estar:["estou","está","estamos","estão"], ter:["tenho","tem","temos","têm"], ir:["vou","vai","vamos","vão"],
+    fazer:["faço","faz","fazemos","fazem"], poder:["posso","pode","podemos","podem"], querer:["quero","quer","queremos","querem"]},
+  pp:{ser:["fui","foi","fomos","foram"], ir:["fui","foi","fomos","foram"], estar:["estive","esteve","estivemos","estiveram"], ter:["tive","teve","tivemos","tiveram"],
+    fazer:["fiz","fez","fizemos","fizeram"], poder:["pude","pôde","pudemos","puderam"], querer:["quis","quis","quisemos","quiseram"]},
+  imp:{ser:["era","era","éramos","eram"], ter:["tinha","tinha","tínhamos","tinham"]}};
+const PT_FUT = {fazer:"far"};
+function ptForm(v, ten, p){
+  const s = PT_SLOT[p], g = v.slice(-2), st = v.slice(0, -2);
+  if(ten === "fi") return [PT_IRR.pres.ir[s] + " " + v];
+  if(PT_IRR[ten] && PT_IRR[ten][v]) return [PT_IRR[ten][v][s]];
+  if(ten === "pres") return [st + (g === "ar" ? ["o","a","amos","am"] : g === "er" ? ["o","e","emos","em"] : ["o","e","imos","em"])[s]];
+  if(ten === "pp"){
+    if(g === "ar"){
+      if(s === 0) return [(/c$/.test(st) ? st.slice(0, -1) + "qu" : /g$/.test(st) ? st + "u" : /ç$/.test(st) ? st.slice(0, -1) + "c" : st) + "ei"];
+      return [st + ["ei","ou","amos","aram"][s]];
+    }
+    return [st + (g === "er" ? ["i","eu","emos","eram"] : ["i","iu","imos","iram"])[s]];
+  }
+  if(ten === "imp") return [st + (g === "ar" ? ["ava","ava","ávamos","avam"] : ["ia","ia","íamos","iam"])[s]];
+  // futuro simples
+  return [(PT_FUT[v] || v) + ["ei","á","emos","ão"][s]];
+}
+// Arabic (sound three-letter verbs: past root + ending, present prefix + root (+ ending))
+const AR_PRON = ["أنا","أنتَ","أنتِ","هو","هي","نحن","هم"], AR_PRONR = ["anā","anta","anti","huwa","hiya","naḥnu","hum"];
+const AR_PRONE = ["I","you (to a man)","you (to a woman)","he","she","we","they"];
+const ARV = {"كتب":["k t b","a","u","to write"], "درس":["d r s","a","u","to study"], "شرب":["sh r b","i","a","to drink"], "ذهب":["dh h b","a","a","to go"], "فهم":["f h m","i","a","to understand"],
+  "عمل":["ʿ m l","i","a","to work"], "لعب":["l ʿ b","i","a","to play"], "فتح":["f t ḥ","a","a","to open"], "سمع":["s m ʿ","i","a","to hear"], "جلس":["j l s","a","i","to sit"],
+  "رجع":["r j ʿ","a","i","to return"], "طبخ":["ṭ b kh","a","u","to cook"], "غسل":["gh s l","a","i","to wash"], "دخل":["d kh l","a","u","to enter"], "خرج":["kh r j","a","u","to go out"], "ركب":["r k b","i","a","to ride"]};
+function arForm(v, ten, p){
+  const [rt, pv, iv] = ARV[v], [c1, c2, c3] = rt.split(" ");
+  if(ten === "past"){
+    const W = v + ["ت","ت","ت","","ت","نا","وا"][p], R = c1 + "a" + c2 + pv + c3 + ["tu","ta","ti","a","at","nā","ū"][p];
+    return uniq([W, R, R.replace(/(tu|ta|ti)$/, "t").replace(/^(\S+?)a$/, "$1")]);
+  }
+  const pre = ["أ","ت","ت","ي","ت","ن","ي"][p], suf = ["","","ين","","","","ون"][p];
+  const W = pre + v + suf, base = ["a","ta","ta","ya","ta","na","ya"][p] + c1 + c2 + iv + c3, R = base + ["","","īn","","","","ūn"][p];
+  const Rfull = base + ["u","u","īna","u","u","u","ūna"][p];
+  if(ten === "pres") return uniq([W, R, Rfull]);
+  return uniq(["س" + W, "sa-" + R, "sa" + R, "sa " + R, "sa-" + Rfull, "سوف " + W, "sawfa " + R]);
+}
+const xlForm = (code, v, ten, p) => code === "fr" ? frForm(v, ten, p) : code === "pt" ? ptForm(v, ten, p) : arForm(v, ten, p);
+const xlPronList = code => code === "fr" ? FR_PRON : code === "pt" ? PT_PRON : AR_PRON;
+// Arabic labels read left to right in English, with the Arabic words isolated (U+2068 … U+2069)
+const xlPronLabel = (code, p) => code === "ar" ? `${AR_PRONE[p]} (\u2068${AR_PRON[p]}\u2069 ${AR_PRONR[p]})` : xlPronList(code)[p];
+const xlVerbLabel = (code, v) => code === "ar" ? `${ARV[v][3]} (\u2068${v}\u2069)` : v;
+const xlVerbEn = (code, v) => code === "fr" ? FRV[v] : code === "pt" ? PTV[v] : ARV[v][3];
+const XL_FRAMES = {
+  fr:{pres:["… tous les jours.","… maintenant."], pc:["Hier, ….","… la semaine dernière."], fut:["Demain, ….","… l'année prochaine."], imp:["Avant, ….","Quand j'étais petit, …."], fp:["Ce soir, ….","… demain."]},
+  pt:{pres:["… todos os dias.","… agora."], pp:["Ontem, ….","… na semana passada."], imp:["Antigamente, ….","Quando era criança, …."], fut:["Amanhã, ….","… no ano que vem."], fi:["Hoje à noite, ….","… amanhã."]},
+  ar:{past:["أمس …","… في الأسبوع الماضي"], pres:["كل يوم …","… الآن"], fut:["غدا …","… في السنة القادمة"]}};
+const xlFrame = (code, ten) => pick(XL_FRAMES[code][ten]);
+const xlFill = (frame, s) => { const out = frame.replace("…", s); return /^[a-zà-ÿ]/.test(out) ? out.charAt(0).toUpperCase() + out.slice(1) : out; };
+function xlWithPron(code, p, f){
+  if(code === "fr") return frWithPron(p, f);
+  if(code === "pt") return PT_PRON[p] + " " + f;
+  return /[a-zāīū]/i.test(f) ? AR_PRONR[p] + " " + f : AR_PRON[p] + " " + f;
+}
+CONJ.fr = {
+A1:[
+ {t:"Présent: -er verbs", ten:["pres"], vb:["parler","aimer","habiter","travailler","regarder","écouter","jouer"], b:"Regular -er verbs: drop -er and add **-e, -es, -e, -ons, -ez, -ent**: je parle, nous parlons. Before a vowel **je** becomes **j'**: j'aime."},
+ {t:"Être and avoir", ten:["pres"], vb:["être","avoir"], b:"**être**: je suis, tu es, il est, nous sommes, vous êtes, ils sont. **avoir**: j'ai, tu as, il a, nous avons, vous avez, ils ont."},
+ {t:"Aller, faire, prendre", ten:["pres"], vb:["aller","faire","prendre"], b:"Three everyday irregulars: **je vais, je fais, je prends**; **ils vont, ils font, ils prennent**."},
+ {t:"Futur proche", ten:["fp"], vb:["parler","manger","aller","faire","regarder","partir"], b:"**aller + infinitive** = going to: **je vais manger**, **nous allons partir**."}
+],
+A2:[
+ {t:"Passé composé with avoir", ten:["pc"], vb:["parler","manger","finir","vendre","faire","prendre","regarder"], b:"**avoir + past participle**: j'ai parlé, tu as fini, il a vendu. Irregular participles: **fait, pris, eu, été**."},
+ {t:"Passé composé with être", ten:["pc"], vb:["aller","venir","arriver","rester","partir"], b:"Movement verbs use **être**, and the participle agrees: **je suis allé(e)**, **elle est partie**, **nous sommes arrivés**."},
+ {t:"Présent: -ir and -re verbs", ten:["pres"], vb:["finir","choisir","vendre","attendre","répondre"], b:"**-ir**: je finis, nous finissons. **-re**: je vends, il vend (no ending), nous vendons."},
+ {t:"Vouloir, pouvoir, venir", ten:["pres"], vb:["vouloir","pouvoir","venir"], b:"**je veux, je peux, je viens**; **nous voulons, pouvons, venons**; **ils veulent, peuvent, viennent**."}
+],
+B1:[
+ {t:"Futur simple", ten:["fut"], vb:["parler","finir","vendre","être","avoir","aller","faire","venir","pouvoir"], b:"Infinitive + **-ai, -as, -a, -ons, -ez, -ont** (-re verbs drop the e: vendr-). Irregular stems: **ser-, aur-, ir-, fer-, viendr-, pourr-, voudr-**."},
+ {t:"Imparfait", ten:["imp"], vb:["parler","finir","faire","être","avoir","manger","prendre"], b:"Take the **nous** form, drop **-ons**, add **-ais, -ais, -ait, -ions, -iez, -aient**: nous parlons → je parlais. Only **être** is irregular: **j'étais**."},
+ {t:"Imparfait or passé composé", ten:["imp","pc"], vb:["parler","faire","aller","manger","finir","prendre"], b:"**Passé composé** for one finished event (**hier, j'ai mangé**), **imparfait** for habits and background (**avant, je mangeais**)."},
+ {t:"Final boss: every tense", ten:["pres","pc","fut","imp","fp"], vb:["parler","être","avoir","aller","faire","prendre","venir","finir"], b:"Any tense can come up. Read the label."}
+]};
+CONJ.pt = {
+A1:[
+ {t:"Presente: verbos em -ar", ten:["pres"], vb:["falar","morar","trabalhar","estudar","comprar","gostar"], b:"Drop **-ar** and add **-o, -a, -amos, -am**: eu falo, você fala, nós falamos, eles falam. **Você** uses the same form as ele / ela."},
+ {t:"Ser e estar", ten:["pres"], vb:["ser","estar"], b:"**ser**: eu sou, você é, nós somos, eles são. **estar**: eu estou, você está, nós estamos, eles estão."},
+ {t:"Ter, ir, fazer", ten:["pres"], vb:["ter","ir","fazer","querer","poder"], b:"Everyday irregulars: **eu tenho, eu vou, eu faço, eu quero, eu posso**."},
+ {t:"Futuro com ir", ten:["fi"], vb:["falar","comer","viajar","trabalhar","estudar","fazer"], b:"**ir + infinitive** = going to: **eu vou viajar**, **nós vamos comer**."}
+],
+A2:[
+ {t:"Pretérito perfeito: -ar", ten:["pp"], vb:["falar","morar","trabalhar","comprar","chegar","estudar"], b:"**-ei, -ou, -amos, -aram**: eu falei, ela falou. Spelling: chegar → **cheguei**."},
+ {t:"Pretérito perfeito: -er e -ir", ten:["pp"], vb:["comer","beber","aprender","abrir","partir","assistir"], b:"**-er**: comi, comeu, comemos, comeram. **-ir**: abri, abriu, abrimos, abriram."},
+ {t:"Perfeito irregular", ten:["pp"], vb:["ser","ir","estar","ter","fazer"], b:"**ser** and **ir** share the same past: **fui, foi, fomos, foram**. Also **estive, tive, fiz**."},
+ {t:"Presente: -er e -ir", ten:["pres"], vb:["comer","beber","aprender","abrir","partir","assistir"], b:"**-er**: como, come, comemos, comem. **-ir**: abro, abre, abrimos, abrem."}
+],
+B1:[
+ {t:"Pretérito imperfeito", ten:["imp"], vb:["falar","morar","comer","ser","ter","fazer","ir"], b:"**-ava, -ávamos, -avam** (-ar) and **-ia, -íamos, -iam** (-er / -ir). Irregular: **era** (ser), **tinha** (ter)."},
+ {t:"Perfeito ou imperfeito", ten:["pp","imp"], vb:["falar","comer","ser","ter","ir","fazer"], b:"**Perfeito** for a finished event (ontem comi), **imperfeito** for habits and background (antigamente comia)."},
+ {t:"Futuro simples", ten:["fut"], vb:["falar","comer","partir","fazer","viajar","estudar"], b:"Infinitive + **-ei, -á, -emos, -ão**: eu falarei, eles falarão. Irregular: **farei** (fazer). Brazilians mostly say **vou falar**."},
+ {t:"Mistura final", ten:["pres","pp","imp","fi","fut"], vb:["falar","ser","estar","ter","ir","fazer","comer"], b:"Any tense can come up. Read the label."}
+]};
+CONJ.ar = {
+A1:[
+ {t:"Present: I, you, he, she", ten:["pres"], ps:[0,1,2,3,4], vb:["كتب","درس","شرب","ذهب","فهم"], b:"Present verbs add a prefix: **أ** (I), **ت** (you, she), **ي** (he). Talking to a woman, add **ين** at the end: **تكتبين** (taktubīn)."},
+ {t:"Present: we and they", ten:["pres"], ps:[5,6], vb:["كتب","درس","شرب","ذهب","لعب","عمل"], b:"**ن** (na-) = we: **نكتب**. **يـ…ـون** (ya-…-ūn) = they: **يكتبون**."},
+ {t:"Past: I and you", ten:["past"], ps:[0,1,2], vb:["كتب","درس","شرب","ذهب","فهم","فتح"], b:"Past = the verb + an ending: **-tu** (I), **-ta** (you, to a man), **-ti** (you, to a woman). Without vowel marks all three are written **كتبت**."},
+ {t:"Past: he, she, we, they", ten:["past"], ps:[3,4,5,6], vb:["كتب","درس","شرب","ذهب","لعب","رجع"], b:"**كتب** (kataba) = he wrote, **كتبت** (katabat) = she wrote, **كتبنا** (katabnā) = we wrote, **كتبوا** (katabū) = they wrote."}
+],
+A2:[
+ {t:"Present: all persons", ten:["pres"], vb:["كتب","درس","عمل","لعب","سمع","جلس","رجع"], b:"**أ / ت / ت…ين / ي / ت / ن / ي…ون**: the prefix tells you who."},
+ {t:"Past: all persons", ten:["past"], vb:["كتب","درس","عمل","لعب","سمع","جلس","دخل"], b:"**-tu / -ta / -ti / -a / -at / -nā / -ū**: the ending tells you who."},
+ {t:"Future with سـ", ten:["fut"], vb:["كتب","درس","ذهب","شرب","لعب","رجع"], b:"Future = **سـ** (sa-) + present: **سأكتب** (sa-aktub) = I will write, **سيذهبون** = they will go."},
+ {t:"Past or present?", ten:["past","pres"], vb:["كتب","فهم","طبخ","غسل","خرج","ركب"], b:"Past has only an ending (**كتبنا**), the present has a prefix (**نكتب**). Read the label."}
+],
+B1:[
+ {t:"All tenses", ten:["past","pres","fut"], vb:["كتب","درس","عمل","لعب","سمع","جلس","طبخ","غسل","دخل","خرج"], b:"Past, present and future with more verbs."},
+ {t:"Final boss: any verb, any person", ten:["past","pres","fut"], vb:Object.keys(ARV), b:"Any verb, any person, any tense."}
+]};
+// Mandarin: measure words and particles instead of verb tables
+if(WL.zh && WL.zh.measure){ CONJ.zh = {}; for(const lv in WL.zh.measure) CONJ.zh[lv] = xlmConcepts("zh", WL.zh.measure[lv]); }
+// every Arabic form gets its transliteration (tiles and the answer card)
+for(const v of Object.keys(ARV)) for(const ten of ["past","pres","fut"]) for(let p = 0; p < 7; p++){
+  const f = arForm(v, ten, p); XL_ROM[xlKey(f[0])] = f[1]; if(!/\s/.test(f[0])) XL_TOKROM.ar[f[0]] = f[1];
+}
+
+conjQuestion = (orig => function(c, tgt, recent){
+  if(!["fr", "pt", "ar"].includes(tgt)) return orig.apply(this, arguments);
+  const n = xlPronList(tgt).length;
+  for(let tries = 0; tries < 25; tries++){
+    const inf = pick(c.vb), ten = pick(c.ten), p = pick(c.ps || [...Array(n).keys()]);
+    const forms = xlForm(tgt, inf, ten, p), key = `${inf}|${ten}|${p}`;
+    if(recent.has(key) && tries < 20) continue;
+    return {inf, ten, p, pron:xlPronList(tgt)[p], forms, key};
+  }
+  return null;
+})(conjQuestion);
+conjWrongs = (orig => function(tgt, q){
+  if(!["fr", "pt", "ar"].includes(tgt)) return orig.apply(this, arguments);
+  const right = new Set(q.forms.map(f => norm(f, tgt, false))), out = new Set();
+  for(let p = 0; p < xlPronList(tgt).length; p++) if(p !== q.p){ const f = xlForm(tgt, q.inf, q.ten, p)[0]; if(!right.has(norm(f, tgt, false))) out.add(f); }
+  return [...out];
+})(conjWrongs);
+conjAccepted = (orig => function(tgt, forms, pIdx, pron){
+  if(!["fr", "pt", "ar"].includes(tgt)) return orig.apply(this, arguments);
+  return uniq(forms.concat(forms.map(f => xlWithPron(tgt, pIdx, f))));
+})(conjAccepted);
+function xlGenConj(st, plan, c, review, res){
+  const nat = LANG_CODE[st.native], code = LANG_CODE[st.target], L = GMT[nat];
+  const recent = new Set((st.recentK || []).map(k => String(k).replace(/^c:/, "")));
+  const q = conjQuestion(c, code, recent);
+  const games = ["Verb Forge", "Time Machine", "Slip Fixer"];
+  let game = plan.boss ? "Verb Forge" : games.includes(plan.game) ? plan.game : pick(games);
+  let wrong = null;
+  if(game === "Slip Fixer"){ const ws = conjWrongs(code, q); if(ws.length) wrong = pick(ws); else game = "Time Machine"; }
+  const tName = XCT[code][q.ten], form = q.forms[0];
+  const acc = conjAccepted(code, q.forms, q.p, q.pron);
+  const ch = {game, al:code, k:"c", acc, answerKey:form, tests:c.t, speak:"", cw:[], why:`**${form}** · ${q.inf} · ${tName}` + (c.b ? "\n" + c.b : "")};
+  let task;
+  if(game === "Verb Forge"){
+    task = L.cForge(LN[nat][st.target]);
+    ch.target = `${xlPronLabel(code, q.p)} · ${xlVerbLabel(code, q.inf)} · ${tName}`;
+  } else {
+    const frame = xlFrame(code, q.ten), blank = `___ (${xlPronList(code)[q.p]} · ${q.inf})`;
+    ch.acc = uniq(acc.concat(q.forms.map(f => xlFill(frame, xlWithPron(code, q.p, f)))));
+    if(game === "Time Machine"){ task = L.cTime(tName); ch.target = xlFill(frame, blank); }
+    else { task = L.cSlip(tName); ch.target = xlFill(frame, xlWithPron(code, q.p, wrong)); }
+  }
+  const words = form.split(" ");
+  ch.hint = plan.boss || code === "ar" ? "" : words.length > 1 ? L.hStart(words[0], words.length) : L.hLetter(form.slice(0, 2), form.length);
+  Object.assign(ch, bossWrap(L, plan, task + " " + L.cHow));
+  // Arabic: tap the right form (typing the transliteration works too)
+  if(code === "ar"){ const ws = shuffle(conjWrongs(code, q)).slice(0, 3); if(ws.length >= 2) ch.opts = shuffle([form].concat(ws)); }
+  const sample = c.vb[0], tableT = c.ten[0], ps = c.ps || [...Array(xlPronList(code).length).keys()];
+  const table = ps.map(p => ({w:xlWithPron(code, p, xlForm(code, sample, tableT, p)[0]), m:`${sample} · ${xlVerbEn(code, sample)}`}));
+  res.lesson = review ? {title:c.t, body:L.cRev + " " + c.b, words:[]} : {title:c.t, body:c.b, words:table};
+  res.spotlight = {tense:`${XCT[code][tableT]} · ${sample}`, endings:table.map(x => x.w).join(" · "), irregular:""};
+  res.challenge = ch;
+  res._k = "c:" + q.key;
+  return res;
+}
+genConj = (orig => function(st, plan, c, review, res){
+  const code = xlmCode(st && st.target);
+  if(code === "zh") return genSentence(Object.assign({}, st, {mode:8}), plan, c, review, res);   // measure words play like Tricky Pairs
+  if(code) return xlGenConj(st, plan, c, review, res);
+  return orig.apply(this, arguments);
+})(genConj);
+gamesFor = (orig => function(st){
+  if(st && st.mode === 7 && xlmCode(st.target) === "zh") return ["Word Duel", "Cloze Combat", "Classic Mine", "Error Hunter"];
+  return orig.apply(this, arguments);
+})(gamesFor);
+// Mandarin / Arabic number and verb rounds offer their options as tap tiles
+tileItems = (orig => function(ch){
+  if(ch && (ch.al === "zh" || ch.al === "ar") && (ch.k === "n" || ch.k === "c") && Array.isArray(ch.opts)) return {mode:"pick", items:ch.opts, keepScreen:true};
+  return orig.apply(this, arguments);
+})(tileItems);
+
+/* ---------- levels, syllabus and lookups per language ---------- */
+levelsFor = (orig => function(mode, target){
+  const code = xlmCode(target);
+  if(code){
+    if(mode === 4) return Object.keys(XLNUM);
+    if(mode === 5) return Object.keys(XLV[code] || {A1:1});
+    if(mode === 7) return Object.keys(CONJ[code] || {A1:1});
+    if(mode === 8) return Object.keys(TRICKY[code] || {A1:1});
+  }
+  return orig.apply(this, arguments);
+})(levelsFor);
+syllabusFor = (orig => function(st){
+  const code = xlmCode(st && st.target);
+  if(code && st.mode === 4) return xlNumSyl(code, st.level).map(c => c[LANG_CODE[st.native]]);
+  return orig.apply(this, arguments);
+})(syllabusFor);
+conceptAt = (orig => function(st, idx){
+  const code = xlmCode(st && st.target);
+  if(code && st.mode === 4) return xlNumSyl(code, st.level)[idx];
+  return orig.apply(this, arguments);
+})(conceptAt);
+findConcept = (orig => function(st, key){
+  const code = xlmCode(st && st.target);
+  if(code && st.mode === 4){
+    const k = String(key || "").toLowerCase(), nat = LANG_CODE[st.native];
+    for(const lv in XLNUM) for(const c of xlNumSyl(code, lv)) if(c[nat].toLowerCase() === k) return c;
+    return null;
+  }
+  return orig.apply(this, arguments);
+})(findConcept);
+
+/* ---------- menu: Mandarin's mode 7 is about measure words ---------- */
+Object.assign(I18N.en, {zh_m7n:"Measure Words", zh_m7d:"个, 本, 张… plus 了 and 过: the little words Chinese can't do without."});
+Object.assign(I18N.es, {zh_m7n:"Clasificadores", zh_m7d:"个, 本, 张… y 了 y 过: las palabritas imprescindibles del chino."});
+renderMenu = (orig => function(){
+  const r = orig.apply(this, arguments);
+  try{
+    const TP8 = {fr:"tu or vous, c'est or il est, bon or bien…", pt:"ser or estar, por or para, mas or mais…", zh:"不 or 没, 二 or 两, 的 or 得…", ar:"هذا or هذه, ما or ماذا, في or إلى…"};
+    const c8 = xlmCode(setup.target), b8 = document.querySelector('#modes [data-mode="8"] small');
+    if(c8 && b8) b8.textContent = TP8[c8];
+    if(xlmCode(setup.target) === "zh"){
+      const b = document.querySelector('#modes [data-mode="7"]');
+      if(b){ b.querySelector(".ico").textContent = "🧮"; b.querySelector("b").textContent = t("zh_m7n"); b.querySelector("small").textContent = t("zh_m7d"); }
+    }
+  }catch(e){}
+  return r;
+})(renderMenu);
+if(window.__PGM_TEST) window.__xlm = {xlNumWords, xlTime, xlPrice, frNum, ptNum, zhNum, arNum, frForm, ptForm, arForm, XLV, XLNUM, xlNumSyl, WL, STORIES, ISLANDS, TRICKY, CONJ, levelsFor:(m, t) => levelsFor(m, t), renderMenu:() => renderMenu()};
+(() => { const c = document.createElement("style"); c.textContent = ".sline .srom{display:block;color:var(--violet);font-size:.85rem;margin-top:2px}"; document.head.appendChild(c); })();
 
 /* ===================== Typo allowance =====================
    A small slip in a typed answer still counts, except in Survivor, Tricky Pairs, boss
@@ -15346,7 +16707,8 @@ genSentence = (orig => function(st, plan, c){
         if(it && it[3]) w.push(canon(mcStrip(it[3])));
         s.push(...others.map(x => canon(x[1])));
       }
-      ch.mcx = {w, s};
+      // the meaning of the item and of each sibling (Right or Wrong and Spot the Mistake show them)
+      ch.mcx = {w, s, n:it ? canon(it[0]) : "", sm:(!rev && !cz) ? others.map(x => canon(x[0])) : []};
     }
   }catch(e){}
   return res;
@@ -15358,7 +16720,7 @@ genVocab = (orig => function(st, plan){
     const ch = res && res.challenge;
     if(mcWant(st, plan) && ch && ch.k === "w"){
       const nat = LANG_CODE[st.native], tgt = LANG_CODE[st.target];
-      const list = VLIST[st.level] || VLIST.A1, entry = VMAP[tgt][String(ch.wk || "").toLowerCase()];
+      const list = (typeof customVocab === "function" ? customVocab(tgt, st.level) || customVocab(tgt, "A1") : null) || VLIST[st.level] || VLIST.A1, entry = VMAP[tgt][String(ch.wk || "").toLowerCase()];
       const side = ch.al === tgt ? tgt : nat;
       const same = entry ? shuffle(list.filter(e => e !== entry && e.cat === entry.cat)) : [];
       const rest = shuffle(list.filter(e => e !== entry && !(entry && e.cat === entry.cat))).slice(0, 12);
@@ -15563,11 +16925,11 @@ Object.assign(I18N.es, {"game.Quick Pick":"Elección rápida", "game.Meaning Mat
 Object.assign(GAME_ICO, {"Quick Pick":"🔘", "Meaning Match":"💡", "Right or Wrong":"✅", "Spot the Mistake":"🔎"});
 const MCT = {
   en:{qp:T => `Pick the right ${T} translation.`, qpw:T => `Pick the ${T} word.`, qpc:"Pick the right verb form.", mm:N => `What does it mean in ${N}?`,
-      rw:T => `Is this ${T} sentence correct?`, rwY:"✓ Correct", rwN:"✗ Has a mistake", sm:"One sentence has a mistake. Which one?", smQ:"🔎 Find the sentence with the mistake",
+      rw:T => `Is this ${T} sentence correct?`, rwM:(N, T) => `Is this a correct way to say “${N}” in ${T}?`, rwY:"✓ Correct", rwN:"✗ Has a mistake", sm:"One sentence has a mistake. Which one?", smQ:"🔎 Find the sentence with the mistake",
       okRight:"Yes, it's correct:", okWrong:"Right, it has a mistake. Fixed:", badRight:"It was correct as written:", badWrong:"It has a mistake. Fixed:",
       okSpot:"You found it. Fixed:", badSpot:"The mistake was here:", fixed:"Fixed:"},
   es:{qp:T => `Elige la traducción correcta al ${T}.`, qpw:T => `Elige la palabra en ${T}.`, qpc:"Elige la forma verbal correcta.", mm:N => `¿Qué significa en ${N}?`,
-      rw:T => `¿Esta frase en ${T} está bien?`, rwY:"✓ Correcta", rwN:"✗ Tiene un error", sm:"Una frase tiene un error. ¿Cuál?", smQ:"🔎 Encuentra la frase con el error",
+      rw:T => `¿Esta frase en ${T} está bien?`, rwM:(N, T) => `¿Así se dice bien «${N}» en ${T}?`, rwY:"✓ Correcta", rwN:"✗ Tiene un error", sm:"Una frase tiene un error. ¿Cuál?", smQ:"🔎 Encuentra la frase con el error",
       okRight:"Sí, está bien:", okWrong:"Exacto, tiene un error. Corregida:", badRight:"Estaba bien así:", badWrong:"Tiene un error. Corregida:",
       okSpot:"¡La encontraste! Corregida:", badSpot:"El error estaba aquí:", fixed:"Corregida:"}
 };
@@ -15581,8 +16943,6 @@ const MCG_MODES = {1:["Quick Pick", "Meaning Match", "Right or Wrong", "Spot the
 
 gamesFor = (orig => function(st){
   const g = orig.apply(this, arguments), add = (MCG_MODES[st && st.mode] || []).filter(x => !g.includes(x));
-  // the new languages only have Classic/Reverse-style data for most units; Error Hunter needs planted mistakes
-  if(st && typeof xlCode === "function" && xlCode(st.target)) return g.concat(add.filter(x => x === "Quick Pick" || x === "Meaning Match"));
   return g.concat(add);
 })(gamesFor);
 
@@ -15594,12 +16954,12 @@ function mcgPick(st, ch, name){
   mcBuild(st, ch);
   return Array.isArray(ch.opts);
 }
-function mcgRight(st, ch){
+function mcgRight(st, ch, mcx){
   const L = mcT(st), nat = LANG_CODE[st.native], W = ch.target, T = ch.answerKey;
   if(!W || !T || norm(W, ch.al, mcStrict(st)) === norm(T, ch.al, mcStrict(st))) return false;
   const showRight = Math.random() < 0.5;
   ch.game = "Right or Wrong";
-  ch.task = L.rw(LN[nat][st.target]);
+  ch.task = mcx && mcx.n ? L.rwM(mcx.n, LN[nat][st.target]) : L.rw(LN[nat][st.target]);   // the meaning makes the judgement fair
   ch.target = showRight ? T : W;
   ch.acc = [showRight ? L.rwY : L.rwN, T];
   ch.answerKey = showRight ? L.rwY : L.rwN;
@@ -15610,10 +16970,11 @@ function mcgRight(st, ch){
 function mcgSpot(st, ch, mcx){
   const L = mcT(st), W = ch.target, T = ch.answerKey, key = x => norm(x, ch.al, false);
   if(!W || !T || norm(W, ch.al, mcStrict(st)) === norm(T, ch.al, mcStrict(st))) return false;
-  const seen = new Set([key(W), key(T)]), sib = [];
-  for(const x of shuffle(((mcx && mcx.s) || []).slice())){
+  const seen = new Set([key(W), key(T)]), sib = [], mean = new Map([[W, (mcx && mcx.n) || ""]]);
+  const S0 = ((mcx && mcx.s) || []).map((x, i) => [x, (mcx.sm || [])[i] || ""]);
+  for(const [x, m] of shuffle(S0)){
     const k = key(x); if(!k || seen.has(k)) continue;
-    seen.add(k); sib.push(x); if(sib.length >= 3) break;
+    seen.add(k); sib.push(x); mean.set(x, m); if(sib.length >= 3) break;
   }
   if(sib.length < 2) return false;
   ch.game = "Spot the Mistake";
@@ -15622,6 +16983,7 @@ function mcgSpot(st, ch, mcx){
   ch.acc = [W, T];
   ch.answerKey = W;
   ch.opts = shuffle([W].concat(sib));
+  ch.optm = ch.opts.map(o => mean.get(o) || "");   // each sentence's meaning, shown under it
   ch.hint = ""; ch.cw = [];
   return true;
 }
@@ -15637,8 +16999,12 @@ function mcgWrap(orig){
     try{
       const mcx = ch.mcx;
       let ok = false;
-      if(name === "Right or Wrong" && ch.game === "Error Hunter") ok = mcgRight(st, ch);
-      else if(name === "Spot the Mistake" && ch.game === "Error Hunter") ok = mcgSpot(st, ch, mcx) || mcgRight(st, ch);
+      // a slip made by swapping two words isn't a real learner mistake: ask for the translation instead
+      if((name === "Right or Wrong" || name === "Spot the Mistake") && ch.game === "Error Hunter" && typeof XL_AUTO_WRONG !== "undefined" && XL_AUTO_WRONG.has(ch.target) && mcx && mcx.n){
+        ch.target = mcx.n; ok = mcgPick(st, ch, "Quick Pick");
+      }
+      else if(name === "Right or Wrong" && ch.game === "Error Hunter") ok = mcgRight(st, ch, mcx);
+      else if(name === "Spot the Mistake" && ch.game === "Error Hunter") ok = mcgSpot(st, ch, mcx) || mcgRight(st, ch, mcx);
       else if(ch.game === "Classic Mine" || ch.game === "Verb Forge" || (name === "Quick Pick" && ch.k === "c")) ok = mcgPick(st, ch, "Quick Pick");
       else if(ch.game === "Reverse Mine") ok = mcgPick(st, ch, "Meaning Match");
       if(ok){ delete ch.mcx; if(res._k) res._k = res._k.replace(/^[^|]*/, ch.game); }
@@ -15667,12 +17033,22 @@ gradeLocal = (orig => function(st, ch, answer, force){
   }catch(e){ return j; }
 })(gradeLocal);
 if(window.__PGM_TEST) window.__mcg = {gamesFor:st => gamesFor(st), MCG};
-// Spot the Mistake's prompt is an instruction, not a sentence to hear
+// Spot the Mistake's prompt is an instruction, not a sentence to hear; each option shows its meaning
 renderExtras = (orig => function(){
   const r = orig.apply(this, arguments);
-  try{ const ch = S && S.current && S.current.challenge; if(ch && ch.game === "Spot the Mistake"){ const b = document.querySelector('#chTarget [data-say="target"]'); if(b) b.remove(); } }catch(e){}
+  try{
+    const ch = S && S.current && S.current.challenge;
+    if(ch && ch.game === "Spot the Mistake"){
+      const b = document.querySelector('#chTarget [data-say="target"]'); if(b) b.remove();
+      if(Array.isArray(ch.optm)) document.querySelectorAll("#tiles .tile[data-i]").forEach(t => {
+        const m = ch.optm[+t.dataset.i]; if(!m) return;
+        t.dataset.r = (t.dataset.r ? t.dataset.r + "\n" : "") + "“" + m + "”"; t.classList.add("mcm");
+      });
+    }
+  }catch(e){}
   return r;
 })(renderExtras);
+(() => { const c = document.createElement("style"); c.textContent = ".tile.mcm::after{white-space:pre-line;color:var(--muted,#6b6b80);font-style:italic}"; document.head.appendChild(c); })();
 
 /* ===================== Display size =====================
    Scales the whole app from 70% to 150% by setting the root font size (all type is in rem,

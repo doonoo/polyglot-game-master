@@ -106,7 +106,7 @@ function answer(P, right){
   /* ---------- a new language on one side ---------- */
   setLang("Mandarin Chinese");
   d.querySelector('#modes [data-mode="4"]').click();
-  if(!$("startBtn").disabled || !/Ben/.test($("tpBox").textContent)) fail("Numbers with Mandarin should be blocked with a note");
+  if($("startBtn").disabled) fail("Numbers with Mandarin should be allowed now");
   d.querySelector('#modes [data-mode="1"]').click();
   if($("startBtn").disabled) fail("Practice with Mandarin should be allowed");
   $("startBtn").click();

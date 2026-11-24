@@ -40,8 +40,8 @@ const setTarget = L => { const s = $("targetSel"); s.value = L; s.dispatchEvent(
     setTarget(L);
     if($("nativeSel").value !== "English") fail(L, "native should be English");
     const disabled = [...d.querySelectorAll("#modes [data-mode]")].filter(b => b.disabled).map(b => +b.dataset.mode);
-    for(const m of [4, 5, 6, 7, 8, 9]) if(!disabled.includes(m)) fail(L, "mode", m, "should be disabled");
-    if($("storiesBtn").disabled !== true) fail(L, "stories should be disabled");
+    if(disabled.length) fail(L, "every mode should be open now", disabled);   // langmodes.js gives every mode content (test17 plays them)
+    if($("storiesBtn").disabled) fail(L, "stories should be open");
     for(const mode of [1, 2, 3]) for(const lv of ["A1", "A2"]){
       P.setup.mode = mode; P.setup.level = lv; P.startNew();
       const S0 = w.__pgm.S;

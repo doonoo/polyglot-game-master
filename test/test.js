@@ -78,6 +78,7 @@ const matchSizes = new Set();
   if(new Set(allEn).size !== allEn.length) fail("dup en vocab across levels", allEn.filter((k, i) => allEn.indexOf(k) !== i));
   // islands
   for(const isl of P.ISLANDS){
+    if(isl.lang) continue;   // islands for the new languages are checked in test17
     if(!isl.en || !isl.es) fail("island names", isl.id);
     if(isl.it.length < 15) fail("island", isl.id, isl.it.length);
     for(const it of isl.it){

@@ -13,11 +13,11 @@ Object.assign(I18N.es, {"game.Quick Pick":"Elección rápida", "game.Meaning Mat
 Object.assign(GAME_ICO, {"Quick Pick":"🔘", "Meaning Match":"💡", "Right or Wrong":"✅", "Spot the Mistake":"🔎"});
 const MCT = {
   en:{qp:T => `Pick the right ${T} translation.`, qpw:T => `Pick the ${T} word.`, qpc:"Pick the right verb form.", mm:N => `What does it mean in ${N}?`,
-      rw:T => `Is this ${T} sentence correct?`, rwY:"✓ Correct", rwN:"✗ Has a mistake", sm:"One sentence has a mistake. Which one?", smQ:"🔎 Find the sentence with the mistake",
+      rw:T => `Is this ${T} sentence correct?`, rwM:(N, T) => `Is this a correct way to say “${N}” in ${T}?`, rwY:"✓ Correct", rwN:"✗ Has a mistake", sm:"One sentence has a mistake. Which one?", smQ:"🔎 Find the sentence with the mistake",
       okRight:"Yes, it's correct:", okWrong:"Right, it has a mistake. Fixed:", badRight:"It was correct as written:", badWrong:"It has a mistake. Fixed:",
       okSpot:"You found it. Fixed:", badSpot:"The mistake was here:", fixed:"Fixed:"},
   es:{qp:T => `Elige la traducción correcta al ${T}.`, qpw:T => `Elige la palabra en ${T}.`, qpc:"Elige la forma verbal correcta.", mm:N => `¿Qué significa en ${N}?`,
-      rw:T => `¿Esta frase en ${T} está bien?`, rwY:"✓ Correcta", rwN:"✗ Tiene un error", sm:"Una frase tiene un error. ¿Cuál?", smQ:"🔎 Encuentra la frase con el error",
+      rw:T => `¿Esta frase en ${T} está bien?`, rwM:(N, T) => `¿Así se dice bien «${N}» en ${T}?`, rwY:"✓ Correcta", rwN:"✗ Tiene un error", sm:"Una frase tiene un error. ¿Cuál?", smQ:"🔎 Encuentra la frase con el error",
       okRight:"Sí, está bien:", okWrong:"Exacto, tiene un error. Corregida:", badRight:"Estaba bien así:", badWrong:"Tiene un error. Corregida:",
       okSpot:"¡La encontraste! Corregida:", badSpot:"El error estaba aquí:", fixed:"Corregida:"}
 };
@@ -31,8 +31,6 @@ const MCG_MODES = {1:["Quick Pick", "Meaning Match", "Right or Wrong", "Spot the
 
 gamesFor = (orig => function(st){
   const g = orig.apply(this, arguments), add = (MCG_MODES[st && st.mode] || []).filter(x => !g.includes(x));
-  // the new languages only have Classic/Reverse-style data for most units; Error Hunter needs planted mistakes
-  if(st && typeof xlCode === "function" && xlCode(st.target)) return g.concat(add.filter(x => x === "Quick Pick" || x === "Meaning Match"));
   return g.concat(add);
 })(gamesFor);
 
@@ -44,12 +42,12 @@ function mcgPick(st, ch, name){
   mcBuild(st, ch);
   return Array.isArray(ch.opts);
 }
-function mcgRight(st, ch){
+function mcgRight(st, ch, mcx){
   const L = mcT(st), nat = LANG_CODE[st.native], W = ch.target, T = ch.answerKey;
   if(!W || !T || norm(W, ch.al, mcStrict(st)) === norm(T, ch.al, mcStrict(st))) return false;
   const showRight = Math.random() < 0.5;
   ch.game = "Right or Wrong";
-  ch.task = L.rw(LN[nat][st.target]);
+  ch.task = mcx && mcx.n ? L.rwM(mcx.n, LN[nat][st.target]) : L.rw(LN[nat][st.target]);   // the meaning makes the judgement fair
   ch.target = showRight ? T : W;
   ch.acc = [showRight ? L.rwY : L.rwN, T];
   ch.answerKey = showRight ? L.rwY : L.rwN;
@@ -60,10 +58,11 @@ function mcgRight(st, ch){
 function mcgSpot(st, ch, mcx){
   const L = mcT(st), W = ch.target, T = ch.answerKey, key = x => norm(x, ch.al, false);
   if(!W || !T || norm(W, ch.al, mcStrict(st)) === norm(T, ch.al, mcStrict(st))) return false;
-  const seen = new Set([key(W), key(T)]), sib = [];
-  for(const x of shuffle(((mcx && mcx.s) || []).slice())){
+  const seen = new Set([key(W), key(T)]), sib = [], mean = new Map([[W, (mcx && mcx.n) || ""]]);
+  const S0 = ((mcx && mcx.s) || []).map((x, i) => [x, (mcx.sm || [])[i] || ""]);
+  for(const [x, m] of shuffle(S0)){
     const k = key(x); if(!k || seen.has(k)) continue;
-    seen.add(k); sib.push(x); if(sib.length >= 3) break;
+    seen.add(k); sib.push(x); mean.set(x, m); if(sib.length >= 3) break;
   }
   if(sib.length < 2) return false;
   ch.game = "Spot the Mistake";
@@ -72,6 +71,7 @@ function mcgSpot(st, ch, mcx){
   ch.acc = [W, T];
   ch.answerKey = W;
   ch.opts = shuffle([W].concat(sib));
+  ch.optm = ch.opts.map(o => mean.get(o) || "");   // each sentence's meaning, shown under it
   ch.hint = ""; ch.cw = [];
   return true;
 }
@@ -87,8 +87,12 @@ function mcgWrap(orig){
     try{
       const mcx = ch.mcx;
       let ok = false;
-      if(name === "Right or Wrong" && ch.game === "Error Hunter") ok = mcgRight(st, ch);
-      else if(name === "Spot the Mistake" && ch.game === "Error Hunter") ok = mcgSpot(st, ch, mcx) || mcgRight(st, ch);
+      // a slip made by swapping two words isn't a real learner mistake: ask for the translation instead
+      if((name === "Right or Wrong" || name === "Spot the Mistake") && ch.game === "Error Hunter" && typeof XL_AUTO_WRONG !== "undefined" && XL_AUTO_WRONG.has(ch.target) && mcx && mcx.n){
+        ch.target = mcx.n; ok = mcgPick(st, ch, "Quick Pick");
+      }
+      else if(name === "Right or Wrong" && ch.game === "Error Hunter") ok = mcgRight(st, ch, mcx);
+      else if(name === "Spot the Mistake" && ch.game === "Error Hunter") ok = mcgSpot(st, ch, mcx) || mcgRight(st, ch, mcx);
       else if(ch.game === "Classic Mine" || ch.game === "Verb Forge" || (name === "Quick Pick" && ch.k === "c")) ok = mcgPick(st, ch, "Quick Pick");
       else if(ch.game === "Reverse Mine") ok = mcgPick(st, ch, "Meaning Match");
       if(ok){ delete ch.mcx; if(res._k) res._k = res._k.replace(/^[^|]*/, ch.game); }
@@ -117,9 +121,19 @@ gradeLocal = (orig => function(st, ch, answer, force){
   }catch(e){ return j; }
 })(gradeLocal);
 if(window.__PGM_TEST) window.__mcg = {gamesFor:st => gamesFor(st), MCG};
-// Spot the Mistake's prompt is an instruction, not a sentence to hear
+// Spot the Mistake's prompt is an instruction, not a sentence to hear; each option shows its meaning
 renderExtras = (orig => function(){
   const r = orig.apply(this, arguments);
-  try{ const ch = S && S.current && S.current.challenge; if(ch && ch.game === "Spot the Mistake"){ const b = document.querySelector('#chTarget [data-say="target"]'); if(b) b.remove(); } }catch(e){}
+  try{
+    const ch = S && S.current && S.current.challenge;
+    if(ch && ch.game === "Spot the Mistake"){
+      const b = document.querySelector('#chTarget [data-say="target"]'); if(b) b.remove();
+      if(Array.isArray(ch.optm)) document.querySelectorAll("#tiles .tile[data-i]").forEach(t => {
+        const m = ch.optm[+t.dataset.i]; if(!m) return;
+        t.dataset.r = (t.dataset.r ? t.dataset.r + "\n" : "") + "“" + m + "”"; t.classList.add("mcm");
+      });
+    }
+  }catch(e){}
   return r;
 })(renderExtras);
+(() => { const c = document.createElement("style"); c.textContent = ".tile.mcm::after{white-space:pre-line;color:var(--muted,#6b6b80);font-style:italic}"; document.head.appendChild(c); })();

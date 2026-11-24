@@ -29,7 +29,6 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   for(const k of ["Sp5 Quick Pick","Sp7 Quick Pick"]) if(!seen[k]) fail("never played", k);
   if(!seen["Fr1 Quick Pick"] && !seen["Fr1 Meaning Match"]) fail("no option games in French");
   if(!seen["Ma1 Quick Pick"] && !seen["Ma1 Meaning Match"]) fail("no option games in Mandarin");
-  if(Object.keys(seen).some(k => /^(Fr|Ma)/.test(k) && /Right|Spot/.test(k))) fail("judging games need planted mistakes; not for the new languages");
   // quiz screens (typing) never get the option games
   if(w.__mcg.gamesFor({mode:1}).filter(g => MC.includes(g)).length !== 4) fail("rotation", w.__mcg.gamesFor({mode:1}));
   console.log(bad ? bad + " failures" : "mini-games ok: " + JSON.stringify(seen)); process.exit(bad ? 1 : 0);

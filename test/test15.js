@@ -7,7 +7,7 @@ let fails = 0; const fail = (...a) => { fails++; if(fails < 60) console.log("FAI
 const dom = new JSDOM(html, {runScripts:"dangerously", pretendToBeVisual:true, url:"https://example.test/",
   beforeParse(w){ w.__PGM_TEST = true; w.matchMedia = () => ({matches:false, addEventListener(){}, removeEventListener(){}}); w.scrollTo = () => {};
     w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, {get:(o, k) => k in o ? o[k] : () => ({addColorStop(){}})});
-    w.HTMLElement.prototype.scrollIntoView = function(){}; w.addEventListener("error", e => { if(!/setTransform|getContext/.test(e.message)) fail("page error", e.message); }); }});
+    w.HTMLElement.prototype.scrollIntoView = function(){}; w.addEventListener("error", e => { if(!/setTransform|getContext/.test(e.message)) fail("page error", e.message, (e.error && e.error.stack || "").split("\n").slice(1, 7).join(" | ")); }); }});
 const w = dom.window, d = w.document, $ = id => d.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {

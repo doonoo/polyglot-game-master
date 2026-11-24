@@ -74,10 +74,12 @@ recordTurn = (orig => function(prevCh, j){
 /* ---------- Stories ---------- */
 let SP = null;
 const spk = (s, tgt) => Array.isArray(s) ? s[tgt === "es" ? 0 : 1] : s;
+// stories for the language being learned (Spanish and English stories have no lang)
+function storiesFor(tgt){ return STORIES.filter(s => s.lang ? s.lang === tgt : (tgt === "es" || tgt === "en")); }
 function openStories(){ showOnly("storiesPage"); renderStories(); }
 function renderStories(){
   const tgt = TL(), nat = NL();
-  $("storiesList").innerHTML = STORIES.map(s => `<button class="word story ${profile.stories[s.id] ? "sdone" : ""}" data-sid="${s.id}"><span class="sico">${s.ico}</span><span><b>${esc(s.t[tgt])}</b><small>${esc(s.t[nat])} · ${s.lv}</small></span>${profile.stories[s.id] ? `<em>✓</em>` : ""}</button>`).join("");
+  $("storiesList").innerHTML = storiesFor(tgt).map(s => `<button class="word story ${profile.stories[s.id] ? "sdone" : ""}" data-sid="${s.id}"><span class="sico">${s.ico}</span><span><b>${esc(s.t[tgt])}</b><small>${esc(s.t[nat])} · ${s.lv}</small></span>${profile.stories[s.id] ? `<em>✓</em>` : ""}</button>`).join("");
 }
 function openStory(id){
   const s = STORIES.find(x => x.id === id); if(!s) return;
@@ -97,7 +99,7 @@ function advanceStory(){
   const who = spk(p.s, SP.tgt), text = p[SP.tgt], tr = p[SP.nat];
   const div = document.createElement("div");
   div.className = "sline " + (who ? "talk" : "narr");
-  div.innerHTML = `${who ? `<small class="who">${esc(who)}</small>` : ""}<span class="stext">${esc(text)}</span><button class="say" data-say-line="${esc(text)}" aria-label="${esc(t("listen"))}">🔊</button><span class="str" hidden>${esc(tr)}</span>`;
+  div.innerHTML = `${who ? `<small class="who">${esc(who)}</small>` : ""}<span class="stext" dir="auto">${esc(text)}</span>${p.r ? `<small class="srom" dir="ltr">${esc(p.r)}</small>` : ""}<button class="say" data-say-line="${esc(text)}" aria-label="${esc(t("listen"))}">🔊</button><span class="str" hidden>${esc(tr)}</span>`;
   $("storyFeed").appendChild(div);
   if(typeof autoRead !== "undefined" && autoRead) Narrator.say([{text, lang:SP.tgt}]);
   SP.i++; storyBar();

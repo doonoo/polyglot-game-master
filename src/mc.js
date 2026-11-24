@@ -47,7 +47,8 @@ genSentence = (orig => function(st, plan, c){
         if(it && it[3]) w.push(canon(mcStrip(it[3])));
         s.push(...others.map(x => canon(x[1])));
       }
-      ch.mcx = {w, s};
+      // the meaning of the item and of each sibling (Right or Wrong and Spot the Mistake show them)
+      ch.mcx = {w, s, n:it ? canon(it[0]) : "", sm:(!rev && !cz) ? others.map(x => canon(x[0])) : []};
     }
   }catch(e){}
   return res;
@@ -59,7 +60,7 @@ genVocab = (orig => function(st, plan){
     const ch = res && res.challenge;
     if(mcWant(st, plan) && ch && ch.k === "w"){
       const nat = LANG_CODE[st.native], tgt = LANG_CODE[st.target];
-      const list = VLIST[st.level] || VLIST.A1, entry = VMAP[tgt][String(ch.wk || "").toLowerCase()];
+      const list = (typeof customVocab === "function" ? customVocab(tgt, st.level) || customVocab(tgt, "A1") : null) || VLIST[st.level] || VLIST.A1, entry = VMAP[tgt][String(ch.wk || "").toLowerCase()];
       const side = ch.al === tgt ? tgt : nat;
       const same = entry ? shuffle(list.filter(e => e !== entry && e.cat === entry.cat)) : [];
       const rest = shuffle(list.filter(e => e !== entry && !(entry && e.cat === entry.cat))).slice(0, 12);

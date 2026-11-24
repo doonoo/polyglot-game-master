@@ -39,7 +39,8 @@ function buildSchedule(now){
     const tl = TL(), live = typeof S !== "undefined" && S && S.cefr && S.syllabus && S.target === setup.target ? S : null;
     if(live){ const i = live.done.findIndex(d => !d); next = i >= 0 ? live.syllabus[i] : null; }
     const lv = live ? live.level : (setup.level || "A1");
-    const s = STORIES.find(x => !profile.stories[x.id] && x.lv === lv) || STORIES.find(x => !profile.stories[x.id]);
+    const pool = typeof storiesFor === "function" ? storiesFor(tl) : STORIES;
+    const s = pool.find(x => !profile.stories[x.id] && x.lv === lv) || pool.find(x => !profile.stories[x.id]);
     story = s ? s.t[tl] : null;
   }catch(e){}
   const add = (d, hh, mm, kind, title, body) => {

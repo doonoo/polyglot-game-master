@@ -21,6 +21,8 @@ const CDEF = () => ({sources:{g:true, t:true, f:true, verbs:true, tricky:true, n
 profile.custom = null; profile.customPresets = [];
 const curCfg = () => { const d = CDEF(); const c = profile.custom || {}; return Object.assign(d, c, {sources:Object.assign(d.sources, c.sources || {}), games:Object.assign(d.games, c.games || {})}); };
 
+// the word list for a level (the new languages have their own, built from the course)
+function customVocab(tgt, lv){ return typeof XLV !== "undefined" && XLV[tgt] ? XLV[tgt][lv] : VLIST[lv]; }
 // every (source, level) pair that has content and at least one chosen mini-game
 function customCombos(cfg, target){
   const tgt = LANG_CODE[target], out = [];
@@ -33,8 +35,8 @@ function customCombos(cfg, target){
       if(s.mode === 2) idxs = (COURSE[tgt][lv] || []).map((c, i) => (c.k || "g") === s.strand ? i : -1).filter(i => i >= 0);
       else if(s.mode === 7) idxs = ((CONJ[tgt] || {})[lv] || []).map((_, i) => i);
       else if(s.mode === 8) idxs = ((TRICKY[tgt] || {})[lv] || []).map((_, i) => i);
-      else if(s.mode === 4) idxs = (NUMSYL[lv] || []).map((_, i) => i);
-      else if(s.mode === 5) idxs = (VLIST[lv] || []).map((_, i) => i);
+      else if(s.mode === 4) idxs = (typeof xlNumSyl === "function" && XLM_CODES.includes(tgt) ? (XLNUM[lv] ? xlNumSyl(tgt, lv) : []) : (NUMSYL[lv] || [])).map((_, i) => i);
+      else if(s.mode === 5) idxs = (customVocab(tgt, lv) || []).map((_, i) => i);
       if(idxs.length) out.push({src:s.id, mode:s.mode, lv, idxs, games});
     }
   }
@@ -76,7 +78,7 @@ generate = (orig => function(st, plan){
   if(plan.mode === 5){
     // pretend a handful of the level's words were already taught so Odd One Out and
     // Match Madness have material, and retry until the chosen mini-game fits a word
-    const list = VLIST[plan.lv] || VLIST.A1, tgt = LANG_CODE[st.target];
+    const tgt = LANG_CODE[st.target], list = customVocab(tgt, plan.lv) || customVocab(tgt, "A1") || VLIST.A1;
     m.seenW = list.slice(0, 240).map(e => first(e[tgt]));
     let e = list[plan.idx] || pick(list);
     for(let k = 0; k < 15; k++){

@@ -39,14 +39,16 @@ function renderMenu(){
   renderIslandChips();
   renderDaily();
 }
+// each course has its own islands (the new languages' islands carry lang)
+function islandsFor(target){ const c = typeof xlCode === "function" ? xlCode(target) : null; return ISLANDS.filter(i => (i.lang || null) === c); }
 function renderIslandChips(){
   const nat = LANG_CODE[setup.native] || "en";
   $("islandChips").innerHTML = `<button class="chip ${setup.island === "" ? "on" : ""}" data-isl="">🎲 ${esc(t("surpriseMe"))}</button>` +
-    ISLANDS.map(i => `<button class="chip ${setup.island === i.id ? "on" : ""}" data-isl="${i.id}">${esc(i[nat])}</button>`).join("");
+    islandsFor(setup.target).map(i => `<button class="chip ${setup.island === i.id ? "on" : ""}" data-isl="${i.id}">${esc(i[nat])}</button>`).join("");
 }
 function renderNextChips(){
   const nat = LANG_CODE[S.native] || "en";
-  $("nextChips").innerHTML = ISLANDS.filter(i => i.id !== S.islandId).map(i => `<button class="chip" data-isl="${i.id}">${esc(i[nat])}</button>`).join("");
+  $("nextChips").innerHTML = islandsFor(S.target).filter(i => i.id !== S.islandId).map(i => `<button class="chip" data-isl="${i.id}">${esc(i[nat])}</button>`).join("");
 }
 function initMenu(){
   fillLangSelects();
@@ -110,9 +112,10 @@ function freshState(o){
   if(!hasLevel(st.mode, st.target, st.level)) st.level = levelsFor(st.mode, st.target)[0];
   if(o.mode === 6){
     let id = o.islandId;
-    if(!ISLANDS.some(i => i.id === id)){
-      let pool = ISLANDS.filter(i => !st.pastIslands.includes(i.id));
-      if(!pool.length){ pool = ISLANDS; st.pastIslands = []; }
+    const mine = islandsFor(o.target);
+    if(!mine.some(i => i.id === id)){
+      let pool = mine.filter(i => !st.pastIslands.includes(i.id));
+      if(!pool.length){ pool = mine; st.pastIslands = []; }
       id = pool[Math.floor(Math.random() * pool.length)].id;
     }
     st.islandId = id;
