@@ -1,0 +1,1 @@
+Meet Leo, the lion! Leo is the new mascot and app icon. He sits on the main menu (tap him for a hello in another language), cheers when you get an answer right, winks at a small typo, looks sad when you miss, and shows up on the end screen. Also: less memory use during long sessions.

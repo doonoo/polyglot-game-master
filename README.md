@@ -1,5 +1,7 @@
 # Polyglot Game Master
 
+<img src="www/icons/icon-192.png" alt="Leo the lion, the Polyglot Game Master mascot" width="110" align="right">
+
 Learn **Spanish** (for English speakers) or **English** (for Spanish speakers) with games.
 Free, open source, works offline. No account, no ads, no tracking.
 
@@ -19,6 +21,7 @@ Free, open source, works offline. No account, no ads, no tracking.
 - **8-bit sound effects:** NES-style effects built from the same chip voices as the soundtrack: a stage-clear fanfare when you beat a level, a game-over tune when you lose, and sounds for combos, lost hearts, stars, unlocks, tiles, matched pairs, badges, loot and every part of a boss fight. The 🔊 sound switch turns them off.
 - **Voice & audio switches:** the 🔈 Audio button on the main menu turns listening challenges and speaking challenges on or off, or both at once with Quiet mode. Switched-off rounds become reading and typing rounds with no penalty.
 - **Six languages:** Spanish and English both ways, plus French, Portuguese, Mandarin Chinese and Arabic as full courses taught through English (levels A1–A2 so far). They play in Practice, Level Select and Survivor, with bosses, the daily challenge and mistake review. Mandarin shows pinyin and Arabic shows transliteration; you can tap word tiles or type in plain letters (Chinese ignores tones and spaces, Arabic ignores vowel marks), and Arabic is laid out right to left. Numbers, Islands, Conjugation, Tricky Pairs, Vocab and Stories are Spanish and English only for now.
+- **🦁 Leo, your Game Master:** a lion mascot and app icon. Leo sits on the main menu (tap him for a hello in another language), cheers on right answers, winks at small typos, looks sad on misses and shows up on the end screen.
 - **🔘 Multiple choice:** switch the menu's answer mode from Type to Multiple choice and every round gives 4 answers to tap (keys 1-4 on a computer). Works in every mode, every language and in 2-player games. Wrong options are near misses (the classic learner mistake, a swapped word, a wrong ending) and are checked so only one answer is ever right.
 - **🔍 Display size:** make the whole app bigger or smaller (70% to 150%) from the 🔍 button on the menu or the A−/A+ row in the game's 🎛️ settings. It stacks on top of your phone's own text size.
 - **Typo allowance:** a one-letter slip in a typed answer still counts and shows the right spelling. Wrong endings, real words and the planted mistake in Error Hunter don't count as typos, and Survivor, Tricky Pairs and boss fights stay strict.

@@ -32,7 +32,7 @@ function stagger(root){
     }
   }
 }
-if(window.MutationObserver){
+if(window.MutationObserver && !window.__PGM_TEST){   // tests play thousands of turns in one synchronous loop: queued records would keep every old node alive
   new MutationObserver(list => {
     if(!animOn) return;
     const roots = new Set();

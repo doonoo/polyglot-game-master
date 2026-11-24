@@ -239,7 +239,9 @@ function play(lang, mode, level, turns, wrongRate, opts){
   if(!(P.profile.correct > 0 && P.profile.streak === 1 && P.profile.xp > 0 && P.profile.answered >= P.profile.correct - overrides)) fail(tag, "profile", JSON.stringify(P.profile));
   if(!/🔥 1/.test(d.getElementById("dailyCard").textContent)) { d.getElementById("menuBtn").click(); if(!/🔥 1/.test(d.getElementById("dailyCard").textContent)) fail(tag, "daily card", d.getElementById("dailyCard").textContent); }
   console.log(tag, "ok; answered", S.stats.answered, "acc", Math.round(100 * S.stats.correct / S.stats.answered) + "%", "xp", S.xp, "levels", [...levels].join(">"), "events", events, "sails", sails, "overrides", overrides, "back-to-back same game", repeats, "echo skips", skips, "isl teach", islTeach, "mix", cefrMix, "games", JSON.stringify(seenGames));
-  return {S, seenGames, levels};
+  const out = {S: JSON.parse(JSON.stringify(S)), seenGames, levels};
+  w.close();   // each run boots its own page; close it so its timers and DOM can be freed
+  return out;
 }
 for(const lang of ["en", "es"]){
   let r = play(lang, 1, "A1", 400, 0.15);

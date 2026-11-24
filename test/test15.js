@@ -103,6 +103,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   }
   if($("tpRes").hidden) fail("2 players with multiple choice did not finish");
   if(!taps) fail("2 players: no options tapped");
+  // Leo the lion: logo on the menu, reactions on the answer card
+  if(!d.querySelector("#leoHero svg")) fail("Leo missing from the menu");
+  if(!d.querySelector("#judgeCard .stamp.leoStamp svg") && !$("judgeCard").hidden) fail("Leo missing from the answer card");
   d.querySelector('[data-mcs="0"]').click();
   if(M.on) fail("switch back to typing");
   console.log(fails ? `${fails} failures` : `multiple choice ok: ${mc}/${tot} rounds as options; size and typo allowance ok`);
