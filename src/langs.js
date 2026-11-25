@@ -62,7 +62,7 @@ const xlSpace = s => String(s).replace(/([㐀-鿿，。])\s+(?=[㐀-鿿，。])/
       });
       u.w.forEach(([t, en, r]) => { if(r){ XL_ROM[t] = r; if(!/\s/.test(t)) XL_TOKROM[code][t] = r; } });
       (course[lv] = course[lv] || []).push({
-        t:u.t, k:GRAMMAR.test(u.t) ? "g" : /Greetings/.test(u.t) ? "f" : "t", b:u.b, ico:u.ico,
+        t:u.t, k:u.k || (GRAMMAR.test(u.t) ? "g" : /Greetings/.test(u.t) ? "f" : "t"), b:u.b, ico:u.ico,
         w:u.w.map(([t, en, r]) => [r ? `${t} (${r})` : t, en]), it, xl:code
       });
     });

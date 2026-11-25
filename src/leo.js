@@ -75,7 +75,7 @@ showOver = (orig => function(){
   try{
     const el = $("overEmoji"), e = (el.textContent || "").trim();
     if(e && !el.querySelector("svg")){
-      const mood = e === "💀" ? "sad" : e === "⏱️" ? "wow" : "cheer";
+      const mood = e === "💀" ? "sad" : e === "⏱️" ? "wow" : e === "💪" ? "think" : "cheer";
       el.classList.add("leoOver");
       el.innerHTML = lionSVG(mood) + (mood === "cheer" ? "" : `<span class="leoBadge">${esc(e)}</span>`);
     }

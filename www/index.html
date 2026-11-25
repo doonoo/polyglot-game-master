@@ -15056,6 +15056,132 @@ WL.zh.islands = [
  {id:"zh-mind", en:"Big ideas", es:"Grandes ideas", ico:"💭", units:["Feelings and opinions","Plans and the future","Comparing things"]}
 ];
 
+/* ===================== Mandarin: grammar lessons (k:"g") =====================
+   Grammar points for the Grammar Gym and the course. Words are separated by spaces (shown
+   joined on screen), pinyin has one entry per word, and every sentence carries a real
+   learner mistake: s: [english, chinese, pinyin, mistake]. */
+WL.zh.units.push(
+ {lv:"A1", k:"g", t:"的: possession", ico:"🔗",
+  b:"**的** (de) links an owner to a thing, like 's: **我的书** (wǒ de shū) = my book, **妈妈的车** = Mum's car, **谁的?** = whose? With close family you can drop it: **我妈妈** = my mum. The owner always comes **first**.",
+  w:[["的","'s (possession)","de"],["车","car (short word)","chē"],["我们的","our","wǒmen de"],["谁的","whose","shéi de"]],
+  s:[["This is my book.","这 是 我 的 书","zhè shì wǒ de shū","这 是 书 的 我"],
+     ["That is Mum's car.","那 是 妈妈 的 车","nà shì māma de chē","那 是 的 妈妈 车"],
+     ["Whose phone is this?","这 是 谁 的 手机","zhè shì shéi de shǒujī","这 是 的 谁 手机"],
+     ["Her friend is Chinese.","她 的 朋友 是 中国人","tā de péngyou shì Zhōngguórén","她 朋友 的 是 中国人"],
+     ["This is our school.","这 是 我们 的 学校","zhè shì wǒmen de xuéxiào","这 是 学校 我们 的"],
+     ["My mum is a teacher.","我 妈妈 是 老师","wǒ māma shì lǎoshī","我 妈妈 的 是 老师"]]},
+ {lv:"A1", k:"g", t:"很 + adjectives", ico:"💪",
+  b:"Adjectives work like verbs, so there's **no 是**: **我很忙** (wǒ hěn máng) = I'm busy. **很** (hěn) normally goes in front even when it doesn't really mean 'very'. Negative: **不** + adjective: **我不累** = I'm not tired.",
+  w:[["很忙","really busy","hěn máng"],["不累","not tired","bù lèi"],["很高兴","really glad","hěn gāoxìng"],["漂亮","beautiful","piàoliang"]],
+  s:[["I'm busy.","我 很 忙","wǒ hěn máng","我 是 忙"],
+     ["She is very pretty.","她 很 漂亮","tā hěn piàoliang","她 是 漂亮"],
+     ["I'm not tired.","我 不 累","wǒ bù lèi","我 不 是 累"],
+     ["We are happy.","我们 很 高兴","wǒmen hěn gāoxìng","我们 是 高兴"],
+     ["The weather is very good today.","今天 天气 很 好","jīntiān tiānqì hěn hǎo","今天 天气 是 好"],
+     ["Is Chinese difficult?","中文 难 吗","Zhōngwén nán ma","中文 是 难 吗"]]},
+ {lv:"A1", k:"g", t:"Question words", ico:"❓",
+  b:"A question word sits **where the answer would go**, so the word order doesn't change: **你去哪儿?** (nǐ qù nǎr) = Where are you going? (answer: 我去北京). **什么** = what, **谁** = who, **哪儿** = where, **几** = how many, **为什么** = why. Never add **吗** to these.",
+  w:[["吃什么","eat what","chī shénme"],["谁","who","shéi"],["哪儿","where (question)","nǎr"],["几","how many","jǐ"],["为什么","why","wèishénme"]],
+  s:[["What do you want to eat?","你 想 吃 什么","nǐ xiǎng chī shénme","你 想 吃 什么 吗"],
+     ["Where are you going?","你 去 哪儿","nǐ qù nǎr","哪儿 你 去"],
+     ["Who is he?","他 是 谁","tā shì shéi","他 是 谁 吗"],
+     ["How many people are in your family?","你 家 有 几 个 人","nǐ jiā yǒu jǐ gè rén","你 家 有 几 人 个"],
+     ["Why are you learning Chinese?","你 为什么 学 中文","nǐ wèishénme xué Zhōngwén","为什么 你 学 中文 吗"],
+     ["What is this?","这 是 什么","zhè shì shénme","什么 是 这 吗"]]},
+ {lv:"A1", k:"g", t:"在: where things are", ico:"📍",
+  b:"**在** (zài) = to be at / in: **我在家** = I'm at home (no 是!). In a longer sentence the place comes **before** the action: **我在家吃饭** = I eat at home. After a thing, **上** = on top, **里** = inside: **书在桌子上**.",
+  w:[["在","to be at","zài"],["在家","at home","zài jiā"],["上","on (top of)","shàng"],["里","inside","lǐ"],["包","bag","bāo"]],
+  s:[["I'm at home.","我 在 家","wǒ zài jiā","我 是 家"],
+     ["The book is on the table.","书 在 桌子 上","shū zài zhuōzi shàng","书 是 桌子 上"],
+     ["I eat at home.","我 在 家 吃饭","wǒ zài jiā chīfàn","我 吃饭 在 家"],
+     ["Where is she?","她 在 哪儿","tā zài nǎr","她 是 哪儿"],
+     ["He works in Beijing.","他 在 北京 工作","tā zài Běijīng gōngzuò","他 工作 在 北京"],
+     ["The phone is in the bag.","手机 在 包 里","shǒujī zài bāo lǐ","手机 在 里 包"]]},
+
+ {lv:"A2", k:"g", t:"想 and 要: wanting", ico:"🤲",
+  b:"**想** (xiǎng) = would like to / feel like; **要** (yào) = want to, and also 'going to'. Both go **before** the verb: **我想喝茶** = I'd like some tea, **我要去上海** = I'm going to Shanghai. Negative: **不想** (don't feel like).",
+  w:[["想喝","would like to drink","xiǎng hē"],["要去","to be going to go","yào qù"],["休息","to rest","xiūxi"],["出去","to go out","chūqù"],["上海","Shanghai","Shànghǎi"]],
+  s:[["I'd like to drink tea.","我 想 喝 茶","wǒ xiǎng hē chá","我 喝 想 茶"],
+     ["I want to buy a new phone.","我 要 买 新 手机","wǒ yào mǎi xīn shǒujī","我 买 要 新 手机"],
+     ["I don't feel like going out.","我 不 想 出去","wǒ bù xiǎng chūqù","我 想 不 出去"],
+     ["Do you want to come?","你 想 来 吗","nǐ xiǎng lái ma","你 来 想 吗"],
+     ["She is going to go to Shanghai.","她 要 去 上海","tā yào qù Shànghǎi","她 去 要 上海"],
+     ["We would like to rest.","我们 想 休息","wǒmen xiǎng xiūxi","我们 休息 想"]]},
+ {lv:"A2", k:"g", t:"能, 可以 and 会: can", ico:"🔓",
+  b:"Three ways to say 'can'. **能** (néng) = able / possible: **我能来**. **可以** (kěyǐ) = allowed: **可以进来吗?** = May I come in? **会** (huì) = a skill you learned: **我会游泳**. Negative: **不能** (can't), **不可以** (mustn't).",
+  w:[["能","to be able to","néng"],["可以","may","kěyǐ"],["进来","to come in","jìnlái"],["抽烟","to smoke","chōuyān"],["会游泳","can swim","huì yóuyǒng"]],
+  s:[["Can you come tomorrow?","你 明天 能 来 吗","nǐ míngtiān néng lái ma","你 明天 来 能 吗"],
+     ["May I come in?","我 可以 进来 吗","wǒ kěyǐ jìnlái ma","可以 我 进来 吗"],
+     ["You mustn't smoke here.","这儿 不 可以 抽烟","zhèr bù kěyǐ chōuyān","这儿 可以 不 抽烟"],
+     ["I can't go today.","我 今天 不 能 去","wǒ jīntiān bù néng qù","我 今天 能 不 去"],
+     ["Can I pay by card?","我 可以 刷卡 吗","wǒ kěyǐ shuākǎ ma","可以 我 刷卡 吗"],
+     ["He can swim.","他 会 游泳","tā huì yóuyǒng","他 游泳 会"]]},
+ {lv:"A2", k:"g", t:"正在: in the middle of", ico:"⏳",
+  b:"**正在** (zhèngzài), or just **在**, before a verb = in the middle of doing it: **我在吃饭** = I'm eating. **呢** (ne) at the end makes it sound natural: **他在睡觉呢**. Negative: **没在**: **我没在看电视**.",
+  w:[["正在","right in the middle of","zhèngzài"],["呢","(still going on)","ne"],["做饭","to cook","zuòfàn"],["没在","not (in the middle of)","méi zài"],["在睡觉","is sleeping","zài shuìjiào"]],
+  s:[["I'm eating.","我 正在 吃饭","wǒ zhèngzài chīfàn","我 吃饭 正在"],
+     ["He is sleeping.","他 在 睡觉 呢","tā zài shuìjiào ne","他 睡觉 在 呢"],
+     ["Mum is cooking.","妈妈 正在 做饭","māma zhèngzài zuòfàn","妈妈 做饭 正在"],
+     ["What are you doing?","你 在 做 什么","nǐ zài zuò shénme","你 做 在 什么"],
+     ["I'm not watching TV.","我 没 在 看 电视","wǒ méi zài kàn diànshì","我 没 看 在 电视"],
+     ["She is on the phone.","她 正在 打 电话","tā zhèngzài dǎ diànhuà","她 正在 电话 打"]]},
+ {lv:"A2", k:"g", t:"Word order: when and where", ico:"🧭",
+  b:"The order is **who → when → where → what you do**: **我明天在家吃饭** = I'm eating at home tomorrow. The time can also go first: **明天我在家吃饭**. Time and place **never** go at the end like in English.",
+  w:[["下午","afternoon","xiàwǔ"],["图书馆","library","túshūguǎn"],["学习","to study","xuéxí"],["去年","last year","qùnián"],["明天在家","at home tomorrow","míngtiān zài jiā"]],
+  s:[["I'm eating at home tomorrow.","我 明天 在 家 吃饭","wǒ míngtiān zài jiā chīfàn","我 在 家 吃饭 明天"],
+     ["She studies in the library in the afternoon.","她 下午 在 图书馆 学习","tā xiàwǔ zài túshūguǎn xuéxí","她 学习 在 图书馆 下午"],
+     ["We work at the office every day.","我们 每天 在 公司 工作","wǒmen měitiān zài gōngsī gōngzuò","我们 在 公司 工作 每天"],
+     ["Tomorrow I'm going to Shanghai.","明天 我 去 上海","míngtiān wǒ qù Shànghǎi","我 去 上海 明天"],
+     ["He reads at home in the evening.","他 晚上 在 家 看 书","tā wǎnshang zài jiā kàn shū","他 看 书 在 家 晚上"],
+     ["I was in Beijing last year.","我 去年 在 北京","wǒ qùnián zài Běijīng","我 在 北京 去年"]]},
+
+ {lv:"B1", k:"g", t:"把: doing something to it", ico:"✋",
+  b:"**把** (bǎ) brings the object **before** the verb when you do something to it: **我把门关了** = I closed the door. The verb can't stand alone after 把: it needs **了**, a place or a result: **把书放在桌子上**, **把作业做完了**.",
+  w:[["把","(moves the object forward)","bǎ"],["关","to close","guān"],["关门","to close the door","guānmén"],["放","to put","fàng"],["打扫","to clean","dǎsǎo"]],
+  s:[["I closed the door.","我 把 门 关 了","wǒ bǎ mén guān le","我 把 关 门 了"],
+     ["Put the book on the table.","把 书 放 在 桌子 上","bǎ shū fàng zài zhuōzi shàng","把 放 书 在 桌子 上"],
+     ["He ate the cake.","他 把 蛋糕 吃 了","tā bǎ dàngāo chī le","他 把 蛋糕 吃"],
+     ["Please give me the key.","请 把 钥匙 给 我","qǐng bǎ yàoshi gěi wǒ","请 把 给 我 钥匙"],
+     ["She cleaned the room.","她 把 房间 打扫 干净 了","tā bǎ fángjiān dǎsǎo gānjìng le","她 把 打扫 房间 干净 了"],
+     ["I finished the homework.","我 把 作业 做 完 了","wǒ bǎ zuòyè zuò wán le","我 把 作业 做 了 完"]]},
+ {lv:"B1", k:"g", t:"被: the passive", ico:"🫳",
+  b:"**被** (bèi) = 'by', for something that happened **to** someone, often something bad: **我的手机被偷了** = my phone was stolen. The doer can follow 被: **蛋糕被弟弟吃了**. Like 把, the verb needs **了** or a result after it.",
+  w:[["被","(passive marker)","bèi"],["偷","to steal","tōu"],["弄坏","to break","nònghuài"],["骂","to scold","mà"],["钱包","wallet","qiánbāo"]],
+  s:[["My phone was stolen.","我 的 手机 被 偷 了","wǒ de shǒujī bèi tōu le","我 的 手机 偷 被 了"],
+     ["The cake was eaten by my brother.","蛋糕 被 我 弟弟 吃 了","dàngāo bèi wǒ dìdi chī le","蛋糕 被 吃 了 我 弟弟"],
+     ["He was scolded by the teacher.","他 被 老师 骂 了","tā bèi lǎoshī mà le","他 被 骂 老师 了"],
+     ["My wallet was stolen.","我 的 钱包 被 偷 了","wǒ de qiánbāo bèi tōu le","我 的 钱包 被 偷"],
+     ["The computer was broken by him.","电脑 被 他 弄坏 了","diànnǎo bèi tā nònghuài le","电脑 他 被 弄坏 了"],
+     ["The door was blown open by the wind.","门 被 风 吹 开 了","mén bèi fēng chuī kāi le","门 被 吹 开 风 了"]]},
+ {lv:"B1", k:"g", t:"Results: 完, 到, 懂", ico:"🏁",
+  b:"A second verb after the first one shows the **result**: **完** (finished), **到** (reached / managed), **懂** (understood). **我看完了** = I finished reading; **我听懂了** = I understood (what I heard); **找到** = to find. Negative: **没** + verb + result: **我没听懂**.",
+  w:[["完","finished","wán"],["没听懂","didn't understand","méi tīngdǒng"],["找到","to find","zhǎodào"],["作业","homework","zuòyè"],["听懂","to understand (by ear)","tīngdǒng"]],
+  s:[["I finished my homework.","我 做 完 作业 了","wǒ zuò wán zuòyè le","我 完 做 作业 了"],
+     ["Did you understand?","你 听 懂 了 吗","nǐ tīng dǒng le ma","你 懂 听 了 吗"],
+     ["I didn't understand.","我 没 听 懂","wǒ méi tīng dǒng","我 不 听 懂 了"],
+     ["I found my keys.","我 找到 钥匙 了","wǒ zhǎodào yàoshi le","我 找 钥匙 到 了"],
+     ["Have you finished eating?","你 吃 完 了 吗","nǐ chī wán le ma","你 完 吃 了 吗"],
+     ["I didn't find it.","我 没 找到","wǒ méi zhǎodào","我 不 找到 了"]]},
+ {lv:"B1", k:"g", t:"因为…所以…: because… so…", ico:"➡️",
+  b:"Chinese likes to mark **both** halves of a cause: **因为** (yīnwèi) … **所以** (suǒyǐ) … = because … so …: **因为下雨所以我没去** = Because it rained, I didn't go. The cause comes **first**. **所以** always starts its half of the sentence.",
+  w:[["因为","because","yīnwèi"],["所以","so / therefore","suǒyǐ"],["所以没去","so didn't go","suǒyǐ méi qù"],["迟到","to arrive late","chídào"],["堵车","traffic jam","dǔchē"]],
+  s:[["Because it rained, I didn't go.","因为 下雨 所以 我 没 去","yīnwèi xiàyǔ suǒyǐ wǒ méi qù","所以 下雨 因为 我 没 去"],
+     ["Because I was ill, I didn't go to work.","因为 我 生病 了 所以 没 去 上班","yīnwèi wǒ shēngbìng le suǒyǐ méi qù shàngbān","因为 我 生病 了 但是 没 去 上班"],
+     ["He was late because of the traffic.","因为 堵车 所以 他 迟到 了","yīnwèi dǔchē suǒyǐ tā chídào le","因为 堵车 他 所以 迟到 了"],
+     ["Because she is busy, she can't come.","因为 她 很 忙 所以 不 能 来","yīnwèi tā hěn máng suǒyǐ bù néng lái","因为 她 很 忙 所以 能 不 来"],
+     ["It was cheap, so I bought two.","因为 很 便宜 所以 我 买 了 两 个","yīnwèi hěn piányi suǒyǐ wǒ mǎi le liǎng gè","因为 很 便宜 所以 我 买 了 二 个"],
+     ["Because I'm tired, I want to rest.","因为 我 很 累 所以 想 休息","yīnwèi wǒ hěn lèi suǒyǐ xiǎng xiūxi","所以 我 很 累 因为 想 休息"]]},
+ {lv:"B1", k:"g", t:"虽然…但是…: although… but…", ico:"↩️",
+  b:"**虽然** (suīrán) … **但是** (dànshì) … = although … but …. Unlike English, Chinese **keeps both**: **虽然很贵但是很好** = Although it's expensive, it's very good. **还是** (háishi) adds 'still': **但是我们还是去了**.",
+  w:[["虽然","although","suīrán"],["但是","but (formal)","dànshì"],["努力","hard-working","nǔlì"],["还是","still / anyway","háishi"],["虽然很贵","although expensive","suīrán hěn guì"]],
+  s:[["Although it's expensive, it's very good.","虽然 很 贵 但是 很 好","suīrán hěn guì dànshì hěn hǎo","虽然 很 贵 所以 很 好"],
+     ["Although he is busy, he still came.","虽然 他 很 忙 但是 他 还是 来 了","suīrán tā hěn máng dànshì tā háishi lái le","虽然 他 很 忙 因为 他 还是 来 了"],
+     ["Although Chinese is hard, I like it.","虽然 中文 很 难 但是 我 很 喜欢","suīrán Zhōngwén hěn nán dànshì wǒ hěn xǐhuan","但是 中文 很 难 虽然 我 很 喜欢"],
+     ["Although it rained, we still went out.","虽然 下雨 了 但是 我们 还是 出去 了","suīrán xiàyǔ le dànshì wǒmen háishi chūqù le","虽然 下雨 了 所以 我们 还是 出去 了"],
+     ["Although she works hard, she isn't tired.","虽然 她 很 努力 但是 不 累","suīrán tā hěn nǔlì dànshì bù lèi","虽然 她 很 努力 所以 不 累"],
+     ["Although the food is cheap, it's tasty.","虽然 菜 很 便宜 但是 很 好吃","suīrán cài hěn piányi dànshì hěn hǎochī","虽然 菜 很 便宜 因为 很 好吃"]]}
+);
+
 /* ===================== World Languages: Arabic (Modern Standard, A1, taught through English) =====================
    w: [arabic, english, transliteration]   s: [english, arabic words, transliteration with one entry per word] */
 var WL = WL || {};
@@ -15290,6 +15416,132 @@ WL.ar.islands = [
  {id:"ar-work", en:"Work and play", es:"Trabajo y ocio", ico:"💼", units:["Work and jobs","Free time","Phones and the internet"]},
  {id:"ar-mind", en:"Big ideas", es:"Grandes ideas", ico:"💭", units:["Feelings and opinions","Plans and the future","Comparing things"]}
 ];
+
+/* ===================== Arabic: grammar lessons (k:"g") =====================
+   Modern Standard Arabic grammar points for the Grammar Gym and the course. Transliteration
+   has one entry per word, and every sentence carries a real learner mistake:
+   s: [english, arabic, transliteration, mistake]. */
+WL.ar.units.push(
+ {lv:"A1", k:"g", t:"The article ال", ico:"🔤",
+  b:"**ال** (al-) = 'the', joined to the word: **كتاب** (kitāb) = a book, **الكتاب** (al-kitāb) = the book. Before 'sun letters' (t, d, r, s, sh, n…) the l isn't said: **الشمس** (ash-shams). An adjective after a 'the' noun takes **ال** too: **المدرس الجديد** = the new teacher.",
+  w:[["الكتاب","the book","al-kitāb"],["الشمس","the sun","ash-shams"],["القمر","the moon","al-qamar"],["الباب","the door","al-bāb"]],
+  s:[["The book is new.","الكتاب جديد","al-kitāb jadīd","كتاب الجديد"],
+     ["the big house","البيت الكبير","al-bayt al-kabīr","بيت الكبير"],
+     ["The sun is hot.","الشمس حارة","ash-shams ḥārra","الشمس حار"],
+     ["Where is the car?","أين السيارة","ayna as-sayyāra","أين سيارة"],
+     ["the new teacher","المدرس الجديد","al-mudarris al-jadīd","مدرس الجديد"],
+     ["the open door","الباب المفتوح","al-bāb al-maftūḥ","باب المفتوح"]]},
+ {lv:"A1", k:"g", t:"Masculine and feminine", ico:"⚥",
+  b:"Most feminine words end in **ة** (-a): **طالب** (ṭālib) / **طالبة** (ṭāliba). Adjectives copy the gender: **ولد صغير** (a small boy), **بنت صغيرة** (a small girl). 'This' is **هذا** (hādhā) for masculine and **هذه** (hādhihi) for feminine.",
+  w:[["صغير","small","ṣaghīr"],["صغيرة","small (feminine)","ṣaghīra"],["هذا","this (masculine)","hādhā"],["هذه","this (feminine)","hādhihi"],["طويلة","tall (feminine)","ṭawīla"]],
+  s:[["a small girl","بنت صغيرة","bint ṣaghīra","بنت صغير"],
+     ["This is my car.","هذه سيارتي","hādhihi sayyāratī","هذا سيارتي"],
+     ["The city is big.","المدينة كبيرة","al-madīna kabīra","المدينة كبير"],
+     ["He is a teacher and she is a teacher.","هو مدرس وهي مدرسة","huwa mudarris wa-hiya mudarrisa","هو مدرس وهي مدرس"],
+     ["This is a new book.","هذا كتاب جديد","hādhā kitāb jadīd","هذه كتاب جديد"],
+     ["My sister is tall.","أختي طويلة","ukhtī ṭawīla","أختي طويل"]]},
+ {lv:"A1", k:"g", t:"Possessive endings", ico:"🏷️",
+  b:"'My, your, his…' are endings: **ـي** (my), **ـك** (your), **ـه** (his), **ـها** (her), **ـنا** (our): **بيتي** (baytī) = my house, **بيتها** = her house. A word ending in **ة** turns it into **ت** first: **سيارة → سيارتي**. Never add **ال** as well: not *البيتي*.",
+  w:[["بيتي","my house","baytī"],["بيته","his house","baytuhu"],["بيتها","her house","baytuhā"],["بيتنا","our house","baytunā"],["اسمك","your name","ismuk"]],
+  s:[["my house","بيتي","baytī","البيتي"],
+     ["What is your name?","ما اسمك","mā ismuk","ما اسم أنت"],
+     ["Her car is red.","سيارتها حمراء","sayyāratuhā ḥamrāʾ","سيارةها حمراء"],
+     ["Our teacher is kind.","مدرسنا لطيف","mudarrisunā laṭīf","المدرسنا لطيف"],
+     ["His book is on the table.","كتابه على الطاولة","kitābuhu ʿalā aṭ-ṭāwila","الكتابه على الطاولة"],
+     ["My mother's name is Mona.","اسم أمي منى","ism ummī munā","اسم الأمي منى"]]},
+ {lv:"A1", k:"g", t:"Question words", ico:"❓",
+  b:"Question words go **first**: **أين** (ayna) = where, **متى** (matā) = when, **من** (man) = who, **لماذا** (limādhā) = why, **كم** (kam) = how many. 'What' is **ما** (mā) before a noun and **ماذا** (mādhā) before a verb: **ما هذا؟** but **ماذا تريد؟** After **كم** the noun stays singular: **كم أخا؟**",
+  w:[["متى","when","matā"],["لماذا","why","limādhā"],["كم","how many","kam"],["ماذا","what (before a verb)","mādhā"],["أين تسكن","where do you live","ayna taskun"]],
+  s:[["Where do you live?","أين تسكن","ayna taskun","أين أنت يسكن"],
+     ["When does the train leave?","متى يغادر القطار","matā yughādir al-qiṭār","متى تغادر القطار"],
+     ["Why are you sad?","لماذا أنت حزين","limādhā anta ḥazīn","لماذا أنت حزن"],
+     ["How many brothers do you have?","كم أخا عندك","kam akhan ʿindak","كم إخوة عندك"],
+     ["Who is that man?","من ذلك الرجل","man dhālika ar-rajul","من تلك الرجل"],
+     ["What is this?","ما هذا","mā hādhā","ماذا هذا"]]},
+
+ {lv:"A2", k:"g", t:"Negation: لا, ليس, لم", ico:"🚫",
+  b:"Three 'nots'. **لا** (lā) + present verb: **لا أعرف** = I don't know. **ليس** (laysa) = 'is not', for sentences with no verb: **هو ليس هنا**; it changes like a verb: **لست** (I'm not), **ليست** (she isn't). **لم** (lam) + present-form verb = didn't: **لم أذهب** = I didn't go (never **لم** + past).",
+  w:[["ليس","is not","laysa"],["لست","I am not","lastu"],["ليست","she is not","laysat"],["لم","did not","lam"],["لا أعرف","I don't know","lā aʿrif"]],
+  s:[["He isn't here.","هو ليس هنا","huwa laysa hunā","هو لا هنا"],
+     ["I'm not a teacher.","لست مدرسا","lastu mudarrisan","ليس أنا مدرس"],
+     ["I don't know.","لا أعرف","lā aʿrif","ليس أعرف"],
+     ["I didn't go yesterday.","لم أذهب أمس","lam adhhab ams","لم ذهبت أمس"],
+     ["She isn't busy.","هي ليست مشغولة","hiya laysat mashghūla","هي ليس مشغولة"],
+     ["We didn't eat.","لم نأكل","lam naʾkul","لا أكلنا"]]},
+ {lv:"A2", k:"g", t:"The future: سـ and سوف", ico:"🔜",
+  b:"For the future, put **سـ** (sa-) on the front of a present verb, or **سوف** (sawfa) before it: **سأذهب** = **سوف أذهب** = I will go. It only works with the **present** form: never with a past verb like *ذهبت*.",
+  w:[["سأذهب","I will go","sa-adhhab"],["سوف أشتري","I will buy","sawfa ashtarī"],["سنسافر","we will travel","sa-nusāfir"],["الأسبوع القادم","next week","al-usbūʿ al-qādim"],["الليلة","tonight","al-layla"]],
+  s:[["I will go tomorrow.","سأذهب غدا","sa-adhhab ghadan","سذهبت غدا"],
+     ["We will travel next week.","سنسافر الأسبوع القادم","sa-nusāfir al-usbūʿ al-qādim","سافرنا الأسبوع القادم"],
+     ["She will call you.","سوف تتصل بك","sawfa tattaṣil bik","سوف اتصلت بك"],
+     ["Will you come?","هل ستأتي","hal sa-taʾtī","هل سوف أتيت"],
+     ["They will study tonight.","سيدرسون الليلة","sa-yadrusūn al-layla","سدرسوا الليلة"],
+     ["I will buy a car.","سوف أشتري سيارة","sawfa ashtarī sayyāra","سوف اشتريت سيارة"]]},
+ {lv:"A2", k:"g", t:"Noun and adjective", ico:"🧷",
+  b:"The adjective comes **after** the noun and copies it: gender (**مدينة قديمة**) and 'the': **البيت الكبير** = the big house, **بيت كبير** = a big house. If only the noun has **ال**, it becomes a sentence: **البيت كبير** = the house is big.",
+  w:[["الكبير","the big","al-kabīr"],["قديمة","old (feminine)","qadīma"],["الجميلة","the beautiful (feminine)","al-jamīla"],["جديدة","new (feminine)","jadīda"],["الحديقة","the garden","al-ḥadīqa"]],
+  s:[["the big house","البيت الكبير","al-bayt al-kabīr","الكبير البيت"],
+     ["a new car","سيارة جديدة","sayyāra jadīda","جديدة سيارة"],
+     ["The house is big.","البيت كبير","al-bayt kabīr","بيت الكبير"],
+     ["an old city","مدينة قديمة","madīna qadīma","مدينة قديم"],
+     ["the beautiful garden","الحديقة الجميلة","al-ḥadīqa al-jamīla","حديقة الجميلة"],
+     ["The new teacher (woman) is kind.","المدرسة الجديدة لطيفة","al-mudarrisa al-jadīda laṭīfa","المدرسة الجديد لطيفة"]]},
+ {lv:"A2", k:"g", t:"Plurals: ـون and ـات", ico:"👥",
+  b:"Many words for people add **ـون** (-ūn) for a group of men: **مدرس → مدرسون**, and **ـات** (-āt) for women: **مدرسة → مدرسات**. Many things take **ـات** too: **سيارة → سيارات**. Plurals of **things** take a feminine **singular** adjective: **السيارات جديدة**.",
+  w:[["مدرسون","teachers (men)","mudarrisūn"],["مدرسات","teachers (women)","mudarrisāt"],["سيارات","cars","sayyārāt"],["مهندسون","engineers","muhandisūn"],["ساعات","hours","sāʿāt"]],
+  s:[["The teachers are here.","المدرسون هنا","al-mudarrisūn hunā","المدرسين هنا"],
+     ["The cars are new.","السيارات جديدة","as-sayyārāt jadīda","السيارات جديدات"],
+     ["The engineers work here.","المهندسون يعملون هنا","al-muhandisūn yaʿmalūn hunā","المهندسون يعمل هنا"],
+     ["I worked for three hours.","عملت ثلاث ساعات","ʿamiltu thalāth sāʿāt","عملت ثلاث ساعة"],
+     ["The women teachers are busy.","المدرسات مشغولات","al-mudarrisāt mashghūlāt","المدرسات مشغولون"],
+     ["The meetings are long.","الاجتماعات طويلة","al-ijtimāʿāt ṭawīla","الاجتماعات طويلات"]]},
+
+ {lv:"B1", k:"g", t:"كان: was", ico:"🕰️",
+  b:"**كان** (kāna) = was. It changes like a past verb: **كنت** (I was), **كانت** (she was), **كنا** (we were). The word after it gets **ـا** (-an) in writing: **كان الجو جميلا**. **كان** + present verb = used to: **كنت أسكن** = I used to live.",
+  w:[["كنت","I was","kuntu"],["كانت","she was","kānat"],["كنا","we were","kunnā"],["كان يعمل","he used to work","kāna yaʿmal"],["الجو","the weather (air)","al-jaww"]],
+  s:[["I was at home.","كنت في البيت","kuntu fī al-bayt","كان أنا في البيت"],
+     ["She was tired.","كانت متعبة","kānat mutʿaba","كان متعبة"],
+     ["We were in Cairo.","كنا في القاهرة","kunnā fī al-qāhira","نحن كان في القاهرة"],
+     ["The weather was nice.","كان الجو جميلا","kāna al-jaww jamīlan","كانت الجو جميلا"],
+     ["I used to live in Amman.","كنت أسكن في عمان","kuntu askun fī ʿammān","كنت يسكن في عمان"],
+     ["He used to work in a bank.","كان يعمل في بنك","kāna yaʿmal fī bank","كان أعمل في بنك"]]},
+ {lv:"B1", k:"g", t:"الذي and التي: who / which", ico:"🔗",
+  b:"After a **'the'** noun use **الذي** (alladhī) for masculine and **التي** (allatī) for feminine: **الرجل الذي يعمل هنا**, **السيارة التي اشتريتها**. After a noun **without** ال, use nothing: **رجل يعمل هنا** = a man who works here. Arabic repeats the noun as a pronoun: **المدينة التي ولدت فيها** (the city I was born in it).",
+  w:[["الذي","who / which (masculine)","alladhī"],["التي","who / which (feminine)","allatī"],["اشتريتها","I bought it","ishtaraytuhā"],["ولدت","I was born","wulidtu"]],
+  s:[["The man who works here is kind.","الرجل الذي يعمل هنا لطيف","ar-rajul alladhī yaʿmal hunā laṭīf","الرجل التي يعمل هنا لطيف"],
+     ["the car that I bought","السيارة التي اشتريتها","as-sayyāra allatī ishtaraytuhā","السيارة الذي اشتريتها"],
+     ["the book that I read","الكتاب الذي قرأته","al-kitāb alladhī qaraʾtuhu","الكتاب التي قرأته"],
+     ["a man who works here","رجل يعمل هنا","rajul yaʿmal hunā","رجل الذي يعمل هنا"],
+     ["The girl who lives next to us is a doctor.","البنت التي تسكن بجانبنا طبيبة","al-bint allatī taskun bi-jānibinā ṭabība","البنت الذي تسكن بجانبنا طبيبة"],
+     ["the city where I was born","المدينة التي ولدت فيها","al-madīna allatī wulidtu fīhā","المدينة التي ولدت"]]},
+ {lv:"B1", k:"g", t:"The dual: two of something", ico:"✌️",
+  b:"For exactly **two**, add **ـان** (-ān) instead of using the number: **كتاب → كتابان** = two books, **مدينة → مدينتان**. After a preposition or as an object it becomes **ـين** (-ayn): **بعد يومين** = after two days, **درست ساعتين**. Adjectives take the same ending: **مدينتان كبيرتان**.",
+  w:[["كتابان","two books","kitābān"],["يومين","two days","yawmayn"],["ساعتين","two hours","sāʿatayn"],["ولدان","two boys","waladān"],["مدينتان","two cities","madīnatān"]],
+  s:[["I have two books.","عندي كتابان","ʿindī kitābān","عندي اثنان كتاب"],
+     ["There are two students (women) in the class.","في الفصل طالبتان","fī al-faṣl ṭālibatān","في الفصل طالبتون"],
+     ["I'll come back in two days.","سأرجع بعد يومين","sa-arjiʿ baʿda yawmayn","سأرجع بعد يومان"],
+     ["I studied for two hours.","درست ساعتين","darastu sāʿatayn","درست ساعتان"],
+     ["He has two boys.","عنده ولدان","ʿindahu waladān","عنده اثنان ولد"],
+     ["two big cities","مدينتان كبيرتان","madīnatān kabīratān","مدينتان كبيرة"]]},
+ {lv:"B1", k:"g", t:"لن: will not", ico:"⛔",
+  b:"**لن** (lan) + present verb = won't: **لن أذهب** = I won't go. Endings in **ـون** drop the **ن**: **لن يأتوا** = they won't come. **لن** replaces **سـ / سوف**, so never use them together.",
+  w:[["لن","will not","lan"],["لن أذهب","I won't go","lan adhhab"],["أبدا","ever / never","abadan"],["لن يأتوا","they won't come","lan yaʾtū"]],
+  s:[["I won't go.","لن أذهب","lan adhhab","لن سأذهب"],
+     ["We won't forget you.","لن ننساك","lan nansāk","لن سوف ننساك"],
+     ["They won't come.","لن يأتوا","lan yaʾtū","لن يأتون"],
+     ["She won't travel tomorrow.","لن تسافر غدا","lan tusāfir ghadan","لن سافرت غدا"],
+     ["I will never smoke.","لن أدخن أبدا","lan udakhkhin abadan","لا سأدخن أبدا"],
+     ["You (all) won't understand.","لن تفهموا","lan tafhamū","لن تفهمون"]]},
+ {lv:"B1", k:"g", t:"يجب أن: must", ico:"❗",
+  b:"**يجب أن** (yajib an) + present verb = must: **يجب أن أدرس** = I must study. Don't drop **أن**, and after it endings in **ـون** lose the **ن**: **يجب أن يعملوا** = they must work. The verb after **أن** is never past.",
+  w:[["يجب أن","must","yajib an"],["أدرس","I study","adrus"],["مبكرا","early","mubakkiran"],["نغادر","we leave","nughādir"],["ترتاح","she rests","tartāḥ"]],
+  s:[["I must study.","يجب أن أدرس","yajib an adrus","يجب أدرس أن"],
+     ["You must sleep early.","يجب أن تنام مبكرا","yajib an tanām mubakkiran","يجب أن نمت مبكرا"],
+     ["We must leave now.","يجب أن نغادر الآن","yajib an nughādir al-ān","يجب نغادر الآن"],
+     ["They must work.","يجب أن يعملوا","yajib an yaʿmalū","يجب أن يعملون"],
+     ["She must rest.","يجب أن ترتاح","yajib an tartāḥ","يجب أن ارتاحت"],
+     ["I want to go home.","أريد أن أذهب إلى البيت","urīd an adhhab ilā al-bayt","أريد أذهب إلى البيت"]]}
+);
 
 /* ===================== World Languages: French (A1–A2, taught through English) =====================
    w: [target, english]   s: [english, target]   Sentences: words separated by spaces (tiles). */
@@ -15529,6 +15781,131 @@ WL.fr.islands = [
  {id:"fr-mind", en:"Big ideas", es:"Grandes ideas", ico:"💭", units:["Feelings and opinions","Plans and the future","Comparing things"]}
 ];
 
+/* ===================== French: grammar lessons (k:"g") =====================
+   Grammar points for the Grammar Gym and the course: every sentence carries a real learner
+   mistake (s: [english, french, null, mistake]). */
+WL.fr.units.push(
+ {lv:"A1", k:"g", t:"Avoir: to have", ico:"🎒",
+  b:"**Avoir** = to have: **j'ai**, **tu as**, **il / elle a**, **nous avons**, **vous avez**, **ils ont**. French uses avoir for age and some feelings: **j'ai vingt ans** (I'm twenty), **j'ai faim** (I'm hungry), **j'ai froid** (I'm cold).",
+  w:[["j'ai","I have"],["tu as","you have"],["nous avons","we have"],["ils ont","they have"],["avoir faim","to be hungry"]],
+  s:[["I have a cat.","J'ai un chat.",null,"Je suis un chat."],
+     ["Do you have a pen?","Tu as un stylo ?",null,"Tu a un stylo ?"],
+     ["We have two children.","Nous avons deux enfants.",null,"Nous avez deux enfants."],
+     ["They have a big house.","Ils ont une grande maison.",null,"Ils sont une grande maison."],
+     ["I am twenty years old.","J'ai vingt ans.",null,"Je suis vingt ans."],
+     ["She is hungry.","Elle a faim.",null,"Elle est faim."]]},
+ {lv:"A1", k:"g", t:"Aller and faire", ico:"🚶",
+  b:"Two irregular verbs you use all day. **Aller** (to go): **je vais**, **tu vas**, **il va**, **nous allons**, **vous allez**, **ils vont**. **Faire** (to do / make): **je fais**, **il fait**, **nous faisons**, **ils font**. **À + le = au**: je vais **au** marché.",
+  w:[["je vais","I go"],["nous allons","we go"],["je fais","I do"],["ils font","they do"],["au","to the (masculine)"]],
+  s:[["I'm going to the market.","Je vais au marché.",null,"Je vais à le marché."],
+     ["We are going to Paris.","Nous allons à Paris.",null,"Nous allez à Paris."],
+     ["Where are you going?","Où vas-tu ?",null,"Où va-tu ?"],
+     ["I'm doing my homework.","Je fais mes devoirs.",null,"Je fait mes devoirs."],
+     ["They are making a cake.","Ils font un gâteau.",null,"Ils faisent un gâteau."],
+     ["He goes to school by bus.","Il va à l'école en bus.",null,"Il vont à l'école en bus."]]},
+ {lv:"A1", k:"g", t:"Asking questions", ico:"❓",
+  b:"The easiest question is a statement with a rising voice: **tu parles anglais ?** Or put **est-ce que** in front: **est-ce que tu parles anglais ?** Question words: **où** (where), **quand** (when), **pourquoi** (why), **comment** (how), **qu'est-ce que** (what).",
+  w:[["est-ce que","(question marker)"],["pourquoi","why"],["quand","when"],["comment","how"],["qu'est-ce que","what (question)"]],
+  s:[["Do you speak English?","Est-ce que tu parles anglais ?",null,"Est-ce tu parles anglais ?"],
+     ["Why are you sad?","Pourquoi es-tu triste ?",null,"Pourquoi tu es-tu triste ?"],
+     ["When does the film start?","Quand est-ce que le film commence ?",null,"Quand est-ce le film commence ?"],
+     ["How are you?","Comment allez-vous ?",null,"Comment allons-vous ?"],
+     ["What are you doing?","Qu'est-ce que tu fais ?",null,"Qu'est-ce tu fais ?"],
+     ["Where do you live?","Où est-ce que tu habites ?",null,"Où est-ce que tu habite ?"]]},
+ {lv:"A1", k:"g", t:"Adjectives: agreement and place", ico:"🎨",
+  b:"Adjectives agree with the noun: add **-e** for feminine and **-s** for plural: **un petit chat**, **une petite maison**, **des petits chats**. Most go **after** the noun (**une voiture rouge**), but short common ones go **before**: **grand, petit, bon, beau, jeune, vieux**.",
+  w:[["petit","small"],["grand","big / tall"],["gentil","kind"],["beau","handsome"],["intéressant","interesting"]],
+  s:[["a small house","une petite maison",null,"une petit maison"],
+     ["a red car","une voiture rouge",null,"une rouge voiture"],
+     ["My brothers are tall.","Mes frères sont grands.",null,"Mes frères sont grand."],
+     ["a young woman","une jeune femme",null,"un jeune femme"],
+     ["an interesting book","un livre intéressant",null,"un intéressant livre"],
+     ["The girls are small.","Les filles sont petites.",null,"Les filles sont petits."]]},
+
+ {lv:"A2", k:"g", t:"Passé composé with être", ico:"🚪",
+  b:"About 15 verbs of movement take **être** in the passé composé, not avoir: **aller, venir, partir, arriver, entrer, sortir, rester, naître, mourir, tomber**... The participle agrees like an adjective: **il est allé**, **elle est allée**, **nous sommes partis**. Reflexive verbs take être too: **je me suis levé**.",
+  w:[["je suis venu","I came"],["elle est partie","she left"],["nous sommes arrivés","we arrived"],["rester","to stay"],["tomber","to fall"]],
+  s:[["I went to the beach.","Je suis allé à la plage.",null,"J'ai allé à la plage."],
+     ["She left at eight.","Elle est partie à huit heures.",null,"Elle a parti à huit heures."],
+     ["We arrived late.","Nous sommes arrivés en retard.",null,"Nous avons arrivés en retard."],
+     ["They stayed at home.","Ils sont restés à la maison.",null,"Ils ont restés à la maison."],
+     ["He fell in the street.","Il est tombé dans la rue.",null,"Il a tombé dans la rue."],
+     ["My sister came yesterday.","Ma sœur est venue hier.",null,"Ma sœur a venue hier."]]},
+ {lv:"A2", k:"g", t:"The imparfait", ico:"📼",
+  b:"The **imparfait** describes the past: what things were like, habits, and background. Take the **nous** form, drop **-ons**, add **-ais, -ais, -ait, -ions, -iez, -aient**: nous parlons → **je parlais**. Être is irregular: **j'étais**. Compare: **il pleuvait** (background) quand **je suis sorti** (event).",
+  w:[["j'étais","I was"],["il faisait","it was (weather)"],["nous habitions","we used to live"],["quand j'étais petit","when I was little"],["pleuvoir","to rain"]],
+  s:[["When I was little, I lived in Lyon.","Quand j'étais petit, j'habitais à Lyon.",null,"Quand j'ai été petit, j'habitais à Lyon."],
+     ["It was nice weather.","Il faisait beau.",null,"Il était beau."],
+     ["We used to live near the sea.","Nous habitions près de la mer.",null,"Nous habitaions près de la mer."],
+     ["It was raining when I went out.","Il pleuvait quand je suis sorti.",null,"Il pleuvait quand j'ai sorti."],
+     ["She always played the piano.","Elle jouait toujours du piano.",null,"Elle jouais toujours du piano."],
+     ["They were tired.","Ils étaient fatigués.",null,"Ils était fatigués."]]},
+ {lv:"A2", k:"g", t:"Near future: aller + infinitive", ico:"🔜",
+  b:"For plans, use **aller** + infinitive, just like 'going to': **je vais manger** = I'm going to eat. Negative: wrap **aller** with **ne … pas**: **je ne vais pas sortir**. Time words: **demain**, **ce soir**, **la semaine prochaine**.",
+  w:[["je vais manger","I'm going to eat"],["ce soir","tonight"],["la semaine prochaine","next week"],["sortir","to go out"],["visiter","to visit (a place)"]],
+  s:[["I'm going to eat at home tonight.","Je vais manger à la maison ce soir.",null,"Je vais mange à la maison ce soir."],
+     ["We are going to visit Rome next week.","Nous allons visiter Rome la semaine prochaine.",null,"Nous allons visitons Rome la semaine prochaine."],
+     ["She isn't going to go out.","Elle ne va pas sortir.",null,"Elle ne va sortir pas."],
+     ["Are you going to call him?","Tu vas l'appeler ?",null,"Tu vas appeler le ?"],
+     ["They are going to buy a car.","Ils vont acheter une voiture.",null,"Ils vont achètent une voiture."],
+     ["It's going to rain.","Il va pleuvoir.",null,"Il va pleut."]]},
+ {lv:"A2", k:"g", t:"Possessives: mon, ma, mes", ico:"🏷️",
+  b:"The possessive agrees with the **thing owned**, not the owner: **mon** frère, **ma** sœur, **mes** parents; **son** livre (his or her book), **sa** voiture, **ses** amis. Before a vowel use **mon / ton / son** even for feminine words: **mon amie**. Plural owners: **notre / nos**, **votre / vos**, **leur / leurs**.",
+  w:[["mon","my (masculine)"],["ma","my (feminine)"],["mes","my (plural)"],["notre","our"],["nos","our (plural)"]],
+  s:[["my sister","ma sœur",null,"mon sœur"],
+     ["my parents","mes parents",null,"mon parents"],
+     ["his car","sa voiture",null,"son voiture"],
+     ["my friend (a woman)","mon amie",null,"ma amie"],
+     ["Our house is small.","Notre maison est petite.",null,"Nos maison est petite."],
+     ["Their children are nice.","Leurs enfants sont gentils.",null,"Leur enfants sont gentils."]]},
+
+ {lv:"B1", k:"g", t:"Object pronouns: le, la, lui, leur", ico:"🎯",
+  b:"Direct objects: **le, la, les** (him / her / it / them). Indirect objects (to someone): **lui** (to him / her), **leur** (to them). They go **before** the verb: **je le vois**, **je lui parle**. In the passé composé, before **avoir**: **je l'ai vu**. With two verbs, before the infinitive: **je vais le faire**.",
+  w:[["je le vois","I see him"],["je lui parle","I talk to him"],["leur","to them"],["donner","to give"],["téléphoner","to phone"]],
+  s:[["I see him every day.","Je le vois tous les jours.",null,"Je vois le tous les jours."],
+     ["I talk to her often.","Je lui parle souvent.",null,"Je la parle souvent."],
+     ["We phone them on Sundays.","Nous leur téléphonons le dimanche.",null,"Nous les téléphonons le dimanche."],
+     ["I saw it yesterday.","Je l'ai vu hier.",null,"J'ai le vu hier."],
+     ["I'm going to do it tomorrow.","Je vais le faire demain.",null,"Je le vais faire demain."],
+     ["She gives him a present.","Elle lui donne un cadeau.",null,"Elle le donne un cadeau."]]},
+ {lv:"B1", k:"g", t:"Y and en", ico:"📍",
+  b:"**Y** replaces a place or **à** + thing: **je vais à Paris → j'y vais**; **je pense à mon examen → j'y pense**. **En** replaces **de** + thing, or a quantity: **je veux du pain → j'en veux**; **j'ai trois frères → j'en ai trois**. Both go before the verb.",
+  w:[["j'y vais","I'm going there"],["j'en veux","I want some"],["penser à","to think about"],["il y en a","there are some"],["en","some (of it)"]],
+  s:[["I'm going there tomorrow.","J'y vais demain.",null,"Je vais y demain."],
+     ["Do you want some? Yes, I want some.","Tu en veux ? Oui, j'en veux.",null,"Tu en veux ? Oui, je le veux."],
+     ["I have three brothers. I have three.","J'ai trois frères. J'en ai trois.",null,"J'ai trois frères. J'ai trois."],
+     ["I often think about it.","J'y pense souvent.",null,"J'en pense souvent."],
+     ["There are some in the kitchen.","Il y en a dans la cuisine.",null,"Il en y a dans la cuisine."],
+     ["We have been there.","Nous y sommes allés.",null,"Nous sommes allés y."]]},
+ {lv:"B1", k:"g", t:"The conditional", ico:"💭",
+  b:"The **conditional** = 'would'. Future stem + imparfait endings: **je parlerais**, **tu aimerais**, **il pourrait**. Use it to be polite (**je voudrais**, **pourriez-vous**) and with **si** + imparfait: **si j'avais le temps, je voyagerais**. Never put the conditional after **si**.",
+  w:[["je voudrais","I would like"],["j'aimerais","I would love"],["pourriez-vous","could you"],["si j'avais","if I had"],["je voyagerais","I would travel"]],
+  s:[["I would like a coffee, please.","Je voudrais un café, s'il vous plaît.",null,"Je voudrai un café, s'il vous plaît."],
+     ["Could you help me?","Pourriez-vous m'aider ?",null,"Pouvriez-vous m'aider ?"],
+     ["If I had time, I would travel.","Si j'avais le temps, je voyagerais.",null,"Si j'aurais le temps, je voyagerais."],
+     ["I would love to live in Canada.","J'aimerais habiter au Canada.",null,"J'aimerai habiter au Canada."],
+     ["If it rained, we would stay at home.","S'il pleuvait, nous resterions à la maison.",null,"S'il pleuvrait, nous resterions à la maison."],
+     ["She would come with us.","Elle viendrait avec nous.",null,"Elle venirait avec nous."]]},
+ {lv:"B1", k:"g", t:"The subjunctive: il faut que", ico:"⚖️",
+  b:"After expressions of need, wish or feeling + **que**, French uses the **subjunctive**: **il faut que je parte** (I have to leave), **je veux que tu viennes**. Regular forms come from **ils** + **-e, -es, -e, -ions, -iez, -ent**: ils finissent → **que je finisse**. Irregular: **que je sois**, **que j'aie**, **que je fasse**, **que j'aille**.",
+  w:[["il faut que","it's necessary that"],["je veux que","I want (someone) to"],["bien que","although"],["avant que","before"],["finir","to finish"]],
+  s:[["I have to leave.","Il faut que je parte.",null,"Il faut que je pars."],
+     ["I want you to come.","Je veux que tu viennes.",null,"Je veux que tu viens."],
+     ["We have to finish today.","Il faut que nous finissions aujourd'hui.",null,"Il faut que nous finissons aujourd'hui."],
+     ["She wants me to be happy.","Elle veut que je sois heureux.",null,"Elle veut que je suis heureux."],
+     ["Although it's late, I'm staying.","Bien qu'il soit tard, je reste.",null,"Bien qu'il est tard, je reste."],
+     ["You have to do your homework.","Il faut que tu fasses tes devoirs.",null,"Il faut que tu fais tes devoirs."]]},
+ {lv:"B1", k:"g", t:"Relative pronouns: qui, que, où", ico:"🔗",
+  b:"**Qui** is the subject of the next verb: **l'homme qui parle**. **Que** is the object (someone else does the action): **le livre que je lis**. **Où** = where or when: **la ville où j'habite**, **le jour où je suis né**. **Que** becomes **qu'** before a vowel; **qui** never does.",
+  w:[["qui","who / which (subject)"],["que","that / which (object)"],["où","where / when"],["la ville","town"],["le jour où","the day when"]],
+  s:[["The man who is talking is my uncle.","L'homme qui parle est mon oncle.",null,"L'homme que parle est mon oncle."],
+     ["The book that I'm reading is long.","Le livre que je lis est long.",null,"Le livre qui je lis est long."],
+     ["The town where I live is pretty.","La ville où j'habite est jolie.",null,"La ville que j'habite est jolie."],
+     ["the day when I was born","le jour où je suis né",null,"le jour que je suis né"],
+     ["The girl he loves lives in Nice.","La fille qu'il aime habite à Nice.",null,"La fille qui il aime habite à Nice."],
+     ["the friend who helps me","l'ami qui m'aide",null,"l'ami que m'aide"]]}
+);
+
 /* ===================== World Languages: Portuguese (Brazil, A1, taught through English) ===================== */
 var WL = WL || {};
 WL.pt = {code:"pt", name:"Portuguese", self:"Português", flag:"🇧🇷", tts:"pt-BR", dir:"ltr", typing:true, music:"samba", bosses:[["🐊","O Jacaré-Açu"],["🧜","A Iara"],["🔥","O Boitatá"],["🌪️","O Saci"]], units:[
@@ -15762,6 +16139,131 @@ WL.pt.islands = [
  {id:"pt-mind", en:"Big ideas", es:"Grandes ideas", ico:"💭", units:["Feelings and opinions","Plans and the future","Comparing things"]}
 ];
 
+/* ===================== Portuguese: grammar lessons (k:"g") =====================
+   Brazilian Portuguese grammar points for the Grammar Gym and the course: every sentence carries
+   a real learner mistake (s: [english, portuguese, null, mistake]). */
+WL.pt.units.push(
+ {lv:"A1", k:"g", t:"Ter: to have", ico:"🎒",
+  b:"**Ter** = to have: **eu tenho**, **você tem**, **ele / ela tem**, **nós temos**, **eles têm**. Age uses ter too: **eu tenho vinte anos**. In Brazil **tem** also means 'there is / there are': **tem um café aqui perto**.",
+  w:[["eu tenho","I have"],["você tem","you have"],["nós temos","we have"],["tem","there is"],["anos","years (of age)"]],
+  s:[["I have a dog.","Eu tenho um cachorro.",null,"Eu tem um cachorro."],
+     ["Do you have a car?","Você tem carro?",null,"Você tenho carro?"],
+     ["We have three children.","Nós temos três filhos.",null,"Nós tem três filhos."],
+     ["I am twenty years old.","Eu tenho vinte anos.",null,"Eu sou vinte anos."],
+     ["There is a café near here.","Tem um café aqui perto.",null,"Tenho um café aqui perto."],
+     ["She has two sisters.","Ela tem duas irmãs.",null,"Ela tem dois irmãs."]]},
+ {lv:"A1", k:"g", t:"Contractions: no, na, do, da", ico:"🧩",
+  b:"Prepositions join the article: **em + o = no**, **em + a = na**, **de + o = do**, **de + a = da**, **a + o = ao**. So: **no Brasil**, **na praia**, **o livro do Pedro**, **a casa da Ana**, **vou ao mercado**. Cities usually have no article: **em São Paulo**, **de Lisboa**.",
+  w:[["no","in the (masculine)"],["na","in the (feminine)"],["do","of the (masculine)"],["da","of the (feminine)"],["ao","to the"]],
+  s:[["I live in Brazil.","Eu moro no Brasil.",null,"Eu moro em o Brasil."],
+     ["We are at the beach.","Nós estamos na praia.",null,"Nós estamos no praia."],
+     ["This is Pedro's book.","Este é o livro do Pedro.",null,"Este é o livro de o Pedro."],
+     ["Ana's house is big.","A casa da Ana é grande.",null,"A casa do Ana é grande."],
+     ["I'm going to the market.","Vou ao mercado.",null,"Vou a o mercado."],
+     ["She works in São Paulo.","Ela trabalha em São Paulo.",null,"Ela trabalha no São Paulo."]]},
+ {lv:"A1", k:"g", t:"Asking questions", ico:"❓",
+  b:"A yes/no question is just a statement with a rising voice: **você fala inglês?** Question words: **onde** (where), **quando** (when), **por que** (why, two words), **como** (how), **o que** (what), **quem** (who). The answer 'because' is **porque**, one word.",
+  w:[["onde","where"],["quando","when"],["por que","why"],["porque","because"],["o que","what"]],
+  s:[["Where do you live?","Onde você mora?",null,"Onde você moro?"],
+     ["Why are you sad? Because I'm tired.","Por que você está triste? Porque estou cansado.",null,"Porque você está triste? Por que estou cansado."],
+     ["When does the class start?","Quando começa a aula?",null,"Quando começo a aula?"],
+     ["What are you doing?","O que você está fazendo?",null,"Que o você está fazendo?"],
+     ["Who is that man?","Quem é aquele homem?",null,"Quem está aquele homem?"],
+     ["How are you?","Como você está?",null,"Como você estás?"]]},
+ {lv:"A1", k:"g", t:"Adjectives: agreement", ico:"🎨",
+  b:"Adjectives go **after** the noun and agree with it: **o carro novo**, **a casa nova**, **os carros novos**, **as casas novas**. Adjectives ending in **-e** don't change for gender: **um livro grande**, **uma casa grande**. Plural adds **-s**: **grandes**.",
+  w:[["novo","new"],["bonito","pretty / nice"],["caros","expensive (plural)"],["nova","new (feminine)"],["alto","tall"]],
+  s:[["a new house","uma casa nova",null,"uma casa novo"],
+     ["The shoes are expensive.","Os sapatos são caros.",null,"Os sapatos são caro."],
+     ["a pretty city","uma cidade bonita",null,"uma bonito cidade"],
+     ["My brothers are tall.","Meus irmãos são altos.",null,"Meus irmãos são alto."],
+     ["The tickets are cheap.","As passagens são baratas.",null,"As passagens são baratos."],
+     ["a big house","uma casa grande",null,"uma casa granda"]]},
+
+ {lv:"A2", k:"g", t:"Ir + infinitive: the future", ico:"🔜",
+  b:"For plans, use **ir** + infinitive: **eu vou viajar** = I'm going to travel. **Ir**: **eu vou**, **você vai**, **nós vamos**, **eles vão**. Negative: **não** before **ir**: **eu não vou sair**. Time words: **amanhã**, **hoje à noite**, **na semana que vem**.",
+  w:[["eu vou","I go / I'm going"],["nós vamos","we go / we're going"],["vamos comer","we're going to eat"],["hoje à noite","tonight"],["vai chover","it's going to rain"]],
+  s:[["I'm going to travel tomorrow.","Eu vou viajar amanhã.",null,"Eu vou viajo amanhã."],
+     ["We are going to eat at home tonight.","Nós vamos comer em casa hoje à noite.",null,"Nós vai comer em casa hoje à noite."],
+     ["She isn't going to go out.","Ela não vai sair.",null,"Ela vai não sair."],
+     ["Are you going to study?","Você vai estudar?",null,"Você vai estuda?"],
+     ["They are going to buy a car.","Eles vão comprar um carro.",null,"Eles vai comprar um carro."],
+     ["It's going to rain.","Vai chover.",null,"Vai chove."]]},
+ {lv:"A2", k:"g", t:"The imperfect", ico:"📼",
+  b:"The **imperfeito** describes the past: what things were like and what you used to do. **-ar → -ava**: **eu falava**; **-er / -ir → -ia**: **eu comia**, **eu morava**. Irregular: **eu era** (ser), **eu tinha** (ter). Compare: **eu estava dormindo** (background) **quando você ligou** (event).",
+  w:[["eu era","I was (ser)"],["eu tinha","I had (back then)"],["eu morava","I used to live"],["quando eu era criança","when I was a child"],["fazia frio","it was cold"]],
+  s:[["When I was a child, I lived in Rio.","Quando eu era criança, eu morava no Rio.",null,"Quando eu fui criança, eu morei no Rio."],
+     ["I had a cat.","Eu tinha um gato.",null,"Eu tenha um gato."],
+     ["We always played football.","Nós sempre jogávamos futebol.",null,"Nós sempre jogava futebol."],
+     ["She used to work at a bank.","Ela trabalhava num banco.",null,"Ela trabalhia num banco."],
+     ["It was cold.","Fazia frio.",null,"Fazio frio."],
+     ["They were happy.","Eles eram felizes.",null,"Eles era felizes."]]},
+ {lv:"A2", k:"g", t:"Possessives: meu, minha, seu", ico:"🏷️",
+  b:"Possessives agree with the **thing owned**: **meu** carro, **minha** casa, **meus** livros, **minhas** amigas. **Seu / sua** = your (or his / her). To avoid confusion Brazilians say **dele** (his) and **dela** (her) after the noun: **o carro dele**. **Nosso / nossa** = our.",
+  w:[["meu","my (masculine)"],["minha","my (feminine)"],["dele","his"],["dela","her (owner)"],["nosso","our"]],
+  s:[["my house","minha casa",null,"meu casa"],
+     ["my books","meus livros",null,"minhas livros"],
+     ["his car","o carro dele",null,"o carro de ele"],
+     ["her mother","a mãe dela",null,"a dela mãe"],
+     ["Our city is small.","Nossa cidade é pequena.",null,"Nosso cidade é pequena."],
+     ["Is this your bag?","Esta é a sua bolsa?",null,"Esta é a seu bolsa?"]]},
+ {lv:"A2", k:"g", t:"Estar + -ndo: right now", ico:"⏳",
+  b:"For something happening right now, Brazilians use **estar** + the **gerund**: **-ar → -ando**, **-er → -endo**, **-ir → -indo**. **Eu estou estudando** = I'm studying; **ela está comendo**; **nós estamos saindo**. In the past: **eu estava dormindo**.",
+  w:[["estou estudando","I'm studying"],["está comendo","is eating"],["estamos saindo","we're leaving"],["estava dormindo","was sleeping"],["agora","now"]],
+  s:[["I'm studying now.","Estou estudando agora.",null,"Estou estudar agora."],
+     ["She is eating.","Ela está comendo.",null,"Ela está comindo."],
+     ["We are leaving.","Nós estamos saindo.",null,"Nós estamos saendo."],
+     ["I was sleeping when you called.","Eu estava dormindo quando você ligou.",null,"Eu estava dormir quando você ligou."],
+     ["What are you doing?","O que você está fazendo?",null,"O que você é fazendo?"],
+     ["It's raining.","Está chovendo.",null,"Está chovindo."]]},
+
+ {lv:"B1", k:"g", t:"The conditional", ico:"💭",
+  b:"The **futuro do pretérito** = 'would'. Infinitive + **-ia**: **eu falaria**, **você gostaria**, **nós iríamos**. Irregular stems: **fazer → faria**, **dizer → diria**, **trazer → traria**. Use it to be polite (**eu gostaria de um café**) and with **se** + imperfect subjunctive: **se eu tivesse tempo, eu viajaria**.",
+  w:[["eu gostaria","I would like"],["eu faria","I would do"],["seria","it would be"],["se eu tivesse","if I had"],["viajaria","would travel"]],
+  s:[["I would like a coffee, please.","Eu gostaria de um café, por favor.",null,"Eu gostaria um café, por favor."],
+     ["What would you do?","O que você faria?",null,"O que você fazeria?"],
+     ["It would be better to wait.","Seria melhor esperar.",null,"Seria mais bom esperar."],
+     ["If I had time, I would travel.","Se eu tivesse tempo, eu viajaria.",null,"Se eu teria tempo, eu viajaria."],
+     ["She said she would come.","Ela disse que viria.",null,"Ela disse que vinharia."],
+     ["Would you help me?","Você me ajudaria?",null,"Você me ajudarias?"]]},
+ {lv:"B1", k:"g", t:"The present subjunctive", ico:"⚖️",
+  b:"After wishes, doubts and feelings + **que**, use the **subjunctive**: **espero que você venha**. Take the **eu** form, drop **-o**, and swap the vowel: **-ar → -e** (falo → **fale**), **-er / -ir → -a** (como → **coma**). Irregular: **seja** (ser), **esteja**, **vá** (ir), **tenha**, **faça**.",
+  w:[["espero que","I hope that"],["é importante que","it's important that"],["talvez ele esteja","maybe he is"],["venha","come (subjunctive)"],["seja","be (subjunctive)"]],
+  s:[["I hope you come.","Espero que você venha.",null,"Espero que você vem."],
+     ["It's important that you study.","É importante que você estude.",null,"É importante que você estuda."],
+     ["Maybe he is at home.","Talvez ele esteja em casa.",null,"Talvez ele está em casa."],
+     ["I want you to be happy.","Quero que você seja feliz.",null,"Quero que você é feliz."],
+     ["I doubt that she knows.","Duvido que ela saiba.",null,"Duvido que ela sabe."],
+     ["We hope they have time.","Esperamos que eles tenham tempo.",null,"Esperamos que eles têm tempo."]]},
+ {lv:"B1", k:"g", t:"Object pronouns", ico:"🎯",
+  b:"In Brazil the pronoun usually goes **before** the verb: **eu te amo**, **ela me ligou**. **Te / me / nos** for people you talk to. For 'him / her / it' speech often uses **ele / ela** after the verb (**eu vi ele**), but writing uses **o / a** before it: **eu o vi**. **Lhe** = to you / him (formal).",
+  w:[["te","you (object)"],["me","me"],["eu o vi","I saw him"],["me ligou","called me"],["ajudar","to help"]],
+  s:[["I love you.","Eu te amo.",null,"Eu tu amo."],
+     ["She called me yesterday.","Ela me ligou ontem.",null,"Ela eu ligou ontem."],
+     ["Can you help me?","Você pode me ajudar?",null,"Você pode eu ajudar?"],
+     ["I saw him at the party.","Eu o vi na festa.",null,"Eu lhe vi na festa."],
+     ["We'll call you tomorrow.","Nós te ligamos amanhã.",null,"Nós tu ligamos amanhã."],
+     ["Tell me the truth.","Me diga a verdade.",null,"Eu diga a verdade."]]},
+ {lv:"B1", k:"g", t:"Por and para", ico:"↔️",
+  b:"**Para** = purpose, destination, deadline, recipient: **estudo para aprender**, **vou para casa**, **para amanhã**, **um presente para você**. **Por** = cause, through, exchange, duration: **obrigado por tudo**, **passei pelo parque**, **paguei 20 reais pelo livro**. **Por + o = pelo**, **por + a = pela**.",
+  w:[["para","for / to (purpose)"],["por","for / through (cause)"],["pelo","through the / for the"],["obrigado por","thanks for"],["um presente","a present"]],
+  s:[["This present is for you.","Este presente é para você.",null,"Este presente é por você."],
+     ["Thanks for everything.","Obrigado por tudo.",null,"Obrigado para tudo."],
+     ["I'm going home.","Vou para casa.",null,"Vou por casa."],
+     ["I walked through the park.","Passei pelo parque.",null,"Passei para o parque."],
+     ["I study to learn.","Estudo para aprender.",null,"Estudo por aprender."],
+     ["I paid ten reais for the book.","Paguei dez reais pelo livro.",null,"Paguei dez reais para o livro."]]},
+ {lv:"B1", k:"g", t:"Relatives: que, quem, onde", ico:"🔗",
+  b:"**Que** is the all-purpose 'who / that / which': **o homem que trabalha aqui**, **o livro que eu li**. After a preposition, people take **quem**: **a pessoa com quem falei**. **Onde** = where: **a cidade onde eu moro**. **O que** = what (the thing that): **não entendi o que ele disse**.",
+  w:[["que","who / that"],["quem","whom"],["onde moro","where I live"],["com quem","with whom"],["a pessoa","person"]],
+  s:[["The man who works here is nice.","O homem que trabalha aqui é simpático.",null,"O homem quem trabalha aqui é simpático."],
+     ["the book that I read","o livro que eu li",null,"o livro o que eu li"],
+     ["the person I spoke with","a pessoa com quem falei",null,"a pessoa com que falei"],
+     ["The city where I live is big.","A cidade onde eu moro é grande.",null,"A cidade que eu moro é grande."],
+     ["I didn't understand what he said.","Não entendi o que ele disse.",null,"Não entendi que o ele disse."],
+     ["the friend who helped me","o amigo que me ajudou",null,"o amigo quem me ajudou"]]}
+);
+
 /* ===================== More languages in the main game =====================
    French, Portuguese, Mandarin Chinese and Arabic as full courses next to Spanish and English,
    always taught through English. Their content lives in lang_*.js (WL.<code> packs) and is
@@ -15826,7 +16328,7 @@ const xlSpace = s => String(s).replace(/([㐀-鿿，。])\s+(?=[㐀-鿿，。])/
       });
       u.w.forEach(([t, en, r]) => { if(r){ XL_ROM[t] = r; if(!/\s/.test(t)) XL_TOKROM[code][t] = r; } });
       (course[lv] = course[lv] || []).push({
-        t:u.t, k:GRAMMAR.test(u.t) ? "g" : /Greetings/.test(u.t) ? "f" : "t", b:u.b, ico:u.ico,
+        t:u.t, k:u.k || (GRAMMAR.test(u.t) ? "g" : /Greetings/.test(u.t) ? "f" : "t"), b:u.b, ico:u.ico,
         w:u.w.map(([t, en, r]) => [r ? `${t} (${r})` : t, en]), it, xl:code
       });
     });
@@ -18022,8 +18524,7 @@ if(window.__PGM_TEST) window.__tp = {get TP(){ return TP; }, TPS, tpStart, tpGo,
    misses come back until they're right. At the end every point gets a mastery verdict.
    Results from Practice, Level Select, Survivor and Custom grammar rounds are recorded too,
    so "My weak spots" can build a workout from the points you miss most.
-   Spanish / English: the course's grammar lessons (k:"g"). French, Portuguese, Mandarin,
-   Arabic: every unit except Greetings, since each unit's tip teaches a grammar point. */
+   Every course lists its grammar lessons (k:"g"); fr/pt/zh/ar get theirs from lang_<code>3.js. */
 MODES.push({id:10, name:"Grammar Gym", ico:"📐", color:"#F7A6C4", desc:"Pick grammar points and drill just those."});
 if(typeof XL_MODES !== "undefined" && !XL_MODES.includes(10)) XL_MODES.push(10);
 
@@ -18034,7 +18535,7 @@ Object.assign(I18N.en, {
   gWeakPicked:"Weak spots picked: {n}", gClear:"Clear", gRoundsL:"Rounds",
   gSel:"{n} selected", gSelNone:"Pick at least one grammar point to start.", gNone:"No grammar points at this level.",
   gKey:"✅ solid · 🟡 getting there · 🔴 needs work · ⚪ new",
-  gDoneT:"Workout done!", gDoneB:"{c} of {n} right ({p}%).", gOverT:"How each point went",
+  gDoneT:"Workout done!", gKeepT:"Keep training!", gDoneB:"{c} of {n} right ({p}%).", gOverT:"How each point went",
   gSolid:"Solid", gShaky:"Getting there", gWork:"Needs work", gNew:"New", gOf:"{r} of {n}",
   gBadge:"Grammar Gym"
 });
@@ -18045,7 +18546,7 @@ Object.assign(I18N.es, {
   gWeakPicked:"Puntos débiles elegidos: {n}", gClear:"Borrar", gRoundsL:"Rondas",
   gSel:"{n} elegidos", gSelNone:"Elige al menos un punto de gramática para empezar.", gNone:"No hay puntos de gramática en este nivel.",
   gKey:"✅ dominado · 🟡 casi · 🔴 hay que practicar · ⚪ nuevo",
-  gDoneT:"¡Entrenamiento terminado!", gDoneB:"{c} de {n} bien ({p} %).", gOverT:"Cómo te fue en cada punto",
+  gDoneT:"¡Entrenamiento terminado!", gKeepT:"¡Sigue entrenando!", gDoneB:"{c} de {n} bien ({p} %).", gOverT:"Cómo te fue en cada punto",
   gSolid:"Dominado", gShaky:"Casi", gWork:"Hay que practicar", gNew:"Nuevo", gOf:"{r} de {n}",
   gBadge:"Gimnasio de gramática"
 });
@@ -18063,7 +18564,8 @@ function gymLessons(target, lv){
   const out = [];
   L.forEach((c, idx) => {
     const k = c.k || "g";
-    if(xl ? k === "f" : k !== "g") return;
+    if(k !== "g") return;
+    if(/greeting|saludo/i.test(c.t)) return;   // greetings are phrases, not a grammar point
     let label = c.t;
     if(xl){ const bold = [...(c.b || "").matchAll(/\*\*(.+?)\*\*/g)].map(m => m[1]).slice(0, 2); if(bold.length) label += " · " + bold.join(", "); }
     out.push({lv, idx, t:c.t, label});
@@ -18192,12 +18694,24 @@ renderHud = (orig => function(){
   $("hudBadge").textContent = "📐 " + (lv.length > 1 ? lv[0] + "–" + lv[lv.length - 1] : lv[0] || S.level);
 })(renderHud);
 
+/* A workout that went badly (under 60%) still finishes, but without the victory fanfare,
+   confetti and cheering Leo: those parts all key off "conquered", so they run as if it ended */
+const gymPoor = () => !!(S && S.mode === 10 && S.status === "conquered" && S.stats.answered && S.stats.correct / S.stats.answered < 0.6);
+const gymCalm = f => function(){
+  if(!gymPoor()) return f.apply(this, arguments);
+  S.status = "gameover";
+  try{ return f.apply(this, arguments); } finally { S.status = "conquered"; }
+};
+playOutcome = gymCalm(playOutcome);
+runJuice = gymCalm(runJuice);
 showOver = (orig => function(){
-  orig();
+  const poor = gymPoor();
+  gymCalm(orig)();
   if(!S || S.mode !== 10) return;
   const done = S.status === "conquered", n = S.stats.answered, c = S.stats.correct, p = n ? Math.round(100 * c / n) : 0;
-  $("overTitle").textContent = done ? t("gDoneT") : t("gameOver");
-  $("overEmoji").textContent = done ? "📐" : "💀";
+  $("overTitle").textContent = !done ? t("gameOver") : poor ? t("gKeepT") : t("gDoneT");
+  $("overEmoji").textContent = !done ? "💀" : poor ? "💪" : "📐";
+  $("overTitle").classList.toggle("win", done && !poor);
   const rows = S.gym.picks.map(pk => {
     const s = S.gym.per[gymKey(pk.lv, pk.t)] || {r:0, w:0}, tot = s.r + s.w;
     const m = gymMastery(gymRec(S.target, gymKey(pk.lv, pk.t)));
@@ -18426,7 +18940,7 @@ showOver = (orig => function(){
   try{
     const el = $("overEmoji"), e = (el.textContent || "").trim();
     if(e && !el.querySelector("svg")){
-      const mood = e === "💀" ? "sad" : e === "⏱️" ? "wow" : "cheer";
+      const mood = e === "💀" ? "sad" : e === "⏱️" ? "wow" : e === "💪" ? "think" : "cheer";
       el.classList.add("leoOver");
       el.innerHTML = lionSVG(mood) + (mood === "cheer" ? "" : `<span class="leoBadge">${esc(e)}</span>`);
     }

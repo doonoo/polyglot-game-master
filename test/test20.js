@@ -80,10 +80,29 @@ function pickMode(target, native){
     if($("over").hidden) fail(target, "end screen not shown");
     const rows = d.querySelectorAll("#overText .gover li");
     if(rows.length !== 2) fail(target, "end screen rows", rows.length);
+    if(!/Workout done|Entrenamiento terminado/.test($("overTitle").textContent)) fail(target, "good workout title", $("overTitle").textContent);
     // weak spots: the miss is on record
     const weak = G.gymWeak(target, 3);
     if(!weak.length) fail(target, "no weak spot after a miss");
   }
+
+  // no greetings in the grammar list, and every course has real grammar points at each level
+  for(const T of ["Spanish","English","French","Portuguese","Mandarin Chinese","Arabic"])
+    for(const lv of G.gymLevels(T)){
+      const L = G.gymLessons(T, lv);
+      if(L.some(x => /greeting|saludo/i.test(x.t))) fail(T, lv, "greetings listed as grammar");
+      if(L.length < 4) fail(T, lv, "too few grammar points", L.length);
+    }
+  // a bad workout ends calmly: no victory title
+  pickMode("Spanish", "English");
+  G.gymSetSel("Spanish", [G.gymKey("A1", G.gymLessons("Spanish", "A1")[0].t)]);
+  d.querySelector('#gymBody [data-grounds]').value = "10"; d.querySelector('#gymBody [data-grounds]').dispatchEvent(new w.Event("change", {bubbles:true}));
+  $("startBtn").click();
+  for(let i = 0; i < 12 && P.S.status === "playing"; i++){ answer(i < 3); if($("nextBtn") && !$("nextBtn").hidden) $("nextBtn").click(); }
+  await sleep(20);
+  if(P.S.status !== "conquered") fail("bad workout did not finish", P.S.status);
+  if(!/Keep training|Sigue entrenando/.test($("overTitle").textContent)) fail("bad workout title", $("overTitle").textContent);
+  if($("overTitle").classList.contains("win")) fail("bad workout marked as a win");
 
   // Practice results feed the weak-spot list
   w.localStorage.clear();

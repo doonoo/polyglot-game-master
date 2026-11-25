@@ -4,8 +4,7 @@
    misses come back until they're right. At the end every point gets a mastery verdict.
    Results from Practice, Level Select, Survivor and Custom grammar rounds are recorded too,
    so "My weak spots" can build a workout from the points you miss most.
-   Spanish / English: the course's grammar lessons (k:"g"). French, Portuguese, Mandarin,
-   Arabic: every unit except Greetings, since each unit's tip teaches a grammar point. */
+   Every course lists its grammar lessons (k:"g"); fr/pt/zh/ar get theirs from lang_<code>3.js. */
 MODES.push({id:10, name:"Grammar Gym", ico:"📐", color:"#F7A6C4", desc:"Pick grammar points and drill just those."});
 if(typeof XL_MODES !== "undefined" && !XL_MODES.includes(10)) XL_MODES.push(10);
 
@@ -16,7 +15,7 @@ Object.assign(I18N.en, {
   gWeakPicked:"Weak spots picked: {n}", gClear:"Clear", gRoundsL:"Rounds",
   gSel:"{n} selected", gSelNone:"Pick at least one grammar point to start.", gNone:"No grammar points at this level.",
   gKey:"✅ solid · 🟡 getting there · 🔴 needs work · ⚪ new",
-  gDoneT:"Workout done!", gDoneB:"{c} of {n} right ({p}%).", gOverT:"How each point went",
+  gDoneT:"Workout done!", gKeepT:"Keep training!", gDoneB:"{c} of {n} right ({p}%).", gOverT:"How each point went",
   gSolid:"Solid", gShaky:"Getting there", gWork:"Needs work", gNew:"New", gOf:"{r} of {n}",
   gBadge:"Grammar Gym"
 });
@@ -27,7 +26,7 @@ Object.assign(I18N.es, {
   gWeakPicked:"Puntos débiles elegidos: {n}", gClear:"Borrar", gRoundsL:"Rondas",
   gSel:"{n} elegidos", gSelNone:"Elige al menos un punto de gramática para empezar.", gNone:"No hay puntos de gramática en este nivel.",
   gKey:"✅ dominado · 🟡 casi · 🔴 hay que practicar · ⚪ nuevo",
-  gDoneT:"¡Entrenamiento terminado!", gDoneB:"{c} de {n} bien ({p} %).", gOverT:"Cómo te fue en cada punto",
+  gDoneT:"¡Entrenamiento terminado!", gKeepT:"¡Sigue entrenando!", gDoneB:"{c} de {n} bien ({p} %).", gOverT:"Cómo te fue en cada punto",
   gSolid:"Dominado", gShaky:"Casi", gWork:"Hay que practicar", gNew:"Nuevo", gOf:"{r} de {n}",
   gBadge:"Gimnasio de gramática"
 });
@@ -45,7 +44,8 @@ function gymLessons(target, lv){
   const out = [];
   L.forEach((c, idx) => {
     const k = c.k || "g";
-    if(xl ? k === "f" : k !== "g") return;
+    if(k !== "g") return;
+    if(/greeting|saludo/i.test(c.t)) return;   // greetings are phrases, not a grammar point
     let label = c.t;
     if(xl){ const bold = [...(c.b || "").matchAll(/\*\*(.+?)\*\*/g)].map(m => m[1]).slice(0, 2); if(bold.length) label += " · " + bold.join(", "); }
     out.push({lv, idx, t:c.t, label});
@@ -174,12 +174,24 @@ renderHud = (orig => function(){
   $("hudBadge").textContent = "📐 " + (lv.length > 1 ? lv[0] + "–" + lv[lv.length - 1] : lv[0] || S.level);
 })(renderHud);
 
+/* A workout that went badly (under 60%) still finishes, but without the victory fanfare,
+   confetti and cheering Leo: those parts all key off "conquered", so they run as if it ended */
+const gymPoor = () => !!(S && S.mode === 10 && S.status === "conquered" && S.stats.answered && S.stats.correct / S.stats.answered < 0.6);
+const gymCalm = f => function(){
+  if(!gymPoor()) return f.apply(this, arguments);
+  S.status = "gameover";
+  try{ return f.apply(this, arguments); } finally { S.status = "conquered"; }
+};
+playOutcome = gymCalm(playOutcome);
+runJuice = gymCalm(runJuice);
 showOver = (orig => function(){
-  orig();
+  const poor = gymPoor();
+  gymCalm(orig)();
   if(!S || S.mode !== 10) return;
   const done = S.status === "conquered", n = S.stats.answered, c = S.stats.correct, p = n ? Math.round(100 * c / n) : 0;
-  $("overTitle").textContent = done ? t("gDoneT") : t("gameOver");
-  $("overEmoji").textContent = done ? "📐" : "💀";
+  $("overTitle").textContent = !done ? t("gameOver") : poor ? t("gKeepT") : t("gDoneT");
+  $("overEmoji").textContent = !done ? "💀" : poor ? "💪" : "📐";
+  $("overTitle").classList.toggle("win", done && !poor);
   const rows = S.gym.picks.map(pk => {
     const s = S.gym.per[gymKey(pk.lv, pk.t)] || {r:0, w:0}, tot = s.r + s.w;
     const m = gymMastery(gymRec(S.target, gymKey(pk.lv, pk.t)));
