@@ -9,17 +9,13 @@ Free, open source, works offline. No account, no ads, no tracking.
 
 ## Screenshots
 
-<p>
-  <img src="docs/screenshots/menu-phone.png" alt="Main menu with Leo the lion, daily quests and streak" width="190">
-  <img src="docs/screenshots/question-phone.png" alt="A Quick Pick multiple-choice question in Spanish" width="190">
-  <img src="docs/screenshots/feedback-phone.png" alt="Feedback card with the correct answer and a grammar tip" width="190">
-  <img src="docs/screenshots/french-phone.png" alt="An Error Hunter round in French" width="190">
-</p>
-<p>
-  <img src="docs/screenshots/mandarin-phone.png" alt="A Meaning Check round in Mandarin Chinese" width="190">
-  <img src="docs/screenshots/modes-desktop.png" alt="The ten game modes on desktop" width="400">
-  <img src="docs/screenshots/game-desktop.png" alt="A Syntax Scramble round on desktop" width="400">
-</p>
+On a phone: the menu, a Spanish question, feedback with a grammar tip, then French and Mandarin rounds.
+
+<img src="docs/screenshots/overview-phones.png" alt="Five phone screenshots: the main menu with Leo the lion, a Spanish multiple-choice question, a feedback card with a grammar tip, a French round and a Mandarin round">
+
+On desktop: the ten game modes and a round in progress.
+
+<img src="docs/screenshots/overview-desktop.png" alt="Two desktop screenshots: the list of ten game modes and a Syntax Scramble round">
 
 ## Get it
 
