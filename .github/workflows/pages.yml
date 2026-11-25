@@ -15,18 +15,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # build and upload in one job, deploy in another: deploy-pages then finds the
+  # finished artifact, and "Re-run failed jobs" re-runs only the deploy without
+  # uploading a second github-pages artifact
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build
+        run: python3 tools/build.py
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: www
+
   deploy:
+    needs: build
     runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v5
-      - name: Build
-        run: python3 tools/build.py
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: www
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
