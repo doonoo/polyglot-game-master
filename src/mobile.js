@@ -78,7 +78,8 @@ renderGame = (orig => function(fresh){
     // answer card: verdict only after a right answer
     if(j && !jc.hidden){
       if(fresh) mobOpenJ = false;
-      const mini = j.correct && !mobOpenJ;
+      // an also-right answer stays open so the lesson's own phrase is visible
+      const mini = j.correct && !j.alt && !mobOpenJ;
       jc.classList.toggle("jmini", mini);
       if(j.correct && jc.querySelector(".ans") && !jc.querySelector(".mobtog")){
         const b = document.createElement("button"); b.className = "mobtog"; b.type = "button";

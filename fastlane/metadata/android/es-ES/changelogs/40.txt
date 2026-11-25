@@ -1,0 +1,1 @@
+Ahora cuentan otras respuestas correctas. Se acepta una frase alternativa normal, como 'Adiós, nos vemos' por 'Adiós, hasta luego' o 'Thanks' por 'Thank you', y el juego sigue mostrando la frase que practica la lección. Español, inglés, francés y portugués. Y cuando tocas 'Mi respuesta era correcta', esa respuesta se acepta en esa pregunta desde entonces.
