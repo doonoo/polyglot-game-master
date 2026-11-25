@@ -7,6 +7,20 @@ Free, open source, works offline. No account, no ads, no tracking.
 
 **▶ Play now: https://doonoo.github.io/polyglot-game-master/** · **📱 [Android app (APK)](https://github.com/doonoo/polyglot-game-master/releases/download/latest/PolyglotGameMaster.apk)**
 
+## Screenshots
+
+<p>
+  <img src="docs/screenshots/menu-phone.png" alt="Main menu with Leo the lion, daily quests and streak" width="190">
+  <img src="docs/screenshots/question-phone.png" alt="A Quick Pick multiple-choice question in Spanish" width="190">
+  <img src="docs/screenshots/feedback-phone.png" alt="Feedback card with the correct answer and a grammar tip" width="190">
+  <img src="docs/screenshots/french-phone.png" alt="An Error Hunter round in French" width="190">
+</p>
+<p>
+  <img src="docs/screenshots/mandarin-phone.png" alt="A Meaning Check round in Mandarin Chinese" width="190">
+  <img src="docs/screenshots/modes-desktop.png" alt="The ten game modes on desktop" width="400">
+  <img src="docs/screenshots/game-desktop.png" alt="A Syntax Scramble round on desktop" width="400">
+</p>
+
 ## Get it
 
 - **Android:** download [`PolyglotGameMaster.apk`](https://github.com/doonoo/polyglot-game-master/releases/download/latest/PolyglotGameMaster.apk) from the [latest build](../../releases/tag/latest) and open it on your phone. (Android asks you to allow installs from your browser or file manager the first time.) New versions install over the old one and keep your progress.
