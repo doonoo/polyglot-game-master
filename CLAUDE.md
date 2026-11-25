@@ -140,8 +140,9 @@ Read this first in any new chat about this project. It is the short version of e
 | 2.10.2 | Right or Wrong / Spot the Mistake show the correction on every answer |
 | 2.11.0 | Seven more tap mini-games: Gap Fill, Order Up, Meaning Check, Number Pick, Number Match, Who's Doing It?, Tense Detective |
 | 2.11.1 | Phone layout: answer bar fixed at the bottom, folded answer cards and lessons, no scrolling to answer |
+| 2.11.2 | Music no longer restarts after every answer in fr/pt/zh/ar (syncMood set two moods per call; `Chip.setMood` now settles on the last one in a microtask and only restarts on a real change) |
 
-Current version: 2.11.1, versionCode 36.
+Current version: 2.11.2, versionCode 37.
 
 ## Working with Emmanuel
 - He likes short, direct answers and wants Claude to take the initiative on scope.

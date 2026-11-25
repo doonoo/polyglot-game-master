@@ -14326,7 +14326,7 @@ const Chip = (() => {
   }
 
   let ctx = null, master = null, duckG = null, waves = {}, noiseBuf = null, built = {};
-  let on = true, vol = 0.5, timer = null, cur = null, pos = 0, next = 0, wanted = "title", fixed = "auto";
+  let on = true, vol = 0.5, timer = null, cur = null, pos = 0, next = 0, wanted = "title", fixed = "auto", moodPend = false;
   try{
     on = localStorage.getItem("pgm-music") !== "off";
     const v = parseFloat(localStorage.getItem("pgm-music-vol")); if(!isNaN(v)) vol = v;
@@ -14459,10 +14459,14 @@ const Chip = (() => {
     start, stop, compile, isOn: () => on, getVol: () => vol, current: () => cur && cur.id, fixed: () => fixed,
     toggle(){ on = !on; try{ localStorage.setItem("pgm-music", on ? "on" : "off"); }catch(e){} if(on) start(); else stop(); return on; },
     setVol(v){ vol = v; try{ localStorage.setItem("pgm-music-vol", String(v)); }catch(e){} if(master) master.gain.setTargetAtTime(v * 0.32, ctx.currentTime, 0.05); },
+    /* syncMood's wrappers can set two moods in one go (the generic one, then the language's own tune),
+       so settle on the last one and only restart when it differs from what's already playing */
     setMood(m){
-      if(!CHIP_TRACKS[m] || m === wanted) return;
+      if(!CHIP_TRACKS[m]) return;
       wanted = m;
-      if(fixed === "auto") play(m);
+      if(fixed !== "auto" || moodPend) return;
+      moodPend = true;
+      Promise.resolve().then(() => { moodPend = false; if(fixed === "auto" && (!cur || cur.id !== wanted)) play(wanted); });
     },
     setFixed(id){
       fixed = CHIP_TRACKS[id] ? id : "auto";

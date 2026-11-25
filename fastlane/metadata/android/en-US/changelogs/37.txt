@@ -1,0 +1,1 @@
+Music fix: in French, Portuguese, Mandarin and Arabic the soundtrack restarted from the beginning after every answer, so you kept hearing the same opening bars. Each tune now plays through and loops normally.
