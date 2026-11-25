@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "build": "python3 tools/build.py",
-    "test": "node test/test.js && node test/test4.js && node test/test5.js && node test/test6.js && node test/test7.js && node test/test8.js && node test/test9.js && node test/test10.js && node test/test11.js && node test/test12.js && node test/test13.js && node test/test14.js && node test/test15.js && node test/test16.js && node test/test17.js && node test/test18.js",
+    "test": "node test/test.js && node test/test4.js && node test/test5.js && node test/test6.js && node test/test7.js && node test/test8.js && node test/test9.js && node test/test10.js && node test/test11.js && node test/test12.js && node test/test13.js && node test/test14.js && node test/test15.js && node test/test16.js && node test/test17.js && node test/test18.js && node test/test19.js",
     "android": "npx cap sync android && npx cap open android"
   },
   "dependencies": {

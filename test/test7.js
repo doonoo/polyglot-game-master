@@ -27,7 +27,7 @@ for(const lang of ["en", "es"]){
   P.setup.mode = 1;
   key("Enter", {}, d.body);
   if($("game").hidden || !P.S) { fail(lang, "Enter did not start"); continue; }
-  if(d.activeElement !== $("answer")) fail(lang, "answer not focused at start", d.activeElement && d.activeElement.id);
+  if(!$("answer").hidden && d.activeElement !== $("answer")) fail(lang, "answer not focused at start", d.activeElement && d.activeElement.id);   // a tap round hides the box
 
   // Alt+letter accents
   const a = $("answer"); a.value = ""; a.focus();
