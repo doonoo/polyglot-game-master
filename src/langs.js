@@ -152,7 +152,8 @@ function xlDecorate(){
   // Chinese is written without spaces
   const tgtEl = $("chTarget");
   if(code === "zh" && ch.game !== "Syntax Scramble") tgtEl.childNodes.forEach(n => { if(n.nodeType === 3) n.textContent = xlSpace(n.textContent); });
-  tgtEl.dir = code === "ar" && ch.al === "ar" ? (ch.k === "c" && ch.game === "Verb Forge" ? "ltr" : "rtl") : "auto";
+  // only right-to-left when the text shown is Arabic (the prompt can be English while the answer is Arabic)
+  tgtEl.dir = code === "ar" && ch.al === "ar" && /[\u0600-\u06FF]/.test(tgtEl.textContent) ? (ch.k === "c" && ch.game === "Verb Forge" ? "ltr" : "rtl") : "auto";
   if((code === "zh" || code === "ar") && ch.game === "Reverse Mine" && !tgtEl.querySelector(".xlrom")){
     const r = XL_ROM[xlKey(ch.target)];
     if(r){ const s = document.createElement("div"); s.className = "xlrom"; s.textContent = r; s.dir = "ltr"; tgtEl.appendChild(s); }
