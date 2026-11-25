@@ -7,6 +7,12 @@ Free, open source, works offline. No account, no ads, no tracking.
 
 **▶ Play now: https://doonoo.github.io/polyglot-game-master/** · **📱 [Android app (APK)](https://github.com/doonoo/polyglot-game-master/releases/download/latest/PolyglotGameMaster.apk)**
 
+## Trailer
+
+[![Watch the Polyglot Game Master trailer (38 seconds)](docs/trailer-poster.jpg)](docs/trailer.mp4)
+
+A 38-second look at the game, filmed from the real app, with an 8-bit soundtrack.
+
 ## Screenshots
 
 On a phone: the menu, a Spanish question, feedback with a grammar tip, then French and Mandarin rounds.
