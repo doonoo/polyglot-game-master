@@ -1,0 +1,1 @@
+New mode: Grammar Gym. Pick the grammar points you want from any level and drill only those. Each round shows the rule, then tests it; misses come back until you get them right. The end screen rates each point (solid, getting there, needs work), and My weak spots builds a workout from the points you miss most, including misses in Practice and Survivor.

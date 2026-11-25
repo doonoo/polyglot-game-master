@@ -1,0 +1,1 @@
+Nuevo modo: Gimnasio de gramática. Elige los puntos de gramática que quieras de cualquier nivel y practica solo esos. Cada ronda muestra la regla y luego la pone a prueba; los fallos vuelven hasta que los aciertes. Al final cada punto recibe una nota, y Mis puntos débiles arma un entrenamiento con lo que más fallas, también en Práctica y Supervivencia.
