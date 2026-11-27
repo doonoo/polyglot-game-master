@@ -7,7 +7,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   await sleep(300);
   let bad = 0; const fail = (...a) => { bad++; console.log("FAIL", ...a); };
-  d.querySelector('#modes [data-mode="2"]').click(); P.setup.mode = 2; P.setup.target = "Spanish"; P.setup.native = "English"; P.setup.level = "A1"; $("targetSel").value = "Spanish"; $("nativeSel").value = "English";
+  w.__pickMode(2); P.setup.mode = 2; P.setup.target = "Spanish"; P.setup.native = "English"; P.setup.level = "A1"; $("targetSel").value = "Spanish"; $("nativeSel").value = "English";
   P.profile.clock = "blitz"; P.startNew();
   const dock = $("ansDock");
   if(!dock) fail("no answer bar");

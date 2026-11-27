@@ -16,7 +16,8 @@ Polyglot Game Master teaches languages through short games. Everything is built 
 
 <b>Game modes</b>
 <ul>
-<li>Practice and Level Select: translate, unscramble, fill the gap, spot the mistake, and more than 20 other mini-games.</li>
+<li>Practice: translate, unscramble, fill the gap, spot the mistake, and more than 20 other mini-games. Move up level by level, or stay on the one you pick.</li>
+<li>Dialogues: real-life conversations (a café, a hotel, the doctor, a job interview…). Answer each line to keep the talk going.</li>
 <li>Survivor: strict grading, one life. Boss battles every few rounds.</li>
 <li>Grammar Gym: pick the grammar points you want and drill only those, with mastery marks.</li>
 <li>Card Clash: build sentences from a hand of word cards to beat three foes.</li>

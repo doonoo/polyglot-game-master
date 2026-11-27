@@ -8,7 +8,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await sleep(300);
   const seen = {}, MC = ["Quick Pick","Meaning Match","Right or Wrong","Spot the Mistake"]; let bad = 0; const fail = (...a) => { bad++; console.log("FAIL", ...a); };
   for(const [tgt, nat, mode] of [["Spanish","English",1],["English","Spanish",1],["Spanish","English",3],["Spanish","English",5],["Spanish","English",7],["Spanish","English",8],["French","English",1],["Mandarin Chinese","English",1]]){
-    d.querySelector(`#modes [data-mode="${mode}"]`).click(); P.setup.mode = mode; P.setup.target = tgt; P.setup.native = nat; P.setup.level = "A1"; $("targetSel").value = tgt; $("nativeSel").value = nat; P.startNew();
+    w.__pickMode(mode); P.setup.mode = mode; P.setup.target = tgt; P.setup.native = nat; P.setup.level = "A1"; $("targetSel").value = tgt; $("nativeSel").value = nat; P.startNew();
     for(let i = 0; i < (mode === 1 || mode === 8 ? 90 : 40); i++){
       const S = P.S; if(S.status !== "playing") break;
       const ch = S.current.challenge;

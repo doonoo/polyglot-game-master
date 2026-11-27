@@ -53,7 +53,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   let tot = 0, mc = 0;
   const runs = [["Spanish","English",[1,2,3,4,5,6,7,8,9]],["English","Spanish",[1,2,3,4,5,7,8]],["French","English",[1,2,3]],["Mandarin Chinese","English",[1,2]],["Arabic","English",[1]],["Portuguese","English",[1]]];
   for(const [tgt, nat, modes] of runs) for(const mode of modes){
-    d.querySelector(`#modes [data-mode="${mode}"]`).click();
+    w.__pickMode(mode);
     P.setup.mode = mode; P.setup.target = tgt; P.setup.native = nat; P.setup.level = "A1";
     $("targetSel").value = tgt; $("nativeSel").value = nat;
     P.startNew();

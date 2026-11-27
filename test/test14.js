@@ -40,9 +40,9 @@ function answer(P, right){
   if(d.getElementById("duelBtn") || d.getElementById("duelPage")) fail("old duel page should be gone");
   /* ---------- every mode ---------- */
   const summary = {};
-  for(const mode of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]){
+  for(const mode of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]){
     P.setup.mode = mode; P.setup.level = "A1";
-    d.querySelector(`#modes [data-mode="${mode}"]`).click();
+    w.__pickMode(mode);
     if($("tpRounds")){ $("tpRounds").value = "5"; $("tpRounds").dispatchEvent(new w.Event("change", {bubbles:true})); }
     if(mode === 10 && !d.querySelector("#gymBody .gl.on")) d.querySelector("#gymBody .gl").click();   // Grammar Gym needs a point picked
     $("tpHand").checked = mode % 2 === 1; $("tpHand").dispatchEvent(new w.Event("change", {bubbles:true}));

@@ -23,35 +23,35 @@ Read this first in any new chat about this project. It is the short version of e
   2. Apply exact-string `rep()` patches, including the CSS blocks injected before `</style>`.
   3. Append every `src/*.js` module in the order of the `out = "\n".join([...])` line near the bottom of build.py.
 - All modules share one scope, an IIFE. Extend an existing function only through `wrap()` (src/wrap.js, loaded first): `fn = wrap("fn", "<module file name>", fn, orig => function(...){ ...orig(...)... });`. It names the layer for stack traces (`gradeLocal[typo]`) and records the chain; `wrapChains()` (`window.__wrapChains` in tests) lists every chain innermost → outermost. **test24 holds the expected chains**: adding, removing or moving a wrapper (or a module in the build.py join) means updating `EXPECTED` there and the map below, on purpose. Layer order is behavior: an outer layer sees what inner layers return (e.g. Card Clash and Grammar Gym wrap `generate` outside mc.js so their rounds can switch multiple choice off).
-- **Wrapper chains (2.17), innermost → outermost** (single-layer ones are in test24):
+- **Wrapper chains (2.18), innermost → outermost** (single-layer ones are in test24):
   - `applyI18n`: chiptune → voiceprefs
-  - `applyResult`: island → practice → custom → boss → gym → cards
+  - `applyResult`: island → practice → custom → boss → gym → cards → dialog
   - `conceptAt`: practice → langmodes
   - `conjQuestion`: langmodes → mc
-  - `freshState`: custom → timer → mc → gym → cards
+  - `freshState`: custom → timer → mc → gym → cards → dialog
   - `gamesFor`: langmodes → mcgames → mcgames2
   - `genConj`: langmodes → mc → mcgames → mcgames2
   - `genNumber`: langmodes → mc → mcgames2
   - `genSentence`: mc → mcgames → mcgames2
   - `genVocab`: langmodes → mc → mcgames → mcgames2
-  - `generate`: practice → custom → boss → mc → gym → cards
+  - `generate`: practice → custom → boss → mc → gym → cards → dialog
   - `gradeLocal`: custom → boss → typo → mcgames → mcgames2 → alts
   - `grantRewards`: timer → boss
-  - `makePlanCore`: island → practice → custom → gym → cards
+  - `makePlanCore`: island → practice → custom → gym → cards → dialog
   - `playOutcome`: juice → sfx → gym
-  - `progress`: custom → gym → cards
+  - `progress`: custom → gym → cards → dialog
   - `recordAnswer`: features4 → notify → twoplayer
   - `renderDaily`: features3 → features4 → notify
-  - `renderExtras`: island → boss → feedback → keyboard → anim → voice → juice → langs → mc → mcgames → mcgames2 → cards
+  - `renderExtras`: island → boss → feedback → keyboard → anim → voice → juice → langs → mc → mcgames → mcgames2 → cards → dialog
   - `renderGame`: twoplayer → leo → mobile
-  - `renderHud`: custom → anim → juice → gym → cards
-  - `renderMenu`: custom → timer → langs → langmodes → mc → uisize → twoplayer → gym → cards → leo → firstrun
+  - `renderHud`: custom → anim → juice → gym → cards → dialog
+  - `renderMenu`: custom → timer → langs → langmodes → mc → uisize → twoplayer → gym → cards → dialog → menumerge → leo → firstrun
   - `showOnly`: chiptune → sfx
-  - `showOver`: custom → timer → anim → juice → twoplayer → gym → cards → leo → firstrun
+  - `showOver`: custom → timer → anim → juice → twoplayer → gym → cards → dialog → leo → firstrun
   - `syllabusFor`: practice → langmodes
   - `syncMood`: langs → sfx → twoplayer → cards
-  - `tileItems`: langs → langmodes → mc → cards
-- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js (each followed by its lang_<code>2.js and lang_<code>3.js) → lang_<code>4.js and lang_<code>5.js for zh, ar, fr, pt → langs.js → langmodes.js → typo.js → mc.js → mcgames.js → mcgames2.js → alts.js → uisize.js → voiceprefs.js → sfx.js → twoplayer.js → gym.js → cards.js → mascot.js → leo.js → firstrun.js → mobile.js → boot.js. `wrap.js` comes first of all, right after base.html section A. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
+  - `tileItems`: langs → langmodes → mc → cards → dialog
+- **Content load order:** content_* files → MORE (more_*.js) → gm.js → conj.js → tricky.js → CEFR lessons (cefr_es1/2, cefr_en1/2, cefr_idioms.js) → deep_loader.js → deep_*.js → `applyDeep()` → feature modules (… timer, boss, tips, feedback, keyboard, anim, fx, voice) → base.html section E (Sound, Music) → chiptune.js, juice.js → lang_zh/ar/fr/pt.js (each followed by its lang_<code>2.js and lang_<code>3.js) → lang_<code>4.js and lang_<code>5.js for zh, ar, fr, pt → langs.js → langmodes.js → typo.js → mc.js → mcgames.js → mcgames2.js → alts.js → uisize.js → voiceprefs.js → sfx.js → twoplayer.js → gym.js → cards.js → dialog_data.js → dialog.js → menumerge.js → mascot.js → leo.js → firstrun.js → mobile.js → boot.js. `wrap.js` comes first of all, right after base.html section A. Sound and Music are consts, so a module that touches them at load time must come after E in the build.py join.
 - A new feature module needs adding to that join list. A new CEFR content file needs adding to the `CEFR = [...]` list.
 - `www/native-tts.js` bridges the native Android text-to-speech plugin. The `www/` folder (with `index.html` built) is what Capacitor packages.
 - After changing npm Capacitor plugins, run `npx cap sync android` and commit the changed `android/` gradle files.
@@ -87,7 +87,7 @@ Read this first in any new chat about this project. It is the short version of e
 
 ## Modes and systems
 - **Mini-games** (rotation): Classic Mine, Reverse Mine, Syntax Scramble, Cloze Combat, Error Hunter, Word Duel, Odd One Out, Match Madness, Verb Forge, Time Machine, Slip Fixer, the number games, plus Quick Pick, Meaning Match, Right or Wrong, Spot the Mistake, Gap Fill, Order Up, Meaning Check, Number Pick, Number Match, Who's Doing It?, Tense Detective.
-- **Modes:** 1 Practice, 2 Level Select, 3 Survivor, 4 Numbers, 5 Vocab, 6 Island Hopper, 7 Conjugation Station (renamed from Conjugation Gym in 2.17 so it isn't confused with Grammar Gym; es "Estación de verbos"), 8 Tricky Pairs, 9 Custom, 10 Grammar Gym, 11 Card Clash.
+- **Modes:** 1 Practice, 2 Level Select (no menu card since 2.18: it is Practice with **Stay on this level** on; menumerge.js), 3 Survivor, 4 Numbers, 5 Vocab, 6 Island Hopper, 7 Conjugation Station (renamed from Conjugation Gym in 2.17 so it isn't confused with Grammar Gym; es "Estación de verbos"), 8 Tricky Pairs, 9 Custom (under **More modes** since 2.18), 10 Grammar Gym, 11 Card Clash, 12 Dialogues.
 - **Mini-games** come from `gamesFor(st)`; sentence challenges are built in `genSentence` in gm.js.
 - **Systems by file:**
   - `timer.js`: the Clock, plus Time Attack.
@@ -115,6 +115,8 @@ Read this first in any new chat about this project. It is the short version of e
   - `gym.js` (2.12): Grammar Gym, mode 10, built like Custom. `gymLessons(target, lv)` = the course's grammar lessons (`k:"g"`, minus anything titled greetings / saludos); fr/pt/zh/ar labels add the tip's first bold terms. A workout under 60% still ends "conquered" but `gymCalm` runs playOutcome / runJuice / showOver as if it were gameover, so there's no fanfare or confetti; the title is Keep training! and Leo thinks (💪 in leo.js). Picks are stored per course in `profile.gymSel[code]` as `"lv|title"`, rounds in `profile.gymRounds`. Plans are `{kind:"gym", lv, idx, t, game}`, generated as a mode-2 syllabus round (`cefr:0`, so idx = COURSE index); games = `gamesFor({mode:2})` minus `GYM_SKIP` (meaning-only games), and a fallback to a skipped game is retried with another game. The least-drilled point comes next; misses go into `st.gym.redo`. Lifetime record `profile.gym[code]["lv|title"] = {r, w, h}` (h = last 10 results) feeds the ✅/🟡/🔴/⚪ marks and `gymWeak()`; it is also filled by Practice / Level Select / Survivor (syllabus and srs plans) and Custom grammar rounds. **applyResult runs twice per turn** (on a preview clone in runTurn, then on S in absorb), so side effects outside the state must check `st === S`. Not recorded in two-player games. test20 covers it; test14 plays it with two players.
   - `alts.js` (2.13.1): also-right answers, the outermost gradeLocal wrapper (after mcgames2). `ALT_EQ[lang]` = groups of phrases interchangeable **as a whole clause** (between punctuation; `{lead:true}` groups may also start a clause, e.g. thanks / thank you + rest). If a typed answer fails but its clause key (`altKey`) equals a variant's, it's accepted with `alt:true` and the feedback names the lesson's phrase (also in `S.judgement.alt`, via the build.py rep; mobile.js keeps those cards unfolded). "My answer was right" (gradeLocal with force) stores the answer in `profile.okAns["al|first variant"]`, accepted next time, unless it's a planted mistake from any course (`altBad`) or shares under a third of the lesson's words (`altClose`). Strict grading (Survivor, bosses, strict Custom) keeps accents in the comparison (`ALT_ACC` = the group phrases as written). Skipped: tap rounds (`ch.opts`), gap / scramble / match games, numbers, Tricky Pairs. test21 checks every planted mistake in every course stays wrong. Add new equivalents to `ALT_EQ` only when they hold as a standalone clause.
   - `cards.js` (2.14): Card Clash, mode 11 (idea from a Reddit reply about a Thai card battler). Plans `{kind:"card", lv, idx, it}`; generate asks for a mode-2 syllabus **Classic Mine** round (mc off, 3–9 words, retrying other lessons), then deals `ch.card = {hand, n, words, li}`: the sentence's words (`cardWords`: punctuation off, first word lower-cased) + decoys (one word from the item's planted mistake, then words from the level's sentences via `cardPool`). `card` is in the build.py challenge copy list. `tileItems` returns the hand as word tiles (langs.js adds romanization for zh/ar); the prompt stays visible, the head reads Card Clash, accent keys hide, `#answer.kcard` is one line. State `S.card = {foe, hp, max, chain, best, dealt, last, lastIdx, redo, ev}`: damage = 8 × words × (1 + 0.25 × min(chain, 6)) × 1.2 if Linked (shares a `cardLinkable` word with the previous sentence; half the time the next sentence comes from the same lesson). Three `CARD_FOES` (HP 170/260/360 × 1 + 0.2 per level), 5 hearts; a miss stores a copy of the challenge in `redo` and re-deals it two turns later. `#cardBar` shows the foe, HP bar, chain and a floating hit; battle music via syncMood ("boss"). test22 plays a run in every language; test14 plays it with two players.
+  - `dialog_data.js` + `dialog.js` (2.18): Dialogues, mode 12. `DLG` = scenes `{id, lv, ico, t:{en,es}, note:{en,es}, lines}`, lines alternating `{w:"n"}` (the other person) and `{w:"y"}` (you), each with `en, es, fr, pt, zh, ar` (+ `zr` pinyin / `an` transliteration of the first reading, one entry per word; Chinese split by spaces); "y" lines may hold `|` alternatives and carry `x:{<code>:planted mistake}` for every language. One script serves every course: es course answers `es` (prompts `en`), en course answers `en` (prompts `es`), fr/pt/zh/ar answer their language (prompts `en`). Two scenes per level, three replies each; a run = the level's scenes in order (6 replies), 5 hearts, a miss costs a heart and the talk goes on. Plans `{kind:"dlg", sid, ti}`; generate builds the challenge itself (game `"Dialogue"`, `ch.dlg = {sid, ti, n, hist, ico, t, lv}`, `dlg` is in the build.py copy list) and calls `mcBuild` when `st.mc` (candidates: the planted mistake, then other replies). zh/ar typing gets word tiles; the y lines' readings go into `XL_ROM` / `XL_TOKROM`. `renderDlg` draws `#dlgBox` (chat bubbles; tap = hear it and reveal the meaning, which is hidden from B1 up). test25 checks every line in every course and plays every course × level, typing and multiple choice; test14 plays it with two players.
+  - `menumerge.js` (2.18): one **Practice** card (selected for mode 1 and 2) with a **Stay on this level** switch under the level picker (on = `setup.mode = 2`); `MORE_MODES = [9]` go in a collapsible `#modesMore` below the list (`pgm-more`), open while one is picked. Tests pick modes with `window.__pickMode(m)`.
   - `uisize.js`: Display size 70–150% (root font size, all type is rem), localStorage `pgm-size`. 🔍 chip in the menu top bar opens a sheet; A−/A+ row in the 🎛️ panel.
   - `mascot.js`: `lionSVG(mood, {crown, title, cls})` draws Leo the lion (viewBox 200×200; moods happy, cheer, sad, think, wow, wink). No app globals, so `tools/icons.js` can render it too. The build checks for exactly one closing title tag in the page, so never write that tag literally in a module.
   - `firstrun.js` (2.17): a brand-new player (nothing answered, no saved game, no `pgm-firstrun` flag) gets one sheet over the menu: pick a course (Spanish first in an English app, English first in a Spanish one), then **Start with Practice** (mode 1, A1) or Show me the menu. The Practice card has a **Start here** badge until a first game ends (`pgm-firstgame`) or 10 answers. Off under `__PGM_TEST` unless `__FIRSTRUN_FORCE`; test24 covers it.
@@ -123,7 +125,7 @@ Read this first in any new chat about this project. It is the short version of e
 - **Challenge copying:** when a challenge is copied into `S.current`, only listed fields survive. The list is in a build.py rep ending with `strict, double, parts`. A new challenge field must be added there.
 
 ## Testing
-- Run `npm run test:quick` (about 2 minutes) while working and `npm test` (everything, about 10 minutes) before a release. `npm test`: test.js and test4–test24, all JSDOM. test14 plays a 2-player game in every mode; test15 covers multiple choice, display size and the typo allowance; test16 the multiple-choice mini-games; test17 the new languages in every mode (content checks plus a game in every mode and level); test18 the 2.11 tap games; test19 the phone layout; test20 Grammar Gym; test21 also-right answers; test22 Card Clash; test23 the fr/pt/zh/ar content checks (readings, planted mistakes, unique prompts / words / meanings per course, bold tip terms, romanization per word, the answer card reading line); test24 the wrapper chains and the first-run sheet. Tests that type answers must answer option rounds with the right option (see test.js `optRound`). It takes a few minutes.
+- Run `npm run test:quick` (about 2 minutes) while working and `npm test` (everything, about 10 minutes) before a release. `npm test`: test.js and test4–test25, all JSDOM. test14 plays a 2-player game in every mode; test15 covers multiple choice, display size and the typo allowance; test16 the multiple-choice mini-games; test17 the new languages in every mode (content checks plus a game in every mode and level); test18 the 2.11 tap games; test19 the phone layout; test20 Grammar Gym; test21 also-right answers; test22 Card Clash; test23 the fr/pt/zh/ar content checks (readings, planted mistakes, unique prompts / words / meanings per course, bold tip terms, romanization per word, the answer card reading line); test24 the wrapper chains and the first-run sheet; test25 Dialogues and the merged menu. Tests that type answers must answer option rounds with the right option (see test.js `optRound`). It takes a few minutes.
   - anim.js skips its MutationObserver under `__PGM_TEST`: tests play thousands of turns in one synchronous loop, and undelivered mutation records kept every old node alive (test.js used to peak near 6 GB and get killed; now about 2 GB). test.js also closes each simulated page.
   - Tests set `window.__PGM_TEST = true`, which exposes `window.__pgm` (S, setup, COURSE, variantsOf, gradeLocal, expand, tipsFor…).
   - Test pages keep timers running, so a new test file must end with `process.exit(0)`.
@@ -185,8 +187,9 @@ Read this first in any new chat about this project. It is the short version of e
 | 2.15.0 | 152 more sentences per extra language (lang_<code>4.js, ~360 each), with planted mistakes; listening/speaking round code removed; test23; `npm run test:quick` |
 | 2.16.0 | B2 for fr/pt/zh/ar (lang_<code>5.js, 11 units each); answer card reading line fixed (showed the next question's); no grammar tips on answers in your own language; new store text and screenshots |
 | 2.17.0 | First-run sheet + Start here badge (firstrun.js); Conjugation Gym → Conjugation Station; every wrapper goes through `wrap()` with named, test-locked chains (wrap.js, test24) |
+| 2.18.0 | Dialogues (mode 12, 8 scenes A1–B2 in six languages); Practice and Level Select merged (Stay on this level switch); Custom under More modes |
 
-Current version: 2.17.0, versionCode 44.
+Current version: 2.18.0, versionCode 45.
 
 ## Working with Emmanuel
 - He likes short, direct answers and wants Claude to take the initiative on scope.

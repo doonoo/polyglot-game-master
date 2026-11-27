@@ -8,7 +8,7 @@ const JUDGE = new Set(["Meaning Check", "Who's Doing It?", "Tense Detective"]);
 (async () => {
   await sleep(300);
   let bad = 0; const fail = (...a) => { bad++; if(bad < 40) console.log("FAIL", ...a); };
-  const start = (tgt, nat, mode, level) => { d.querySelector(`#modes [data-mode="${mode}"]`).click(); P.setup.mode = mode; P.setup.target = tgt; P.setup.native = nat; P.setup.level = level; $("targetSel").value = tgt; $("nativeSel").value = nat; P.startNew(); };
+  const start = (tgt, nat, mode, level) => { w.__pickMode(mode); P.setup.mode = mode; P.setup.target = tgt; P.setup.native = nat; P.setup.level = level; $("targetSel").value = tgt; $("nativeSel").value = nat; P.startNew(); };
   const LANGS = [["Spanish","English"],["English","Spanish"],["French","English"],["Portuguese","English"],["Mandarin Chinese","English"],["Arabic","English"]];
   const MODES = {1:["Gap Fill","Order Up","Meaning Check"], 3:["Order Up"], 5:["Meaning Check"], 6:["Gap Fill","Order Up","Meaning Check"], 4:["Number Pick","Number Match"], 7:["Who's Doing It?","Tense Detective"]};
   const made = {};

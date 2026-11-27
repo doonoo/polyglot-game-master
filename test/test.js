@@ -267,7 +267,7 @@ for(const lang of ["en", "es"]){
   const dom = boot("en", true), w = dom.window, d = w.document, P = w.__pgm;
   if(P.LEVELS.join() !== "A1,A2,B1,B2") fail("levels", P.LEVELS);
   if(d.querySelectorAll("#levels .lv").length !== 4 || d.querySelectorAll("#levels .lv:disabled").length) fail("level buttons");
-  for(const m of [1,2,4,5]){ d.querySelector(`[data-mode="${m}"]`).click(); if(d.querySelectorAll("#levels .lv:disabled").length) fail("locked level in mode", m); if(d.getElementById("levelNote").textContent.trim() && m !== 2) fail("level note", m); }
+  for(const m of [1,2,4,5]){ d.defaultView.__pickMode(m); if(d.querySelectorAll("#levels .lv:disabled").length) fail("locked level in mode", m); if(d.getElementById("levelNote").textContent.trim() && m !== 2) fail("level note", m); }
   d.querySelector('[data-mode="1"]').click();
   d.getElementById("startBtn").click();
   for(let i = 0, missed = 0; i < 80; i++){

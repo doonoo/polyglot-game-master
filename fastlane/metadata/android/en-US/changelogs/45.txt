@@ -1,0 +1,1 @@
+New mode: Dialogues. Real-life conversations (a café, directions, the doctor, a hotel, a job interview, a complaint), two per level from A1 to B2, in all six languages. Read what the other person says, then answer to keep the talk going. Practice and Level Select are now one Practice mode with a "Stay on this level" switch, and Custom Game moved under "More modes".

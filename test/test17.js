@@ -69,10 +69,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const seen = {};
   for(const tgt of ["French","Portuguese","Mandarin Chinese","Arabic"]){
     for(const mode of [1,2,3,4,5,6,7,8,9]){
-      d.querySelector(`#modes [data-mode="${mode}"]`).click();
+      w.__pickMode(mode);
       P.setup.target = tgt; P.setup.native = "English"; $("targetSel").value = tgt; P.setup.mode = mode;
       X.renderMenu();
-      if(d.querySelector(`#modes [data-mode="${mode}"]`).disabled) fail(tgt, "mode", mode, "is disabled");
+      if((d.querySelector(`#modes [data-mode="${mode}"]`) || {}).disabled) fail(tgt, "mode", mode, "is disabled");
       const lvls = mode === 3 || mode === 6 || mode === 9 ? [null] : X.levelsFor(mode, tgt);
       for(const lv of lvls){
         if(lv) P.setup.level = lv;
@@ -101,7 +101,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   // the same modes with the Multiple choice answer mode on
   w.__mc.setMC(true);
   for(const tgt of ["French","Portuguese","Mandarin Chinese","Arabic"]) for(const mode of [4,5,6,7,8]){
-    d.querySelector(`#modes [data-mode="${mode}"]`).click();
+    w.__pickMode(mode);
     P.setup.target = tgt; P.setup.native = "English"; $("targetSel").value = tgt; P.setup.mode = mode; P.setup.level = "A1";
     P.startNew();
     for(let i = 0; i < 10; i++){
