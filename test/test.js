@@ -172,22 +172,6 @@ function play(lang, mode, level, turns, wrongRate, opts){
       if(c.plan.kind === "mix") cefrMix++;
     }
     if(S.event) events++;
-    if(ch.game === "Echo Chamber" && d.getElementById("chTarget").textContent.includes(ch.target)) fail(tag, "echo target visible", ch.target);
-    if(ch.game === "Echo Chamber" && !opts.tts) fail(tag, "echo without audio");
-    if(ch.game === "Echo Chamber" && Math.random() < 0.4){
-      const btn = d.querySelector("[data-echoskip]");
-      if(!btn){ fail(tag, "no skip button"); break; }
-      const a0 = S.stats.answered, hp0 = S.hp, xp0 = S.xp, st0 = S.stats.streak, done0 = JSON.stringify(S.done);
-      btn.click();
-      const S2 = P.S, c2 = S2.current.challenge;
-      if(S2.stats.answered !== a0 || S2.hp !== hp0 || S2.xp !== xp0 || S2.stats.streak !== st0 || JSON.stringify(S2.done) !== done0) fail(tag, "skip changed score");
-      if(c2.game === "Echo Chamber" || !c2.target || !c2.acc.length) fail(tag, "skip did not swap", c2.game);
-      if(mode === 5 && c2.wk !== ch.wk) fail(tag, "skip changed word", ch.wk, c2.wk);
-      if(!!c2.boss !== !!ch.boss) fail(tag, "skip lost boss");
-      if(!d.getElementById("chTarget").textContent.includes(c2.target) || d.querySelector("[data-echoskip]")) fail(tag, "skip render", d.getElementById("chTarget").textContent);
-      skips = (skips || 0) + 1;
-      continue;
-    }
     if(ch.game === "Match Madness"){
       const before0 = S.stats.answered, prs = [...d.querySelectorAll("#pairs .pr")];
       if(d.getElementById("pairs").hidden || prs.length < 6 || !d.getElementById("submitBtn").hidden) fail(tag, "pairs ui", prs.length);

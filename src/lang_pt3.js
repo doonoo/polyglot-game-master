@@ -26,7 +26,7 @@ WL.pt.units.push(
   s:[["Where do you live?","Onde você mora?",null,"Onde você moro?"],
      ["Why are you sad? Because I'm tired.","Por que você está triste? Porque estou cansado.",null,"Porque você está triste? Por que estou cansado."],
      ["When does the class start?","Quando começa a aula?",null,"Quando começo a aula?"],
-     ["What are you doing?","O que você está fazendo?",null,"Que o você está fazendo?"],
+     ["What do you want to eat?","O que você quer comer?",null,"Que o você quer comer?"],
      ["Who is that man?","Quem é aquele homem?",null,"Quem está aquele homem?"],
      ["How are you?","Como você está?",null,"Como você estás?"]]},
  {lv:"A1", k:"g", t:"Adjectives: agreement", ico:"🎨",

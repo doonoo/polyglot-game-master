@@ -24,7 +24,7 @@ function ensureQuests(){
   let list;
   try{
     const core = pick(QUESTS.filter(q => q.core));
-    const rest = shuffle(QUESTS.filter(q => !q.core && (!q.ear || canEcho()))).slice(0, 2);
+    const rest = shuffle(QUESTS.filter(q => !q.core && !q.ear)).slice(0, 2);
     list = [core].concat(rest).map(q => ({id:q.id, g:q.g, n:0, done:false}));
   } finally { Math.random = orig; }
   profile.quests = {d:profile.today, list, bonus:false};
@@ -68,7 +68,6 @@ recordTurn = (orig => function(prevCh, j){
   if(prevCh.k === "c") questAdd("conj");
   if(S.mode === 8) questAdd("tricky");
   if(S.mode === 5) questAdd("vocab");
-  if(prevCh.game === "Echo Chamber") questAdd("listen");
 })(recordTurn);
 
 /* ---------- Stories ---------- */

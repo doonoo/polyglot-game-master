@@ -17,34 +17,6 @@ NUMSYL.B2 = [
  {ty:"int",a:1,b:999999999,en:"Final boss: any number",es:"Jefe final: cualquier número"}
 ];
 
-/* ===================== Listening game (Echo Chamber) ===================== */
-let echoOn = true;
-try{ echoOn = localStorage.getItem("pgm-echo") !== "off"; }catch(e){}
-// 2.10.1: listening rounds (Echo Chamber) were removed at Emmanuel's request; everything that offered one checks this
-const canEcho = () => false;
-function echoPlay(slow){
-  const c = S && S.current; if(!c) return;
-  const text = c.challenge.target, lang = LANG_CODE[S.target];
-  try{
-    const ss = window.speechSynthesis;
-    if(ss && window.SpeechSynthesisUtterance){
-      ss.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = lang;
-      const v = bestVoice(lang);
-      if(v) u.voice = v;
-      u.rate = slow ? 0.65 : 1;
-      ss.speak(u);
-      return;
-    }
-  }catch(e){}
-  Narrator.say([{text, lang}]);
-}
-$("echoChk").addEventListener("change", () => {
-  echoOn = $("echoChk").checked;
-  try{ localStorage.setItem("pgm-echo", echoOn ? "on" : "off"); }catch(e){}
-});
-
 /* ===================== Match Madness ===================== */
 let pairState = null;
 const PAIR_DELAY = window.__PGM_TEST ? 0 : 450;
@@ -87,7 +59,7 @@ $("pairs").addEventListener("click", e => {
   }
 });
 
-/* ===================== Challenge extras (tiles, listening, pairs) ===================== */
+/* ===================== Challenge extras (tiles, pairs) ===================== */
 function renderExtras(fresh){
   const tiles = $("tiles"), keys = $("accentKeys"), screen = $("chTarget").parentElement, pairs = $("pairs");
   const ansLabel = document.querySelector('label[for="answer"]');
@@ -100,12 +72,6 @@ function renderExtras(fresh){
   screen.hidden = (!!ti && ch.game !== "Word Duel") || isPairs;
   if(isPairs){ tiles.hidden = true; renderPairs(ch, fresh); }
   else pairState = null;
-  if(ch.game === "Echo Chamber"){
-    if(canEcho()){
-      $("chTarget").innerHTML = `<div class="echo"><button class="echo-btn" data-echo="1">🔊 ${esc(t("playAudio"))}</button><button class="echo-btn slow" data-echo="slow">🐢 ${esc(t("slowAudio"))}</button><button class="echo-skip" data-echoskip="1">🔇 ${esc(t("cantListen"))}</button></div>`;
-      if(fresh) setTimeout(() => echoPlay(false), 500);
-    } else $("chTarget").textContent = ch.target;
-  }
   if(!ti){ tiles.hidden = true; tiles.innerHTML = ""; tiles.dataset.key = ""; return; }
   tiles.hidden = false;
   if(fresh || tiles.dataset.key !== ch.target){
@@ -115,7 +81,6 @@ function renderExtras(fresh){
       (ti.mode !== "pick" ? `<button class="tile undo" data-undo="1" aria-label="${esc(t("undoTile"))}">⌫</button>` : "");
   }
 }
-$("chTarget").addEventListener("click", e => { const b = e.target.closest("[data-echo]"); if(b){ Sound.unlock(); echoPlay(b.dataset.echo === "slow"); } });
 
 /* ===================== Phrasebook ===================== */
 profile.bank = {}; profile.echo = 0; profile.match = 0; profile.conj = 0;
@@ -134,7 +99,6 @@ function recordTurn(prevCh, j){
   if(!S) return;
   const tgt = LANG_CODE[S.target];
   if(prevCh && j && j.correct && !j.gaveUp){
-    if(prevCh.game === "Echo Chamber") profile.echo++;
     if(prevCh.game === "Match Madness") profile.match++;
     if(prevCh.k === "c") profile.conj++;
   }
@@ -283,27 +247,3 @@ $("voiceRow").addEventListener("change", e => {
 $("voiceRow").addEventListener("click", e => { const b = e.target.closest("[data-vtest]"); if(b){ Sound.unlock(); testVoice(b.dataset.vtest); } });
 try{ if(window.speechSynthesis) window.speechSynthesis.addEventListener("voiceschanged", renderVoices); }catch(e){}
 
-/* ===================== Skip a listening round (no penalty) ===================== */
-function skipEcho(){
-  const c = S && S.current;
-  if(!c || c.challenge.game !== "Echo Chamber" || S.status !== "playing") return;
-  Narrator.stop();
-  try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
-  const plan = Object.assign({}, c.plan, {game:"Classic Mine", swarm:false});
-  if(S.mode === 5) plan.key = c.plan.key || c.challenge.wk;
-  const was = echoOn; echoOn = false;
-  let res = null;
-  try{ res = generate(Object.assign({}, S, {lastGame:"Echo Chamber"}), plan); }catch(e){}
-  finally{ echoOn = was; }
-  const ch = res && res.challenge;
-  if(!ch || !ch.target) return;
-  c.challenge = {game:String(ch.game), boss: plan.boss ? String(ch.boss || "") : "", task:String(ch.task || ""), target:String(ch.target),
-    hint: S.mode === 3 ? "" : String(ch.hint || ""), answerKey:String(ch.answerKey || ""), speak:"", acc:ch.acc || [], al:ch.al || "", k:ch.k || "s",
-    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double, parts:Array.isArray(ch.parts) ? ch.parts : null};
-  S.lastGame = c.challenge.game;
-  save();
-  $("answer").value = "";
-  renderGame(true);
-  toast("🔇 " + t("echoSkipped"));
-}
-$("chTarget").addEventListener("click", e => { if(e.target.closest("[data-echoskip]")) skipEcho(); });

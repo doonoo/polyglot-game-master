@@ -515,7 +515,6 @@ function genSentence(st, plan, c, review, res){
     if(n >= 3 && n <= 10) combos.push({g:"Syntax Scramble", it});
     if(it[2] && !surv && blank(T, it[2])) combos.push({g:"Cloze Combat", it});
     if(it[3] && !(surv && it[3][0] === "~")) combos.push({g:"Error Hunter", it});
-    if(canEcho() && n >= 2 && n <= 12) combos.push({g:"Echo Chamber", it});
   }
   if(st.mode === 8){
     combos = combos.filter(x => x.g === "Classic Mine" || x.g === "Error Hunter" || x.g === "Cloze Combat");
@@ -544,7 +543,6 @@ function genSentence(st, plan, c, review, res){
     ch.opts = shuffle([...new Set((it[4] || c.o).concat([it[2]]))]);
     ch.hint = L.hMeans(N);
   }
-  else if(sel.g === "Echo Chamber"){ task = L.tEcho(LN[nat][st.target]); ch.target = T; ch.hint = L.hWords(T.split(" ").length); }
   else { task = surv ? L.tErrS : L.tErr(N); ch.target = it[3].replace(/^~/, ""); ch.hint = L.hTopic(c.t); }
   if(c.island && review && sel.g === "Classic Mine") ch.hint = L.hWords(T.split(" ").length);
   if(plan.boss) ch.hint = "";
@@ -619,7 +617,6 @@ function genVocab(st, plan){
   const games = ["Classic Mine", "Reverse Mine"];
   if(!/\s/.test(core) && core.length >= 4) games.push("Syntax Scramble");
   if(oddCats.length) games.push("Odd One Out");
-  if(canEcho()) games.push("Echo Chamber");
   if(known.length >= 3) games.push("Match Madness");
   let game = games.includes(plan.game) ? plan.game : pick(games.filter(x => x !== st.lastGame).length ? games.filter(x => x !== st.lastGame) : games);
   if(plan.boss) game = "Classic Mine";
@@ -631,8 +628,6 @@ function genVocab(st, plan){
     let letters = core.split("");
     for(let i = 0; i < 12; i++){ letters = shuffle(core.split("")); if(letters.join("") !== core) break; }
     task = L.vScr(m); ch.target = letters.join(" ");
-  } else if(game === "Echo Chamber"){
-    task = L.vEcho(LN[nat][st.target]); ch.target = k; ch.hint = L.hLetter(core.charAt(0), core.length);
   } else if(game === "Match Madness"){
     const others = shuffle(known).filter((e, i, a) => a.findIndex(x => mean(x) === mean(e)) === i && mean(e) !== m && key(e) !== k).slice(0, matchRows(st) - 1);
     ch.pairs = shuffle([[k, m]].concat(others.map(e => [key(e), mean(e)])));

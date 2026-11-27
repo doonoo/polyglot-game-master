@@ -19,7 +19,7 @@ function trackMistake(prevCh, j){
   const m = S.mode, mm = profile.modes[m] = profile.modes[m] || {a:0, c:0};
   if(!j.gaveUp) mm.a++;
   if(j.correct) mm.c++;
-  if(prevCh.k === "p" || prevCh.game === "Echo Chamber" || prevCh.game === "Speak Up") return;
+  if(prevCh.k === "p") return;
   const key = mistakeKey(prevCh);
   profile.mistakes = profile.mistakes.filter(x => mistakeKey(x.ch) !== key);
   if(!j.correct){
@@ -41,9 +41,8 @@ function dailyKey(){ return `${dayStr(new Date())}|${setup.target}|${dailyLevel(
 const dailyLevel = () => LEVELS.includes(setup.level) ? setup.level : "A1";
 function buildDaily(){
   const target = setup.target, native = setup.native, level = dailyLevel();
-  const orig = Math.random, was = echoOn, out = [];
+  const orig = Math.random, out = [];
   Math.random = seeded(hashStr(dailyKey()));
-  echoOn = false;
   try{
     for(const m of shuffle([1,1,1,7,7,8,8,4,5,5])){
       const st = freshState({mode:m, target, native, level});
@@ -51,19 +50,19 @@ function buildDaily(){
       if(m === 5) plan = {kind:"vocab", swarm:true, game:pick(["Classic Mine","Reverse Mine","Syntax Scramble"])};
       else {
         st.syllabus = syllabusFor(st); st.done = st.syllabus.map(() => false);
-        const games = gamesFor(st).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && g !== "Speak Up" && !MCG.has(g));
+        const games = gamesFor(st).filter(g => g !== "Match Madness" && !MCG.has(g));
         plan = {kind:"syllabus", idx:Math.floor(Math.random() * st.syllabus.length), game:pick(games)};
       }
       let res = null;
       try{ res = generate(st, plan); }catch(e){}
       const ch = res && res.challenge;
-      if(ch && ch.target && ch.k !== "p" && ch.game !== "Echo Chamber"){
+      if(ch && ch.target && ch.k !== "p"){
         const c = {mode:m};
         for(const f of ["game","task","target","acc","al","k","nn","answerKey","why","opts","wk","wm"]) if(ch[f] !== undefined && ch[f] !== null) c[f] = ch[f];
         out.push({ch:c, native, target});
       }
     }
-  } finally { Math.random = orig; echoOn = was; }
+  } finally { Math.random = orig; }
   return out;
 }
 

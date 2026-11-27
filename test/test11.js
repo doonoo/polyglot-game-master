@@ -1,4 +1,4 @@
-/* Voice exercises (Speak Up + dictation) and the idiom/slang lessons */
+/* 🎤 Dictation and the idiom/slang lessons (Speak Up rounds and their code are gone since 2.15) */
 const fs = require("fs"), path = require("path");
 const { JSDOM } = require("jsdom");
 const html = fs.readFileSync(path.join(__dirname, "..", "www", "index.html"), "utf8");
@@ -38,29 +38,8 @@ const bare = s => s.toLowerCase().replace(/[¿¡?!.,;:]/g, "").replace(/\s+/g, "
       const S = P.S;
       if(S.status !== "playing"){ $("restartBtn").hidden ? $("overMenuBtn").click() : $("restartBtn").click(); if(!P.S || P.S.status !== "playing"){ P.setup.mode = 1; $("startBtn").click(); } continue; }
       const ch = S.current.challenge, good = P.variantsOf(ch)[0];
-      if(ch.game === "Speak Up"){
-        stat.speak++;
-        const reading = ch.target === ch.answerKey; reading ? stat.read++ : stat.talk++;
-        if(ch.boss) fail(lang, "Speak Up during a boss");
-        if($("speakBox").hidden || !d.querySelector("[data-vmic]")) fail(lang, "no mic button on Speak Up");
-        if(!$("micBtn").hidden) fail(lang, "dictation mic shown on Speak Up");
-        let expectOk = true;
-        const words = good.split(" ");
-        if(stat.speak % 5 === 3){ w.__said = ["completely different words here"]; expectOk = false; }
-        else if(stat.speak % 5 === 4 && reading && words.length >= 6){
-          const ws = bare(good).split(" "); ws[ws.length - 1] = "zzzz"; w.__said = [ws.join(" ")]; stat.close++;
-        } else w.__said = ["uh", bare(good)];
-        d.querySelector("[data-vmic]").click();
-        await tick(10);
-        if(!w.__lastLang || !w.__lastLang.startsWith(ch.al)) fail(lang, "wrong recognition language", w.__lastLang, ch.al);
-        const j = P.S.judgement;
-        if(!j) { fail(lang, "speaking did not submit"); continue; }
-        if(expectOk && !j.correct) fail(lang, "spoken answer rejected", good, w.__said);
-        if(!expectOk){ if(j.correct) fail(lang, "wrong speech accepted", good); else stat.wrong++; }
-        if(expectOk && j.correct) stat.ok++;
-        if($("continueBtn") && !$("continueBtn").hidden) $("continueBtn").click();
-        continue;
-      }
+      if(ch.game === "Speak Up"){ stat.speak++; }
+      if(d.getElementById("speakBox")) fail(lang, "Speak Up box should be gone");
       if(!$("micBtn").hidden && ch.k === "s" && stat.dict < 3){
         w.__said = [bare(good)];
         $("micBtn").click(); await tick(10);
@@ -75,21 +54,10 @@ const bare = s => s.toLowerCase().replace(/[¿¡?!.,;:]/g, "").replace(/\s+/g, "
     if(stat.speak) fail(lang, "Speak Up should not appear any more", stat.speak);
     if(!stat.dict) fail(lang, "dictation should still work", stat);
     if(!stat.dict) fail(lang, "dictation never used");
-    // skip button swaps for a typing round
-    let guard = 0;
-    while(P.S && P.S.status === "playing" && P.S.current.challenge.game !== "Speak Up" && guard++ < 200){
-      const ch = P.S.current.challenge; $("answer").value = P.variantsOf(ch)[0] || "x"; ch.k === "p" ? $("giveUpBtn").click() : $("submitBtn").click();
-      if($("continueBtn") && !$("continueBtn").hidden) $("continueBtn").click();
-    }
-    if(P.S && P.S.current && P.S.current.challenge.game === "Speak Up"){
-      d.querySelector("[data-vskip]").click();
-      if(P.S.current.challenge.game === "Speak Up") fail(lang, "skip did not swap the round");
-      if(!$("speakBox").hidden) fail(lang, "speak box still shown after skip");
-    }
     // microphone denied: voice goes away
     guard = 0;
     while(P.S && P.S.status === "playing" && $("micBtn").hidden && guard++ < 50){
-      const ch = P.S.current.challenge; if(ch.game === "Speak Up"){ d.querySelector("[data-vskip]").click(); continue; }
+      const ch = P.S.current.challenge;
       $("answer").value = P.variantsOf(ch)[0] || "x"; ch.k === "p" ? $("giveUpBtn").click() : $("submitBtn").click();
       if($("continueBtn") && !$("continueBtn").hidden) $("continueBtn").click();
     }

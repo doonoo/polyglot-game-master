@@ -19,9 +19,9 @@ On a phone: the menu, a Spanish question, feedback with a grammar tip, then Fren
 
 <img src="docs/screenshots/overview-phones.png" alt="Five phone screenshots: the main menu with Leo the lion, a Spanish multiple-choice question, a feedback card with a grammar tip, a French round and a Mandarin round">
 
-On desktop: the ten game modes and a round in progress.
+On desktop: the game mode list and a round in progress.
 
-<img src="docs/screenshots/overview-desktop.png" alt="Two desktop screenshots: the list of ten game modes and a Syntax Scramble round">
+<img src="docs/screenshots/overview-desktop.png" alt="Two desktop screenshots: the list of game modes and a Syntax Scramble round">
 
 ## Get it
 
@@ -35,7 +35,7 @@ On desktop: the ten game modes and a round in progress.
 
 - **Full CEFR levels (A1 to B2):** every level covers grammar, everyday topics (food, home, travel, work, health, media, society...) and communication (introducing yourself, ordering, directions, invitations, opinions, complaints, formal emails...). Practice mode teaches each lesson, then brings it back until you recall it twice, and mixes in verb, tricky-pair and number drills.
 - **8-bit sound effects:** NES-style effects built from the same chip voices as the soundtrack: a stage-clear fanfare when you beat a level, a game-over tune when you lose, and sounds for combos, lost hearts, stars, unlocks, tiles, matched pairs, badges, loot and every part of a boss fight. The 🔊 sound switch turns them off.
-- **Six languages:** Spanish and English both ways, plus French, Portuguese, Mandarin Chinese and Arabic as full courses taught through English (levels A1–B1). Every mode works in every language, fitted to it: Numbers use each language's own number words, clock and money; Conjugation drills real French, Portuguese and Arabic verb tables (in Mandarin, whose verbs don't change, it becomes **Measure Words**: 个, 本, 张, 了, 过); Tricky Pairs covers each language's classic confusions (tu/vous, ser/estar, 不/没, هذا/هذه); plus Vocab, Island Hopper, Custom and two stories per language. Mandarin shows pinyin and Arabic shows transliteration; you can tap tiles or type in plain letters (Chinese ignores tones and spaces, Arabic ignores vowel marks), and Arabic is laid out right to left.
+- **Six languages:** Spanish and English both ways, plus French, Portuguese, Mandarin Chinese and Arabic as full courses taught through English (levels A1–B1, about 360 sentences each, most with a real learner mistake to spot in Error Hunter). Every mode works in every language, fitted to it: Numbers use each language's own number words, clock and money; Conjugation drills real French, Portuguese and Arabic verb tables (in Mandarin, whose verbs don't change, it becomes **Measure Words**: 个, 本, 张, 了, 过); Tricky Pairs covers each language's classic confusions (tu/vous, ser/estar, 不/没, هذا/هذه); plus Vocab, Island Hopper, Custom and two stories per language. Mandarin shows pinyin and Arabic shows transliteration; you can tap tiles or type in plain letters (Chinese ignores tones and spaces, Arabic ignores vowel marks), and Arabic is laid out right to left.
 - **🦁 Leo, your Game Master:** a lion mascot and app icon. Leo sits on the main menu (tap him for a hello in another language), cheers on right answers, winks at small typos, looks sad on misses and shows up on the end screen.
 - **Multiple-choice mini-games:** 🔘 Quick Pick (pick the right translation), 💡 Meaning Match (pick what it means), ✅ Right or Wrong (is this sentence correct?) and 🔎 Spot the Mistake (find the sentence with the error) rotate in with the typing games in Practice, Level Select, Survivor, Vocab, Conjugation, Tricky Pairs and Custom. After a Right or Wrong or Spot the Mistake answer, the card shows the sentence with the mistake crossed out and the correct version highlighted.
 - **More tap mini-games:** 🧩 Gap Fill (pick the missing word), 🔀 Order Up (pick the sentence in the right order), ⚖️ Meaning Check (does it mean this?), 🔢 Number Pick and 🔣 Number Match (digits ↔ words) in Numbers, and 👤 Who's Doing It? and 🕵️ Tense Detective (who does it, which tense) in Conjugation. They play in every language.
@@ -49,7 +49,7 @@ On desktop: the ten game modes and a round in progress.
 - **Daily quests and a daily challenge**, streaks, XP and trophies.
 - **Game modes:** Practice, Level Select, Survivor, Number Cruncher, Lexicon Onslaught, Island Hopper (25 topics of phrases about your own life), Conjugation Gym, Tricky Pairs (ser/estar, por/para, este/esto/aquel…) and Grammar Gym.
 - **Listening:** tap 🔊 to hear any sentence with the device's own text-to-speech voices.
-- **Dictation (where supported):** a 🎤 button in the answer box lets you say your answer instead of typing it. Listening (Echo Chamber) and speaking (Speak Up) rounds were removed in 2.10.1.
+- **Dictation (where supported):** a 🎤 button in the answer box lets you say your answer instead of typing it.
 - **Idioms and slang:** everyday idioms (B1), body and animal idioms (B2), and regional slang (B2). For Spanish that means Mexico, Spain, Argentina, Colombia and the Caribbean; for English, the US and the UK. There is also an Island Hopper island of sayings.
 - **Card Clash 🃏:** a card battle. Each turn deals a hand of word cards for a sentence, with decoys mixed in (including words from real learner mistakes). Play them in order to attack; longer sentences and right answers in a row hit harder, and reusing a word from the last sentence gives a **Linked!** bonus. Beat three foes with five hearts.
 - **Grammar Gym:** pick the grammar points you want (ser vs estar, the preterite, French reflexive verbs, Mandarin's 了…) from any level and drill only those. Each round shows the rule, then tests it with grammar-focused games; misses come back until you get them right. The end screen rates every point (✅ solid, 🟡 getting there, 🔴 needs work), and **🎯 My weak spots** builds a workout from the points you miss most, including misses in Practice, Level Select, Survivor and Custom. French, Portuguese, Mandarin and Arabic have their own grammar lessons for it (avoir and the subjunctive, por and para, 的 / 把 / 被, the article ال and the dual…), each sentence paired with a real learner mistake.
@@ -71,7 +71,8 @@ Needs Python 3 and Node.js 22.
 ```bash
 npm install
 npm run build      # writes www/index.html from src/
-npm test           # plays thousands of rounds in both directions
+npm run test:quick # the fast checks (content, grading, layout), about 2 minutes
+npm test           # everything: plays thousands of rounds in every mode, about 10 minutes
 ```
 
 Android app (needs the Android SDK and JDK 21). The `android/` project is checked in:

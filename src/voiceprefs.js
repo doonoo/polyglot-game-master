@@ -1,18 +1,13 @@
 /* ===================== Voice & audio quick settings =====================
-   One place, reachable from the main menu, to switch off the
-   rounds you can't do right now: listening (Echo Chamber)
-   and speaking (Speak Up, 🎤 dictation). Both switches drive the existing settings
-   (pgm-echo via #echoChk and pgm-voice via .voiceChk), so the in-game 🎛️ panel stays in sync. */
-Object.assign(I18N.en, {va_short:"Audio", va_btn:"Voice & audio", va_title:"Voice & audio", va_listen:"Listening challenges", va_listenSub:"Rounds where you hear a word or sentence and answer.",
+   One place, reachable from the main menu, for the 🎤 dictation switch. It drives the
+   existing setting (pgm-voice via .voiceChk), so the in-game 🎛️ panel stays in sync.
+   (The listening switch and Quiet mode went with the listening / speaking rounds.) */
+Object.assign(I18N.en, {va_short:"Audio", va_btn:"Voice & audio", va_title:"Voice & audio",
   va_speak:"Dictation button", va_speakSub:"A 🎤 button to say your answers instead of typing them.", va_speakNA:"Not available on this device.",
-  va_listenNA:"No voice on this device, so there are no listening rounds.",
-  va_note:"There are no listening or speaking rounds. You can still hear any sentence with 🔊 and dictate answers with 🎤.",
-  va_quiet:"Quiet mode: turn both off", va_done:"Done", va_quietOn:"🤫 Quiet mode on: no listening or speaking rounds"});
-Object.assign(I18N.es, {va_short:"Audio", va_btn:"Voz y audio", va_title:"Voz y audio", va_listen:"Retos de escucha", va_listenSub:"Rondas en las que oyes una palabra o frase y respondes.",
+  va_note:"You can hear any sentence with 🔊 and dictate answers with 🎤.", va_done:"Done"});
+Object.assign(I18N.es, {va_short:"Audio", va_btn:"Voz y audio", va_title:"Voz y audio",
   va_speak:"Botón de dictado", va_speakSub:"Un botón 🎤 para decir tus respuestas en vez de escribirlas.", va_speakNA:"No disponible en este dispositivo.",
-  va_listenNA:"Este dispositivo no tiene voz, así que no hay rondas de escucha.",
-  va_note:"No hay rondas de escucha ni de voz. Puedes oír cualquier frase con 🔊 y dictar respuestas con 🎤.",
-  va_quiet:"Modo silencio: apagar los dos", va_done:"Listo", va_quietOn:"🤫 Modo silencio: sin rondas de escucha ni de voz"});
+  va_note:"Puedes oír cualquier frase con 🔊 y dictar respuestas con 🎤.", va_done:"Listo"});
 
 (() => {
   const css = document.createElement("style");
@@ -37,9 +32,8 @@ Object.assign(I18N.es, {va_short:"Audio", va_btn:"Voz y audio", va_title:"Voz y 
   back.className = "vaback"; back.id = "vaSheet"; back.hidden = true;
   back.innerHTML = `<div class="vasheet" role="dialog" aria-modal="true" aria-labelledby="vaTitle">
     <h2 class="display" id="vaTitle"></h2><p class="note" id="vaNote"></p>
-    <label class="varow" id="vaListenRow"><span class="txt"><b>🎧 <span id="vaListenL"></span></b><small id="vaListenS"></small></span><input type="checkbox" id="vaListen"></label>
     <label class="varow" id="vaSpeakRow"><span class="txt"><b>🎤 <span id="vaSpeakL"></span></b><small id="vaSpeakS"></small></span><input type="checkbox" id="vaSpeak" class="voiceChk"></label>
-    <div class="vabtns"><button class="ghost" id="vaQuiet"></button><button class="primary" id="vaDone"></button></div></div>`;
+    <div class="vabtns"><button class="primary" id="vaDone"></button></div></div>`;
   document.body.appendChild(back);
   // menu button, next to the music chip
   const btn = document.createElement("button");
@@ -47,23 +41,14 @@ Object.assign(I18N.es, {va_short:"Audio", va_btn:"Voz y audio", va_title:"Voz y 
   $("menuMusicBtn").after(btn);
 })();
 
-const vaListenNA = () => typeof Narrator === "undefined" || !Narrator.available();
 const vaSpeakNA = () => typeof VOICE === "undefined" || !VOICE.supported() || (typeof voiceBlocked !== "undefined" && voiceBlocked);
 function vaRefresh(){
-  // 2.10.1: listening and speaking rounds are gone, so only the dictation switch is left
-  $("vaListenRow").hidden = true; $("vaQuiet").hidden = true;
-  const er = $("echoRow"); if(er) er.hidden = true;
   $("vaTitle").textContent = "🔈 " + t("va_title");
   $("vaNote").textContent = t("va_note");
-  $("vaListenL").textContent = t("va_listen");
-  $("vaListenS").textContent = vaListenNA() ? t("va_listenNA") : t("va_listenSub");
   $("vaSpeakL").textContent = t("va_speak");
   $("vaSpeakS").textContent = vaSpeakNA() ? t("va_speakNA") : t("va_speakSub");
-  $("vaQuiet").textContent = "🤫 " + t("va_quiet");
   $("vaDone").textContent = t("va_done");
-  $("vaListen").checked = !!echoOn && !vaListenNA(); $("vaListen").disabled = vaListenNA();
   $("vaSpeak").checked = !!voiceOn && !vaSpeakNA(); $("vaSpeak").disabled = vaSpeakNA();
-  $("vaListenRow").classList.toggle("na", vaListenNA());
   $("vaSpeakRow").classList.toggle("na", vaSpeakNA());
   // the menu chip shows at a glance when something is switched off
   const off = !voiceOn && !vaSpeakNA();
@@ -72,32 +57,17 @@ function vaRefresh(){
   b.setAttribute("aria-label", t("va_btn")); b.title = t("va_btn");
   b.classList.toggle("va-off", off);
 }
-function vaSetListen(on){
-  const chk = $("echoChk");
-  if(chk){ chk.checked = on; chk.dispatchEvent(new Event("change", {bubbles:true})); }
-  else { echoOn = on; try{ localStorage.setItem("pgm-echo", on ? "on" : "off"); }catch(e){} }
-}
-function vaSetSpeak(on){
-  const chk = $("vaSpeak"); chk.checked = on;
-  chk.dispatchEvent(new Event("change", {bubbles:true}));   // voice.js listens for .voiceChk changes
-}
 function vaOpen(){ vaRefresh(); $("vaSheet").hidden = false; setTimeout(() => { const f = $("vaSpeak").disabled ? $("vaDone") : $("vaSpeak"); f.focus(); }, 30); }
 function vaClose(){ $("vaSheet").hidden = true; vaRefresh(); }
 document.addEventListener("click", e => {
   if(e.target.closest("#menuAudioBtn")){ Sound.tap(); return vaOpen(); }
   if(e.target.id === "vaSheet" || e.target.closest("#vaDone")) return vaClose();
-  if(e.target.closest("#vaQuiet")){
-    if(!vaListenNA()) vaSetListen(false);
-    if(!vaSpeakNA()) vaSetSpeak(false);
-    vaRefresh(); toast(t("va_quietOn")); setTimeout(vaClose, 350);
-  }
 });
 document.addEventListener("change", e => {
-  if(e.target && e.target.id === "vaListen") vaSetListen(e.target.checked);
-  if(e.target && (e.target.id === "echoChk" || (e.target.classList && e.target.classList.contains("voiceChk")))) setTimeout(vaRefresh, 0);
+  if(e.target && e.target.classList && e.target.classList.contains("voiceChk")) setTimeout(vaRefresh, 0);
 });
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("vaSheet").hidden) vaClose(); });
 applyI18n = (orig => function(){ const r = orig.apply(this, arguments); try{ vaRefresh(); }catch(e){} return r; })(applyI18n);
 
 setTimeout(vaRefresh, 0);
-if(window.__PGM_TEST) window.__va = {vaOpen, vaClose, vaRefresh, get echoOn(){ return echoOn; }, get voiceOn(){ return voiceOn; }};
+if(window.__PGM_TEST) window.__va = {vaOpen, vaClose, vaRefresh, get voiceOn(){ return voiceOn; }};

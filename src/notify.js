@@ -19,7 +19,7 @@ function questsForDay(day){
   Math.random = seeded(hashStr(day + "|quests"));
   try{
     const core = pick(QUESTS.filter(q => q.core));
-    return [core].concat(shuffle(QUESTS.filter(q => !q.core && (!q.ear || canEcho()))).slice(0, 2));
+    return [core].concat(shuffle(QUESTS.filter(q => !q.core && !q.ear)).slice(0, 2));
   } finally { Math.random = orig; }
 }
 function pickBy(arr, key){ return arr.length ? arr[hashStr(key) % arr.length] : null; }

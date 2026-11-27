@@ -81,8 +81,6 @@ function ckBudget(ch){
   const k = ckMode(), len = String(ch.answerKey || ch.target || "").length;
   let s = CK_BASE[k] + Math.round(len / CK_PER[k]);
   if(Array.isArray(ch.pairs)) s += ch.pairs.length * CK_PAIR[k];
-  if(ch.game === "Echo Chamber") s += 4;
-  if(ch.game === "Speak Up") s += 6;
   return s * 1000;
 }
 function ckPaused(){

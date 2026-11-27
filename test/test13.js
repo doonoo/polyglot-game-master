@@ -1,4 +1,4 @@
-/* Voice & audio quick settings: menu sheet, listening and speaking switches, quiet mode, World Languages respects them */
+/* Voice & audio quick settings: menu sheet with the 🎤 dictation switch (listening switch and quiet mode removed in 2.15) */
 const fs = require("fs"), path = require("path");
 const { JSDOM } = require("jsdom");
 const html = fs.readFileSync(path.join(__dirname, "..", "www", "index.html"), "utf8");
@@ -27,12 +27,8 @@ function boot(withVoice){
   if(!/Audio/.test(btn.textContent) || btn.getAttribute("aria-label") !== "Voice & audio") fail("menu button label", btn.textContent);
   btn.click();
   if($("vaSheet").hidden) fail("sheet did not open");
-  if($("vaListen").disabled || !$("vaListen").checked) fail("listening switch should be on and enabled");
+  if($("vaListen") || $("vaQuiet") || $("echoChk")) fail("listening switch / quiet mode should be gone");
   if($("vaSpeak").disabled || !$("vaSpeak").checked) fail("speaking switch should be on and enabled");
-  // listening off
-  $("vaListen").checked = false; $("vaListen").dispatchEvent(new w.Event("change", {bubbles:true}));
-  if(w.localStorage.getItem("pgm-echo") !== "off") fail("listening off not saved");
-  if($("echoChk").checked) fail("in-game listening switch not synced");
   // speaking off
   $("vaSpeak").checked = false; $("vaSpeak").dispatchEvent(new w.Event("change", {bubbles:true}));
   await new Promise(r => setTimeout(r, 10));
@@ -41,18 +37,13 @@ function boot(withVoice){
   if(!btn.classList.contains("va-off") || !/🔇/.test(btn.textContent)) fail("menu button should show something is off");
   $("vaDone").click();
   if(!$("vaSheet").hidden) fail("sheet did not close");
-  // both back on through the in-game switches, the sheet follows
-  $("echoChk").checked = true; $("echoChk").dispatchEvent(new w.Event("change", {bubbles:true}));
+  // back on through the in-game switch, the sheet follows
   const vc = d.querySelector("#voiceExRow .voiceChk"); vc.checked = true; vc.dispatchEvent(new w.Event("change", {bubbles:true}));
   await new Promise(r => setTimeout(r, 10));
   btn.click();
-  if(!$("vaListen").checked || !$("vaSpeak").checked) fail("sheet out of sync with in-game switches");
+  if(!$("vaSpeak").checked) fail("sheet out of sync with in-game switch");
   if(btn.classList.contains("va-off")) fail("menu button still shows off");
-  // quiet mode
-  $("vaQuiet").click();
-  await new Promise(r => setTimeout(r, 400));
-  if(w.localStorage.getItem("pgm-echo") !== "off" || w.localStorage.getItem("pgm-voice") !== "off") fail("quiet mode did not turn both off");
-  if(!$("vaSheet").hidden) fail("quiet mode should close the sheet");
+  $("vaDone").click();
   // Spanish UI
   const sel = $("uiSel"); sel.value = "es"; sel.dispatchEvent(new w.Event("change", {bubbles:true}));
   await new Promise(r => setTimeout(r, 20));
@@ -68,8 +59,8 @@ function boot(withVoice){
   dom = boot(false); w = dom.window; d = w.document;
   await new Promise(r => setTimeout(r, 300));
   d.getElementById("menuAudioBtn").click();
-  if(!d.getElementById("vaListen").disabled || !d.getElementById("vaSpeak").disabled) fail("switches should be disabled without voice support");
-  if(!/Not available|No voice/.test(d.getElementById("vaSheet").textContent)) fail("no explanation when unsupported");
+  if(!d.getElementById("vaSpeak").disabled) fail("dictation switch should be disabled without voice support");
+  if(!/Not available/.test(d.getElementById("vaSheet").textContent)) fail("no explanation when unsupported");
   if(dom.errors.length) fail("page errors (no voice)", dom.errors.slice(0, 3).map(String));
 
   if(fails){ console.log(fails, "FAILURES"); process.exit(1); }

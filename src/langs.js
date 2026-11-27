@@ -124,7 +124,7 @@ tileItems = (orig => function(ch){
   const base = orig.apply(this, arguments);
   if(base || !ch || !(ch.al === "zh" || ch.al === "ar")) return base;
   const first = canon(ch.acc[ch.game === "Cloze Combat" ? 1 : 0]);
-  if(ch.game === "Classic Mine" || ch.game === "Echo Chamber" || ch.game === "Error Hunter"){
+  if(ch.game === "Classic Mine" || ch.game === "Error Hunter"){
     const words = first.split(" ");
     const items = xlShuf(words.concat(xlExtra(ch.al, words, Math.min(3, Math.max(2, 7 - words.length)))));
     return {mode:"words", items, keepScreen:true};

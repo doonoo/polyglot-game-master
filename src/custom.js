@@ -12,7 +12,7 @@ const CSRC = [
 ];
 const VOCAB_GAMES = ["Classic Mine","Reverse Mine","Syntax Scramble","Odd One Out","Match Madness"];
 function srcGames(src){
-  if(src.mode === 5) return VOCAB_GAMES.filter(g => g !== "Echo Chamber" || canEcho());
+  if(src.mode === 5) return VOCAB_GAMES.slice();
   return gamesFor({mode:src.mode});
 }
 const ALL_CGAMES = () => [...new Set(CSRC.flatMap(srcGames))];

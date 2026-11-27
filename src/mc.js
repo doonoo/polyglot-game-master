@@ -135,7 +135,7 @@ function mcPerturb(right, ch, pool){
 
 function mcBuild(st, ch){
   const mcx = ch.mcx; delete ch.mcx;
-  if(ch.k === "p" || ch.parts || Array.isArray(ch.opts) || ch.game === "Odd One Out" || ch.game === "Speak Up" || ch.game === "Match Madness") return;
+  if(ch.k === "p" || ch.parts || Array.isArray(ch.opts) || ch.game === "Odd One Out" || ch.game === "Match Madness") return;
   const loose = {native:st.native, mode:1};
   const ok = (a, s) => { try{ return gradeLocal(s || loose, ch, a, false).correct; }catch(e){ return false; } };
   let right = ch.game === "Cloze Combat" ? first(ch.acc[0]) : String(ch.answerKey || "");

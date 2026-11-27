@@ -68,7 +68,7 @@ makePlanCore = (orig => function(st, rolls, exclude){
     const srcs = mixSources(st);
     if(srcs.length){
       const src = srcs[Math.floor(rolls.s * srcs.length)], m = mixState(st, src);
-      const games = gamesFor(m).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && g !== "Speak Up" && !(st.mode === 3 && (g === "Cloze Combat" || g === "Word Duel")));
+      const games = gamesFor(m).filter(g => g !== "Match Madness" && !(st.mode === 3 && (g === "Cloze Combat" || g === "Word Duel")));
       return {kind:"mix", src, idx:Math.floor(rolls.c * m.syllabus.length), game:games[Math.floor(rolls.g * games.length)]};
     }
   }

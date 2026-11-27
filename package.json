@@ -1,12 +1,13 @@
 {
   "name": "polyglot-game-master",
   "version": "1.0.0",
-  "description": "Learn Spanish or English with games, stories, a learning path and daily quests. Offline, no account, no ads.",
+  "description": "Learn Spanish, English, French, Portuguese, Mandarin or Arabic with mini-games, stories and daily quests. Offline, no account, no ads.",
   "license": "MIT",
   "private": true,
   "scripts": {
     "build": "python3 tools/build.py",
-    "test": "node test/test.js && node test/test4.js && node test/test5.js && node test/test6.js && node test/test7.js && node test/test8.js && node test/test9.js && node test/test10.js && node test/test11.js && node test/test12.js && node test/test13.js && node test/test14.js && node test/test15.js && node test/test16.js && node test/test17.js && node test/test18.js && node test/test19.js && node test/test20.js && node test/test21.js && node test/test22.js",
+    "test": "node test/test.js && node test/test4.js && node test/test5.js && node test/test6.js && node test/test7.js && node test/test8.js && node test/test9.js && node test/test10.js && node test/test11.js && node test/test12.js && node test/test13.js && node test/test14.js && node test/test15.js && node test/test16.js && node test/test17.js && node test/test18.js && node test/test19.js && node test/test20.js && node test/test21.js && node test/test22.js && node test/test23.js",
+    "test:quick": "python3 tools/build.py && node test/test4.js && node test/test5.js && node test/test7.js && node test/test10.js && node test/test11.js && node test/test12.js && node test/test13.js && node test/test14.js && node test/test17.js && node test/test19.js && node test/test20.js && node test/test21.js && node test/test22.js && node test/test23.js",
     "android": "npx cap sync android && npx cap open android"
   },
   "dependencies": {

@@ -7,7 +7,7 @@ WL.ar.units.push(
   b:"**ال** (al-) = 'the', joined to the word: **كتاب** (kitāb) = a book, **الكتاب** (al-kitāb) = the book. Before 'sun letters' (t, d, r, s, sh, n…) the l isn't said: **الشمس** (ash-shams). An adjective after a 'the' noun takes **ال** too: **المدرس الجديد** = the new teacher.",
   w:[["الكتاب","the book","al-kitāb"],["الشمس","the sun","ash-shams"],["القمر","the moon","al-qamar"],["الباب","the door","al-bāb"]],
   s:[["The book is new.","الكتاب جديد","al-kitāb jadīd","كتاب الجديد"],
-     ["the big house","البيت الكبير","al-bayt al-kabīr","بيت الكبير"],
+     ["the new car","السيارة الجديدة","as-sayyāra al-jadīda","سيارة الجديدة"],
      ["The sun is hot.","الشمس حارة","ash-shams ḥārra","الشمس حار"],
      ["Where is the car?","أين السيارة","ayna as-sayyāra","أين سيارة"],
      ["the new teacher","المدرس الجديد","al-mudarris al-jadīd","مدرس الجديد"],

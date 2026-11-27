@@ -469,15 +469,7 @@ html{overflow-x:hidden;overflow-x:clip}
 @keyframes bbPulse{50%{filter:brightness(1.35)}}
 .challenge.boss{animation:bossShake .5s ease-out}
 @keyframes bossShake{0%{transform:scale(.96) rotate(-1deg)}30%{transform:scale(1.02) rotate(1deg)}60%{transform:rotate(-.5deg)}100%{transform:none}}
-/* voice exercises */
-.speak{display:flex;flex-direction:column;align-items:center;gap:10px;margin:6px 0 10px}
-.mic-big{display:flex;align-items:center;gap:10px;padding:14px 26px;border-radius:999px;border:0;background:linear-gradient(135deg,var(--violet),var(--violet-deep));color:#fff;font-weight:800;font-size:1.05rem;box-shadow:var(--shadow);cursor:pointer}
-.mic-big .mic-ico{font-size:1.5rem}
-body.listening .mic-big{background:linear-gradient(135deg,#FF3B5C,#FF8A3D);animation:micPulse 1.1s ease-in-out infinite}
-.speak-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.speak-heard{min-height:1.2em;text-align:center;margin:0}
-body.speaking #answer,body.speaking label[for="answer"]{display:none}
-body.speaking #submitBtn,body.speaking #accentKeys{display:none!important}
+/* 🎤 dictation */
 .answrap{position:relative}
 .answrap #answer{width:100%}
 body.micok .answrap #answer{padding-right:54px}
@@ -485,7 +477,7 @@ body.micok .answrap #answer{padding-right:54px}
 .answrap .mic[hidden]{display:none}
 .answrap .mic.on{background:#FF3B5C;color:#fff;border-color:#FF3B5C;animation:micPulse 1.1s ease-in-out infinite}
 @keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,59,92,.55)}50%{box-shadow:0 0 0 12px rgba(255,59,92,0)}}
-body.noanim .mic-big,body.noanim .answrap .mic.on{animation:none}
+body.noanim .answrap .mic.on{animation:none}
 </style>
 </head>
 <body>
@@ -665,7 +657,6 @@ body.noanim .mic-big,body.noanim .answrap .mic.on{animation:none}
       <label class="srow"><span>🎵 <span data-i18n="music">Music</span></span><input type="checkbox" id="musicChk"></label>
       <label class="srow"><span data-i18n="volume">Volume</span><input type="range" id="musicVol" min="0" max="100"></label>
       <label class="srow"><span>🔊 <span data-i18n="sfx">Sound effects</span></span><input type="checkbox" id="sfxChk"></label>
-      <label class="srow" id="echoRow" hidden><span>🎧 <span data-i18n="echoOn">Listening games</span></span><input type="checkbox" id="echoChk"></label>
       <div class="vrow" id="voiceRow" hidden><b>🗣️ <span data-i18n="voices">Voices</span></b><label class="vl" for="voice-es" data-i18n="voiceEs">Spanish voice</label><div class="vsel"><select id="voice-es"></select><button class="chip" type="button" data-vtest="es">▶ <span data-i18n="voiceTest">Test</span></button></div><label class="vl" for="voice-en" data-i18n="voiceEn">English voice</label><div class="vsel"><select id="voice-en"></select><button class="chip" type="button" data-vtest="en">▶ <span data-i18n="voiceTest">Test</span></button></div><p class="note" data-i18n="voiceTip"></p></div>
       <label class="srow" id="readRow" hidden><span>🗣️ <span data-i18n="readOn">Read each turn aloud</span></span><input type="checkbox" id="readChk"></label>
     </div>
@@ -1062,11 +1053,10 @@ function freshState(o){
 /* ===================== Game logic (deterministic) ===================== */
 function gamesFor(st){
   if(st.mode === 4) return Object.keys(NUM_GAMES);
-  const ear = canEcho() ? ["Echo Chamber"] : [];
   if(st.mode === 7) return ["Verb Forge","Time Machine","Slip Fixer"];
   if(st.mode === 8) return ["Word Duel","Cloze Combat","Error Hunter","Classic Mine"];
-  if(st.mode === 5) return ["Classic Mine","Reverse Mine","Syntax Scramble","Odd One Out","Match Madness"].concat(ear);
-  return (st.mode === 3 ? ["Classic Mine","Reverse Mine","Syntax Scramble","Error Hunter"] : ["Classic Mine","Reverse Mine","Syntax Scramble","Cloze Combat","Error Hunter"]).concat(ear);
+  if(st.mode === 5) return ["Classic Mine","Reverse Mine","Syntax Scramble","Odd One Out","Match Madness"];
+  return (st.mode === 3 ? ["Classic Mine","Reverse Mine","Syntax Scramble","Error Hunter"] : ["Classic Mine","Reverse Mine","Syntax Scramble","Cloze Combat","Error Hunter"]);
 }
 function addSrs(st, k, type, m){
   if(!k) return;
@@ -4513,7 +4503,6 @@ function genSentence(st, plan, c, review, res){
     if(n >= 3 && n <= 10) combos.push({g:"Syntax Scramble", it});
     if(it[2] && !surv && blank(T, it[2])) combos.push({g:"Cloze Combat", it});
     if(it[3] && !(surv && it[3][0] === "~")) combos.push({g:"Error Hunter", it});
-    if(canEcho() && n >= 2 && n <= 12) combos.push({g:"Echo Chamber", it});
   }
   if(st.mode === 8){
     combos = combos.filter(x => x.g === "Classic Mine" || x.g === "Error Hunter" || x.g === "Cloze Combat");
@@ -4542,7 +4531,6 @@ function genSentence(st, plan, c, review, res){
     ch.opts = shuffle([...new Set((it[4] || c.o).concat([it[2]]))]);
     ch.hint = L.hMeans(N);
   }
-  else if(sel.g === "Echo Chamber"){ task = L.tEcho(LN[nat][st.target]); ch.target = T; ch.hint = L.hWords(T.split(" ").length); }
   else { task = surv ? L.tErrS : L.tErr(N); ch.target = it[3].replace(/^~/, ""); ch.hint = L.hTopic(c.t); }
   if(c.island && review && sel.g === "Classic Mine") ch.hint = L.hWords(T.split(" ").length);
   if(plan.boss) ch.hint = "";
@@ -4617,7 +4605,6 @@ function genVocab(st, plan){
   const games = ["Classic Mine", "Reverse Mine"];
   if(!/\s/.test(core) && core.length >= 4) games.push("Syntax Scramble");
   if(oddCats.length) games.push("Odd One Out");
-  if(canEcho()) games.push("Echo Chamber");
   if(known.length >= 3) games.push("Match Madness");
   let game = games.includes(plan.game) ? plan.game : pick(games.filter(x => x !== st.lastGame).length ? games.filter(x => x !== st.lastGame) : games);
   if(plan.boss) game = "Classic Mine";
@@ -4629,8 +4616,6 @@ function genVocab(st, plan){
     let letters = core.split("");
     for(let i = 0; i < 12; i++){ letters = shuffle(core.split("")); if(letters.join("") !== core) break; }
     task = L.vScr(m); ch.target = letters.join(" ");
-  } else if(game === "Echo Chamber"){
-    task = L.vEcho(LN[nat][st.target]); ch.target = k; ch.hint = L.hLetter(core.charAt(0), core.length);
   } else if(game === "Match Madness"){
     const others = shuffle(known).filter((e, i, a) => a.findIndex(x => mean(x) === mean(e)) === i && mean(e) !== m && key(e) !== k).slice(0, matchRows(st) - 1);
     ch.pairs = shuffle([[k, m]].concat(others.map(e => [key(e), mean(e)])));
@@ -10235,34 +10220,6 @@ NUMSYL.B2 = [
  {ty:"int",a:1,b:999999999,en:"Final boss: any number",es:"Jefe final: cualquier número"}
 ];
 
-/* ===================== Listening game (Echo Chamber) ===================== */
-let echoOn = true;
-try{ echoOn = localStorage.getItem("pgm-echo") !== "off"; }catch(e){}
-// 2.10.1: listening rounds (Echo Chamber) were removed at Emmanuel's request; everything that offered one checks this
-const canEcho = () => false;
-function echoPlay(slow){
-  const c = S && S.current; if(!c) return;
-  const text = c.challenge.target, lang = LANG_CODE[S.target];
-  try{
-    const ss = window.speechSynthesis;
-    if(ss && window.SpeechSynthesisUtterance){
-      ss.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = lang;
-      const v = bestVoice(lang);
-      if(v) u.voice = v;
-      u.rate = slow ? 0.65 : 1;
-      ss.speak(u);
-      return;
-    }
-  }catch(e){}
-  Narrator.say([{text, lang}]);
-}
-$("echoChk").addEventListener("change", () => {
-  echoOn = $("echoChk").checked;
-  try{ localStorage.setItem("pgm-echo", echoOn ? "on" : "off"); }catch(e){}
-});
-
 /* ===================== Match Madness ===================== */
 let pairState = null;
 const PAIR_DELAY = window.__PGM_TEST ? 0 : 450;
@@ -10305,7 +10262,7 @@ $("pairs").addEventListener("click", e => {
   }
 });
 
-/* ===================== Challenge extras (tiles, listening, pairs) ===================== */
+/* ===================== Challenge extras (tiles, pairs) ===================== */
 function renderExtras(fresh){
   const tiles = $("tiles"), keys = $("accentKeys"), screen = $("chTarget").parentElement, pairs = $("pairs");
   const ansLabel = document.querySelector('label[for="answer"]');
@@ -10318,12 +10275,6 @@ function renderExtras(fresh){
   screen.hidden = (!!ti && ch.game !== "Word Duel") || isPairs;
   if(isPairs){ tiles.hidden = true; renderPairs(ch, fresh); }
   else pairState = null;
-  if(ch.game === "Echo Chamber"){
-    if(canEcho()){
-      $("chTarget").innerHTML = `<div class="echo"><button class="echo-btn" data-echo="1">🔊 ${esc(t("playAudio"))}</button><button class="echo-btn slow" data-echo="slow">🐢 ${esc(t("slowAudio"))}</button><button class="echo-skip" data-echoskip="1">🔇 ${esc(t("cantListen"))}</button></div>`;
-      if(fresh) setTimeout(() => echoPlay(false), 500);
-    } else $("chTarget").textContent = ch.target;
-  }
   if(!ti){ tiles.hidden = true; tiles.innerHTML = ""; tiles.dataset.key = ""; return; }
   tiles.hidden = false;
   if(fresh || tiles.dataset.key !== ch.target){
@@ -10333,7 +10284,6 @@ function renderExtras(fresh){
       (ti.mode !== "pick" ? `<button class="tile undo" data-undo="1" aria-label="${esc(t("undoTile"))}">⌫</button>` : "");
   }
 }
-$("chTarget").addEventListener("click", e => { const b = e.target.closest("[data-echo]"); if(b){ Sound.unlock(); echoPlay(b.dataset.echo === "slow"); } });
 
 /* ===================== Phrasebook ===================== */
 profile.bank = {}; profile.echo = 0; profile.match = 0; profile.conj = 0;
@@ -10352,7 +10302,6 @@ function recordTurn(prevCh, j){
   if(!S) return;
   const tgt = LANG_CODE[S.target];
   if(prevCh && j && j.correct && !j.gaveUp){
-    if(prevCh.game === "Echo Chamber") profile.echo++;
     if(prevCh.game === "Match Madness") profile.match++;
     if(prevCh.k === "c") profile.conj++;
   }
@@ -10501,31 +10450,6 @@ $("voiceRow").addEventListener("change", e => {
 $("voiceRow").addEventListener("click", e => { const b = e.target.closest("[data-vtest]"); if(b){ Sound.unlock(); testVoice(b.dataset.vtest); } });
 try{ if(window.speechSynthesis) window.speechSynthesis.addEventListener("voiceschanged", renderVoices); }catch(e){}
 
-/* ===================== Skip a listening round (no penalty) ===================== */
-function skipEcho(){
-  const c = S && S.current;
-  if(!c || c.challenge.game !== "Echo Chamber" || S.status !== "playing") return;
-  Narrator.stop();
-  try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
-  const plan = Object.assign({}, c.plan, {game:"Classic Mine", swarm:false});
-  if(S.mode === 5) plan.key = c.plan.key || c.challenge.wk;
-  const was = echoOn; echoOn = false;
-  let res = null;
-  try{ res = generate(Object.assign({}, S, {lastGame:"Echo Chamber"}), plan); }catch(e){}
-  finally{ echoOn = was; }
-  const ch = res && res.challenge;
-  if(!ch || !ch.target) return;
-  c.challenge = {game:String(ch.game), boss: plan.boss ? String(ch.boss || "") : "", task:String(ch.task || ""), target:String(ch.target),
-    hint: S.mode === 3 ? "" : String(ch.hint || ""), answerKey:String(ch.answerKey || ""), speak:"", acc:ch.acc || [], al:ch.al || "", k:ch.k || "s",
-    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:Array.isArray(ch.pairs) ? ch.pairs : null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double, parts:Array.isArray(ch.parts) ? ch.parts : null};
-  S.lastGame = c.challenge.game;
-  save();
-  $("answer").value = "";
-  renderGame(true);
-  toast("🔇 " + t("echoSkipped"));
-}
-$("chTarget").addEventListener("click", e => { if(e.target.closest("[data-echoskip]")) skipEcho(); });
-
 /* ===================== Daily challenge, Fix my mistakes, Stats ===================== */
 profile.days = {}; profile.modes = {}; profile.mistakes = []; profile.fixed = 0;
 profile.daily = {}; profile.dailyCount = 0; profile.dailyBest = 0;
@@ -10547,7 +10471,7 @@ function trackMistake(prevCh, j){
   const m = S.mode, mm = profile.modes[m] = profile.modes[m] || {a:0, c:0};
   if(!j.gaveUp) mm.a++;
   if(j.correct) mm.c++;
-  if(prevCh.k === "p" || prevCh.game === "Echo Chamber" || prevCh.game === "Speak Up") return;
+  if(prevCh.k === "p") return;
   const key = mistakeKey(prevCh);
   profile.mistakes = profile.mistakes.filter(x => mistakeKey(x.ch) !== key);
   if(!j.correct){
@@ -10569,9 +10493,8 @@ function dailyKey(){ return `${dayStr(new Date())}|${setup.target}|${dailyLevel(
 const dailyLevel = () => LEVELS.includes(setup.level) ? setup.level : "A1";
 function buildDaily(){
   const target = setup.target, native = setup.native, level = dailyLevel();
-  const orig = Math.random, was = echoOn, out = [];
+  const orig = Math.random, out = [];
   Math.random = seeded(hashStr(dailyKey()));
-  echoOn = false;
   try{
     for(const m of shuffle([1,1,1,7,7,8,8,4,5,5])){
       const st = freshState({mode:m, target, native, level});
@@ -10579,19 +10502,19 @@ function buildDaily(){
       if(m === 5) plan = {kind:"vocab", swarm:true, game:pick(["Classic Mine","Reverse Mine","Syntax Scramble"])};
       else {
         st.syllabus = syllabusFor(st); st.done = st.syllabus.map(() => false);
-        const games = gamesFor(st).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && g !== "Speak Up" && !MCG.has(g));
+        const games = gamesFor(st).filter(g => g !== "Match Madness" && !MCG.has(g));
         plan = {kind:"syllabus", idx:Math.floor(Math.random() * st.syllabus.length), game:pick(games)};
       }
       let res = null;
       try{ res = generate(st, plan); }catch(e){}
       const ch = res && res.challenge;
-      if(ch && ch.target && ch.k !== "p" && ch.game !== "Echo Chamber"){
+      if(ch && ch.target && ch.k !== "p"){
         const c = {mode:m};
         for(const f of ["game","task","target","acc","al","k","nn","answerKey","why","opts","wk","wm"]) if(ch[f] !== undefined && ch[f] !== null) c[f] = ch[f];
         out.push({ch:c, native, target});
       }
     }
-  } finally { Math.random = orig; echoOn = was; }
+  } finally { Math.random = orig; }
   return out;
 }
 
@@ -11304,7 +11227,7 @@ function ensureQuests(){
   let list;
   try{
     const core = pick(QUESTS.filter(q => q.core));
-    const rest = shuffle(QUESTS.filter(q => !q.core && (!q.ear || canEcho()))).slice(0, 2);
+    const rest = shuffle(QUESTS.filter(q => !q.core && !q.ear)).slice(0, 2);
     list = [core].concat(rest).map(q => ({id:q.id, g:q.g, n:0, done:false}));
   } finally { Math.random = orig; }
   profile.quests = {d:profile.today, list, bonus:false};
@@ -11348,7 +11271,6 @@ recordTurn = (orig => function(prevCh, j){
   if(prevCh.k === "c") questAdd("conj");
   if(S.mode === 8) questAdd("tricky");
   if(S.mode === 5) questAdd("vocab");
-  if(prevCh.game === "Echo Chamber") questAdd("listen");
 })(recordTurn);
 
 /* ---------- Stories ---------- */
@@ -11525,7 +11447,7 @@ function questsForDay(day){
   Math.random = seeded(hashStr(day + "|quests"));
   try{
     const core = pick(QUESTS.filter(q => q.core));
-    return [core].concat(shuffle(QUESTS.filter(q => !q.core && (!q.ear || canEcho()))).slice(0, 2));
+    return [core].concat(shuffle(QUESTS.filter(q => !q.core && !q.ear)).slice(0, 2));
   } finally { Math.random = orig; }
 }
 function pickBy(arr, key){ return arr.length ? arr[hashStr(key) % arr.length] : null; }
@@ -11815,7 +11737,7 @@ makePlanCore = (orig => function(st, rolls, exclude){
     const srcs = mixSources(st);
     if(srcs.length){
       const src = srcs[Math.floor(rolls.s * srcs.length)], m = mixState(st, src);
-      const games = gamesFor(m).filter(g => g !== "Echo Chamber" && g !== "Match Madness" && g !== "Speak Up" && !(st.mode === 3 && (g === "Cloze Combat" || g === "Word Duel")));
+      const games = gamesFor(m).filter(g => g !== "Match Madness" && !(st.mode === 3 && (g === "Cloze Combat" || g === "Word Duel")));
       return {kind:"mix", src, idx:Math.floor(rolls.c * m.syllabus.length), game:games[Math.floor(rolls.g * games.length)]};
     }
   }
@@ -11896,7 +11818,7 @@ const CSRC = [
 ];
 const VOCAB_GAMES = ["Classic Mine","Reverse Mine","Syntax Scramble","Odd One Out","Match Madness"];
 function srcGames(src){
-  if(src.mode === 5) return VOCAB_GAMES.filter(g => g !== "Echo Chamber" || canEcho());
+  if(src.mode === 5) return VOCAB_GAMES.slice();
   return gamesFor({mode:src.mode});
 }
 const ALL_CGAMES = () => [...new Set(CSRC.flatMap(srcGames))];
@@ -12214,8 +12136,6 @@ function ckBudget(ch){
   const k = ckMode(), len = String(ch.answerKey || ch.target || "").length;
   let s = CK_BASE[k] + Math.round(len / CK_PER[k]);
   if(Array.isArray(ch.pairs)) s += ch.pairs.length * CK_PAIR[k];
-  if(ch.game === "Echo Chamber") s += 4;
-  if(ch.game === "Speak Up") s += 6;
   return s * 1000;
 }
 function ckPaused(){
@@ -13254,33 +13174,26 @@ confetti = function(n){
 document.addEventListener("visibilitychange", () => { if(document.hidden) fxStop(); });
 window.addEventListener("pagehide", fxStop);
 
-/* ===================== Voice exercises (v2.0) =====================
+/* ===================== 🎤 Dictation =====================
    Only where the device can do speech recognition: Chrome/Edge/Safari on the web
    (Web Speech API) or the Android app (phone's own recognizer, via
    @capacitor-community/speech-recognition). Everywhere else it stays hidden.
-   - "Speak Up": read a sentence out loud, or hear it in your language and say it.
-   - 🎤 button next to the answer box: dictate any typed answer. */
+   A 🎤 button next to the answer box dictates any typed answer.
+   (The Speak Up rounds were removed in 2.10.1 and their code in 2.15.) */
 Object.assign(I18N.en, {
-  "game.Speak Up":"Speak Up", vToggle:"🎤 Dictation", vToggleSub:"A 🎤 button to say your answers instead of typing them. Uses your device's speech recognition (may need internet).",
-  vTap:"Tap and speak", vListening:"Listening… speak now", vStop:"Tap to stop", vHear:"Hear it", vSkip:"Can't talk now", vMic:"Dictate your answer",
-  vHeard:"I heard: {s}", vClose:"Close enough! I heard: {s}", vNoSpeech:"I didn't catch that. Tap the mic and try again.",
-  vDenied:"Microphone access is blocked, so voice exercises are off for now. You can allow it in your browser or phone settings.",
+  vToggle:"🎤 Dictation", vToggleSub:"A 🎤 button to say your answers instead of typing them. Uses your device's speech recognition (may need internet).",
+  vMic:"Dictate your answer", vNoSpeech:"I didn't catch that. Tap the mic and try again.",
+  vDenied:"Microphone access is blocked, so dictation is off for now. You can allow it in your browser or phone settings.",
   vNet:"Speech recognition needs an internet connection right now.", vErr:"Speech recognition didn't work. You can type your answer instead.",
-  vSkipped:"No problem, here's a typing round instead.", kbMic:"Speak (voice exercises)"
+  kbMic:"Dictate your answer"
 });
 Object.assign(I18N.es, {
-  "game.Speak Up":"¡Habla!", vToggle:"🎤 Dictado", vToggleSub:"Un botón 🎤 para decir tus respuestas en vez de escribirlas. Usa el reconocimiento de voz de tu dispositivo (puede necesitar internet).",
-  vTap:"Toca y habla", vListening:"Escuchando… habla ahora", vStop:"Toca para parar", vHear:"Escuchar", vSkip:"No puedo hablar ahora", vMic:"Dicta tu respuesta",
-  vHeard:"Escuché: {s}", vClose:"¡Casi perfecto! Escuché: {s}", vNoSpeech:"No te entendí. Toca el micrófono e inténtalo otra vez.",
-  vDenied:"El micrófono está bloqueado, así que los ejercicios de voz se desactivan por ahora. Puedes permitirlo en los ajustes del navegador o del teléfono.",
+  vToggle:"🎤 Dictado", vToggleSub:"Un botón 🎤 para decir tus respuestas en vez de escribirlas. Usa el reconocimiento de voz de tu dispositivo (puede necesitar internet).",
+  vMic:"Dicta tu respuesta", vNoSpeech:"No te entendí. Toca el micrófono e inténtalo otra vez.",
+  vDenied:"El micrófono está bloqueado, así que el dictado se desactiva por ahora. Puedes permitirlo en los ajustes del navegador o del teléfono.",
   vNet:"El reconocimiento de voz necesita conexión a internet ahora mismo.", vErr:"El reconocimiento de voz no funcionó. Puedes escribir tu respuesta.",
-  vSkipped:"Sin problema, aquí tienes una ronda escrita.", kbMic:"Hablar (ejercicios de voz)"
+  kbMic:"Dictar tu respuesta"
 });
-GAME_ICO["Speak Up"] = "🎤";
-const VTASK = {
-  en:{read:T => `Read this out loud in ${T}:`, talk:T => `Say this out loud in ${T}:`},
-  es:{read:T => `Lee esto en voz alta en ${T}:`, talk:T => `Dilo en voz alta en ${T}:`}
-};
 
 const VOICE = (() => {
   const C = window.Capacitor;
@@ -13330,70 +13243,12 @@ const VOICE = (() => {
   return {supported:() => ok, listen, stop, busy:() => busy, locale, native};
 })();
 
-let voiceOn = true, voiceBlocked = false, voiceSuppress = false;
+let voiceOn = true, voiceBlocked = false;
 try{ voiceOn = localStorage.getItem("pgm-voice") !== "off"; }catch(e){}
-const canSpeak = () => voiceOn && !voiceBlocked && !voiceSuppress && VOICE.supported();
-const SPEAK_MODES = new Set([1, 2, 3, 6]);
-profile.voice = profile.voice || 0;
-
-/* ---------- Rotation: Speak Up joins the sentence games ---------- */
-gamesFor = (orig => function(st){
-  // 2.10.1: Speak Up rounds were removed at Emmanuel's request; the 🎤 dictation button stays
-  return orig(st).filter(g => g !== "Speak Up");
-})(gamesFor);
-
-genSentence = (orig => function(st, plan, c, review, res){
-  if(!plan || plan.game !== "Speak Up" || plan.boss || !canSpeak()) return orig(st, plan, c, review, res);
-  const out = orig(st, Object.assign({}, plan, {game:"Classic Mine"}), c, review, res);
-  const ch = out && out.challenge;
-  if(!ch || ch.game !== "Classic Mine") return out;
-  const nat = LANG_CODE[st.native], lv = Math.max(0, LEVELS.indexOf(st.level));
-  const talk = Math.random() < ([0, 0.3, 0.5, 0.6][lv] ?? 0.6);
-  const Tn = LN[nat][st.target], V = VTASK[nat] || VTASK.en;
-  ch.game = "Speak Up";
-  if(talk) ch.task = V.talk(Tn);
-  else { ch.task = V.read(Tn); ch.target = ch.answerKey; ch.hint = ""; }
-  if(out._k) out._k = out._k.replace(/^Classic Mine/, "Speak Up");
-  return out;
-})(genSentence);
-
-/* ---------- Matching what was heard ---------- */
-function voiceDigits(s, lang){
-  return String(s).replace(/\d+(?:[.,]\d+)?/g, d => {
-    const n = Number(d.replace(",", "."));
-    if(!Number.isInteger(n) || n < 0 || n > 999999999) return d;
-    try{ return lang === "es" ? esNum(n) : enNum(n); }catch(e){ return d; }
-  });
-}
-// Pick the closest transcript; an exact (or, when reading aloud, nearly exact) match
-// is submitted as the expected sentence so speech-to-text punctuation/accents don't count against you.
-function speakMatch(alts, ch){
-  const vars = variantsOf(ch), cands = [];
-  for(const a of alts){ cands.push(a); const w = voiceDigits(a, ch.al); if(w !== a) cands.push(w); }
-  let best = null;
-  for(const a of cands){
-    const aw = nrm(a, ch, false).split(" ").filter(Boolean);
-    for(const v of vars){
-      const vw = nrm(v, ch, false).split(" ").filter(Boolean), d = lev(aw, vw);
-      if(!best || d < best.d) best = {d, a, v, n:vw.length};
-    }
-  }
-  const heard = String(alts[0] || "");
-  if(!best) return {answer:heard, heard, close:false, exact:false};
-  const reading = ch.target === ch.answerKey;
-  const tol = reading ? Math.floor(best.n / 6) : 0;
-  if(best.d === 0) return {answer:best.v, heard:best.a, close:false, exact:true};
-  if(best.d <= tol) return {answer:best.v, heard:best.a, close:true, exact:false};
-  return {answer:best.a, heard:best.a, close:false, exact:false};
-}
+const canSpeak = () => voiceOn && !voiceBlocked && VOICE.supported();
 
 /* ---------- UI ---------- */
 function voiceEls(){
-  if(!$("speakBox")){
-    const box = document.createElement("div");
-    box.id = "speakBox"; box.className = "speak"; box.hidden = true;
-    $("chTarget").parentElement.after(box);
-  }
   if(!$("micBtn")){
     const b = document.createElement("button");
     b.type = "button"; b.id = "micBtn"; b.className = "ghost mic"; b.hidden = true;
@@ -13402,48 +13257,27 @@ function voiceEls(){
     wrap.className = "answrap"; a.before(wrap); wrap.appendChild(a); wrap.appendChild(b);
   }
 }
-function isSpeakUp(ch){ return !!(ch && ch.game === "Speak Up" && canSpeak()); }
-function voiceUI(fresh){
+function voiceUI(){
   voiceEls();
-  const box = $("speakBox"), mic = $("micBtn"), c = S && S.current, ch = c && c.challenge;
-  if(!ch){ box.hidden = true; mic.hidden = true; return; }
-  const sp = isSpeakUp(ch);
-  if(ch.game === "Speak Up" && !sp && S.status === "playing"){ setTimeout(() => voiceSkip(true), 0); }
-  box.hidden = !sp;
-  if(sp && (fresh || box.dataset.key !== ch.target + "|" + ch.task)){
-    box.dataset.key = ch.target + "|" + ch.task;
-    const reading = ch.target === ch.answerKey;
-    box.innerHTML = `<button class="mic-big" type="button" data-vmic="speak"><span class="mic-ico" aria-hidden="true">🎤</span><span class="mic-lbl">${esc(t("vTap"))}</span></button>
-      <div class="speak-row">${reading && typeof canEcho === "function" && canEcho() ? `<button class="chip" type="button" data-vhear="1">🔊 ${esc(t("vHear"))}</button>` : ""}<button class="chip" type="button" data-vskip="1">🔇 ${esc(t("vSkip"))}</button></div>
-      <p class="note speak-heard" id="speakHeard" aria-live="polite"></p>`;
-  }
+  const mic = $("micBtn"), c = S && S.current, ch = c && c.challenge;
+  if(!ch){ mic.hidden = true; return; }
   const textAns = !$("answer").hidden && !(ch.game === "Match Madness") && $("tiles").hidden;
-  mic.hidden = !(canSpeak() && textAns && !sp);
+  mic.hidden = !(canSpeak() && textAns);
   document.body.classList.toggle("micok", !mic.hidden);
   if(!mic.hidden){ mic.setAttribute("aria-label", t("vMic")); mic.title = t("vMic"); }
-  document.body.classList.toggle("speaking", sp);
 }
-renderExtras = (orig => function(fresh){ orig(fresh); voiceUI(fresh); })(renderExtras);
+renderExtras = (orig => function(fresh){ orig(fresh); voiceUI(); })(renderExtras);
 
 function setListening(on){
   document.body.classList.toggle("listening", on);
-  const big = document.querySelector("#speakBox .mic-lbl");
-  if(big) big.textContent = t(on ? "vListening" : "vTap");
   const mic = $("micBtn"); if(mic) mic.classList.toggle("on", on);
 }
-function voiceSay(msg){ const h = $("speakHeard"); if(h && !$("speakBox").hidden) h.textContent = msg; else toast(msg); }
 function voiceErr(code){
   if(code === "busy") return;
-  if(code === "denied"){
-    voiceBlocked = true; toast("🎤 " + t("vDenied"));
-    const c = S && S.current;
-    if(c && c.challenge.game === "Speak Up") voiceSkip(true); else renderGame(false);
-    voiceRefresh();
-    return;
-  }
-  voiceSay(code === "nospeech" ? t("vNoSpeech") : code === "network" ? t("vNet") : t("vErr"));
+  if(code === "denied"){ voiceBlocked = true; toast("🎤 " + t("vDenied")); renderGame(false); voiceRefresh(); return; }
+  toast(code === "nospeech" ? t("vNoSpeech") : code === "network" ? t("vNet") : t("vErr"));
 }
-async function voiceGo(kind){
+async function voiceGo(){
   const c = S && S.current; if(!c || S.status !== "playing") return;
   if(VOICE.busy()){ VOICE.stop(); return; }
   if($("submitBtn").disabled) return;
@@ -13457,61 +13291,20 @@ async function voiceGo(kind){
   catch(e){ setListening(false); if(S && S.current === c) voiceErr(e && e.code); return; }
   setListening(false);
   if(!S || S.current !== c || S.status !== "playing") return;
-  if(kind === "speak"){
-    const r = speakMatch(alts, ch);
-    voiceSay(t(r.close ? "vClose" : "vHeard", {s:r.heard}));
-    if(r.close) toast("🎤 " + t("vClose", {s:r.heard}));
-    $("answer").value = r.answer;
-    submit(false);
-  } else {
-    const a = $("answer"), add = String(alts[0] || "").trim();
-    a.value = (a.value.trim() ? a.value.trim() + " " : "") + add;
-    try{ a.focus({preventScroll:true}); a.setSelectionRange(a.value.length, a.value.length); }catch(e){}
-  }
+  const a = $("answer"), add = String(alts[0] || "").trim();
+  a.value = (a.value.trim() ? a.value.trim() + " " : "") + add;
+  try{ a.focus({preventScroll:true}); a.setSelectionRange(a.value.length, a.value.length); }catch(e){}
 }
-// Swap a Speak Up round for a typing round (no penalty), like skipping a listening round
-function voiceSkip(quiet){
-  const c = S && S.current;
-  if(!c || c.challenge.game !== "Speak Up" || S.status !== "playing") return;
-  VOICE.stop();
-  const plan = Object.assign({}, c.plan, {game:"Classic Mine", swarm:false});
-  let res = null;
-  voiceSuppress = true;
-  try{ res = generate(Object.assign({}, S, {lastGame:"Speak Up"}), plan); }catch(e){}
-  finally{ voiceSuppress = false; }
-  const ch = res && res.challenge;
-  if(!ch || !ch.target) return;
-  c.challenge = {game:String(ch.game), boss:"", task:String(ch.task || ""), target:String(ch.target),
-    hint: S.mode === 3 ? "" : String(ch.hint || ""), answerKey:String(ch.answerKey || ""), speak:"", acc:ch.acc || [], al:ch.al || "", k:ch.k || "s",
-    nn:!!ch.nn, why:String(ch.why || ""), cw:ch.cw || [], wk:ch.wk || "", wm:ch.wm || "", pairs:null, opts:Array.isArray(ch.opts) ? ch.opts : null, strict:!!ch.strict, double:!!ch.double, parts:null};
-  S.lastGame = c.challenge.game;
-  save();
-  $("answer").value = "";
-  renderGame(true);
-  if(!quiet) toast("🔇 " + t("vSkipped"));
-}
-document.addEventListener("click", e => {
-  const m = e.target.closest("[data-vmic]"); if(m){ voiceGo("speak"); return; }
-  if(e.target.closest("#micBtn")){ voiceGo("dictate"); return; }
-  if(e.target.closest("[data-vhear]")){ Sound.unlock(); echoPlay(false); return; }
-  if(e.target.closest("[data-vskip]")) voiceSkip(false);
-});
+document.addEventListener("click", e => { if(e.target.closest("#micBtn")) voiceGo(); });
 document.addEventListener("keydown", e => {
   if(!e.altKey || e.ctrlKey || e.metaKey || e.code !== "KeyM") return;
-  const big = document.querySelector("#speakBox:not([hidden]) [data-vmic]"), mic = $("micBtn");
-  if(big){ e.preventDefault(); voiceGo("speak"); }
-  else if(mic && !mic.hidden){ e.preventDefault(); voiceGo("dictate"); }
+  const mic = $("micBtn");
+  if(mic && !mic.hidden){ e.preventDefault(); voiceGo(); }
 }, true);
 if(typeof kbHelpHtml === "function") kbHelpHtml = (orig => function(){
   const h = orig();
   return canSpeak() ? h.replace("<tr><td><kbd>Alt+A E I O U N Y</kbd>", `<tr><td><kbd>Alt+M</kbd></td><td>${esc(t("kbMic"))}</td></tr>$&`) : h;
 })(kbHelpHtml);
-
-// Stats: count good spoken answers
-recordTurn = (orig => function(prevCh, j){
-  if(prevCh && j && j.correct && !j.gaveUp && prevCh.game === "Speak Up") profile.voice = (profile.voice || 0) + 1;
-  return orig(prevCh, j);
-})(recordTurn);
 
 /* ---------- Settings toggle (only shown where voice works) ---------- */
 (() => {
@@ -13525,13 +13318,13 @@ function voiceRefresh(){
   const row = $("voiceExRow"); if(!row) return;
   row.hidden = !VOICE.supported() || voiceBlocked;
   document.querySelectorAll(".voiceChk").forEach(x => x.checked = voiceOn);
-  if(S && S.current && $("game") && !$("game").hidden) voiceUI(false);
+  if(S && S.current && $("game") && !$("game").hidden) voiceUI();
 }
 document.addEventListener("change", e => {
   if(!e.target.classList || !e.target.classList.contains("voiceChk")) return;
   voiceOn = e.target.checked;
   try{ localStorage.setItem("pgm-voice", voiceOn ? "on" : "off"); }catch(err){}
-  if(!voiceOn){ VOICE.stop(); const c = S && S.current; if(c && c.challenge.game === "Speak Up") voiceSkip(true); }
+  if(!voiceOn) VOICE.stop();
   voiceRefresh();
 });
 voiceRefresh();
@@ -15426,7 +15219,7 @@ WL.ar.units.push(
   b:"**ال** (al-) = 'the', joined to the word: **كتاب** (kitāb) = a book, **الكتاب** (al-kitāb) = the book. Before 'sun letters' (t, d, r, s, sh, n…) the l isn't said: **الشمس** (ash-shams). An adjective after a 'the' noun takes **ال** too: **المدرس الجديد** = the new teacher.",
   w:[["الكتاب","the book","al-kitāb"],["الشمس","the sun","ash-shams"],["القمر","the moon","al-qamar"],["الباب","the door","al-bāb"]],
   s:[["The book is new.","الكتاب جديد","al-kitāb jadīd","كتاب الجديد"],
-     ["the big house","البيت الكبير","al-bayt al-kabīr","بيت الكبير"],
+     ["the new car","السيارة الجديدة","as-sayyāra al-jadīda","سيارة الجديدة"],
      ["The sun is hot.","الشمس حارة","ash-shams ḥārra","الشمس حار"],
      ["Where is the car?","أين السيارة","ayna as-sayyāra","أين سيارة"],
      ["the new teacher","المدرس الجديد","al-mudarris al-jadīd","مدرس الجديد"],
@@ -16167,7 +15960,7 @@ WL.pt.units.push(
   s:[["Where do you live?","Onde você mora?",null,"Onde você moro?"],
      ["Why are you sad? Because I'm tired.","Por que você está triste? Porque estou cansado.",null,"Porque você está triste? Por que estou cansado."],
      ["When does the class start?","Quando começa a aula?",null,"Quando começo a aula?"],
-     ["What are you doing?","O que você está fazendo?",null,"Que o você está fazendo?"],
+     ["What do you want to eat?","O que você quer comer?",null,"Que o você quer comer?"],
      ["Who is that man?","Quem é aquele homem?",null,"Quem está aquele homem?"],
      ["How are you?","Como você está?",null,"Como você estás?"]]},
  {lv:"A1", k:"g", t:"Adjectives: agreement", ico:"🎨",
@@ -16263,6 +16056,746 @@ WL.pt.units.push(
      ["I didn't understand what he said.","Não entendi o que ele disse.",null,"Não entendi que o ele disse."],
      ["the friend who helped me","o amigo que me ajudou",null,"o amigo quem me ajudou"]]}
 );
+
+/* ===================== Mandarin: more sentences (2.15) =====================
+   Extra sentences for the A1–B1 topic units: [english, target (words split by spaces), pinyin (one entry per word), planted mistake].
+   Pushed into the units by title before langs.js turns the pack into lessons. */
+(() => {
+  const M = {
+  "Greetings":[
+    ["Good morning, everyone.","大家 早上好","dàjiā zǎoshanghǎo",null],
+    ["See you later.","一会儿 见","yíhuìr jiàn",null],
+    ["Nice to meet you.","认识 你 很 高兴","rènshi nǐ hěn gāoxìng","认识 你 是 很 高兴"],
+    ["Good night, Mom.","妈妈 晚安","māma wǎn'ān",null],
+    ["Yes, thank you.","好 的 谢谢","hǎo de xièxie",null],
+    ["No, thank you.","不 用 了 谢谢","bú yòng le xièxie","没 用 了 谢谢"],
+    ["How are you, sir?","先生 您 好 吗","xiānsheng nín hǎo ma","先生 您 是 好 吗"]],
+  "Me and you":[
+    ["I am tired.","我 很 累","wǒ hěn lèi","我 是 累"],
+    ["You are my friend.","你 是 我 的 朋友","nǐ shì wǒ de péngyou","你 是 我 朋友 的"],
+    ["They are from Mexico.","他们 是 墨西哥 人","tāmen shì Mòxīgē rén","他们 是 人 墨西哥"],
+    ["Is she a teacher?","她 是 老师 吗","tā shì lǎoshī ma","她 是 吗 老师"],
+    ["We are from America.","我们 是 美国 人","wǒmen shì Měiguó rén","我们 是 人 美国"],
+    ["What is his name?","他 叫 什么 名字","tā jiào shénme míngzi","他 叫 名字 什么"],
+    ["I am not a student.","我 不 是 学生","wǒ bú shì xuésheng","我 没 是 学生"]],
+  "Numbers 1–10":[
+    ["I have three children.","我 有 三 个 孩子","wǒ yǒu sān gè háizi","我 有 三 孩子"],
+    ["We have two cats.","我们 有 两 只 猫","wǒmen yǒu liǎng zhī māo","我们 有 二 只 猫"],
+    ["I have eight books.","我 有 八 本 书","wǒ yǒu bā běn shū","我 有 八 书"],
+    ["He is nine years old.","他 九 岁","tā jiǔ suì","他 有 九 岁"],
+    ["I want six apples.","我 要 六 个 苹果","wǒ yào liù gè píngguǒ","我 要 六 苹果"],
+    ["There are seven days in a week.","一 个 星期 有 七 天","yí gè xīngqī yǒu qī tiān","一 个 星期 有 七 个 天"],
+    ["One coffee and two teas, please.","请 给 我 一 杯 咖啡 和 两 杯 茶","qǐng gěi wǒ yì bēi kāfēi hé liǎng bēi chá","请 给 我 一 杯 咖啡 和 二 杯 茶"]],
+  "Family":[
+    ["My older brother is tall.","我 哥哥 很 高","wǒ gēge hěn gāo","我 哥哥 是 高"],
+    ["My older sister lives in Spain.","我 姐姐 住 在 西班牙","wǒ jiějie zhù zài Xībānyá","我 姐姐 住 西班牙 在"],
+    ["I have two sons.","我 有 两 个 儿子","wǒ yǒu liǎng gè érzi","我 有 二 个 儿子"],
+    ["His wife is a teacher.","他 的 妻子 是 老师","tā de qīzi shì lǎoshī","他 的 妻子 老师 是"],
+    ["My dad is very busy.","我 爸爸 很 忙","wǒ bàba hěn máng","我 爸爸 是 忙"],
+    ["Their daughter is five years old.","他们 的 女儿 五 岁","tāmen de nǚ'ér wǔ suì","他们 的 女儿 有 五 岁"],
+    ["Do you have children?","你 有 孩子 吗","nǐ yǒu háizi ma","你 有 没 有 孩子 吗"]],
+  "Food and drink":[
+    ["I drink milk every morning.","我 每天 早上 喝 牛奶","wǒ měitiān zǎoshang hē niúnǎi","我 喝 牛奶 每天 早上"],
+    ["We eat chicken and rice.","我们 吃 鸡肉 和 米饭","wǒmen chī jīròu hé mǐfàn","我们 吃 鸡肉 米饭 和"],
+    ["I don't drink coffee.","我 不 喝 咖啡","wǒ bù hē kāfēi","我 喝 不 咖啡"],
+    ["The bread is very good.","面包 很 好吃","miànbāo hěn hǎochī","面包 是 好吃"],
+    ["He eats an apple.","他 吃 一 个 苹果","tā chī yí gè píngguǒ","他 吃 一 苹果"],
+    ["I'm hungry.","我 饿 了","wǒ è le","我 是 饿"],
+    ["What do you want to drink?","你 想 喝 什么","nǐ xiǎng hē shénme","你 想 什么 喝"]],
+  "Around town":[
+    ["The bank is near the hotel.","银行 在 酒店 附近","yínháng zài jiǔdiàn fùjìn","银行 在 附近 酒店"],
+    ["Where is the restaurant?","饭馆 在 哪里","fànguǎn zài nǎlǐ","在 哪里 饭馆"],
+    ["Turn right.","往 右 拐","wǎng yòu guǎi",null],
+    ["The beach is far.","海滩 很 远","hǎitān hěn yuǎn","海滩 是 远"],
+    ["Is there a hotel here?","这里 有 酒店 吗","zhèlǐ yǒu jiǔdiàn ma","这里 在 酒店 吗"],
+    ["The station is on this street.","车站 在 这 条 街 上","chēzhàn zài zhè tiáo jiē shang","车站 在 这 街 条 上"],
+    ["Excuse me, where is the school?","请问 学校 在 哪里","qǐngwèn xuéxiào zài nǎlǐ","请问 学校 在 哪里 吗"]],
+  "Days and time":[
+    ["Tomorrow is Friday.","明天 是 星期五","míngtiān shì xīngqīwǔ","明天 星期五 是"],
+    ["I don't work on Sunday.","我 星期天 不 工作","wǒ xīngqītiān bù gōngzuò","我 不 工作 星期天"],
+    ["It's three o'clock.","现在 三 点","xiànzài sān diǎn","现在 三 个 点"],
+    ["See you on Monday.","星期一 见","xīngqīyī jiàn",null],
+    ["What day is it today?","今天 星期 几","jīntiān xīngqī jǐ","今天 是 星期 什么"],
+    ["We have class on Tuesday and Thursday.","我们 星期二 和 星期四 有 课","wǒmen xīngqī'èr hé xīngqīsì yǒu kè","我们 有 课 星期二 和 星期四"],
+    ["Yesterday I was at home.","昨天 我 在 家","zuótiān wǒ zài jiā","我 在 家 昨天"]],
+  "Everyday verbs":[
+    ["I like music.","我 喜欢 音乐","wǒ xǐhuan yīnyuè","喜欢 我 音乐"],
+    ["She speaks English and Spanish.","她 说 英语 和 西班牙语","tā shuō Yīngyǔ hé Xībānyáyǔ","她 说 英语 西班牙语 和"],
+    ["I want to eat something.","我 想 吃 东西","wǒ xiǎng chī dōngxi","我 吃 想 东西"],
+    ["We work every day.","我们 每天 工作","wǒmen měitiān gōngzuò","我们 工作 每天"],
+    ["Do you understand?","你 懂 吗","nǐ dǒng ma","你 懂 不 懂 吗"],
+    ["They live in a big city.","他们 住 在 一 个 大 城市","tāmen zhù zài yí gè dà chéngshì","他们 住 在 一 个 城市 大"],
+    ["I have a car.","我 有 一 辆 车","wǒ yǒu yí liàng chē","我 有 一 车"]],
+  "Shopping":[
+    ["How much is this shirt?","这 件 衬衫 多少 钱","zhè jiàn chènshān duōshao qián","这 件 衬衫 钱 多少"],
+    ["I want to buy bread.","我 想 买 面包","wǒ xiǎng mǎi miànbāo","我 想 卖 面包"],
+    ["This one is very cheap.","这 个 很 便宜","zhè ge hěn piányi","这 个 是 便宜"],
+    ["The shop is closed.","商店 关门 了","shāngdiàn guānmén le","商店 是 关门"],
+    ["Can I pay in cash?","我 可以 付 现金 吗","wǒ kěyǐ fù xiànjīn ma","我 付 可以 现金 吗"],
+    ["It costs twenty dollars.","要 二十 美元","yào èrshí měiyuán","要 两十 美元"],
+    ["I don't have money.","我 没有 钱","wǒ méiyǒu qián","我 不 有 钱"]],
+  "Clothes and colors":[
+    ["I like your red skirt.","我 喜欢 你 的 红色 裙子","wǒ xǐhuan nǐ de hóngsè qúnzi","我 喜欢 你 的 裙子 红色"],
+    ["He wears black shoes.","他 穿 黑色 的 鞋","tā chuān hēisè de xié","他 戴 黑色 的 鞋"],
+    ["This coat is too big.","这 件 大衣 太 大 了","zhè jiàn dàyī tài dà le","这 件 大衣 很 太 大"],
+    ["My favorite color is blue.","我 最 喜欢 的 颜色 是 蓝色","wǒ zuì xǐhuan de yánsè shì lánsè","我 喜欢 最 的 颜色 是 蓝色"],
+    ["I need new shoes.","我 需要 新 鞋","wǒ xūyào xīn xié","我 需要 鞋 新"],
+    ["The shirt is green.","衬衫 是 绿色 的","chènshān shì lǜsè de","绿色 是 衬衫 的"],
+    ["She has a white skirt.","她 有 一 条 白色 的 裙子","tā yǒu yì tiáo báisè de qúnzi","她 有 一 白色 的 裙子"]],
+  "At home":[
+    ["My house is big.","我 的 房子 很 大","wǒ de fángzi hěn dà","我 的 房子 是 大"],
+    ["The bed is in the bedroom.","床 在 卧室 里","chuáng zài wòshì lǐ","床 是 卧室 里"],
+    ["Open the door, please.","请 开 门","qǐng kāi mén","请 门 开"],
+    ["We eat in the kitchen.","我们 在 厨房 吃饭","wǒmen zài chúfáng chīfàn","我们 吃饭 在 厨房"],
+    ["The bathroom is small.","洗手间 很 小","xǐshǒujiān hěn xiǎo","洗手间 是 小"],
+    ["I live in an apartment.","我 住 在 公寓 里","wǒ zhù zài gōngyù lǐ","我 住 公寓 在 里"],
+    ["There is a table in the living room.","客厅 里 有 一 张 桌子","kètīng lǐ yǒu yì zhāng zhuōzi","客厅 里 有 一 本 桌子"]],
+  "Daily routine":[
+    ["I go to bed at eleven.","我 十一 点 睡觉","wǒ shíyī diǎn shuìjiào","我 睡觉 十一 点"],
+    ["I eat breakfast at home.","我 在 家 吃 早饭","wǒ zài jiā chī zǎofàn","我 吃 早饭 在 家"],
+    ["She gets up early.","她 起床 很 早","tā qǐchuáng hěn zǎo","她 起床 是 早"],
+    ["We have lunch at noon.","我们 中午 吃 午饭","wǒmen zhōngwǔ chī wǔfàn","我们 吃 午饭 中午"],
+    ["I take a shower in the evening.","我 晚上 洗澡","wǒ wǎnshang xǐzǎo","我 洗澡 晚上"],
+    ["He often works late.","他 经常 工作 到 很 晚","tā jīngcháng gōngzuò dào hěn wǎn","他 工作 经常 到 很 晚"],
+    ["What time do you get up?","你 几 点 起床","nǐ jǐ diǎn qǐchuáng","你 起床 几 点"]],
+  "Weather and seasons":[
+    ["It's cold today.","今天 很 冷","jīntiān hěn lěng","今天 是 冷"],
+    ["The weather is nice.","天气 很 好","tiānqì hěn hǎo","天气 是 好"],
+    ["It often rains in spring.","春天 经常 下雨","chūntiān jīngcháng xiàyǔ","春天 下雨 经常"],
+    ["I like summer.","我 喜欢 夏天","wǒ xǐhuan xiàtiān","喜欢 我 夏天"],
+    ["Winter is very cold here.","这里 的 冬天 很 冷","zhèlǐ de dōngtiān hěn lěng","这里 的 冬天 是 冷"],
+    ["Is it hot outside?","外面 热 吗","wàimiàn rè ma","外面 是 热 吗"],
+    ["The sun has come out.","太阳 出来 了","tàiyáng chūlái le","太阳 了 出来"]],
+  "Getting around":[
+    ["I take the train every day.","我 每天 坐 火车","wǒ měitiān zuò huǒchē","我 坐 火车 每天"],
+    ["Where is the bus stop?","公共汽车 站 在 哪里","gōnggòngqìchē zhàn zài nǎlǐ","在 哪里 公共汽车 站"],
+    ["We are going by car.","我们 坐 汽车 去","wǒmen zuò qìchē qù","我们 汽车 坐 去"],
+    ["The plane arrives at noon.","飞机 中午 到","fēijī zhōngwǔ dào","飞机 到 中午"],
+    ["I ride a bike to work.","我 骑 自行车 去 上班","wǒ qí zìxíngchē qù shàngbān","我 坐 自行车 去 上班"],
+    ["My suitcase is heavy.","我 的 行李箱 很 重","wǒ de xínglixiāng hěn zhòng","我 的 行李箱 是 重"],
+    ["How much is a ticket?","一 张 票 多少 钱","yì zhāng piào duōshao qián","一 票 多少 钱"]],
+  "Health and body":[
+    ["My hand hurts.","我 的 手 很 疼","wǒ de shǒu hěn téng","我 的 手 是 疼"],
+    ["I need a doctor.","我 需要 医生","wǒ xūyào yīshēng","我 医生 需要"],
+    ["She is sick.","她 生病 了","tā shēngbìng le","她 是 生病"],
+    ["Where is the hospital?","医院 在 哪里","yīyuàn zài nǎlǐ","在 哪里 医院"],
+    ["My feet hurt.","我 的 脚 很 疼","wǒ de jiǎo hěn téng","我 的 脚 疼 很"],
+    ["Take this medicine.","吃 这 个 药","chī zhè ge yào","吃 药 这 个"],
+    ["I feel much better today.","我 今天 好 多 了","wǒ jīntiān hǎo duō le","我 今天 多 好 了"]],
+  "Talking about the past":[
+    ["I ate at home yesterday.","我 昨天 在 家 吃饭 了","wǒ zuótiān zài jiā chīfàn le","我 昨天 吃饭 了 在 家"],
+    ["We went to the beach.","我们 去 海滩 了","wǒmen qù hǎitān le","我们 去 海滩 过 了"],
+    ["She bought a new car.","她 买 了 一 辆 新 车","tā mǎi le yí liàng xīn chē","她 买 了 一 辆 车 新"],
+    ["I saw my friend last week.","我 上 个 星期 见 了 朋友","wǒ shàng ge xīngqī jiàn le péngyou","我 见 了 朋友 上 个 星期"],
+    ["Did you eat?","你 吃饭 了 吗","nǐ chīfàn le ma","你 吃饭 了 没 吗"],
+    ["He came late.","他 来 晚 了","tā lái wǎn le","他 来 了 晚"],
+    ["I already drank coffee.","我 已经 喝 了 咖啡","wǒ yǐjīng hē le kāfēi","我 喝 了 已经 咖啡"]],
+  "Work and jobs":[
+    ["I start work at eight.","我 八 点 上班","wǒ bā diǎn shàngbān","我 上班 八 点"],
+    ["My salary is high.","我 的 工资 很 高","wǒ de gōngzī hěn gāo","我 的 工资 是 高"],
+    ["She works from home.","她 在 家 工作","tā zài jiā gōngzuò","她 工作 在 家"],
+    ["This meeting is very long.","这 个 会 很 长","zhè ge huì hěn cháng","这 个 会 是 长"],
+    ["I want to change jobs.","我 想 换 工作","wǒ xiǎng huàn gōngzuò","我 想 工作 换"]],
+  "Free time":[
+    ["I like to swim in the summer.","我 夏天 喜欢 游泳","wǒ xiàtiān xǐhuan yóuyǒng","我 喜欢 游泳 在 夏天"],
+    ["What do you do on weekends?","你 周末 做 什么","nǐ zhōumò zuò shénme","你 做 什么 周末"],
+    ["He reads a book every week.","他 每 个 星期 看 一 本 书","tā měi ge xīngqī kàn yì běn shū","他 看 一 本 书 每 个 星期"],
+    ["We often watch movies.","我们 经常 看 电影","wǒmen jīngcháng kàn diànyǐng","我们 看 电影 经常"],
+    ["My favorite sport is basketball.","我 最 喜欢 的 运动 是 篮球","wǒ zuì xǐhuan de yùndòng shì lánqiú","我 最 喜欢 运动 的 是 篮球"]],
+  "Travel":[
+    ["Our plane takes off tomorrow morning.","我们 的 飞机 明天 早上 起飞","wǒmen de fēijī míngtiān zǎoshang qǐfēi","我们 的 飞机 起飞 明天 早上"],
+    ["I want to go to Japan.","我 想 去 日本","wǒ xiǎng qù Rìběn","我 想 日本 去"],
+    ["We stayed in a very nice hotel.","我们 住 在 一 家 很 好 的 酒店","wǒmen zhù zài yì jiā hěn hǎo de jiǔdiàn","我们 住 在 一 家 很 好 酒店 的"],
+    ["Do you need a visa?","你 需要 签证 吗","nǐ xūyào qiānzhèng ma","你 需要 不 需要 签证 吗"],
+    ["I lost my key.","我 的 钥匙 丢 了","wǒ de yàoshi diū le","我 的 钥匙 了 丢"]],
+  "At the restaurant":[
+    ["Can I look at the menu?","我 可以 看看 菜单 吗","wǒ kěyǐ kànkan càidān ma","我 看看 可以 菜单 吗"],
+    ["I would like a glass of water.","我 想 要 一 杯 水","wǒ xiǎng yào yì bēi shuǐ","我 想 要 一 个 水"],
+    ["The food is delicious.","菜 很 好吃","cài hěn hǎochī","菜 是 好吃"],
+    ["We would like to order now.","我们 现在 想 点菜","wǒmen xiànzài xiǎng diǎncài","我们 想 点菜 现在"],
+    ["Do you have vegetarian dishes?","你们 有 素菜 吗","nǐmen yǒu sùcài ma","有 你们 素菜 吗"]],
+  "Feelings and opinions":[
+    ["He is angry.","他 生气 了","tā shēngqì le","他 是 生气"],
+    ["I'm sad because it's raining.","因为 下雨 我 很 难过","yīnwèi xiàyǔ wǒ hěn nánguò","因为 下雨 我 是 难过"],
+    ["I'm proud of you.","我 为 你 骄傲","wǒ wèi nǐ jiāo'ào","我 骄傲 为 你"],
+    ["Are you worried?","你 担心 吗","nǐ dānxīn ma","你 是 担心 吗"],
+    ["This book is interesting.","这 本 书 很 有意思","zhè běn shū hěn yǒuyìsi","这 本 书 是 有意思"]],
+  "Plans and the future":[
+    ["Next year I'm going to travel.","我 明年 要 去 旅行","wǒ míngnián yào qù lǚxíng","我 要 去 旅行 明年"],
+    ["Let's see later.","我们 再 看 吧","wǒmen zài kàn ba","我们 看 再 吧"],
+    ["Maybe I will come tomorrow.","我 明天 可能 会 来","wǒ míngtiān kěnéng huì lái","我 明天 会 可能 来"],
+    ["She wants to study medicine in the future.","她 将来 要 学 医","tā jiānglái yào xué yī","她 要 学 医 将来"],
+    ["Later I'm going to buy a house.","我 以后 要 买 房子","wǒ yǐhòu yào mǎi fángzi","我 要 买 房子 以后"]],
+  "Comparing things":[
+    ["My older brother is older than me.","我 哥哥 比 我 大","wǒ gēge bǐ wǒ dà","我 哥哥 比 我 很 大"],
+    ["This phone is cheaper.","这 个 手机 更 便宜","zhè ge shǒujī gèng piányi","这 个 手机 是 更 便宜"],
+    ["Tea is better than coffee.","茶 比 咖啡 好","chá bǐ kāfēi hǎo","茶 比 咖啡 很 好"],
+    ["She runs faster than him.","她 跑 得 比 他 快","tā pǎo de bǐ tā kuài","她 跑 比 他 快 得"],
+    ["This city is less expensive than Paris.","这 个 城市 没有 巴黎 贵","zhè ge chéngshì méiyǒu Bālí guì","这 个 城市 比 巴黎 不 贵"]],
+  "Phones and the internet":[
+    ["Send me an email.","给 我 发 电子邮件","gěi wǒ fā diànzǐyóujiàn","给 我 电子邮件 发"],
+    ["My computer is slow.","我 的 电脑 很 慢","wǒ de diànnǎo hěn màn","我 的 电脑 是 慢"],
+    ["I'll call you tonight.","我 今天 晚上 给 你 打电话","wǒ jīntiān wǎnshang gěi nǐ dǎdiànhuà","我 今天 晚上 打电话 给 你"],
+    ["Can we get online?","能 上网 吗","néng shàngwǎng ma","上网 能 吗"],
+    ["I'm watching a video online.","我 在 网上 看 视频","wǒ zài wǎngshàng kàn shìpín","我 看 视频 在 网上"]]
+  };
+  WL.zh.units.forEach(u => { if(!u.k && M[u.t]) u.s.push(...M[u.t]); });
+})();
+
+/* ===================== Arabic (MSA): more sentences (2.15) =====================
+   Extra sentences for the A1–B1 topic units: [english, target, transliteration (one entry per word), planted mistake].
+   Pushed into the units by title before langs.js turns the pack into lessons. */
+(() => {
+  const M = {
+  "Greetings":[
+    ["Good morning, everyone.","صباح الخير جميعا","ṣabāḥ al-khayr jamīʿan","صباح خير جميعا"],
+    ["See you later.","أراك لاحقا","arāka lāḥiqan",null],
+    ["Nice to meet you.","تشرفت بمعرفتك","tasharraftu bi-maʿrifatik",null],
+    ["Good night, Mom.","تصبحين على خير يا أمي","tuṣbiḥīna ʿalā khayr yā ummī","تصبح على خير يا أمي"],
+    ["Yes, thank you.","نعم شكرا","naʿam shukran",null],
+    ["No, thank you.","لا شكرا","lā shukran",null],
+    ["How are you, sir?","كيف حالك يا سيدي","kayfa ḥāluka yā sayyidī",null]],
+  "Me and you":[
+    ["I am tired.","أنا متعب|أنا متعبة","anā mutʿab","أنا متعبون"],
+    ["You are my friend.","أنت صديقي","anta ṣadīqī","أنت الصديقي"],
+    ["They are from Mexico.","هم من المكسيك","hum min al-maksīk","هم من مكسيك"],
+    ["Is she a teacher?","هل هي معلمة","hal hiya muʿallima","هل هي معلم"],
+    ["We are from America.","نحن من أمريكا","naḥnu min amrīkā","نحن من الأمريكا"],
+    ["What is his name?","ما اسمه","mā ismuhu","ما الاسمه"],
+    ["I am not a student.","لست طالبا|أنا لست طالبا|لست طالبة|أنا لست طالبة","lastu ṭāliban","أنا لا طالب"]],
+  "Numbers 1–10":[
+    ["I have three children.","عندي ثلاثة أطفال","ʿindī thalāthat aṭfāl","عندي ثلاث أطفال"],
+    ["We have two cats.","عندنا قطتان","ʿindanā qiṭṭatān","عندنا اثنان قطة"],
+    ["I have eight books.","عندي ثمانية كتب","ʿindī thamāniyat kutub","عندي ثمانية كتاب"],
+    ["He is nine years old.","عمره تسع سنوات","ʿumruhu tisʿ sanawāt","عمره تسعة سنوات"],
+    ["I want six apples.","أريد ست تفاحات","urīd sitt tuffāḥāt","أريد ستة تفاحة"],
+    ["There are seven days in a week.","في الأسبوع سبعة أيام","fī al-usbūʿ sabʿat ayyām","في الأسبوع سبع أيام"],
+    ["I have one sister.","عندي أخت واحدة","ʿindī ukht wāḥida","عندي أخت واحد"]],
+  "Family":[
+    ["My brother is tall.","أخي طويل","akhī ṭawīl","أخي طويلة"],
+    ["My sister lives in Spain.","أختي تعيش في إسبانيا","ukhtī taʿīsh fī isbāniyā","أختي يعيش في إسبانيا"],
+    ["I have two sons.","عندي ابنان","ʿindī ibnān","عندي اثنان ابن"],
+    ["His wife is a teacher.","زوجته معلمة","zawjatuhu muʿallima","زوجته معلم"],
+    ["My father works a lot.","أبي يعمل كثيرا","abī yaʿmal kathīran","أبي تعمل كثيرا"],
+    ["Their daughter is five years old.","عمر ابنتهم خمس سنوات","ʿumr ibnatihim khams sanawāt","عمر ابنتهم خمسة سنوات"],
+    ["Do you have children?","هل عندك أطفال","hal ʿindaka aṭfāl","هل عندك الأطفال"]],
+  "Food and drink":[
+    ["I drink milk every morning.","أشرب الحليب كل صباح","ashrab al-ḥalīb kull ṣabāḥ","أشرب الحليب كل الصباح"],
+    ["We eat chicken and rice.","نأكل الدجاج والأرز","naʾkul ad-dajāj wa-l-aruzz","يأكل الدجاج والأرز"],
+    ["I don't drink coffee.","لا أشرب القهوة","lā ashrab al-qahwa","ليس أشرب القهوة"],
+    ["The bread is very good.","الخبز جيد جدا","al-khubz jayyid jiddan","الخبز جيدة جدا"],
+    ["He eats an apple.","يأكل تفاحة|هو يأكل تفاحة","yaʾkul tuffāḥa","تأكل تفاحة"],
+    ["I'm hungry.","أنا جائع|أنا جائعة","anā jāʾiʿ","أنا جوع"],
+    ["What do you want to drink?","ماذا تريد أن تشرب","mādhā turīd an tashrab","ماذا تريد أن أشرب"]],
+  "Around town":[
+    ["The bank is near the hotel.","البنك قريب من الفندق","al-bank qarīb min al-funduq","البنك قريبة من الفندق"],
+    ["Where is the restaurant?","أين المطعم","ayna al-maṭʿam",null],
+    ["Turn right.","اتجه يمينا","ittajih yamīnan",null],
+    ["The beach is far.","الشاطئ بعيد","ash-shāṭiʾ baʿīd","الشاطئ بعيدة"],
+    ["Is there a hotel here?","هل يوجد فندق هنا","hal yūjad funduq hunā","هل توجد فندق هنا"],
+    ["The station is on this street.","المحطة في هذا الشارع","al-maḥaṭṭa fī hādhā ash-shāriʿ","المحطة في هذه الشارع"],
+    ["Excuse me, where is the school?","عفوا أين المدرسة","ʿafwan ayna al-madrasa",null]],
+  "Days and time":[
+    ["Tomorrow is Friday.","غدا يوم الجمعة","ghadan yawm al-jumʿa","غدا اليوم الجمعة"],
+    ["I don't work on Sunday.","لا أعمل يوم الأحد","lā aʿmal yawm al-aḥad","لا أعمل اليوم الأحد"],
+    ["It's three o'clock.","الساعة الثالثة","as-sāʿa ath-thālitha","الساعة الثالث"],
+    ["See you on Monday.","أراك يوم الاثنين","arāka yawm al-ithnayn",null],
+    ["What day is it today?","أي يوم اليوم","ayy yawm al-yawm","ماذا يوم اليوم"],
+    ["We have class on Tuesday and Thursday.","عندنا درس يوم الثلاثاء ويوم الخميس","ʿindanā dars yawm ath-thulāthāʾ wa-yawm al-khamīs","عندنا درس اليوم الثلاثاء ويوم الخميس"],
+    ["Yesterday I was at home.","أمس كنت في البيت","ams kuntu fī al-bayt","أمس كان في البيت"]],
+  "Everyday verbs":[
+    ["I love my city.","أحب مدينتي","uḥibb madīnatī","أحب المدينتي"],
+    ["She speaks English and Spanish.","تتكلم الإنجليزية والإسبانية","tatakallam al-injilīziyya wa-l-isbāniyya","يتكلم الإنجليزية والإسبانية"],
+    ["I want to eat.","أريد أن آكل","urīd an ākul","أريد أن يأكل"],
+    ["We work every day.","نعمل كل يوم","naʿmal kull yawm","نعمل كل اليوم"],
+    ["Do you understand?","هل تفهم","hal tafham",null],
+    ["They live in a big city.","يعيشون في مدينة كبيرة","yaʿīshūn fī madīna kabīra","يعيشون في مدينة كبير"],
+    ["I have a car.","عندي سيارة","ʿindī sayyāra","عندي سيارة واحد"]],
+  "Shopping":[
+    ["How much is this shirt?","بكم هذا القميص","bikam hādhā al-qamīṣ","بكم هذه القميص"],
+    ["I want to buy bread.","أريد أن أشتري خبزا","urīd an ashtarī khubzan","أريد أن أبيع خبزا"],
+    ["This is cheap.","هذا رخيص","hādhā rakhīṣ","هذا رخيصة"],
+    ["The shop is closed.","المحل مغلق","al-maḥall mughlaq","المحل مغلقة"],
+    ["Can I pay in cash?","هل يمكنني الدفع نقدا","hal yumkinunī ad-dafʿ naqdan","هل يمكن أنا الدفع نقدا"],
+    ["It costs twenty dollars.","سعره عشرون دولارا","siʿruhu ʿishrūn dūlāran","سعره عشرون دولارات"],
+    ["I don't have money.","ليس عندي مال","laysa ʿindī māl","لا عندي مال"]],
+  "Clothes and colors":[
+    ["I like your red dress.","أحب فستانك الأحمر","uḥibb fustānaki al-aḥmar","أحب فستانك أحمر"],
+    ["He wears black shoes.","يلبس حذاء أسود","yalbas ḥidhāʾan aswad","يلبس حذاء سوداء"],
+    ["This coat is too big.","هذا المعطف كبير جدا","hādhā al-miʿṭaf kabīr jiddan","هذه المعطف كبير جدا"],
+    ["My favorite color is blue.","لوني المفضل هو الأزرق","lawnī al-mufaḍḍal huwa al-azraq","لوني المفضلة هو الأزرق"],
+    ["I need new shoes.","أحتاج إلى حذاء جديد","aḥtāj ilā ḥidhāʾ jadīd","أحتاج إلى جديد حذاء"],
+    ["The shirt is green.","القميص أخضر","al-qamīṣ akhḍar","القميص خضراء"],
+    ["She has a white dress.","عندها فستان أبيض","ʿindahā fustān abyaḍ","عندها فستان بيضاء"]],
+  "At home":[
+    ["My house is big.","بيتي كبير","baytī kabīr","البيتي كبير"],
+    ["The bed is in the bedroom.","السرير في غرفة النوم","as-sarīr fī ghurfat an-nawm","السرير في الغرفة النوم"],
+    ["Open the door, please.","افتح الباب من فضلك","iftaḥ al-bāb min faḍlik","يفتح الباب من فضلك"],
+    ["We eat in the kitchen.","نأكل في المطبخ","naʾkul fī al-maṭbakh","نأكلون في المطبخ"],
+    ["The bathroom is small.","الحمام صغير","al-ḥammām ṣaghīr","الحمام صغيرة"],
+    ["I live in an apartment.","أسكن في شقة","askun fī shaqqa","يسكن في شقة"],
+    ["There is a table in the living room.","في غرفة الجلوس طاولة","fī ghurfat al-julūs ṭāwila","في الغرفة الجلوس طاولة"]],
+  "Daily routine":[
+    ["I go to bed at eleven.","أنام في الساعة الحادية عشرة","anām fī as-sāʿa al-ḥādiya ʿashra","أنام في الساعة الحادي عشر"],
+    ["I eat breakfast at home.","أتناول الفطور في البيت","atanāwal al-fuṭūr fī al-bayt","يتناول الفطور في البيت"],
+    ["She gets up early.","تستيقظ مبكرا","tastayqiẓ mubakkiran","يستيقظ مبكرا"],
+    ["We have lunch at noon.","نتناول الغداء عند الظهر","natanāwal al-ghadāʾ ʿinda aẓ-ẓuhr","نتناول الغداء عند ظهر"],
+    ["I take a shower in the evening.","أستحم في المساء","astaḥimm fī al-masāʾ","أستحم في مساء"],
+    ["He often works late.","غالبا ما يعمل حتى وقت متأخر","ghāliban mā yaʿmal ḥattā waqt mutaʾakhkhir","غالبا ما تعمل حتى وقت متأخر"],
+    ["What time do you get up?","في أي ساعة تستيقظ","fī ayy sāʿa tastayqiẓ","في أي الساعة تستيقظ"]],
+  "Weather and seasons":[
+    ["It's cold today.","الجو بارد اليوم","al-jaww bārid al-yawm","الجو باردة اليوم"],
+    ["The weather is nice.","الطقس جميل","aṭ-ṭaqs jamīl","الطقس جميلة"],
+    ["It rains a lot in spring.","تمطر كثيرا في الربيع","tumṭir kathīran fī ar-rabīʿ","تمطر كثيرا في ربيع"],
+    ["I like summer.","أحب الصيف","uḥibb aṣ-ṣayf","أحب صيف"],
+    ["Winter is very cold here.","الشتاء بارد جدا هنا","ash-shitāʾ bārid jiddan hunā","الشتاء باردة جدا هنا"],
+    ["Is it hot outside?","هل الجو حار في الخارج","hal al-jaww ḥārr fī al-khārij","هل الجو حارة في الخارج"],
+    ["The sun is shining.","الشمس مشرقة","ash-shams mushriqa","الشمس مشرق"]],
+  "Getting around":[
+    ["I take the train every day.","أركب القطار كل يوم","arkab al-qiṭār kull yawm","أركب القطار كل اليوم"],
+    ["Where is the bus stop?","أين موقف الحافلة","ayna mawqif al-ḥāfila","أين الموقف الحافلة"],
+    ["We are going by car.","نذهب بالسيارة","nadhhab bi-s-sayyāra","يذهب بالسيارة"],
+    ["The plane arrives at noon.","تصل الطائرة عند الظهر","taṣil aṭ-ṭāʾira ʿinda aẓ-ẓuhr","يصل الطائرة عند الظهر"],
+    ["I go to work by bike.","أذهب إلى العمل بالدراجة","adhhab ilā al-ʿamal bi-d-darrāja","أذهب إلى عمل بالدراجة"],
+    ["My suitcase is heavy.","حقيبتي ثقيلة","ḥaqībatī thaqīla","حقيبتي ثقيل"],
+    ["How much is the ticket?","بكم التذكرة","bikam at-tadhkira",null]],
+  "Health and body":[
+    ["My hand hurts.","يدي تؤلمني","yadī tuʾlimunī","يدي يؤلمني"],
+    ["I need a doctor.","أحتاج إلى طبيب","aḥtāj ilā ṭabīb","أحتاج طبيب إلى"],
+    ["She is sick.","هي مريضة","hiya marīḍa","هي مريض"],
+    ["Is the pharmacy open?","هل الصيدلية مفتوحة","hal aṣ-ṣaydaliyya maftūḥa","هل الصيدلية مفتوح"],
+    ["My back hurts.","ظهري يؤلمني","ẓahrī yuʾlimunī","ظهري تؤلمني"],
+    ["Take this medicine.","خذ هذا الدواء","khudh hādhā ad-dawāʾ","خذ هذه الدواء"],
+    ["I feel better today.","أشعر بتحسن اليوم","ashʿur bi-taḥassun al-yawm","يشعر بتحسن اليوم"]],
+  "Talking about the past":[
+    ["I ate at home yesterday.","أكلت في البيت أمس","akaltu fī al-bayt ams","آكل في البيت أمس"],
+    ["We went to the beach.","ذهبنا إلى الشاطئ","dhahabnā ilā ash-shāṭiʾ","نذهب إلى الشاطئ"],
+    ["She bought a new car.","اشترت سيارة جديدة","ishtarat sayyāra jadīda","اشترى سيارة جديدة"],
+    ["I saw my friend last week.","رأيت صديقي الأسبوع الماضي","raʾaytu ṣadīqī al-usbūʿ al-māḍī","رأيت صديقي الأسبوع الماضية"],
+    ["Did you eat?","هل أكلت","hal akalta",null],
+    ["He arrived late.","وصل متأخرا","waṣala mutaʾakhkhiran",null],
+    ["I already drank the coffee.","قد شربت القهوة","qad sharibtu al-qahwa","قد أشرب القهوة"]],
+  "Work and jobs":[
+    ["I start work at eight o'clock.","أبدأ العمل في الساعة الثامنة","abdaʾ al-ʿamal fī as-sāʿa ath-thāmina","أبدأ العمل في الساعة الثامن"],
+    ["My salary is good.","راتبي جيد","rātibī jayyid","راتبي جيدة"],
+    ["She works from home.","تعمل من البيت","taʿmal min al-bayt","يعمل من البيت"],
+    ["The meeting was long.","كان الاجتماع طويلا","kāna al-ijtimāʿ ṭawīlan","كانت الاجتماع طويلا"],
+    ["I want to change my job.","أريد أن أغير عملي","urīd an ughayyir ʿamalī","أريد أن يغير عملي"]],
+  "Free time":[
+    ["I like swimming in the summer.","أحب السباحة في الصيف","uḥibb as-sibāḥa fī aṣ-ṣayf","أحب السباحة في صيف"],
+    ["What do you do on the weekend?","ماذا تفعل في عطلة نهاية الأسبوع","mādhā tafʿal fī ʿuṭlat nihāyat al-usbūʿ","ماذا تفعل في العطلة نهاية الأسبوع"],
+    ["He reads a book every week.","يقرأ كتابا كل أسبوع","yaqraʾ kitāban kull usbūʿ","تقرأ كتابا كل أسبوع"],
+    ["We watch movies a lot.","نشاهد الأفلام كثيرا","nushāhid al-aflām kathīran","يشاهد الأفلام كثيرا"],
+    ["My favorite sport is basketball.","رياضتي المفضلة هي كرة السلة","riyāḍatī al-mufaḍḍala hiya kurat as-salla","رياضتي المفضل هي كرة السلة"]],
+  "Travel":[
+    ["Our flight leaves tomorrow morning.","رحلتنا تغادر صباح الغد","riḥlatunā tughādir ṣabāḥ al-ghad","رحلتنا يغادر صباح الغد"],
+    ["I want to visit Japan.","أريد أن أزور اليابان","urīd an azūr al-yābān","أريد أن أزور يابان"],
+    ["We stayed in a beautiful hotel.","أقمنا في فندق جميل","aqamnā fī funduq jamīl","أقمنا في فندق جميلة"],
+    ["Do you need a visa?","هل تحتاج إلى تأشيرة","hal taḥtāj ilā taʾshīra","هل يحتاج إلى تأشيرة"],
+    ["I lost my key.","أضعت مفتاحي","aḍaʿtu miftāḥī","أضعت المفتاحي"]],
+  "At the restaurant":[
+    ["Can I see the menu?","هل يمكنني أن أرى القائمة","hal yumkinunī an arā al-qāʾima","هل يمكنني أن يرى القائمة"],
+    ["I would like a glass of water.","أريد كوبا من الماء","urīd kūban min al-māʾ","أريد كوبا في الماء"],
+    ["The food was delicious.","كان الطعام لذيذا","kāna aṭ-ṭaʿām ladhīdhan","كانت الطعام لذيذا"],
+    ["We want to order now.","نريد أن نطلب الآن","nurīd an naṭlub al-ān","نريد أن أطلب الآن"],
+    ["Do you have vegetarian dishes?","هل عندكم أطباق نباتية","hal ʿindakum aṭbāq nabātiyya","هل عندكم أطباق نباتي"]],
+  "Feelings and opinions":[
+    ["He is angry.","هو غاضب","huwa ghāḍib","هو غاضبة"],
+    ["I'm sad because it's raining.","أنا حزين لأنها تمطر","anā ḥazīn li-annahā tumṭir","أنا حزين لأن تمطر"],
+    ["I'm proud of you.","أنا فخور بك","anā fakhūr bik","أنا فخور لك"],
+    ["Are you worried?","هل أنت قلق","hal anta qaliq","هل أنت قلقون"],
+    ["This book is interesting.","هذا الكتاب ممتع","hādhā al-kitāb mumtiʿ","هذه الكتاب ممتع"]],
+  "Plans and the future":[
+    ["We will travel next month.","سنسافر في الشهر القادم","sa-nusāfir fī ash-shahr al-qādim","سنسافر في الشهر القادمة"],
+    ["We will meet tomorrow.","سنلتقي غدا","sa-naltaqī ghadan","سنلتقي أمس"],
+    ["Maybe I will come tomorrow.","ربما آتي غدا","rubbamā ātī ghadan","ربما أتيت غدا"],
+    ["She will study medicine.","ستدرس الطب","sa-tadrus aṭ-ṭibb","سيدرس الطب"],
+    ["I will buy a house one day.","سأشتري بيتا يوما ما","sa-ashtarī baytan yawman mā","سيشتري بيتا يوما ما"]],
+  "Comparing things":[
+    ["My brother is older than me.","أخي أكبر مني","akhī akbar minnī","أخي أكبر من أنا"],
+    ["This phone is cheaper.","هذا الهاتف أرخص","hādhā al-hātif arkhaṣ","هذا الهاتف أكثر رخيص"],
+    ["Tea is better than coffee.","الشاي أفضل من القهوة","ash-shāy afḍal min al-qahwa","الشاي أكثر جيد من القهوة"],
+    ["She runs faster than him.","هي تركض أسرع منه","hiya tarkuḍ asraʿ minhu","هي تركض أسرع من هو"],
+    ["This city is less expensive than Paris.","هذه المدينة أقل غلاء من باريس","hādhihi al-madīna aqall ghalāʾan min bārīs","هذا المدينة أقل غلاء من باريس"]],
+  "Phones and the internet":[
+    ["Send me an email.","أرسل لي بريدا إلكترونيا","arsil lī barīdan iliktrūniyyan","أرسل لي إلكترونيا بريدا"],
+    ["My computer is slow.","حاسوبي بطيء","ḥāsūbī baṭīʾ","حاسوبي بطيئة"],
+    ["I'll call you tonight.","سأتصل بك الليلة","sa-attaṣil bik al-layla","سأتصل لك الليلة"],
+    ["Send me the photo.","أرسل لي الصورة","arsil lī aṣ-ṣūra","أرسل أنا الصورة"],
+    ["I'm watching a video online.","أشاهد فيديو على الإنترنت","ushāhid fīdyū ʿalā al-intarnit","يشاهد فيديو على الإنترنت"]]
+  };
+  WL.ar.units.forEach(u => { if(!u.k && M[u.t]) u.s.push(...M[u.t]); });
+})();
+
+/* ===================== French: more sentences (2.15) =====================
+   Extra sentences for the A1–B1 topic units: [english, target, rom|null, planted mistake].
+   Pushed into the units by title before langs.js turns the pack into lessons. */
+(() => {
+  const M = {
+  "Greetings":[
+    ["Good morning, everyone.","Bonjour à tous.",null,"Bonjour à tout."],
+    ["See you later.","À plus tard.",null,"À plus tarde."],
+    ["Nice to meet you.","Enchanté|Enchantée.",null,null],
+    ["Good night, Mom.","Bonne nuit, maman.",null,"Bon nuit, maman."],
+    ["Yes, thank you.","Oui, merci.",null,null],
+    ["No, thank you.","Non, merci.",null,null],
+    ["How are you, sir?","Comment allez-vous, monsieur ?",null,"Comment vas-vous, monsieur ?"]],
+  "Me and you":[
+    ["I am tired.","Je suis fatigué|Je suis fatiguée.",null,"Je es fatigué."],
+    ["You are my friend.","Tu es mon ami|Tu es mon amie.",null,"Tu est mon ami."],
+    ["They are from Mexico.","Ils sont du Mexique|Elles sont du Mexique.",null,"Ils sont de Mexique."],
+    ["Is she a teacher?","Elle est professeure|Elle est professeur|Elle est prof ?",null,"Elle est une professeure ?"],
+    ["We are from Tennessee.","Nous sommes du Tennessee|On est du Tennessee.",null,"Nous sommes de le Tennessee."],
+    ["What is your name?","Comment tu t'appelles|Comment vous appelez-vous|Tu t'appelles comment ?",null,"Comment tu appelles ?"],
+    ["I am not a student.","Je ne suis pas étudiant|Je ne suis pas étudiante.",null,"Je suis ne pas étudiant."]],
+  "Numbers 1–10":[
+    ["I have three children.","J'ai trois enfants.",null,"Je ai trois enfants."],
+    ["We have two cats.","Nous avons deux chats|On a deux chats.",null,"Nous avons deux chat."],
+    ["I have eight books.","J'ai huit livres.",null,"J'ai huit livre."],
+    ["He is nine years old.","Il a neuf ans.",null,"Il est neuf ans."],
+    ["I want six apples.","Je veux six pommes|Je voudrais six pommes.",null,"Je veux six pomme."],
+    ["There are seven days in a week.","Il y a sept jours dans une semaine|Il y a sept jours par semaine.",null,"Il y a sept jours dans un semaine."],
+    ["One coffee and two teas, please.","Un café et deux thés, s'il vous plaît.",null,"Une café et deux thés, s'il vous plaît."]],
+  "Family":[
+    ["My brother is tall.","Mon frère est grand.",null,"Mon frère est grande."],
+    ["My sister lives in Spain.","Ma sœur habite en Espagne|Ma sœur vit en Espagne.",null,"Ma sœur habite à Espagne."],
+    ["I have two sons.","J'ai deux fils.",null,"J'ai deux des fils."],
+    ["His wife is a teacher.","Sa femme est professeure|Sa femme est professeur|Sa femme est prof.",null,"Son femme est professeure."],
+    ["My father works a lot.","Mon père travaille beaucoup.",null,"Mon père travaille un lot."],
+    ["Their daughter is five years old.","Leur fille a cinq ans.",null,"Leur fille est cinq ans."],
+    ["Do you have children?","Tu as des enfants|Vous avez des enfants|Avez-vous des enfants ?",null,"Tu as enfants ?"]],
+  "Food and drink":[
+    ["I drink milk every morning.","Je bois du lait tous les matins|Je bois du lait chaque matin.",null,"Je bois lait tous les matins."],
+    ["We eat chicken and rice.","Nous mangeons du poulet et du riz|On mange du poulet et du riz.",null,"Nous mangeons poulet et riz."],
+    ["I don't drink coffee.","Je ne bois pas de café.",null,"Je ne bois pas du café."],
+    ["The bread is very good.","Le pain est très bon.",null,"Le pain est très bonne."],
+    ["He eats an apple.","Il mange une pomme.",null,"Il mange un pomme."],
+    ["I'm hungry.","J'ai faim.",null,"Je suis faim."],
+    ["What do you want to drink?","Qu'est-ce que tu veux boire|Tu veux boire quoi|Qu'est-ce que vous voulez boire|Que voulez-vous boire ?",null,"Que est-ce que tu veux boire ?"]],
+  "Around town":[
+    ["The bank is near the hotel.","La banque est près de l'hôtel.",null,"La banque est près le hôtel."],
+    ["Where is the restaurant?","Où est le restaurant ?",null,"Où est la restaurant ?"],
+    ["Turn right.","Tournez à droite|Tourne à droite.",null,"Tournez droite."],
+    ["The beach is far.","La plage est loin.",null,"Le plage est loin."],
+    ["Is there a hotel here?","Il y a un hôtel ici|Est-ce qu'il y a un hôtel ici|Y a-t-il un hôtel ici ?",null,"Il est un hôtel ici ?"],
+    ["The station is on this street.","La gare est dans cette rue.",null,"La gare est dans ce rue."],
+    ["Excuse me, where is the school?","Pardon, où est l'école|Excusez-moi, où est l'école ?",null,"Pardon, où est la école ?"]],
+  "Days and time":[
+    ["Tomorrow is Friday.","Demain, c'est vendredi|Demain, on est vendredi|Demain nous sommes vendredi.",null,"Demain est le vendredi."],
+    ["I don't work on Sunday.","Je ne travaille pas le dimanche|Je ne travaille pas dimanche.",null,"Je ne travaille pas sur dimanche."],
+    ["It's three o'clock.","Il est trois heures.",null,"Il est trois heure."],
+    ["See you on Monday.","À lundi.",null,null],
+    ["What day is it today?","Quel jour sommes-nous aujourd'hui|On est quel jour aujourd'hui|Quel jour on est aujourd'hui|Quel jour sommes-nous ?",null,"Quel jour est aujourd'hui ?"],
+    ["We have class on Tuesday and Thursday.","Nous avons cours le mardi et le jeudi|On a cours le mardi et le jeudi.",null,"Nous avons cours sur mardi et jeudi."],
+    ["Yesterday I was at home.","Hier, j'étais à la maison|Hier, j'étais chez moi|J'étais à la maison hier.",null,"Hier, j'ai été à maison."]],
+  "Everyday verbs":[
+    ["I like music.","J'aime la musique.",null,"J'aime musique."],
+    ["She speaks English and Spanish.","Elle parle anglais et espagnol|Elle parle l'anglais et l'espagnol.",null,"Elle parles anglais et espagnol."],
+    ["I want to eat.","Je veux manger.",null,"Je veux mange."],
+    ["We work every day.","Nous travaillons tous les jours|On travaille tous les jours.",null,"Nous travaillons chaque jours."],
+    ["Do you understand?","Tu comprends|Vous comprenez|Comprenez-vous ?",null,"Tu comprend ?"],
+    ["They live in a big city.","Ils habitent dans une grande ville|Elles habitent dans une grande ville|Ils vivent dans une grande ville.",null,"Ils habitent dans une ville grande."],
+    ["I have a car.","J'ai une voiture.",null,"J'ai un voiture."]],
+  "Shopping":[
+    ["How much is this shirt?","Combien coûte cette chemise ?",null,"Combien coûte ce chemise ?"],
+    ["I want to buy bread.","Je veux acheter du pain|Je voudrais acheter du pain.",null,"Je veux acheter pain."],
+    ["This is cheap.","Ce n'est pas cher|C'est pas cher.",null,"C'est ne pas cher."],
+    ["The store is closed.","Le magasin est fermé.",null,"La magasin est fermé."],
+    ["Can I pay in cash?","Je peux payer en espèces|Je peux payer en liquide|Est-ce que je peux payer en espèces ?",null,"Je peux paie en espèces ?"],
+    ["It costs twenty dollars.","Ça coûte vingt dollars|Cela coûte vingt dollars.",null,"Ça coûte vingt dollar."],
+    ["I don't have money.","Je n'ai pas d'argent.",null,"Je n'ai pas de l'argent."]],
+  "Clothes and colors":[
+    ["I like your red dress.","J'aime ta robe rouge|J'aime votre robe rouge.",null,"J'aime ta rouge robe."],
+    ["He wears black shoes.","Il porte des chaussures noires.",null,"Il porte des chaussures noirs."],
+    ["This coat is too big.","Ce manteau est trop grand.",null,"Cette manteau est trop grand."],
+    ["My favorite color is blue.","Ma couleur préférée est le bleu|Ma couleur préférée, c'est le bleu.",null,"Mon couleur préférée est le bleu."],
+    ["I need new shoes.","J'ai besoin de nouvelles chaussures.",null,"Je besoin de nouvelles chaussures."],
+    ["The shirt is green.","La chemise est verte.",null,"La chemise est vert."],
+    ["She has a white dress.","Elle a une robe blanche.",null,"Elle a une robe blanc."]],
+  "At home":[
+    ["My house is big.","Ma maison est grande.",null,"Mon maison est grande."],
+    ["The bed is in the bedroom.","Le lit est dans la chambre.",null,"Le lit est en la chambre."],
+    ["Open the door, please.","Ouvre la porte, s'il te plaît|Ouvrez la porte, s'il vous plaît.",null,"Ouvre le porte, s'il te plaît."],
+    ["We eat in the kitchen.","Nous mangeons dans la cuisine|On mange dans la cuisine.",null,"Nous mangons dans la cuisine."],
+    ["The bathroom is small.","La salle de bains est petite.",null,"La salle de bains est petit."],
+    ["I live in an apartment.","J'habite dans un appartement|Je vis dans un appartement.",null,"J'habite dans une appartement."],
+    ["There is a table in the living room.","Il y a une table dans le salon.",null,"Il est une table dans le salon."]],
+  "Daily routine":[
+    ["I go to bed at eleven.","Je me couche à onze heures|Je vais au lit à onze heures.",null,"Je couche à onze heures."],
+    ["I eat breakfast at home.","Je prends le petit-déjeuner à la maison|Je prends mon petit-déjeuner à la maison|Je prends le petit-déjeuner chez moi.",null,"Je prends le petit-déjeuner en maison."],
+    ["She gets up early.","Elle se lève tôt.",null,"Elle lève tôt."],
+    ["We have lunch at noon.","Nous déjeunons à midi|On déjeune à midi.",null,"Nous déjeunons à la midi."],
+    ["I take a shower in the evening.","Je me douche le soir|Je prends une douche le soir.",null,"Je douche le soir."],
+    ["He often works late.","Il travaille souvent tard.",null,"Il souvent travaille tard."],
+    ["What time do you get up?","À quelle heure tu te lèves|À quelle heure vous levez-vous|Tu te lèves à quelle heure ?",null,"À quelle heure tu lèves ?"]],
+  "Weather and seasons":[
+    ["It's cold today.","Il fait froid aujourd'hui.",null,"Il est froid aujourd'hui."],
+    ["The weather is nice.","Il fait beau.",null,"Le temps fait beau."],
+    ["It rains a lot in spring.","Il pleut beaucoup au printemps.",null,"Il pleut beaucoup en printemps."],
+    ["I like summer.","J'aime l'été.",null,"J'aime été."],
+    ["Winter is very cold here.","L'hiver est très froid ici|Ici, l'hiver est très froid.",null,"Le hiver est très froid ici."],
+    ["Is it hot outside?","Il fait chaud dehors|Est-ce qu'il fait chaud dehors|Fait-il chaud dehors ?",null,"Il est chaud dehors ?"],
+    ["The sun is shining.","Le soleil brille.",null,"La soleil brille."]],
+  "Getting around":[
+    ["I take the train every day.","Je prends le train tous les jours|Je prends le train chaque jour.",null,"Je prends la train tous les jours."],
+    ["Where is the bus stop?","Où est l'arrêt de bus ?",null,"Où est le arrêt de bus ?"],
+    ["We are going by car.","Nous y allons en voiture|On y va en voiture|Nous allons en voiture.",null,"Nous allons par voiture."],
+    ["The plane arrives at noon.","L'avion arrive à midi.",null,"Le avion arrive à midi."],
+    ["I go to work by bike.","Je vais au travail à vélo|Je vais au travail en vélo.",null,"Je vais à le travail à vélo."],
+    ["My suitcase is heavy.","Ma valise est lourde.",null,"Ma valise est lourd."],
+    ["How much is a ticket?","Combien coûte un billet ?",null,"Combien coûte une billet ?"]],
+  "Health and body":[
+    ["My stomach hurts.","J'ai mal au ventre.",null,"J'ai mal à le ventre."],
+    ["I need a doctor.","J'ai besoin d'un médecin.",null,"J'ai besoin un médecin."],
+    ["She is sick.","Elle est malade.",null,"Elle a malade."],
+    ["Where is the hospital?","Où est l'hôpital ?",null,"Où est la hôpital ?"],
+    ["My feet hurt.","J'ai mal aux pieds.",null,"J'ai mal à les pieds."],
+    ["Take this medicine.","Prends ce médicament|Prenez ce médicament.",null,"Prends cette médicament."],
+    ["I feel better today.","Je me sens mieux aujourd'hui|Je vais mieux aujourd'hui.",null,"Je sens mieux aujourd'hui."]],
+  "Talking about the past":[
+    ["I ate at home yesterday.","Hier, j'ai mangé à la maison|J'ai mangé à la maison hier|Hier, j'ai mangé chez moi.",null,"Hier, je suis mangé à la maison."],
+    ["We went to the beach.","Nous sommes allés à la plage|Nous sommes allées à la plage|On est allés à la plage.",null,"Nous avons allé à la plage."],
+    ["She bought a new car.","Elle a acheté une nouvelle voiture.",null,"Elle est acheté une nouvelle voiture."],
+    ["I saw my friend last week.","J'ai vu mon ami la semaine dernière|J'ai vu mon amie la semaine dernière.",null,"Je suis vu mon ami la semaine dernière."],
+    ["Did you eat?","Tu as mangé|Vous avez mangé|Est-ce que tu as mangé ?",null,"Tu es mangé ?"],
+    ["He arrived late.","Il est arrivé en retard|Il est arrivé tard.",null,"Il a arrivé en retard."],
+    ["I already drank coffee.","J'ai déjà bu du café|J'ai déjà bu un café.",null,"J'ai bu déjà du café."]],
+  "Work and jobs":[
+    ["I start work at eight.","Je commence le travail à huit heures|Je commence à travailler à huit heures|Je commence à huit heures.",null,"Je commence le travail en huit heures."],
+    ["My salary is good.","Mon salaire est bon.",null,"Ma salaire est bon."],
+    ["She works from home.","Elle travaille à la maison|Elle travaille de chez elle|Elle fait du télétravail.",null,"Elle travaille de maison."],
+    ["The meeting was long.","La réunion était longue|La réunion a été longue.",null,"La réunion était long."],
+    ["I want to change jobs.","Je veux changer de travail|Je veux changer d'emploi|Je veux changer de boulot.",null,"Je veux changer le travail."]],
+  "Free time":[
+    ["I like to swim in the summer.","J'aime nager en été|J'aime nager l'été.",null,"J'aime nager dans l'été."],
+    ["What do you do on weekends?","Qu'est-ce que tu fais le week-end|Que faites-vous le week-end|Tu fais quoi le week-end ?",null,"Qu'est-ce que tu fais sur le week-end ?"],
+    ["He reads a book every week.","Il lit un livre chaque semaine|Il lit un livre par semaine|Il lit un livre toutes les semaines.",null,"Il lis un livre chaque semaine."],
+    ["We often watch movies.","Nous regardons souvent des films|On regarde souvent des films.",null,"Nous souvent regardons des films."],
+    ["My favorite sport is basketball.","Mon sport préféré est le basket|Mon sport préféré, c'est le basket|Mon sport préféré est le basketball.",null,"Mon sport préférée est le basket."]],
+  "Travel":[
+    ["Our flight leaves tomorrow morning.","Notre vol part demain matin.",null,"Nos vol part demain matin."],
+    ["I want to visit Japan.","Je veux visiter le Japon|Je voudrais visiter le Japon.",null,"Je veux visiter Japon."],
+    ["We stayed in a nice hotel.","Nous sommes restés dans un bel hôtel|Nous avons logé dans un bel hôtel|Nous sommes restés dans un hôtel sympa|On est restés dans un bel hôtel.",null,"Nous avons resté dans un bel hôtel."],
+    ["Do you need a visa?","Tu as besoin d'un visa|Vous avez besoin d'un visa|Avez-vous besoin d'un visa ?",null,"Tu as besoin un visa ?"],
+    ["I lost my key.","J'ai perdu ma clé|J'ai perdu ma clef.",null,"J'ai perdu mon clé."]],
+  "At the restaurant":[
+    ["Can I see the menu?","Je peux voir la carte|Je peux voir le menu|Est-ce que je peux voir la carte ?",null,"Je peux voir le carte ?"],
+    ["I would like a glass of water.","Je voudrais un verre d'eau.",null,"Je voudrais un verre de l'eau."],
+    ["The food was delicious.","Le repas était délicieux|C'était délicieux|La nourriture était délicieuse.",null,"Le repas était délicieuse."],
+    ["We want to order now.","Nous voulons commander maintenant|On veut commander maintenant|Nous aimerions commander maintenant.",null,"Nous voulons commandons maintenant."],
+    ["Do you have vegetarian dishes?","Vous avez des plats végétariens|Avez-vous des plats végétariens ?",null,"Vous avez des végétariens plats ?"]],
+  "Feelings and opinions":[
+    ["He is angry.","Il est en colère|Il est fâché.",null,"Il a en colère."],
+    ["I'm sad because it's raining.","Je suis triste parce qu'il pleut.",null,"Je suis triste parce que il pleut."],
+    ["I'm proud of you.","Je suis fier de toi|Je suis fière de toi|Je suis fier de vous|Je suis fière de vous.",null,"Je suis fier pour toi."],
+    ["Are you worried?","Tu es inquiet|Tu es inquiète|Vous êtes inquiet|Vous êtes inquiète ?",null,"Tu as inquiet ?"],
+    ["This book is interesting.","Ce livre est intéressant.",null,"Ce livre est intéressante."]],
+  "Plans and the future":[
+    ["I will travel next year.","Je voyagerai l'année prochaine|L'année prochaine, je voyagerai|Je vais voyager l'année prochaine.",null,"Je voyagerai la prochaine année."],
+    ["We will see.","On verra|Nous verrons.",null,"Nous voirons."],
+    ["Maybe I will come tomorrow.","Je viendrai peut-être demain|Peut-être que je viendrai demain.",null,"Peut-être je viendrai demain."],
+    ["She will study medicine.","Elle étudiera la médecine|Elle va étudier la médecine|Elle fera médecine.",null,"Elle étudiera médecine."],
+    ["I am going to buy a house one day.","Je vais acheter une maison un jour|Un jour, je vais acheter une maison.",null,"Je vais achète une maison un jour."]],
+  "Comparing things":[
+    ["My brother is older than me.","Mon frère est plus âgé que moi|Mon frère est plus vieux que moi.",null,"Mon frère est plus âgé que je."],
+    ["This phone is cheaper.","Ce portable est moins cher|Ce téléphone est moins cher.",null,"Ce portable est plus pas cher."],
+    ["Tea is better than coffee.","Le thé est meilleur que le café.",null,"Le thé est plus bon que le café."],
+    ["She runs faster than him.","Elle court plus vite que lui.",null,"Elle court plus vite que il."],
+    ["This city is less expensive than Paris.","Cette ville est moins chère que Paris.",null,"Cette ville est moins cher que Paris."]],
+  "Phones and the internet":[
+    ["Send me an email.","Envoie-moi un courriel|Envoie-moi un e-mail|Envoie-moi un mail|Envoyez-moi un courriel|Envoyez-moi un e-mail.",null,"Envoie-me un courriel."],
+    ["My computer is slow.","Mon ordinateur est lent.",null,"Mon ordinateur est lente."],
+    ["I'll call you tonight.","Je t'appelle ce soir|Je t'appellerai ce soir|Je vous appelle ce soir.",null,"Je te appelle ce soir."],
+    ["Is the internet working?","Internet marche|Est-ce qu'Internet marche|Internet fonctionne ?",null,"Internet marchent ?"],
+    ["I'm watching a video online.","Je regarde une vidéo en ligne.",null,"Je regarde un vidéo en ligne."]]
+  };
+  WL.fr.units.forEach(u => { if(!u.k && M[u.t]) u.s.push(...M[u.t]); });
+})();
+
+/* ===================== Portuguese (Brazil): more sentences (2.15) =====================
+   Extra sentences for the A1–B1 topic units: [english, target, rom|null, planted mistake].
+   Pushed into the units by title before langs.js turns the pack into lessons. */
+(() => {
+  const M = {
+  "Greetings":[
+    ["Good morning, everyone.","Bom dia a todos|Bom dia, pessoal.",null,"Boa dia a todos."],
+    ["See you later.","Até logo|Até mais tarde|Até mais.",null,"Até luego."],
+    ["Nice to meet you.","Prazer em conhecer você|Prazer em te conhecer|Muito prazer|Prazer.",null,"Prazer em conhecer a você."],
+    ["Good night, Mom.","Boa noite, mãe.",null,"Bom noite, mãe."],
+    ["Yes, thank you.","Sim, obrigado|Sim, obrigada.",null,null],
+    ["No, thank you.","Não, obrigado|Não, obrigada.",null,null],
+    ["How are you, sir?","Como o senhor está|Como vai o senhor|Tudo bem com o senhor?",null,"Como o senhor estás?"]],
+  "Me and you":[
+    ["I am tired.","Estou cansado|Estou cansada|Eu estou cansado|Eu estou cansada.",null,"Sou cansado."],
+    ["You are my friend.","Você é meu amigo|Você é minha amiga.",null,"Você está meu amigo."],
+    ["They are from Mexico.","Eles são do México|Elas são do México.",null,"Eles são de México."],
+    ["Is she a teacher?","Ela é professora?",null,"Ela está professora?"],
+    ["We are from Tennessee.","Somos do Tennessee|Nós somos do Tennessee.",null,"Estamos do Tennessee."],
+    ["What is your name?","Qual é o seu nome|Como você se chama|Qual é seu nome|Qual o seu nome?",null,"Qual é o você nome?"],
+    ["I am not a student.","Não sou estudante|Eu não sou estudante|Não sou aluno|Não sou aluna.",null,"Não estou estudante."]],
+  "Numbers 1–10":[
+    ["I have three children.","Tenho três filhos|Eu tenho três filhos.",null,"Tenho três filho."],
+    ["We have two cats.","Temos dois gatos|Nós temos dois gatos|A gente tem dois gatos.",null,"Temos duas gatos."],
+    ["I have eight books.","Tenho oito livros|Eu tenho oito livros.",null,"Tenho oito livro."],
+    ["He is nine years old.","Ele tem nove anos.",null,"Ele é nove anos."],
+    ["I want six apples.","Quero seis maçãs|Eu quero seis maçãs.",null,"Quero seis maçã."],
+    ["There are seven days in a week.","Uma semana tem sete dias|Tem sete dias em uma semana|Há sete dias em uma semana|Há sete dias numa semana.",null,"Uma semana tem sete dia."],
+    ["One coffee and two teas, please.","Um café e dois chás, por favor.",null,"Uma café e dois chás, por favor."]],
+  "Family":[
+    ["My brother is tall.","Meu irmão é alto.",null,"Minha irmão é alto."],
+    ["My sister lives in Spain.","Minha irmã mora na Espanha|Minha irmã vive na Espanha.",null,"Minha irmã mora no Espanha."],
+    ["I have two sons.","Tenho dois filhos|Eu tenho dois filhos.",null,"Tenho duas filhos."],
+    ["His wife is a teacher.","A esposa dele é professora|A mulher dele é professora|Sua esposa é professora.",null,"O esposa dele é professora."],
+    ["My father works a lot.","Meu pai trabalha muito.",null,"Meu pai trabalha muitos."],
+    ["Their daughter is five years old.","A filha deles tem cinco anos|A filha delas tem cinco anos.",null,"A filha deles é cinco anos."],
+    ["Do you have children?","Você tem filhos?",null,"Você tens filhos?"]],
+  "Food and drink":[
+    ["I drink milk every morning.","Bebo leite todas as manhãs|Eu bebo leite todas as manhãs|Tomo leite todas as manhãs|Eu tomo leite toda manhã|Tomo leite toda manhã.",null,"Bebo leite todos as manhãs."],
+    ["We eat chicken and rice.","Comemos frango e arroz|Nós comemos frango e arroz|Comemos frango com arroz|A gente come frango e arroz.",null,"Nós come frango e arroz."],
+    ["I don't drink coffee.","Não bebo café|Eu não bebo café|Não tomo café|Eu não tomo café.",null,"Eu bebo não café."],
+    ["The bread is very good.","O pão é muito bom|O pão está muito bom.",null,"O pão é muito boa."],
+    ["He eats an apple.","Ele come uma maçã.",null,"Ele come um maçã."],
+    ["I'm hungry.","Estou com fome|Eu estou com fome|Tenho fome.",null,"Sou com fome."],
+    ["What do you want to drink?","O que você quer beber|O que você quer tomar|Você quer beber o quê?",null,"O que você quer bebe?"]],
+  "Around town":[
+    ["The bank is near the hotel.","O banco fica perto do hotel|O banco é perto do hotel|O banco está perto do hotel.",null,"O banco fica perto de o hotel."],
+    ["Where is the restaurant?","Onde fica o restaurante|Onde é o restaurante|Onde está o restaurante?",null,"Onde fica a restaurante?"],
+    ["Turn right.","Vire à direita|Vira à direita.",null,"Vire à direito."],
+    ["The beach is far.","A praia é longe|A praia fica longe|A praia está longe.",null,"O praia é longe."],
+    ["Is there a hotel here?","Tem um hotel aqui|Há um hotel aqui|Tem algum hotel aqui?",null,"Está um hotel aqui?"],
+    ["The station is on this street.","A estação fica nesta rua|A estação fica nessa rua|A estação é nesta rua|A estação é nessa rua.",null,"A estação fica em esta rua."],
+    ["Excuse me, where is the school?","Com licença, onde fica a escola|Com licença, onde é a escola|Com licença, onde está a escola|Desculpa, onde fica a escola?",null,"Com licença, onde fica o escola?"]],
+  "Days and time":[
+    ["Tomorrow is Friday.","Amanhã é sexta-feira|Amanhã é sexta.",null,"Amanhã está sexta-feira."],
+    ["I don't work on Sunday.","Não trabalho no domingo|Eu não trabalho no domingo|Não trabalho aos domingos|Eu não trabalho aos domingos.",null,"Não trabalho em o domingo."],
+    ["It's three o'clock.","São três horas|São três.",null,"É três horas."],
+    ["See you on Monday.","Até segunda|Até segunda-feira.",null,null],
+    ["What day is it today?","Que dia é hoje|Hoje é que dia?",null,"Que dia está hoje?"],
+    ["We have class on Tuesday and Thursday.","Temos aula na terça e na quinta|Nós temos aula na terça e na quinta|Temos aula terça e quinta|Temos aula às terças e quintas.",null,"Temos aula em terça e em quinta."],
+    ["Yesterday I was at home.","Ontem eu estava em casa|Ontem eu fiquei em casa|Ontem fiquei em casa|Eu estava em casa ontem.",null,"Ontem eu era em casa."]],
+  "Everyday verbs":[
+    ["I like music.","Gosto de música|Eu gosto de música.",null,"Gosto música."],
+    ["She speaks English and Spanish.","Ela fala inglês e espanhol.",null,"Ela falas inglês e espanhol."],
+    ["I want to eat.","Quero comer|Eu quero comer.",null,"Quero como."],
+    ["We work every day.","Trabalhamos todos os dias|Nós trabalhamos todos os dias|Nós trabalhamos todo dia|Trabalhamos todo dia|A gente trabalha todo dia.",null,"Trabalhamos todos as dias."],
+    ["Do you understand?","Você entende|Você entendeu|Entendeu?",null,"Você entendes?"],
+    ["They live in a big city.","Eles moram em uma cidade grande|Eles moram numa cidade grande|Elas moram em uma cidade grande|Eles moram em uma grande cidade.",null,"Eles moram em um cidade grande."],
+    ["I have a car.","Tenho um carro|Eu tenho um carro.",null,"Tenho uma carro."]],
+  "Shopping":[
+    ["How much is this shirt?","Quanto custa esta camisa|Quanto custa essa camisa|Quanto é esta camisa|Quanto é essa camisa?",null,"Quanto custa este camisa?"],
+    ["I want to buy bread.","Quero comprar pão|Eu quero comprar pão.",null,"Quero compro pão."],
+    ["This is cheap.","Isto é barato|Isso é barato|Isso está barato|É barato.",null,"Isto é barata."],
+    ["The store is closed.","A loja está fechada.",null,"A loja está fechado."],
+    ["Can I pay in cash?","Posso pagar em dinheiro?",null,"Posso pago em dinheiro?"],
+    ["It costs twenty dollars.","Custa vinte dólares|Isso custa vinte dólares.",null,"Custa vinte dólar."],
+    ["I don't have money.","Não tenho dinheiro|Eu não tenho dinheiro.",null,"Tenho não dinheiro."]],
+  "Clothes and colors":[
+    ["I like your red dress.","Gosto do seu vestido vermelho|Eu gosto do seu vestido vermelho|Adoro seu vestido vermelho|Gosto do teu vestido vermelho.",null,"Gosto do seu vermelho vestido."],
+    ["He wears black shoes.","Ele usa sapatos pretos|Ele está usando sapatos pretos|Ele está de sapatos pretos.",null,"Ele usa sapatos pretas."],
+    ["This coat is too big.","Este casaco é grande demais|Este casaco está grande demais|Esse casaco está grande demais|Este casaco é muito grande|Esse casaco está muito grande.",null,"Esta casaco é grande demais."],
+    ["My favorite color is blue.","Minha cor favorita é azul|Minha cor favorita é o azul|Minha cor preferida é azul|Minha cor preferida é o azul.",null,"Meu cor favorita é azul."],
+    ["I need new shoes.","Preciso de sapatos novos|Eu preciso de sapatos novos.",null,"Preciso de sapatos novas."],
+    ["The shirt is green.","A camisa é verde.",null,"O camisa é verde."],
+    ["She has a white dress.","Ela tem um vestido branco.",null,"Ela tem uma vestido branco."]],
+  "At home":[
+    ["My house is big.","Minha casa é grande.",null,"Meu casa é grande."],
+    ["The bed is in the bedroom.","A cama está no quarto|A cama fica no quarto.",null,"A cama está em o quarto."],
+    ["Open the door, please.","Abra a porta, por favor|Abre a porta, por favor.",null,"Abra o porta, por favor."],
+    ["We eat in the kitchen.","Comemos na cozinha|Nós comemos na cozinha|A gente come na cozinha.",null,"Comemos em a cozinha."],
+    ["The bathroom is small.","O banheiro é pequeno.",null,"O banheiro é pequena."],
+    ["I live in an apartment.","Moro em um apartamento|Eu moro em um apartamento|Moro num apartamento|Eu moro num apartamento.",null,"Moro em uma apartamento."],
+    ["There is a table in the living room.","Tem uma mesa na sala|Há uma mesa na sala.",null,"Está uma mesa na sala."]],
+  "Daily routine":[
+    ["I go to bed at eleven.","Vou dormir às onze|Eu vou dormir às onze|Vou para a cama às onze|Eu vou para a cama às onze|Deito às onze.",null,"Vou dormir na onze."],
+    ["I eat breakfast at home.","Tomo café da manhã em casa|Eu tomo café da manhã em casa.",null,"Tomo café da manhã na casa."],
+    ["She gets up early.","Ela acorda cedo|Ela se levanta cedo|Ela levanta cedo.",null,"Ela acordo cedo."],
+    ["We have lunch at noon.","Almoçamos ao meio-dia|Nós almoçamos ao meio-dia|A gente almoça ao meio-dia.",null,"Almoçamos no meio-dia."],
+    ["I take a shower in the evening.","Tomo banho à noite|Eu tomo banho à noite.",null,"Tomo banho em a noite."],
+    ["He often works late.","Ele trabalha até tarde muitas vezes|Muitas vezes ele trabalha até tarde|Ele costuma trabalhar até tarde|Ele sempre trabalha até tarde.",null,"Ele trabalha tarde até muitas vezes."],
+    ["What time do you get up?","A que horas você acorda|Que horas você acorda|A que horas você se levanta|Que horas você se levanta?",null,"Que horas você acordas?"]],
+  "Weather and seasons":[
+    ["It's cold today.","Está frio hoje|Hoje está frio|Faz frio hoje|Hoje faz frio.",null,"É frio hoje."],
+    ["The weather is nice.","O tempo está bom|O tempo está bonito|Está um dia bonito.",null,"A tempo está bom."],
+    ["It rains a lot in spring.","Chove muito na primavera.",null,"Chove muito em primavera."],
+    ["I like summer.","Gosto do verão|Eu gosto do verão.",null,"Gosto verão."],
+    ["Winter is very cold here.","O inverno é muito frio aqui|Aqui o inverno é muito frio.",null,"A inverno é muito frio aqui."],
+    ["Is it hot outside?","Está quente lá fora|Está calor lá fora|Faz calor lá fora?",null,"É quente lá fora?"],
+    ["The sun is shining.","O sol está brilhando|Está fazendo sol|Faz sol.",null,"A sol está brilhando."]],
+  "Getting around":[
+    ["I take the train every day.","Pego o trem todos os dias|Eu pego o trem todos os dias|Pego o trem todo dia|Eu pego o trem todo dia.",null,"Pego a trem todos os dias."],
+    ["Where is the bus stop?","Onde fica o ponto de ônibus|Onde é o ponto de ônibus|Onde está o ponto de ônibus?",null,"Onde fica a ponto de ônibus?"],
+    ["We are going by car.","Vamos de carro|Nós vamos de carro|A gente vai de carro.",null,"Vamos em carro."],
+    ["The plane arrives at noon.","O avião chega ao meio-dia.",null,"O avião chega no meio-dia."],
+    ["I go to work by bike.","Vou para o trabalho de bicicleta|Eu vou para o trabalho de bicicleta|Vou ao trabalho de bicicleta|Eu vou ao trabalho de bicicleta|Vou trabalhar de bicicleta.",null,"Vou para o trabalho em bicicleta."],
+    ["My suitcase is heavy.","Minha mala está pesada|Minha mala é pesada.",null,"Minha mala está pesado."],
+    ["How much is a ticket?","Quanto custa uma passagem|Quanto custa um bilhete|Quanto é a passagem?",null,"Quanto custa um passagem?"]],
+  "Health and body":[
+    ["My stomach hurts.","Minha barriga dói|Estou com dor de barriga|Meu estômago dói|Estou com dor no estômago.",null,"Minha barriga dor."],
+    ["I need a doctor.","Preciso de um médico|Eu preciso de um médico|Preciso de uma médica.",null,"Preciso de uma médico."],
+    ["She is sick.","Ela está doente.",null,"Ela está doenta."],
+    ["Where is the hospital?","Onde fica o hospital|Onde é o hospital|Onde está o hospital?",null,"Onde fica a hospital?"],
+    ["My feet hurt.","Meus pés doem|Estou com dor nos pés.",null,"Meus pés dói."],
+    ["Take this medicine.","Tome este remédio|Tome esse remédio|Toma esse remédio|Toma este remédio.",null,"Tome esta remédio."],
+    ["I feel better today.","Estou melhor hoje|Hoje estou melhor|Me sinto melhor hoje|Eu me sinto melhor hoje.",null,"Sou melhor hoje."]],
+  "Talking about the past":[
+    ["I ate at home yesterday.","Comi em casa ontem|Eu comi em casa ontem|Ontem eu comi em casa|Ontem comi em casa.",null,"Comei em casa ontem."],
+    ["We went to the beach.","Fomos à praia|Nós fomos à praia|Fomos para a praia|A gente foi à praia|A gente foi para a praia.",null,"Nós foi à praia."],
+    ["She bought a new car.","Ela comprou um carro novo.",null,"Ela comprei um carro novo."],
+    ["I saw my friend last week.","Vi meu amigo na semana passada|Eu vi meu amigo na semana passada|Eu vi meu amigo semana passada|Vi minha amiga na semana passada|Eu vi minha amiga na semana passada.",null,"Vi meu amigo na semana passado."],
+    ["Did you eat?","Você comeu|Você já comeu?",null,"Você comi?"],
+    ["He arrived late.","Ele chegou atrasado|Ele chegou tarde.",null,"Ele chegou atrasada."],
+    ["I already drank coffee.","Já tomei café|Eu já tomei café|Já bebi café|Eu já bebi café.",null,"Já tomou café."]],
+  "Work and jobs":[
+    ["I start work at eight.","Começo a trabalhar às oito|Eu começo a trabalhar às oito|Entro no trabalho às oito|Eu entro no trabalho às oito.",null,"Começo trabalhar às oito."],
+    ["My salary is good.","Meu salário é bom.",null,"Minha salário é bom."],
+    ["She works from home.","Ela trabalha de casa|Ela trabalha em casa.",null,"Ela trabalha da casa."],
+    ["The meeting was long.","A reunião foi longa|A reunião foi comprida.",null,"A reunião foi longo."],
+    ["I want to change jobs.","Quero mudar de emprego|Eu quero mudar de emprego|Quero trocar de emprego|Eu quero trocar de emprego.",null,"Quero mudar de empregos."]],
+  "Free time":[
+    ["I like to swim in the summer.","Gosto de nadar no verão|Eu gosto de nadar no verão.",null,"Gosto nadar no verão."],
+    ["What do you do on weekends?","O que você faz nos fins de semana|O que você faz no fim de semana?",null,"O que você fazes nos fins de semana?"],
+    ["He reads a book every week.","Ele lê um livro toda semana|Ele lê um livro por semana|Ele lê um livro todas as semanas.",null,"Ele lê uma livro toda semana."],
+    ["We often watch movies.","Assistimos filmes com frequência|Nós assistimos filmes com frequência|Vemos filmes com frequência|Muitas vezes assistimos filmes|A gente assiste filmes com frequência.",null,"Nós assiste filmes com frequência."],
+    ["My favorite sport is basketball.","Meu esporte favorito é o basquete|Meu esporte favorito é basquete|Meu esporte preferido é o basquete|Meu esporte preferido é basquete.",null,"Minha esporte favorito é o basquete."]],
+  "Travel":[
+    ["Our flight leaves tomorrow morning.","Nosso voo sai amanhã de manhã|Nosso voo parte amanhã de manhã|Nosso voo é amanhã de manhã.",null,"Nossa voo sai amanhã de manhã."],
+    ["I want to visit Japan.","Quero visitar o Japão|Eu quero visitar o Japão|Quero conhecer o Japão.",null,"Quero visitar a Japão."],
+    ["We stayed in a nice hotel.","Ficamos em um hotel bom|Ficamos num hotel bom|Ficamos em um hotel legal|Ficamos num hotel legal|Nós ficamos em um hotel bom.",null,"Ficamos em uma hotel bom."],
+    ["Do you need a visa?","Você precisa de visto|Você precisa de um visto?",null,"Você precisas de visto?"],
+    ["I lost my key.","Perdi minha chave|Eu perdi minha chave|Perdi a minha chave|Eu perdi a minha chave.",null,"Perdi meu chave."]],
+  "At the restaurant":[
+    ["What do you recommend?","O que você recomenda|O que o senhor recomenda|O que a senhora recomenda?",null,"O que você recomendas?"],
+    ["I would like a glass of water.","Eu gostaria de um copo de água|Gostaria de um copo de água|Queria um copo de água|Eu queria um copo de água.",null,"Eu gostaria um copo de água."],
+    ["The food was delicious.","A comida estava deliciosa|A comida estava uma delícia.",null,"A comida estava delicioso."],
+    ["We want to order now.","Queremos pedir agora|Nós queremos pedir agora|Queremos fazer o pedido agora.",null,"Queremos pedimos agora."],
+    ["Do you have vegetarian dishes?","Vocês têm pratos vegetarianos|Tem pratos vegetarianos?",null,"Vocês têm vegetarianos pratos?"]],
+  "Feelings and opinions":[
+    ["He is angry.","Ele está bravo|Ele está com raiva|Ele está irritado|Ele está zangado.",null,"Ele é bravo."],
+    ["I'm sad because it's raining.","Estou triste porque está chovendo|Eu estou triste porque está chovendo.",null,"Sou triste porque está chovendo."],
+    ["I'm proud of you.","Tenho orgulho de você|Eu tenho orgulho de você|Estou orgulhoso de você|Estou orgulhosa de você.",null,"Tenho orgulho para você."],
+    ["Are you worried?","Você está preocupado|Você está preocupada?",null,"Você estás preocupado?"],
+    ["This book is interesting.","Este livro é interessante|Esse livro é interessante.",null,"Esta livro é interessante."]],
+  "Plans and the future":[
+    ["I will travel next year.","Vou viajar no ano que vem|Eu vou viajar no ano que vem|Vou viajar no próximo ano|Viajarei no ano que vem|Viajarei no próximo ano.",null,"Vou viajo no ano que vem."],
+    ["We will see.","Vamos ver|Veremos.",null,"Vamos vemos."],
+    ["Maybe I will come tomorrow.","Talvez eu venha amanhã.",null,"Talvez eu venho amanhã."],
+    ["She will study medicine.","Ela vai estudar medicina|Ela vai fazer medicina|Ela estudará medicina.",null,"Ela vai estuda medicina."],
+    ["I am going to buy a house one day.","Vou comprar uma casa um dia|Eu vou comprar uma casa um dia|Um dia vou comprar uma casa|Um dia eu vou comprar uma casa.",null,"Vou compro uma casa um dia."]],
+  "Comparing things":[
+    ["My brother is older than me.","Meu irmão é mais velho que eu|Meu irmão é mais velho do que eu.",null,"Meu irmão é mais velho que mim."],
+    ["This phone is cheaper.","Este celular é mais barato|Esse celular é mais barato|Este telefone é mais barato|Esse telefone é mais barato.",null,"Este celular é mais barata."],
+    ["Tea is better than coffee.","O chá é melhor que o café|O chá é melhor do que o café|Chá é melhor que café|Chá é melhor do que café.",null,"O chá é mais bom que o café."],
+    ["She runs faster than him.","Ela corre mais rápido que ele|Ela corre mais rápido do que ele.",null,"Ela corre mais rápido que lhe."],
+    ["This city is less expensive than Paris.","Esta cidade é menos cara que Paris|Esta cidade é menos cara do que Paris|Essa cidade é menos cara que Paris|Essa cidade é menos cara do que Paris.",null,"Esta cidade é menos caro que Paris."]],
+  "Phones and the internet":[
+    ["Send me an email.","Me manda um e-mail|Me mande um e-mail|Mande-me um e-mail|Me manda um email|Me mande um email.",null,"Manda eu um e-mail."],
+    ["My computer is slow.","Meu computador está lento|Meu computador é lento.",null,"Meu computador está lenta."],
+    ["I'll call you tonight.","Te ligo hoje à noite|Eu te ligo hoje à noite|Vou te ligar hoje à noite|Ligo para você hoje à noite|Vou ligar para você hoje à noite.",null,"Te ligo hoje em a noite."],
+    ["Is the internet working?","A internet está funcionando?",null,"O internet está funcionando?"],
+    ["I'm watching a video online.","Estou assistindo um vídeo online|Estou assistindo a um vídeo online|Estou vendo um vídeo online|Eu estou assistindo um vídeo online.",null,"Estou assistindo uma vídeo online."]]
+  };
+  WL.pt.units.forEach(u => { if(!u.k && M[u.t]) u.s.push(...M[u.t]); });
+})();
 
 /* ===================== More languages in the main game =====================
    French, Portuguese, Mandarin Chinese and Arabic as full courses next to Spanish and English,
@@ -16390,7 +16923,7 @@ tileItems = (orig => function(ch){
   const base = orig.apply(this, arguments);
   if(base || !ch || !(ch.al === "zh" || ch.al === "ar")) return base;
   const first = canon(ch.acc[ch.game === "Cloze Combat" ? 1 : 0]);
-  if(ch.game === "Classic Mine" || ch.game === "Echo Chamber" || ch.game === "Error Hunter"){
+  if(ch.game === "Classic Mine" || ch.game === "Error Hunter"){
     const words = first.split(" ");
     const items = xlShuf(words.concat(xlExtra(ch.al, words, Math.min(3, Math.max(2, 7 - words.length)))));
     return {mode:"words", items, keepScreen:true};
@@ -17328,7 +17861,7 @@ function mcPerturb(right, ch, pool){
 
 function mcBuild(st, ch){
   const mcx = ch.mcx; delete ch.mcx;
-  if(ch.k === "p" || ch.parts || Array.isArray(ch.opts) || ch.game === "Odd One Out" || ch.game === "Speak Up" || ch.game === "Match Madness") return;
+  if(ch.k === "p" || ch.parts || Array.isArray(ch.opts) || ch.game === "Odd One Out" || ch.game === "Match Madness") return;
   const loose = {native:st.native, mode:1};
   const ok = (a, s) => { try{ return gradeLocal(s || loose, ch, a, false).correct; }catch(e){ return false; } };
   let right = ch.game === "Cloze Combat" ? first(ch.acc[0]) : String(ch.answerKey || "");
@@ -18043,20 +18576,15 @@ document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("szSheet
 if(window.__PGM_TEST) window.__sz = {szApply, get v(){ return SZ; }};
 
 /* ===================== Voice & audio quick settings =====================
-   One place, reachable from the main menu, to switch off the
-   rounds you can't do right now: listening (Echo Chamber)
-   and speaking (Speak Up, 🎤 dictation). Both switches drive the existing settings
-   (pgm-echo via #echoChk and pgm-voice via .voiceChk), so the in-game 🎛️ panel stays in sync. */
-Object.assign(I18N.en, {va_short:"Audio", va_btn:"Voice & audio", va_title:"Voice & audio", va_listen:"Listening challenges", va_listenSub:"Rounds where you hear a word or sentence and answer.",
+   One place, reachable from the main menu, for the 🎤 dictation switch. It drives the
+   existing setting (pgm-voice via .voiceChk), so the in-game 🎛️ panel stays in sync.
+   (The listening switch and Quiet mode went with the listening / speaking rounds.) */
+Object.assign(I18N.en, {va_short:"Audio", va_btn:"Voice & audio", va_title:"Voice & audio",
   va_speak:"Dictation button", va_speakSub:"A 🎤 button to say your answers instead of typing them.", va_speakNA:"Not available on this device.",
-  va_listenNA:"No voice on this device, so there are no listening rounds.",
-  va_note:"There are no listening or speaking rounds. You can still hear any sentence with 🔊 and dictate answers with 🎤.",
-  va_quiet:"Quiet mode: turn both off", va_done:"Done", va_quietOn:"🤫 Quiet mode on: no listening or speaking rounds"});
-Object.assign(I18N.es, {va_short:"Audio", va_btn:"Voz y audio", va_title:"Voz y audio", va_listen:"Retos de escucha", va_listenSub:"Rondas en las que oyes una palabra o frase y respondes.",
+  va_note:"You can hear any sentence with 🔊 and dictate answers with 🎤.", va_done:"Done"});
+Object.assign(I18N.es, {va_short:"Audio", va_btn:"Voz y audio", va_title:"Voz y audio",
   va_speak:"Botón de dictado", va_speakSub:"Un botón 🎤 para decir tus respuestas en vez de escribirlas.", va_speakNA:"No disponible en este dispositivo.",
-  va_listenNA:"Este dispositivo no tiene voz, así que no hay rondas de escucha.",
-  va_note:"No hay rondas de escucha ni de voz. Puedes oír cualquier frase con 🔊 y dictar respuestas con 🎤.",
-  va_quiet:"Modo silencio: apagar los dos", va_done:"Listo", va_quietOn:"🤫 Modo silencio: sin rondas de escucha ni de voz"});
+  va_note:"Puedes oír cualquier frase con 🔊 y dictar respuestas con 🎤.", va_done:"Listo"});
 
 (() => {
   const css = document.createElement("style");
@@ -18081,9 +18609,8 @@ Object.assign(I18N.es, {va_short:"Audio", va_btn:"Voz y audio", va_title:"Voz y 
   back.className = "vaback"; back.id = "vaSheet"; back.hidden = true;
   back.innerHTML = `<div class="vasheet" role="dialog" aria-modal="true" aria-labelledby="vaTitle">
     <h2 class="display" id="vaTitle"></h2><p class="note" id="vaNote"></p>
-    <label class="varow" id="vaListenRow"><span class="txt"><b>🎧 <span id="vaListenL"></span></b><small id="vaListenS"></small></span><input type="checkbox" id="vaListen"></label>
     <label class="varow" id="vaSpeakRow"><span class="txt"><b>🎤 <span id="vaSpeakL"></span></b><small id="vaSpeakS"></small></span><input type="checkbox" id="vaSpeak" class="voiceChk"></label>
-    <div class="vabtns"><button class="ghost" id="vaQuiet"></button><button class="primary" id="vaDone"></button></div></div>`;
+    <div class="vabtns"><button class="primary" id="vaDone"></button></div></div>`;
   document.body.appendChild(back);
   // menu button, next to the music chip
   const btn = document.createElement("button");
@@ -18091,23 +18618,14 @@ Object.assign(I18N.es, {va_short:"Audio", va_btn:"Voz y audio", va_title:"Voz y 
   $("menuMusicBtn").after(btn);
 })();
 
-const vaListenNA = () => typeof Narrator === "undefined" || !Narrator.available();
 const vaSpeakNA = () => typeof VOICE === "undefined" || !VOICE.supported() || (typeof voiceBlocked !== "undefined" && voiceBlocked);
 function vaRefresh(){
-  // 2.10.1: listening and speaking rounds are gone, so only the dictation switch is left
-  $("vaListenRow").hidden = true; $("vaQuiet").hidden = true;
-  const er = $("echoRow"); if(er) er.hidden = true;
   $("vaTitle").textContent = "🔈 " + t("va_title");
   $("vaNote").textContent = t("va_note");
-  $("vaListenL").textContent = t("va_listen");
-  $("vaListenS").textContent = vaListenNA() ? t("va_listenNA") : t("va_listenSub");
   $("vaSpeakL").textContent = t("va_speak");
   $("vaSpeakS").textContent = vaSpeakNA() ? t("va_speakNA") : t("va_speakSub");
-  $("vaQuiet").textContent = "🤫 " + t("va_quiet");
   $("vaDone").textContent = t("va_done");
-  $("vaListen").checked = !!echoOn && !vaListenNA(); $("vaListen").disabled = vaListenNA();
   $("vaSpeak").checked = !!voiceOn && !vaSpeakNA(); $("vaSpeak").disabled = vaSpeakNA();
-  $("vaListenRow").classList.toggle("na", vaListenNA());
   $("vaSpeakRow").classList.toggle("na", vaSpeakNA());
   // the menu chip shows at a glance when something is switched off
   const off = !voiceOn && !vaSpeakNA();
@@ -18116,35 +18634,20 @@ function vaRefresh(){
   b.setAttribute("aria-label", t("va_btn")); b.title = t("va_btn");
   b.classList.toggle("va-off", off);
 }
-function vaSetListen(on){
-  const chk = $("echoChk");
-  if(chk){ chk.checked = on; chk.dispatchEvent(new Event("change", {bubbles:true})); }
-  else { echoOn = on; try{ localStorage.setItem("pgm-echo", on ? "on" : "off"); }catch(e){} }
-}
-function vaSetSpeak(on){
-  const chk = $("vaSpeak"); chk.checked = on;
-  chk.dispatchEvent(new Event("change", {bubbles:true}));   // voice.js listens for .voiceChk changes
-}
 function vaOpen(){ vaRefresh(); $("vaSheet").hidden = false; setTimeout(() => { const f = $("vaSpeak").disabled ? $("vaDone") : $("vaSpeak"); f.focus(); }, 30); }
 function vaClose(){ $("vaSheet").hidden = true; vaRefresh(); }
 document.addEventListener("click", e => {
   if(e.target.closest("#menuAudioBtn")){ Sound.tap(); return vaOpen(); }
   if(e.target.id === "vaSheet" || e.target.closest("#vaDone")) return vaClose();
-  if(e.target.closest("#vaQuiet")){
-    if(!vaListenNA()) vaSetListen(false);
-    if(!vaSpeakNA()) vaSetSpeak(false);
-    vaRefresh(); toast(t("va_quietOn")); setTimeout(vaClose, 350);
-  }
 });
 document.addEventListener("change", e => {
-  if(e.target && e.target.id === "vaListen") vaSetListen(e.target.checked);
-  if(e.target && (e.target.id === "echoChk" || (e.target.classList && e.target.classList.contains("voiceChk")))) setTimeout(vaRefresh, 0);
+  if(e.target && e.target.classList && e.target.classList.contains("voiceChk")) setTimeout(vaRefresh, 0);
 });
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("vaSheet").hidden) vaClose(); });
 applyI18n = (orig => function(){ const r = orig.apply(this, arguments); try{ vaRefresh(); }catch(e){} return r; })(applyI18n);
 
 setTimeout(vaRefresh, 0);
-if(window.__PGM_TEST) window.__va = {vaOpen, vaClose, vaRefresh, get echoOn(){ return echoOn; }, get voiceOn(){ return voiceOn; }};
+if(window.__PGM_TEST) window.__va = {vaOpen, vaClose, vaRefresh, get voiceOn(){ return voiceOn; }};
 
 /* ===================== 8-bit sound effects =====================
    Replaces the simple beeps with NES-style effects built from the same voices as the
@@ -18702,7 +19205,7 @@ Object.assign(I18N.es, {
 });
 
 /* games that test form and structure, not just meaning */
-const GYM_SKIP = new Set(["Reverse Mine", "Meaning Match", "Meaning Check", "Odd One Out", "Match Madness", "Word Duel", "Echo Chamber", "Speak Up"]);
+const GYM_SKIP = new Set(["Reverse Mine", "Meaning Match", "Meaning Check", "Odd One Out", "Match Madness", "Word Duel"]);
 const gymGames = st => gamesFor({mode:2, target:st.target, native:st.native, level:st.level}).filter(g => !GYM_SKIP.has(g));
 
 profile.gym = {}; profile.gymSel = {}; profile.gymRounds = 15;
@@ -19730,7 +20233,6 @@ initMenu();
   }
   setup.native = pref.name; setup.target = otherLang(pref.name);
   Narrator.init();
-  $("echoRow").hidden = !Narrator.available(); $("echoChk").checked = echoOn;
   renderVoices();
   setUiLang(pref.code, pref.name);
   renderReadUi();

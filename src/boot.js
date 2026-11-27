@@ -252,7 +252,6 @@ initMenu();
   }
   setup.native = pref.name; setup.target = otherLang(pref.name);
   Narrator.init();
-  $("echoRow").hidden = !Narrator.available(); $("echoChk").checked = echoOn;
   renderVoices();
   setUiLang(pref.code, pref.name);
   renderReadUi();

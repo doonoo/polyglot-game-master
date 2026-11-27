@@ -32,7 +32,7 @@ Object.assign(I18N.es, {
 });
 
 /* games that test form and structure, not just meaning */
-const GYM_SKIP = new Set(["Reverse Mine", "Meaning Match", "Meaning Check", "Odd One Out", "Match Madness", "Word Duel", "Echo Chamber", "Speak Up"]);
+const GYM_SKIP = new Set(["Reverse Mine", "Meaning Match", "Meaning Check", "Odd One Out", "Match Madness", "Word Duel"]);
 const gymGames = st => gamesFor({mode:2, target:st.target, native:st.native, level:st.level}).filter(g => !GYM_SKIP.has(g));
 
 profile.gym = {}; profile.gymSel = {}; profile.gymRounds = 15;
