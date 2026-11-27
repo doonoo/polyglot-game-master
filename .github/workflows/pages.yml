@@ -24,10 +24,17 @@ jobs:
       - uses: actions/checkout@v5
       - name: Build
         run: python3 tools/build.py
+      # the trailer is hosted on Pages (GitHub's file viewer can't play video)
+      # but kept out of www/ so it doesn't get packaged into the Android APK
+      - name: Stage site
+        run: |
+          mkdir _site
+          cp -r www/. _site/
+          cp docs/trailer.mp4 _site/trailer.mp4
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: www
+          path: _site
 
   deploy:
     needs: build
