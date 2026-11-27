@@ -44,7 +44,7 @@ function customCombos(cfg, target){
 }
 
 /* ---------- engine hooks ---------- */
-freshState = (orig => function(o){
+freshState = wrap("freshState", "custom", freshState, orig => function(o){
   const st = orig(o);
   if(o.mode === 9){
     const cfg = curCfg();
@@ -55,9 +55,9 @@ freshState = (orig => function(o){
     st.syllabus = [t("m9n")]; st.done = [false];
   }
   return st;
-})(freshState);
+});
 
-makePlanCore = (orig => function(st, rolls, exclude){
+makePlanCore = wrap("makePlanCore", "custom", makePlanCore, orig => function(st, rolls, exclude){
   if(st.mode !== 9) return orig(st, rolls, exclude);
   const cfg = st.custom;
   if(cfg.review && st.redo && st.redo.length && (st.redo.length >= 4 || rolls.r < 0.35)){
@@ -69,9 +69,9 @@ makePlanCore = (orig => function(st, rolls, exclude){
   const cb = combos[Math.floor(rolls.s * combos.length)];
   const games = cb.games.filter(g => g !== st.lastGame).length > 1 ? cb.games.filter(g => g !== st.lastGame) : cb.games;
   return {kind:"mix", src:cb.src, mode:cb.mode, lv:cb.lv, idx:cb.idxs[Math.floor(rolls.c * cb.idxs.length)], game:games[Math.floor(rolls.g * games.length)]};
-})(makePlanCore);
+});
 
-generate = (orig => function(st, plan){
+generate = wrap("generate", "custom", generate, orig => function(st, plan){
   if(st.mode !== 9 || !plan || plan.kind !== "mix") return orig(st, plan);
   const m = Object.assign({}, st, {mode:plan.mode, level:plan.lv, cefr:0});
   let res;
@@ -99,9 +99,9 @@ generate = (orig => function(st, plan){
   }
   if(res && res.challenge) res.challenge.cplan = plan;
   return res;
-})(generate);
+});
 
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "custom", applyResult, orig => function(st, correct, plan){
   if(st.mode !== 9) return orig(st, correct, plan);
   orig(st, correct, plan && plan.kind === "mix" ? {kind:"mix"} : plan);
   if(st.status !== "playing") return;
@@ -114,21 +114,21 @@ applyResult = (orig => function(st, correct, plan){
   }
   if(!correct && cfg.hearts){ st.hp--; if(st.hp <= 0){ st.status = "gameover"; return; } }
   if(cfg.rounds && st.stats.answered >= cfg.rounds) st.status = "conquered";
-})(applyResult);
+});
 
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "custom", gradeLocal, orig => function(st, ch, answer, force){
   if(st && st.mode === 9 && st.custom && st.custom.strict) return orig(Object.assign({}, st, {mode:3}), ch, answer, force);
   return orig(st, ch, answer, force);
-})(gradeLocal);
+});
 
-progress = (orig => function(){
+progress = wrap("progress", "custom", progress, orig => function(){
   if(!S || S.mode !== 9) return orig();
   const c = S.custom, n = S.stats.answered;
   if(c.rounds) return {n, d:c.rounds, label:t("cRound", {n:Math.min(n + 1, c.rounds), d:c.rounds})};
   return {n:S.stats.correct, d:Math.max(1, n), label:t("cScore", {c:S.stats.correct, n})};
-})(progress);
+});
 
-showOver = (orig => function(){
+showOver = wrap("showOver", "custom", showOver, orig => function(){
   orig();
   if(!S || S.mode !== 9) return;
   const done = S.status === "conquered";
@@ -141,17 +141,17 @@ showOver = (orig => function(){
   $("overIsland").hidden = true;
   const best = profile.customBest || 0;
   if(done && S.stats.correct > best){ profile.customBest = S.stats.correct; saveProfile(); }
-})(showOver);
+});
 
 /* ---------- HUD: hearts and timer ---------- */
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "custom", renderHud, orig => function(){
   orig();
   if(!S || S.mode !== 9) return;
   const max = S.custom.hearts;
   $("hudHearts").hidden = !max;
   if(max){ $("hudHearts").textContent = "❤️".repeat(Math.max(0, S.hp)) + "🖤".repeat(Math.max(0, max - S.hp)); $("hudHearts").setAttribute("aria-label", t("cHearts", {hp:S.hp, max})); }
   $("hudBadge").textContent = "🎛️ " + (S.custom.levels.length > 1 ? S.custom.levels[0] + "–" + S.custom.levels[S.custom.levels.length - 1] : S.custom.levels[0]);
-})(renderHud);
+});
 let cTimer = {cur:null, end:0};
 function timerTick(){
   let el = $("hudTimer");
@@ -241,8 +241,8 @@ document.addEventListener("click", e => {
   if(!e.target.closest || !e.target.closest("#startBtn") || setup.mode !== 9) return;
   if(!customCombos(curCfg(), setup.target).length){ e.stopImmediatePropagation(); e.preventDefault(); $("startNote").textContent = t("cEmpty"); }
 }, true);
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "custom", renderMenu, orig => function(){
   orig();
   $("customGroup").hidden = setup.mode !== 9;
   if(setup.mode === 9){ $("levelGroup").hidden = true; renderCustom(); }
-})(renderMenu);
+});

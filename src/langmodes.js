@@ -65,21 +65,21 @@ for(const code of XLM_CODES){
     }
   });
 }
-genVocab = (orig => function(st){
+genVocab = wrap("genVocab", "langmodes", genVocab, orig => function(st){
   const code = xlmCode(st && st.target);
   if(!code || !XLV[code]) return orig.apply(this, arguments);
   const saved = {};
   for(const lv of LEVELS){ saved[lv] = VLIST[lv]; VLIST[lv] = XLV[code][lv] || XLV[code].A1; }
   try{ return orig.apply(this, arguments); }
   finally{ for(const lv of LEVELS){ if(saved[lv] === undefined) delete VLIST[lv]; else VLIST[lv] = saved[lv]; } }
-})(genVocab);
+});
 // French and Portuguese nouns are taught with their article; the bare word counts too
-wordForms = (orig => function(v, lang){
+wordForms = wrap("wordForms", "langmodes", wordForms, orig => function(v, lang){
   const out = orig.apply(this, arguments);
   if(lang === "fr"){ const m = String(v).trim().match(/^(le |la |les |l'|l’|un |une )(.+)$/i); if(m) out.push(m[2]); }
   if(lang === "pt"){ const m = String(v).trim().match(/^(o |a |os |as |um |uma )(.+)$/i); if(m) out.push(m[2]); }
   return out;
-})(wordForms);
+});
 
 /* ---------- Numbers ---------- */
 const FR_U = ["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize","dix-sept","dix-huit","dix-neuf"];
@@ -299,9 +299,9 @@ function xlNumQ(c, code, lastGame, plain){
     }
   }
 }
-numChallenge = (orig => function(c, tgt, lastGame, plain){
+numChallenge = wrap("numChallenge", "langmodes", numChallenge, orig => function(c, tgt, lastGame, plain){
   return XLM_CODES.includes(tgt) && c && c.tip ? xlNumQ(c, tgt, lastGame, plain) : orig.apply(this, arguments);
-})(numChallenge);
+});
 function xlGenNumber(st, plan, c, review, res){
   const nat = LANG_CODE[st.native], code = LANG_CODE[st.target], L = GMT[nat], T = LN[nat][st.target];
   const q = xlNumQ(c, code, st.lastGame, false);
@@ -330,10 +330,10 @@ function xlGenNumber(st, plan, c, review, res){
   res.spotlight = null;
   return res;
 }
-genNumber = (orig => function(st, plan, c, review, res){
+genNumber = wrap("genNumber", "langmodes", genNumber, orig => function(st, plan, c, review, res){
   const code = xlmCode(st && st.target);
   return code && c && c.tip ? xlGenNumber(st, plan, c, review, res) : orig.apply(this, arguments);
-})(genNumber);
+});
 // Arabic number words get their transliteration under the tiles and on the answer card
 for(let n = 0; n <= 100; n++){ const [w, r] = arNum(n); XL_ROM[xlKey(w)] = r; if(!/\s/.test(w)) XL_TOKROM.ar[w] = r; }
 for(let n = 0; n <= 100; n++){ const w = zhNum(n); XL_ROM[xlKey(w)] = zhPin(w); }
@@ -509,7 +509,7 @@ for(const v of Object.keys(ARV)) for(const ten of ["past","pres","fut"]) for(let
   const f = arForm(v, ten, p); XL_ROM[xlKey(f[0])] = f[1]; if(!/\s/.test(f[0])) XL_TOKROM.ar[f[0]] = f[1];
 }
 
-conjQuestion = (orig => function(c, tgt, recent){
+conjQuestion = wrap("conjQuestion", "langmodes", conjQuestion, orig => function(c, tgt, recent){
   if(!["fr", "pt", "ar"].includes(tgt)) return orig.apply(this, arguments);
   const n = xlPronList(tgt).length;
   for(let tries = 0; tries < 25; tries++){
@@ -519,17 +519,17 @@ conjQuestion = (orig => function(c, tgt, recent){
     return {inf, ten, p, pron:xlPronList(tgt)[p], forms, key};
   }
   return null;
-})(conjQuestion);
-conjWrongs = (orig => function(tgt, q){
+});
+conjWrongs = wrap("conjWrongs", "langmodes", conjWrongs, orig => function(tgt, q){
   if(!["fr", "pt", "ar"].includes(tgt)) return orig.apply(this, arguments);
   const right = new Set(q.forms.map(f => norm(f, tgt, false))), out = new Set();
   for(let p = 0; p < xlPronList(tgt).length; p++) if(p !== q.p){ const f = xlForm(tgt, q.inf, q.ten, p)[0]; if(!right.has(norm(f, tgt, false))) out.add(f); }
   return [...out];
-})(conjWrongs);
-conjAccepted = (orig => function(tgt, forms, pIdx, pron){
+});
+conjAccepted = wrap("conjAccepted", "langmodes", conjAccepted, orig => function(tgt, forms, pIdx, pron){
   if(!["fr", "pt", "ar"].includes(tgt)) return orig.apply(this, arguments);
   return uniq(forms.concat(forms.map(f => xlWithPron(tgt, pIdx, f))));
-})(conjAccepted);
+});
 function xlGenConj(st, plan, c, review, res){
   const nat = LANG_CODE[st.native], code = LANG_CODE[st.target], L = GMT[nat];
   const recent = new Set((st.recentK || []).map(k => String(k).replace(/^c:/, "")));
@@ -564,24 +564,24 @@ function xlGenConj(st, plan, c, review, res){
   res._k = "c:" + q.key;
   return res;
 }
-genConj = (orig => function(st, plan, c, review, res){
+genConj = wrap("genConj", "langmodes", genConj, orig => function(st, plan, c, review, res){
   const code = xlmCode(st && st.target);
   if(code === "zh") return genSentence(Object.assign({}, st, {mode:8}), plan, c, review, res);   // measure words play like Tricky Pairs
   if(code) return xlGenConj(st, plan, c, review, res);
   return orig.apply(this, arguments);
-})(genConj);
-gamesFor = (orig => function(st){
+});
+gamesFor = wrap("gamesFor", "langmodes", gamesFor, orig => function(st){
   if(st && st.mode === 7 && xlmCode(st.target) === "zh") return ["Word Duel", "Cloze Combat", "Classic Mine", "Error Hunter"];
   return orig.apply(this, arguments);
-})(gamesFor);
+});
 // Mandarin / Arabic number and verb rounds offer their options as tap tiles
-tileItems = (orig => function(ch){
+tileItems = wrap("tileItems", "langmodes", tileItems, orig => function(ch){
   if(ch && (ch.al === "zh" || ch.al === "ar") && (ch.k === "n" || ch.k === "c") && Array.isArray(ch.opts)) return {mode:"pick", items:ch.opts, keepScreen:true};
   return orig.apply(this, arguments);
-})(tileItems);
+});
 
 /* ---------- levels, syllabus and lookups per language ---------- */
-levelsFor = (orig => function(mode, target){
+levelsFor = wrap("levelsFor", "langmodes", levelsFor, orig => function(mode, target){
   const code = xlmCode(target);
   if(code){
     if(mode === 4) return Object.keys(XLNUM);
@@ -590,18 +590,18 @@ levelsFor = (orig => function(mode, target){
     if(mode === 8) return Object.keys(TRICKY[code] || {A1:1});
   }
   return orig.apply(this, arguments);
-})(levelsFor);
-syllabusFor = (orig => function(st){
+});
+syllabusFor = wrap("syllabusFor", "langmodes", syllabusFor, orig => function(st){
   const code = xlmCode(st && st.target);
   if(code && st.mode === 4) return xlNumSyl(code, st.level).map(c => c[LANG_CODE[st.native]]);
   return orig.apply(this, arguments);
-})(syllabusFor);
-conceptAt = (orig => function(st, idx){
+});
+conceptAt = wrap("conceptAt", "langmodes", conceptAt, orig => function(st, idx){
   const code = xlmCode(st && st.target);
   if(code && st.mode === 4) return xlNumSyl(code, st.level)[idx];
   return orig.apply(this, arguments);
-})(conceptAt);
-findConcept = (orig => function(st, key){
+});
+findConcept = wrap("findConcept", "langmodes", findConcept, orig => function(st, key){
   const code = xlmCode(st && st.target);
   if(code && st.mode === 4){
     const k = String(key || "").toLowerCase(), nat = LANG_CODE[st.native];
@@ -609,12 +609,12 @@ findConcept = (orig => function(st, key){
     return null;
   }
   return orig.apply(this, arguments);
-})(findConcept);
+});
 
 /* ---------- menu: Mandarin's mode 7 is about measure words ---------- */
 Object.assign(I18N.en, {zh_m7n:"Measure Words", zh_m7d:"个, 本, 张… plus 了 and 过: the little words Chinese can't do without."});
 Object.assign(I18N.es, {zh_m7n:"Clasificadores", zh_m7d:"个, 本, 张… y 了 y 过: las palabritas imprescindibles del chino."});
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "langmodes", renderMenu, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const TP8 = {fr:"tu or vous, c'est or il est, bon or bien…", pt:"ser or estar, por or para, mas or mais…", zh:"不 or 没, 二 or 两, 的 or 得…", ar:"هذا or هذه, ما or ماذا, في or إلى…"};
@@ -626,6 +626,6 @@ renderMenu = (orig => function(){
     }
   }catch(e){}
   return r;
-})(renderMenu);
+});
 if(window.__PGM_TEST) window.__xlm = {xlNumWords, xlTime, xlPrice, frNum, ptNum, zhNum, arNum, frForm, ptForm, arForm, XLV, XLNUM, xlNumSyl, WL, STORIES, ISLANDS, TRICKY, CONJ, levelsFor:(m, t) => levelsFor(m, t), renderMenu:() => renderMenu()};
 (() => { const c = document.createElement("style"); c.textContent = ".sline .srom{display:block;color:var(--violet);font-size:.85rem;margin-top:2px}"; document.head.appendChild(c); })();

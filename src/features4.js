@@ -55,20 +55,20 @@ function renderQuests(){
     profile.quests.list.map(q => `<div class="quest ${q.done ? "done" : ""}"><span class="qi">${q.done ? "✅" : "🎁"}</span><span class="qt">${esc(t("q_" + q.id, {g:q.g}))}<span class="bar"><i style="width:${Math.round(100 * q.n / q.g)}%"></i></span></span><b>${q.n}/${q.g}</b></div>`).join("");
 }
 // hooks into existing tracking
-recordAnswer = (orig => function(correct, xp, forced){
+recordAnswer = wrap("recordAnswer", "features4", recordAnswer, orig => function(correct, xp, forced){
   orig(correct, xp, forced);
   if(forced) return;
   profile.combo = correct ? profile.combo + 1 : 0;
   if(correct){ questAdd("correct"); questAdd("combo", profile.combo, true); }
   if(xp > 0) questAdd("xp", xp);
-})(recordAnswer);
-recordTurn = (orig => function(prevCh, j){
+});
+recordTurn = wrap("recordTurn", "features4", recordTurn, orig => function(prevCh, j){
   orig(prevCh, j);
   if(!prevCh || !j || !j.correct || j.gaveUp || !S) return;
   if(prevCh.k === "c") questAdd("conj");
   if(S.mode === 8) questAdd("tricky");
   if(S.mode === 5) questAdd("vocab");
-})(recordTurn);
+});
 
 /* ---------- Stories ---------- */
 let SP = null;
@@ -159,4 +159,4 @@ $("storiesBtn").addEventListener("click", openStories);
 $("storiesBack").addEventListener("click", () => showMenu());
 $("storiesList").addEventListener("click", e => { const b = e.target.closest("[data-sid]"); if(b){ Sound.unlock(); openStory(b.dataset.sid); } });
 
-renderDaily = (orig => function(){ orig(); try{ renderQuests(); }catch(e){} })(renderDaily);
+renderDaily = wrap("renderDaily", "features4", renderDaily, orig => function(){ orig(); try{ renderQuests(); }catch(e){} });

@@ -44,7 +44,7 @@ function renderClock(){
   $("clockNote").textContent = t("ckn_" + c) + (c === "attack" && best ? " " + t("atkBest", {b:best}) + "." : "");
   $("clockGroup").hidden = setup.mode === 9;   // Custom Game has its own timer
 }
-renderMenu = (orig => function(){ orig(); renderClock(); })(renderMenu);
+renderMenu = wrap("renderMenu", "timer", renderMenu, orig => function(){ orig(); renderClock(); });
 $("clockChips").addEventListener("click", e => {
   const b = e.target.closest("[data-clock]"); if(!b) return;
   Sound.unlock(); Sound.tap();
@@ -53,12 +53,12 @@ $("clockChips").addEventListener("click", e => {
 document.addEventListener("click", e => { if(e.target.closest("[data-mode]")) setTimeout(renderClock, 0); });
 
 /* ---------- Every new run carries the chosen clock ---------- */
-freshState = (orig => function(o){
+freshState = wrap("freshState", "timer", freshState, orig => function(o){
   const st = orig(o);
   st.clock = o.mode === 9 ? "off" : (CLOCKS.includes(profile.clock) ? profile.clock : "off");
   if(st.clock === "attack") st.atk = {left:ATK_START};
   return st;
-})(freshState);
+});
 
 /* ---------- HUD chip and the draining bar ---------- */
 function ckEls(){
@@ -137,7 +137,7 @@ setInterval(ckTick, 100);
 document.addEventListener("visibilitychange", () => { CK.last = Date.now(); });
 
 /* ---------- Rewards: speed bonus, or time in Time Attack ---------- */
-grantRewards = (orig => function(plan, correct){
+grantRewards = wrap("grantRewards", "timer", grantRewards, orig => function(plan, correct){
   const fx = orig(plan, correct);
   if(!S || ((!S.clock || S.clock === "off") && !(plan && plan.boss))) return fx;
   if(ckMode() === "attack"){
@@ -156,10 +156,10 @@ grantRewards = (orig => function(plan, correct){
   fx.xp += bonus; S.xp = (S.xp || 0) + bonus;
   setTimeout(() => toast(msg, "badge"), 350);
   return fx;
-})(grantRewards);
+});
 
 /* ---------- Results ---------- */
-showOver = (orig => function(){
+showOver = wrap("showOver", "timer", showOver, orig => function(){
   orig();
   if(!S) return;
   if(S.clock && S.clock !== "off" && S.clock !== "attack" && S.stats.fast)
@@ -171,4 +171,4 @@ showOver = (orig => function(){
   $("overEmoji").textContent = "⏱️";
   $("overText").innerHTML = `${esc(t("atkOverB", {c:S.stats.correct, n:S.stats.answered}))}<br><b>${esc(isNew ? t("atkNew") : t("atkBest", {b:best}))}</b>`;
   $("overIsland").hidden = true; $("overRestart").hidden = false;
-})(showOver);
+});

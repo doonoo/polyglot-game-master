@@ -3,7 +3,7 @@
 // conquered only after two correct recalls in later rounds, with no phrase card on screen.
 const islKey = (st, k) => String(k || "").toLowerCase();
 const inIslSrs = (st, k) => st.srs.some(x => x.k.toLowerCase() === islKey(st, k));
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "island", applyResult, orig => function(st, correct, plan){
   if(st.mode !== 6 || !plan || !st.syllabus) return orig(st, correct, plan);
   if(plan.kind === "syllabus"){
     orig(st, correct, Object.assign({}, plan, {kind:"teach"}));
@@ -17,8 +17,8 @@ applyResult = (orig => function(st, correct, plan){
     if(i >= 0) st.done[i] = true;
     if(st.done.length === st.syllabus.length && st.done.every(Boolean)) st.status = "conquered";
   }
-})(applyResult);
-makePlanCore = (orig => function(st, rolls, exclude){
+});
+makePlanCore = wrap("makePlanCore", "island", makePlanCore, orig => function(st, rolls, exclude){
   const p = orig(st, rolls, exclude);
   if(!p || st.mode !== 6 || !st.syllabus || p.newSyllabus) return p;
   const exKey = exclude ? islKey(st, exclude.kind === "syllabus" && st.syllabus ? st.syllabus[exclude.idx] : exclude.key) : "";
@@ -34,7 +34,7 @@ makePlanCore = (orig => function(st, rolls, exclude){
   if(fresh.length){ const nx = fresh.find(i => i > exIdx); return {kind:"syllabus", idx:nx !== undefined ? nx : fresh[0], game:p.game}; }
   if(st.srs.length) return {kind:"srs", key:st.srs[0].k, game:p.game};
   return p;
-})(makePlanCore);
+});
 
 // Study gate: on a teach turn the question stays hidden until the player hides the phrase.
 function islandGate(fresh){
@@ -48,7 +48,7 @@ function islandGate(fresh){
   b.innerHTML = `<button class="primary" id="islHide">🙈 ${esc(t("islHide"))}</button><p class="note">${esc(t("islHideNote"))}</p>`;
   $("lessonCard").querySelector(".in").appendChild(b);
 }
-renderExtras = (orig => function(fresh){ orig(fresh); islandGate(fresh); })(renderExtras);
+renderExtras = wrap("renderExtras", "island", renderExtras, orig => function(fresh){ orig(fresh); islandGate(fresh); });
 $("lessonCard").addEventListener("click", e => {
   if(!e.target.closest("#islHide") || !S || !S.current) return;
   Sound.unlock(); Sound.tap(); Narrator.stop();

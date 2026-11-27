@@ -81,7 +81,7 @@ fillLangSelects = function(){
   $("uiSel").innerHTML = UI_LANGS.map(l => `<option value="${l.code}" ${l.code === UI.code ? "selected" : ""}>${l.label}</option>`).join("");
   $("nativeSel").title = xlIs(tgt) ? t("xl_onlyEn") : "";
 };
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "langs", renderMenu, orig => function(){
   const r = orig.apply(this, arguments);
   const x = xlIs(setup.target);
   if(x && !XL_MODES.includes(setup.mode)){ setup.mode = 1; return renderMenu(); }
@@ -96,23 +96,23 @@ renderMenu = (orig => function(){
   if(x) note.textContent = "🌍 " + t("xl_modesNote", {lang:LN[LANG_CODE[setup.native] || "en"][setup.target]});
   const sb = $("storiesBtn"); if(sb){ const none = x && !storiesFor(LANG_CODE[setup.target]).length; sb.disabled = none; sb.title = none ? t("xl_storiesNA") : ""; }
   return r;
-})(renderMenu);
-startNew = (orig => function(){
+});
+startNew = wrap("startNew", "langs", startNew, orig => function(){
   if(xlIs(setup.target)){ setup.native = "English"; if(!XL_MODES.includes(setup.mode)) setup.mode = 1; }
   return orig.apply(this, arguments);
-})(startNew);
+});
 document.addEventListener("change", e => {
   if(e.target && e.target.id === "targetSel" && xlIs(e.target.value)){ setup.target = e.target.value; setup.native = "English"; }
 }, true);
 
-mixSources = (orig => function(st){ return xlIs(st.target) ? [] : orig.apply(this, arguments); })(mixSources);
+mixSources = wrap("mixSources", "langs", mixSources, orig => function(st){ return xlIs(st.target) ? [] : orig.apply(this, arguments); });
 
 /* ---------- grading: spaces, tones and vowel marks don't count ---------- */
-norm = (orig => function(s, lang, strict){
+norm = wrap("norm", "langs", norm, orig => function(s, lang, strict){
   if(lang === "zh") return deacc(orig(s, lang, false)).replace(/[\s，。！？、]/g, "");
   if(lang === "ar") return orig(String(s).replace(/[ً-ْٰʾʿ]/g, ""), lang, false).replace(/[ʿʾ'’]/g, "").replace(/\s+/g, " ").trim();
   return orig.apply(this, arguments);
-})(norm);
+});
 
 /* ---------- tiles: tap the words instead of typing a new script ---------- */
 const xlShuf = a => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -120,7 +120,7 @@ function xlExtra(code, not, n){
   const pool = (XL_TOKENS[code] || []).filter(x => !not.includes(x));
   return xlShuf(pool).slice(0, n);
 }
-tileItems = (orig => function(ch){
+tileItems = wrap("tileItems", "langs", tileItems, orig => function(ch){
   const base = orig.apply(this, arguments);
   if(base || !ch || !(ch.al === "zh" || ch.al === "ar")) return base;
   const first = canon(ch.acc[ch.game === "Cloze Combat" ? 1 : 0]);
@@ -134,12 +134,12 @@ tileItems = (orig => function(ch){
     return {mode:"pick", items:xlShuf([cz].concat(xlExtra(ch.al, [cz], 3))), keepScreen:true};
   }
   return base;
-})(tileItems);
-renderExtras = (orig => function(fresh){
+});
+renderExtras = wrap("renderExtras", "langs", renderExtras, orig => function(fresh){
   const r = orig.apply(this, arguments);
   try{ xlDecorate(); }catch(e){}
   return r;
-})(renderExtras);
+});
 function xlDecorate(){
   const c = S && S.current, code = S && xlCode(S.target);
   const tiles = $("tiles");
@@ -188,13 +188,13 @@ function xlDecorate(){
 })();
 
 /* ---------- each language plays its own tune ---------- */
-syncMood = (orig => function(){
+syncMood = wrap("syncMood", "langs", syncMood, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const code = S && xlCode(S.target), g = $("game");
     if(code && g && !g.hidden && WL[code] && WL[code].music && S.mode !== 3 && !(S.current && S.current.plan && S.current.plan.boss) && S.clock !== "attack") Music.setMood(WL[code].music);
   }catch(e){}
   return r;
-})(syncMood);
+});
 setTimeout(() => { try{ fillLangSelects(); renderMenu(); }catch(e){} }, 0);
 if(window.__PGM_TEST) window.__xl = {XL, XL_ROM, XL_TOKROM, XL_TOKENS, XL_AUTO_WRONG, xlSpace, xlCode, xlKey};

@@ -67,7 +67,7 @@ document.addEventListener("change", e => {
   if(e.target && e.target.classList && e.target.classList.contains("voiceChk")) setTimeout(vaRefresh, 0);
 });
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("vaSheet").hidden) vaClose(); });
-applyI18n = (orig => function(){ const r = orig.apply(this, arguments); try{ vaRefresh(); }catch(e){} return r; })(applyI18n);
+applyI18n = wrap("applyI18n", "voiceprefs", applyI18n, orig => function(){ const r = orig.apply(this, arguments); try{ vaRefresh(); }catch(e){} return r; });
 
 setTimeout(vaRefresh, 0);
 if(window.__PGM_TEST) window.__va = {vaOpen, vaClose, vaRefresh, get voiceOn(){ return voiceOn; }};

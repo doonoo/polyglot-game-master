@@ -120,7 +120,7 @@ const ALT_TXT = {
   en:{ok:"That works too! This lesson is practising:", mine:"Accepted: you marked this answer right before. The lesson's version:"},
   es:{ok:"¡También vale! Esta lección practica:", mine:"Aceptada: ya marcaste esta respuesta como correcta. La versión de la lección:"}
 };
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "alts", gradeLocal, orig => function(st, ch, answer, force){
   const res = orig(st, ch, answer, force);
   if(answer === null || answer === undefined || !altOk(st, ch)) return res;
   const vars = variantsOf(ch);
@@ -143,6 +143,6 @@ gradeLocal = (orig => function(st, ch, answer, force){
     if(vars.some(v => altKey(v, lang, strict) === a)) return yes(T.ok);
   }
   return res;
-})(gradeLocal);
+});
 
 if(window.__PGM_TEST) window.__alts = {altKey, ALT_EQ, altLoose, ALT_ACC};

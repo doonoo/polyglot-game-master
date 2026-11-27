@@ -29,13 +29,13 @@ const mg2T = st => MG2T[LANG_CODE[st.native]] || MG2T.en;
 const MG2_BASE = {"Gap Fill":"Cloze Combat", "Order Up":"Syntax Scramble", "Meaning Check":"Reverse Mine"};
 const MG2_MODES = {1:["Gap Fill", "Order Up", "Meaning Check"], 2:["Gap Fill", "Order Up", "Meaning Check"], 3:["Order Up"], 5:["Meaning Check"],
   6:["Gap Fill", "Order Up", "Meaning Check"], 4:["Number Pick", "Number Match"], 7:["Who's Doing It?", "Tense Detective"]};
-gamesFor = (orig => function(st){
+gamesFor = wrap("gamesFor", "mcgames2", gamesFor, orig => function(st){
   const g = orig.apply(this, arguments);
   let add = (MG2_MODES[st && st.mode] || []).filter(x => !g.includes(x));
   if(st && st.mode === 7 && st.target && LANG_CODE[st.target] === "zh") add = [];   // Mandarin's mode 7 is measure words
   if(st && st.mode === 6 && st.target && !["es", "en"].includes(LANG_CODE[st.target])) add = add.filter(x => x !== "Gap Fill");   // their islands have no gaps
   return g.concat(add);
-})(gamesFor);
+});
 
 const mg2Ok = (st, ch, a) => { try{ return gradeLocal(st, ch, a, false).correct; }catch(e){ return false; } };
 const mg2Key = (ch, x) => norm(String(x), ch.al, false);
@@ -115,12 +115,12 @@ function mg2Wrap(orig){
     return res;
   };
 }
-genSentence = mg2Wrap(genSentence);
-genVocab = mg2Wrap(genVocab);
+genSentence = wrap("genSentence", "mcgames2", genSentence, mg2Wrap);
+genVocab = wrap("genVocab", "mcgames2", genVocab, mg2Wrap);
 
 /* ---------- number games ---------- */
 const MG2_NUMW = new Set(["Digit Dictation", "Real-World Numbers", "Clock Watcher"]);
-genNumber = (orig => function(st, plan, c){
+genNumber = wrap("genNumber", "mcgames2", genNumber, orig => function(st, plan, c){
   const res = orig.apply(this, arguments);
   const name = plan && plan.game, ch = res && res.challenge;
   if(!ch || !plan || plan.boss || (name !== "Number Pick" && name !== "Number Match") || !MG2_NUMW.has(ch.game) || !c) return res;
@@ -148,7 +148,7 @@ genNumber = (orig => function(st, plan, c){
     if(res._k) res._k = res._k.replace(/^[^|]*/, ch.game);
   }catch(e){}
   return res;
-})(genNumber);
+});
 
 /* ---------- conjugation games ---------- */
 const MG2_XL = ["fr", "pt", "ar"];
@@ -171,7 +171,7 @@ function mg2Tenses(st, tgt){
   for(const lv of Object.keys(C)) if(LEVELS.indexOf(lv) <= Math.max(top, 1)) for(const c of C[lv]) for(const t of c.ten || []) out.add(t);
   return [...out];
 }
-genConj = (orig => function(st, plan, c){
+genConj = wrap("genConj", "mcgames2", genConj, orig => function(st, plan, c){
   const name = plan && plan.game;
   if(!plan || plan.boss || (name !== "Who's Doing It?" && name !== "Tense Detective")) return orig.apply(this, arguments);
   const tgt = LANG_CODE[st.target];
@@ -204,10 +204,10 @@ genConj = (orig => function(st, plan, c){
       info:{kind:"conj", rows:[[L.form, `${mg2Show(tgt, q)} (${q.inf})`], [rowL, rowV]]}});
   }catch(e){}
   return res;
-})(genConj);
+});
 
 /* ---------- the answer card for the judging games ---------- */
-gradeLocal = (orig => function(st, ch, answer){
+gradeLocal = wrap("gradeLocal", "mcgames2", gradeLocal, orig => function(st, ch, answer){
   const j = orig.apply(this, arguments);
   try{
     if(!ch || !st || !ch.info || answer === null || (ch.game !== "Meaning Check" && ch.game !== "Who's Doing It?" && ch.game !== "Tense Detective")) return j;
@@ -219,13 +219,13 @@ gradeLocal = (orig => function(st, ch, answer){
     }
     return Object.assign({}, j, {feedback:j.correct ? L.ok : L.bad, struggled:[], rw:{rows:I.rows}});
   }catch(e){ return j; }
-})(gradeLocal);
-renderExtras = (orig => function(){
+});
+renderExtras = wrap("renderExtras", "mcgames2", renderExtras, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const ch = S && S.current && S.current.challenge, tl = $("tiles");
     if(ch && (ch.game === "Who's Doing It?" || ch.game === "Tense Detective" || ch.game === "Meaning Check" || ch.game === "Number Match")){ tl.dir = "ltr"; tl.querySelectorAll(".tile").forEach(t => t.dir = "ltr"); }
   }catch(e){}
   return r;
-})(renderExtras);
+});
 if(window.__PGM_TEST) window.__mg2 = {MG2, gamesFor:st => gamesFor(st), gen:(st, plan) => generate(st, plan)};

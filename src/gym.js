@@ -84,7 +84,7 @@ const gymSel = target => { const s = (profile.gymSel || {})[LANG_CODE[target]] |
 function gymSetSel(target, keys){ (profile.gymSel || (profile.gymSel = {}))[LANG_CODE[target]] = keys; saveProfile(); }
 
 /* ---------- engine hooks ---------- */
-freshState = (orig => function(o){
+freshState = wrap("freshState", "gym", freshState, orig => function(o){
   const st = orig(o);
   if(o.mode === 10){
     let picks = gymSel(o.target).map(k => gymFind(o.target, k)).filter(Boolean);
@@ -96,9 +96,9 @@ freshState = (orig => function(o){
     st.syllabus = [t("m10n")]; st.done = [false];
   }
   return st;
-})(freshState);
+});
 
-makePlanCore = (orig => function(st, rolls, exclude){
+makePlanCore = wrap("makePlanCore", "gym", makePlanCore, orig => function(st, rolls, exclude){
   if(st.mode !== 10) return orig(st, rolls, exclude);
   if(st.status !== "playing") return null;
   const g = st.gym, picks = g.picks;
@@ -113,9 +113,9 @@ makePlanCore = (orig => function(st, rolls, exclude){
   const low = Math.min(...cand.map(n)), least = cand.filter(p => n(p) === low);
   const p = least[Math.floor(rolls.s * least.length)];
   return {kind:"gym", lv:p.lv, idx:p.idx, t:p.t, game};
-})(makePlanCore);
+});
 
-generate = (orig => function(st, plan){
+generate = wrap("generate", "gym", generate, orig => function(st, plan){
   if(st.mode !== 10 || !plan || plan.kind !== "gym") return orig(st, plan);
   const m = Object.assign({}, st, {mode:2, level:plan.lv, cefr:0});
   m.syllabus = syllabusFor(m); m.done = m.syllabus.map(() => false);
@@ -126,9 +126,9 @@ generate = (orig => function(st, plan){
   for(let k = 0; k < others.length && res && res.challenge && GYM_SKIP.has(res.challenge.game); k++) res = orig(m, {kind:"syllabus", idx, game:others[k], boss:false});
   if(res && res.lesson) res.lesson = Object.assign({}, res.lesson, {title:"📐 " + plan.lv + " · " + (res.lesson.title || plan.t)});
   return res;
-})(generate);
+});
 
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "gym", applyResult, orig => function(st, correct, plan){
   // grammar results from the other modes feed the weak-spot list (not in two-player games).
   // runTurn also applies the result to a throwaway copy to plan the next round: record only for the live state
   const tp = (typeof TP !== "undefined" && TP.on) || st !== S;
@@ -158,21 +158,21 @@ applyResult = (orig => function(st, correct, plan){
   else if(plan.redo) g.redo = (g.redo || []).filter(x => !same(x));
   if(!tp){ gymRecord(st.target, plan.lv, plan.t, correct); saveProfile(); }
   if(st.status === "playing" && st.stats.answered >= g.rounds) st.status = "conquered";
-})(applyResult);
+});
 
-progress = (orig => function(){
+progress = wrap("progress", "gym", progress, orig => function(){
   if(!S || S.mode !== 10) return orig();
   const d = S.gym.rounds, n = S.stats.answered;
   return {n, d, label:t("cRound", {n:Math.min(n + 1, d), d})};
-})(progress);
+});
 
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "gym", renderHud, orig => function(){
   orig();
   if(!S || S.mode !== 10) return;
   $("hudHearts").hidden = true;
   const lv = [...new Set(S.gym.picks.map(p => p.lv))];
   $("hudBadge").textContent = "📐 " + (lv.length > 1 ? lv[0] + "–" + lv[lv.length - 1] : lv[0] || S.level);
-})(renderHud);
+});
 
 /* A workout that went badly (under 60%) still finishes, but without the victory fanfare,
    confetti and cheering Leo: those parts all key off "conquered", so they run as if it ended */
@@ -182,9 +182,9 @@ const gymCalm = f => function(){
   S.status = "gameover";
   try{ return f.apply(this, arguments); } finally { S.status = "conquered"; }
 };
-playOutcome = gymCalm(playOutcome);
-runJuice = gymCalm(runJuice);
-showOver = (orig => function(){
+playOutcome = wrap("playOutcome", "gym", playOutcome, gymCalm);
+runJuice = wrap("runJuice", "gym", runJuice, gymCalm);
+showOver = wrap("showOver", "gym", showOver, orig => function(){
   const poor = gymPoor();
   gymCalm(orig)();
   if(!S || S.mode !== 10) return;
@@ -200,7 +200,7 @@ showOver = (orig => function(){
   $("overText").innerHTML = esc(t("gDoneB", {c, n, p})) + (rows ? `<div class="gover"><b>${esc(t("gOverT"))}</b><ul>${rows}</ul></div>` : "");
   $("overIsland").hidden = true;
   if(done) $("overRestart").hidden = false;
-})(showOver);
+});
 
 /* ---------- Setup panel in the menu ---------- */
 (() => {
@@ -270,7 +270,7 @@ document.addEventListener("click", e => {
   if(!e.target.closest || !e.target.closest("#startBtn") || setup.mode !== 10) return;
   if(!gymSel(setup.target).length){ e.stopImmediatePropagation(); e.preventDefault(); $("startNote").textContent = t("gSelNone"); }
 }, true);
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "gym", renderMenu, orig => function(){
   orig();
   $("gymGroup").hidden = setup.mode !== 10;
   if(setup.mode === 10){
@@ -278,7 +278,7 @@ renderMenu = (orig => function(){
     if($("clockGroup")) $("clockGroup").hidden = true;
     renderGym();
   }
-})(renderMenu);
+});
 document.addEventListener("change", e => { if(e.target && e.target.id === "targetSel" && setup.mode === 10){ gymLv = null; setTimeout(renderGym, 0); } });
 
 if(window.__PGM_TEST) window.__gym = {gymLessons, gymLevels, gymSel, gymSetSel, gymWeak, gymMastery, gymRec, gymGames, gymFind, gymKey};

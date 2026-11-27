@@ -90,7 +90,7 @@ function voiceUI(){
   document.body.classList.toggle("micok", !mic.hidden);
   if(!mic.hidden){ mic.setAttribute("aria-label", t("vMic")); mic.title = t("vMic"); }
 }
-renderExtras = (orig => function(fresh){ orig(fresh); voiceUI(); })(renderExtras);
+renderExtras = wrap("renderExtras", "voice", renderExtras, orig => function(fresh){ orig(fresh); voiceUI(); });
 
 function setListening(on){
   document.body.classList.toggle("listening", on);

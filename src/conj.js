@@ -1,5 +1,5 @@
-/* ===================== Conjugation Gym (mode 7) ===================== */
-MODES.push({id:7, name:"Conjugation Gym", ico:"🏋️", color:"#FFC48C", desc:"Drill verb forms tense by tense."});
+/* ===================== Conjugation Station (mode 7) ===================== */
+MODES.push({id:7, name:"Conjugation Station", ico:"🚉", color:"#FFC48C", desc:"Drill verb forms tense by tense."});
 
 /* ---------- Spanish engine ---------- */
 const ESV = {};

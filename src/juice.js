@@ -161,7 +161,7 @@ function juHere(){
 
 /* Answers: pixels, +XP, combos, shakes */
 let juXp = null, juBest = 0;
-playOutcome = (orig => function(prevPlan){
+playOutcome = wrap("playOutcome", "juice", playOutcome, orig => function(prevPlan){
   orig.apply(this, arguments);
   try{
     if(!prevPlan || !S || !S.judgement || !juOn()) { if(S) juXp = S.xp || 0; return; }
@@ -183,7 +183,7 @@ playOutcome = (orig => function(prevPlan){
       if(S.status === "gameover") juFlash("#E5384F");
     }
   }catch(e){}
-})(playOutcome);
+});
 
 /* Boss arrives: the screen flashes red and the floor shakes */
 Sound.bossIntro = (orig => function(){ orig(); try{ juFlash("#E5384F"); juShake($("feed"), "jx-quake"); juBanner(t("ju_boss"), "boss"); }catch(e){} })(Sound.bossIntro);
@@ -193,7 +193,7 @@ Sound.loot = (orig => function(){ orig(); try{ juBurst(window.innerWidth / 2, 96
 
 /* HUD: streak catches fire, level ups get a banner */
 let juBadge = "";
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "juice", renderHud, orig => function(){
   orig.apply(this, arguments);
   if(!S) return;
   const st = S.stats.streak || 0, h = $("hudStreak");
@@ -201,19 +201,19 @@ renderHud = (orig => function(){
   const b = $("hudBadge"), txt = b ? b.textContent : "";
   if(juBadge && txt && txt !== juBadge && !$("game").hidden){ juBanner(t("ju_level") + " " + txt, "lvl"); const c = juCenter(b); juBurst(c.x, c.y, 18, null, 90); }
   juBadge = txt;
-})(renderHud);
+});
 
 /* The correct-answer verdict gets a spinning star */
-renderExtras = (orig => function(fresh){
+renderExtras = wrap("renderExtras", "juice", renderExtras, orig => function(fresh){
   orig.apply(this, arguments);
   const j = $("judgeCard");
   if(fresh && juOn() && j && !j.hidden && j.classList.contains("ok") && !j.querySelector(".jx-star")){
     const h = j.querySelector("h2, h3, .head, b"); if(h){ const s = document.createElement("span"); s.className = "jx-star"; s.setAttribute("aria-hidden", "true"); s.textContent = " ⭐"; h.appendChild(s); }
   }
-})(renderExtras);
+});
 
 /* Results screen: letters drop in, wins rain pixels */
-showOver = (orig => function(){
+showOver = wrap("showOver", "juice", showOver, orig => function(){
   orig.apply(this, arguments);
   juBadge = ""; juXp = null;
   if(!juOn()) return;
@@ -224,7 +224,7 @@ showOver = (orig => function(){
     ti.innerHTML = [...word].map((c, i) => c === " " ? " " : `<span class="jx-l" aria-hidden="true" style="--i:${i}">${esc(c)}</span>`).join("");
     if(win && juOn()){ const c = juCenter($("overEmoji")); [0, 350, 700].forEach(d => setTimeout(() => juBurst(c.x, c.y, 22, null, 160), d)); }
   }catch(e){}
-})(showOver);
+});
 
 /* Pulse with the music */
 document.addEventListener("pgm-beat", e => {

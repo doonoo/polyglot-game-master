@@ -1,0 +1,1 @@
+New players get a simple start: pick a course, then one button starts Practice, and a "Start here" badge marks it on the menu. Conjugation Gym is now Conjugation Station, so it's no longer confused with Grammar Gym. Under the hood, every extension of the game's core functions is now named and checked in a fixed order, which makes future bugs much easier to find.

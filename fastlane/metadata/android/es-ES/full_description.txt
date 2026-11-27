@@ -20,7 +20,7 @@ Polyglot Game Master enseña idiomas con juegos cortos. Todo viene incluido: sin
 <li>Supervivencia: corrección estricta, una sola vida. Batallas contra jefes cada pocas rondas.</li>
 <li>Gimnasio de gramática: elige los puntos de gramática que quieras y practica solo esos, con marcas de dominio.</li>
 <li>Duelo de cartas: arma frases con una mano de cartas de palabras para vencer a tres rivales.</li>
-<li>Números, Avalancha de vocabulario, Salto de islas, Gimnasio de verbos (clasificadores en chino), Palabras trampa y un Juego personalizado.</li>
+<li>Números, Avalancha de vocabulario, Salto de islas, Estación de verbos (clasificadores en chino), Palabras trampa y un Juego personalizado.</li>
 <li>Escribe tus respuestas o cambia a opción múltiple. Añade un reloj o Contrarreloj.</li>
 <li>Dos jugadores en un mismo teléfono, en todos los modos.</li>
 </ul>

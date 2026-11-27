@@ -140,4 +140,4 @@ function renderCorrection(j, box){
   btns.forEach(b => box.appendChild(b));
 }
 (() => { const c = document.createElement("style"); c.textContent = ".ans .fbfix{margin-top:4px;padding:6px 8px;border-radius:10px;background:rgba(46,196,140,.10)}"; document.head.appendChild(c); })();
-renderExtras = (orig => function(fresh){ orig(fresh); renderFeedback(); })(renderExtras);
+renderExtras = wrap("renderExtras", "feedback", renderExtras, orig => function(fresh){ orig(fresh); renderFeedback(); });

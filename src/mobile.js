@@ -68,7 +68,7 @@ function mobDockIn(){
   if(on) requestAnimationFrame(() => { document.documentElement.style.setProperty("--mob-dock", dock.hidden ? "0px" : Math.round(dock.getBoundingClientRect().height + 12) + "px"); });
 }
 function mobHud(){ const h = document.querySelector("#game .hud"); if(h) document.documentElement.style.setProperty("--mob-hud", Math.round(h.getBoundingClientRect().height) + "px"); }
-renderGame = (orig => function(fresh){
+renderGame = wrap("renderGame", "mobile", renderGame, orig => function(fresh){
   const r = orig.apply(this, arguments);
   try{
     mobDock();
@@ -114,5 +114,5 @@ renderGame = (orig => function(fresh){
     }
   }catch(e){}
   return r;
-})(renderGame);
+});
 addEventListener("resize", () => { try{ if(mobOn()) mobHud(); }catch(e){} });

@@ -25,10 +25,10 @@ const MCG_BASE = {"Quick Pick":"Classic Mine", "Meaning Match":"Reverse Mine", "
 const MCG_MODES = {1:["Quick Pick", "Meaning Match", "Right or Wrong", "Spot the Mistake"], 2:["Quick Pick", "Meaning Match", "Right or Wrong", "Spot the Mistake"],
   3:["Quick Pick", "Right or Wrong", "Spot the Mistake"], 6:["Quick Pick", "Meaning Match"], 5:["Quick Pick", "Meaning Match"], 7:["Quick Pick"], 8:["Right or Wrong", "Spot the Mistake"]};
 
-gamesFor = (orig => function(st){
+gamesFor = wrap("gamesFor", "mcgames", gamesFor, orig => function(st){
   const g = orig.apply(this, arguments), add = (MCG_MODES[st && st.mode] || []).filter(x => !g.includes(x));
   return g.concat(add);
-})(gamesFor);
+});
 
 function mcgPick(st, ch, name){
   const L = mcT(st), nat = LANG_CODE[st.native], Tn = LN[nat][st.target], Nn = LN[nat][st.native];
@@ -97,12 +97,12 @@ function mcgWrap(orig){
     return res;
   };
 }
-genSentence = mcgWrap(genSentence);
-genVocab = mcgWrap(genVocab);
-genConj = (w => function(){ return w.apply("conj", arguments); })(mcgWrap(genConj));
+genSentence = wrap("genSentence", "mcgames", genSentence, mcgWrap);
+genVocab = wrap("genVocab", "mcgames", genVocab, mcgWrap);
+genConj = wrap("genConj", "mcgames", genConj, orig => (w => function(){ return w.apply("conj", arguments); })(mcgWrap(orig)));
 
 /* feedback for the two judging games: a short verdict; the card shows the sentence and its correction */
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "mcgames", gradeLocal, orig => function(st, ch, answer, force){
   const j = orig.apply(this, arguments);
   try{
     if(!ch || !st || (ch.game !== "Right or Wrong" && ch.game !== "Spot the Mistake") || answer === null) return j;
@@ -112,10 +112,10 @@ gradeLocal = (orig => function(st, ch, answer, force){
     const fb = ch.game === "Spot the Mistake" ? (j.correct ? L.sOk : L.sBad) : j.correct ? (had ? L.rOkW : L.rOkR) : (had ? L.rBadW : L.rBadR);
     return Object.assign({}, j, {feedback:fb, struggled:[], rw:{shown:String(shown || ""), fix:String(T || ""), had}});
   }catch(e){ return j; }
-})(gradeLocal);
+});
 if(window.__PGM_TEST) window.__mcg = {gamesFor:st => gamesFor(st), MCG};
 // Spot the Mistake's prompt is an instruction, not a sentence to hear; each option shows its meaning
-renderExtras = (orig => function(){
+renderExtras = wrap("renderExtras", "mcgames", renderExtras, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const ch = S && S.current && S.current.challenge;
@@ -128,5 +128,5 @@ renderExtras = (orig => function(){
     }
   }catch(e){}
   return r;
-})(renderExtras);
+});
 (() => { const c = document.createElement("style"); c.textContent = ".tile.mcm::after{white-space:pre-line;color:var(--muted,#6b6b80);font-style:italic}"; document.head.appendChild(c); })();

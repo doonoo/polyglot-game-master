@@ -275,4 +275,4 @@ function updateMenuExtras(){
   $("dailyBtn").innerHTML = `📅 <span>${esc(t("daily"))}</span>${done ? ` <small>✓ ${profile.daily.score}/10</small>` : ""}`;
   $("mistakesBtn").innerHTML = `🩹 <span>${esc(t("fixMistakes"))}</span>${profile.mistakes.length ? ` <small class="pill">${profile.mistakes.length}</small>` : ""}`;
 }
-renderDaily = (orig => function(){ orig(); try{ updateMenuExtras(); }catch(e){} })(renderDaily);
+renderDaily = wrap("renderDaily", "features3", renderDaily, orig => function(){ orig(); try{ updateMenuExtras(); }catch(e){} });

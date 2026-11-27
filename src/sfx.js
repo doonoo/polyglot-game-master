@@ -122,7 +122,7 @@ const SFX = (() => {
 })();
 
 /* Main game: one clear sound per outcome instead of a generic beep */
-playOutcome = (cur => function(prevPlan){
+playOutcome = wrap("playOutcome", "sfx", playOutcome, cur => function(prevPlan){
   SFX.mute(true);
   try{ cur.apply(this, arguments); } finally { SFX.mute(false); }
   if(!prevPlan || !S || !S.judgement) return;
@@ -141,7 +141,7 @@ playOutcome = (cur => function(prevPlan){
     Sound.wrong();
     if(S.mode === 3) setTimeout(() => Sound.heart(), 220);
   }
-})(playOutcome);
+});
 
 /* Tiles and pairs in the main game */
 $("tiles").addEventListener("click", e => {
@@ -153,13 +153,13 @@ $("pairs").addEventListener("click", e => {
   setTimeout(() => { if(b.classList.contains("done") && pairState && pairState.done.size < pairState.n) Sound.match(); }, 0);
 });
 /* Opening a page gets a soft swish */
-showOnly = (orig => function(){ Sound.page(); return orig.apply(this, arguments); })(showOnly);
+showOnly = wrap("showOnly", "sfx", showOnly, orig => function(){ Sound.page(); return orig.apply(this, arguments); });
 
 /* Over screen: the fanfare is the outcome sound, so the music comes back calmly instead of a second jingle */
-syncMood = (orig => function(){
+syncMood = wrap("syncMood", "sfx", syncMood, orig => function(){
   const ov = $("over");
   if(ov && !ov.hidden){ Music.setMood("title"); return; }
   return orig.apply(this, arguments);
-})(syncMood);
+});
 
 if(window.__PGM_TEST) window.__sfx = {SFX, Sound};

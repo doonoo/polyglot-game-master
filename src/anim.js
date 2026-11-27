@@ -42,18 +42,18 @@ if(window.MutationObserver && !window.__PGM_TEST){   // tests play thousands of 
 }
 
 /* Each new turn: cards slide in again, the verdict lands with a glow */
-renderExtras = (orig => function(fresh){
+renderExtras = wrap("renderExtras", "anim", renderExtras, orig => function(fresh){
   orig(fresh);
   if(!fresh || !animOn) return;
   replay($("challengeCard"), "a-in");
   if(!$("lessonCard").hidden) replay($("lessonCard"), "a-in");
   const j = $("judgeCard");
   if(!j.hidden){ replay(j, "a-pop"); animOnce($("challengeCard"), j.classList.contains("ok") ? "a-okglow" : "a-badglow", 900); }
-})(renderExtras);
+});
 
 /* HUD: hearts break, streak bumps, level badge pops */
 let animPrev = {hp:null, streak:0, badge:"", prog:""};
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "anim", renderHud, orig => function(){
   orig();
   if(!S) return;
   if(animPrev.hp !== null && S.hp < animPrev.hp) animOnce($("hudHearts"), "a-hurt", 700);
@@ -63,7 +63,7 @@ renderHud = (orig => function(){
   const prog = $("hudProg").textContent;
   if(animPrev.prog && prog !== animPrev.prog) animOnce($("hudProg"), "a-tick", 400);
   animPrev = {hp:S.hp, streak:S.stats.streak, badge, prog};
-})(renderHud);
+});
 
 /* Results: numbers count up */
 function countUp(el){
@@ -77,13 +77,13 @@ function countUp(el){
   };
   el.textContent = "0" + tail; requestAnimationFrame(step);
 }
-showOver = (orig => function(){
+showOver = wrap("showOver", "anim", showOver, orig => function(){
   animPrev.hp = null;
   orig();
   if(!animOn || window.__PGM_TEST) return;
   $("overStats").querySelectorAll("b").forEach((b, i) => setTimeout(() => countUp(b), 250 + i * 90));
   replay($("overEmoji"), "a-drop");
-})(showOver);
+});
 
 /* Match Madness: a satisfying snap when a pair locks in */
 $("pairs").addEventListener("click", e => {

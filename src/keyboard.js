@@ -53,7 +53,7 @@ function kbLabel(){
   L.forEach((b, i) => { if(i < 9) b.dataset.kb = i + 1; });
   R.forEach((b, i) => { if(i < 9) b.dataset.kb = "ABCDEFGHI"[i]; });
 }
-renderExtras = (orig => function(fresh){ orig(fresh); kbLabel(); kbFocus(); })(renderExtras);
+renderExtras = wrap("renderExtras", "keyboard", renderExtras, orig => function(fresh){ orig(fresh); kbLabel(); kbFocus(); });
 
 /* Typed text and tapped tiles must not fight: typing resets the tile picks */
 $("answer").addEventListener("input", () => {

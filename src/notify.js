@@ -228,8 +228,8 @@ $("notifyBanner").addEventListener("click", async e => {
 });
 
 /* ---------- Hooks ---------- */
-recordAnswer = (orig => function(correct, xp, forced){ const was = profile.last; orig(correct, xp, forced); if(profile.notify.on && (profile.last !== was || correct)) rescheduleSoon(); })(recordAnswer);
-renderDaily = (orig => function(){ orig(); try{ updateNotifyBanner(); }catch(e){} })(renderDaily);
+recordAnswer = wrap("recordAnswer", "notify", recordAnswer, orig => function(correct, xp, forced){ const was = profile.last; orig(correct, xp, forced); if(profile.notify.on && (profile.last !== was || correct)) rescheduleSoon(); });
+renderDaily = wrap("renderDaily", "notify", renderDaily, orig => function(){ orig(); try{ updateNotifyBanner(); }catch(e){} });
 document.addEventListener("visibilitychange", () => { if(profile.notify.on){ if(document.hidden) reschedule(); else { rescheduleSoon(); webTick(); } } });
 setInterval(webTick, 60000);
 setTimeout(() => {

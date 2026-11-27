@@ -131,7 +131,7 @@ function tpMenu(){
       ${bad.length ? `<div class="tpwarn">⚠️ ${esc(t("tp_badMode", {name:bad.join(", ")}))}</div>` : ""}</div>` : ""}`;
   $("startBtn").disabled = TPS.on && bad.length > 0;
 }
-renderMenu = (orig => function(){ const r = orig.apply(this, arguments); try{ tpMenu(); }catch(e){} return r; })(renderMenu);
+renderMenu = wrap("renderMenu", "twoplayer", renderMenu, orig => function(){ const r = orig.apply(this, arguments); try{ tpMenu(); }catch(e){} return r; });
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-tpn]");
   if(b){ TPS.on = b.dataset.tpn === "2"; tpSaveSet(); Sound.tap(); renderMenu(); }
@@ -176,10 +176,10 @@ function tpStart(){
 }
 
 /* ---------- hooks into the engine ---------- */
-ckPaused = (orig => function(){ return orig.apply(this, arguments) || (TP.on && (!$("tpOv").hidden || !$("tpRes").hidden || TP.phase !== "play")); })(ckPaused);
-save = (orig => function(){ if(TP.on) return; return orig.apply(this, arguments); })(save);
-recordAnswer = (orig => function(){ if(TP.on) return; return orig.apply(this, arguments); })(recordAnswer);
-runTurn = (orig => function(answer, force){
+ckPaused = wrap("ckPaused", "twoplayer", ckPaused, orig => function(){ return orig.apply(this, arguments) || (TP.on && (!$("tpOv").hidden || !$("tpRes").hidden || TP.phase !== "play")); });
+save = wrap("save", "twoplayer", save, orig => function(){ if(TP.on) return; return orig.apply(this, arguments); });
+recordAnswer = wrap("recordAnswer", "twoplayer", recordAnswer, orig => function(){ if(TP.on) return; return orig.apply(this, arguments); });
+runTurn = wrap("runTurn", "twoplayer", runTurn, orig => function(answer, force){
   if(!TP.on || TP.inTurn) return orig.apply(this, arguments);
   const answering = !!(S && S.current && S.current.plan), me = TP.cur;
   TP.inTurn = true;
@@ -191,30 +191,30 @@ runTurn = (orig => function(answer, force){
   if(S.judgement) TP.hist[me].push(!!S.judgement.correct);
   if(S.status !== "playing") TP.out[me] = true;
   tpAfterAnswer();
-})(runTurn);
-showOver = (orig => function(){
+});
+showOver = wrap("showOver", "twoplayer", showOver, orig => function(){
   if(!TP.on) return orig.apply(this, arguments);
   TP.out[TP.cur] = true;
   if(!TP.inTurn){ TP.states[TP.cur] = S; tpAfterAnswer(); }   // e.g. Time Attack ran out of time
-})(showOver);
-renderGame = (orig => function(){
+});
+renderGame = wrap("renderGame", "twoplayer", renderGame, orig => function(){
   const r = orig.apply(this, arguments);
   if(TP.on) try{ tpDecorate(); }catch(e){}
   return r;
-})(renderGame);
-showMenu = (orig => function(){
+});
+showMenu = wrap("showMenu", "twoplayer", showMenu, orig => function(){
   if(TP.on) tpEnd(false);
   return orig.apply(this, arguments);
-})(showMenu);
+});
 // leaving a 2-player game takes two taps on ☰
 $("menuBtn").addEventListener("click", e => {
   if(!TP.on || TP.phase === "done") return;
   if(!TP.leaveArmed){ e.stopImmediatePropagation(); TP.leaveArmed = true; toast(t("tp_leave")); setTimeout(() => { TP.leaveArmed = false; }, 2500); }
 }, true);
-syncMood = (orig => function(){
+syncMood = wrap("syncMood", "twoplayer", syncMood, orig => function(){
   if(TP.on && !$("tpRes").hidden){ Music.setMood("title"); return; }
   return orig.apply(this, arguments);
-})(syncMood);
+});
 
 /* ---------- turn flow ---------- */
 const tpKind = () => TP.mode === 3 || (TP.states[0] && TP.states[0].clock === "attack") ? "elim" : TP.mode === 6 ? "race" : "score";

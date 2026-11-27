@@ -18,10 +18,10 @@ const mcSave = () => { try{ localStorage.setItem("pgm-mc", MCS ? "1" : "0"); }ca
 const mcNoSp = s => String(s || "").replace(/\s+/g, " ").trim();
 const mcStrip = s => String(s || "").replace(/^~/, "");
 
-freshState = (orig => function(o){ const st = orig.apply(this, arguments); st.mc = MCS; return st; })(freshState);
+freshState = wrap("freshState", "mc", freshState, orig => function(o){ const st = orig.apply(this, arguments); st.mc = MCS; return st; });
 
 /* ---------- candidate pools, stashed by each generator ---------- */
-genSentence = (orig => function(st, plan, c){
+genSentence = wrap("genSentence", "mc", genSentence, orig => function(st, plan, c){
   const res = orig.apply(this, arguments);
   try{
     const ch = res && res.challenge;
@@ -52,9 +52,9 @@ genSentence = (orig => function(st, plan, c){
     }
   }catch(e){}
   return res;
-})(genSentence);
+});
 
-genVocab = (orig => function(st, plan){
+genVocab = wrap("genVocab", "mc", genVocab, orig => function(st, plan){
   const res = orig.apply(this, arguments);
   try{
     const ch = res && res.challenge;
@@ -68,9 +68,9 @@ genVocab = (orig => function(st, plan){
     }
   }catch(e){}
   return res;
-})(genVocab);
+});
 
-genNumber = (orig => function(st, plan, c){
+genNumber = wrap("genNumber", "mc", genNumber, orig => function(st, plan, c){
   const res = orig.apply(this, arguments);
   try{
     const ch = res && res.challenge;
@@ -84,11 +84,11 @@ genNumber = (orig => function(st, plan, c){
     }
   }catch(e){}
   return res;
-})(genNumber);
+});
 
 let mcLastQ = null;
-conjQuestion = (orig => function(){ const q = orig.apply(this, arguments); mcLastQ = q; return q; })(conjQuestion);
-genConj = (orig => function(st, plan, c){
+conjQuestion = wrap("conjQuestion", "mc", conjQuestion, orig => function(){ const q = orig.apply(this, arguments); mcLastQ = q; return q; });
+genConj = wrap("genConj", "mc", genConj, orig => function(st, plan, c){
   mcLastQ = null;
   const res = orig.apply(this, arguments);
   try{
@@ -100,7 +100,7 @@ genConj = (orig => function(st, plan, c){
     }
   }catch(e){}
   return res;
-})(genConj);
+});
 
 /* ---------- near misses made from the right answer ---------- */
 const MC_SWAP = {el:"la", la:"el", los:"las", las:"los", un:"una", una:"un", le:"la", du:"de la", o:"a", a:"o", os:"as", as:"os", um:"uma", uma:"um"};
@@ -172,20 +172,20 @@ function mcBuild(st, ch){
   ch.hint = "";                              // "starts with…" would give it away
 }
 
-generate = (orig => function(st){
+generate = wrap("generate", "mc", generate, orig => function(st){
   const res = orig.apply(this, arguments);
   try{ if(st && st.mc && res && res.challenge) mcBuild(st, res.challenge); else if(res && res.challenge) delete res.challenge.mcx; }catch(e){}
   return res;
-})(generate);
+});
 
 /* ---------- playing: options instead of the text box ---------- */
 const mcLive = () => { const ch = S && S.current && S.current.challenge; return !!(ch && Array.isArray(ch.opts) && ch.game !== "Word Duel" && (S.mc || MCG.has(ch.game))); };
-tileItems = (orig => function(ch){
+tileItems = wrap("tileItems", "mc", tileItems, orig => function(ch){
   if(ch && S && S.current && ch === S.current.challenge && mcLive()) return {mode:"pick", items:ch.opts, keepScreen:true, mc:true};
   return orig.apply(this, arguments);
-})(tileItems);
+});
 let mcBusy = false;
-renderExtras = (orig => function(fresh){
+renderExtras = wrap("renderExtras", "mc", renderExtras, orig => function(fresh){
   const r = orig.apply(this, arguments);
   const tiles = $("tiles"), live = mcLive();
   tiles.classList.toggle("mc", live);
@@ -207,7 +207,7 @@ renderExtras = (orig => function(fresh){
     });
   }
   return r;
-})(renderExtras);
+});
 // a tap answers straight away
 $("tiles").addEventListener("click", e => {
   const b = e.target.closest(".tile[data-i]");
@@ -243,7 +243,7 @@ function mcMenu(){
     <div class="tpseg" role="group" aria-label="${esc(t("mc_label"))}"><button type="button" data-mcs="0" aria-pressed="${!MCS}">⌨️ ${esc(t("mc_type"))}</button><button type="button" data-mcs="1" aria-pressed="${MCS}">🔘 ${esc(t("mc_pick"))}</button></div>
     ${MCS ? `<p class="note">${esc(t("mc_note"))}</p>` : ""}`;
 }
-renderMenu = (orig => function(){ const r = orig.apply(this, arguments); try{ mcMenu(); }catch(e){} return r; })(renderMenu);
+renderMenu = wrap("renderMenu", "mc", renderMenu, orig => function(){ const r = orig.apply(this, arguments); try{ mcMenu(); }catch(e){} return r; });
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-mcs]");
   if(b){ MCS = b.dataset.mcs === "1"; mcSave(); Sound.tap(); renderMenu(); }

@@ -377,7 +377,7 @@ syncMood = function(){
   }
   Music.setMood(m);
 };
-showOnly = (orig => function(id){ const r = orig.apply(this, arguments); try{ syncMood(); }catch(e){} return r; })(showOnly);
+showOnly = wrap("showOnly", "chiptune", showOnly, orig => function(id){ const r = orig.apply(this, arguments); try{ syncMood(); }catch(e){} return r; });
 
 /* Settings: pick a tune, or let the game choose */
 (() => {
@@ -392,5 +392,5 @@ showOnly = (orig => function(id){ const r = orig.apply(this, arguments); try{ sy
   };
   fill();
   $("trackSel").addEventListener("change", () => { Chip.setFixed($("trackSel").value); if(Music.isOn()) Music.start(); });
-  applyI18n = (orig => function(){ const r = orig.apply(this, arguments); fill(); return r; })(applyI18n);
+  applyI18n = wrap("applyI18n", "chiptune", applyI18n, orig => function(){ const r = orig.apply(this, arguments); fill(); return r; });
 })();

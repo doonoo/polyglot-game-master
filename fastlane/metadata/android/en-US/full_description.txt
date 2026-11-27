@@ -20,7 +20,7 @@ Polyglot Game Master teaches languages through short games. Everything is built 
 <li>Survivor: strict grading, one life. Boss battles every few rounds.</li>
 <li>Grammar Gym: pick the grammar points you want and drill only those, with mastery marks.</li>
 <li>Card Clash: build sentences from a hand of word cards to beat three foes.</li>
-<li>Number Cruncher, Lexicon Onslaught (vocabulary), Island Hopper, Conjugation Gym (Measure Words in Mandarin), Tricky Pairs and a Custom Game you set up yourself.</li>
+<li>Number Cruncher, Lexicon Onslaught (vocabulary), Island Hopper, Conjugation Station (Measure Words in Mandarin), Tricky Pairs and a Custom Game you set up yourself.</li>
 <li>Type your answers or switch to multiple choice. Add a clock or Time Attack.</li>
 <li>Two players on one phone, in every mode.</li>
 </ul>

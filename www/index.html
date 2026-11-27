@@ -924,6 +924,31 @@ const md = s => esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/
 const modeOf = id => MODES.find(m => m.id === id);
 const modeName = id => t("m" + id + "n");
 
+/* ===================== Function wrappers (2.17) =====================
+   Modules extend core functions (gradeLocal, generate, renderExtras, showOver…) by wrapping them.
+   Every wrap goes through wrap(name, label, current, make): make(current) returns the new function,
+   which gets a readable name in stack traces ("gradeLocal[typo]") and remembers what it wraps.
+   wrapChain(fn) lists a chain from the innermost wrapper out; test24 checks every chain against the
+   order written in CLAUDE.md, so a new wrapper or a moved module is a deliberate change.
+   The label is the module's file name (plus #2 when one file wraps the same function twice). */
+const WRAPS = {};
+function wrap(name, label, orig, make){
+  const fn = make(orig);
+  if(typeof fn !== "function") throw new Error("wrap(" + name + ", " + label + ") did not return a function");
+  try{ Object.defineProperty(fn, "name", {value:name + "[" + label + "]", configurable:true}); }catch(e){}
+  fn.__wrap = {name, label, inner:orig};
+  (WRAPS[name] = WRAPS[name] || []).push(label);
+  return fn;
+}
+function wrapChain(fn){
+  const out = [];
+  for(let f = fn, n = 0; f && f.__wrap && n < 100; f = f.__wrap.inner, n++) out.push(f.__wrap.label);
+  return out.reverse();
+}
+// every chain as it stands now (direct eval reads the current binding of each wrapped function in this scope)
+function wrapChains(){ const o = {}; for(const n of Object.keys(WRAPS).sort()){ try{ o[n] = wrapChain(eval(n)); }catch(e){ o[n] = ["?"]; } } return o; }
+if(window.__PGM_TEST) window.__wrapChains = wrapChains;
+
 /* ===================== Persistence (this device only) ===================== */
 const SAVE_KEY = "pgm-pb-save";
 function save(){
@@ -4664,8 +4689,8 @@ function runTurn(answer, force){
   }
 }
 
-/* ===================== Conjugation Gym (mode 7) ===================== */
-MODES.push({id:7, name:"Conjugation Gym", ico:"🏋️", color:"#FFC48C", desc:"Drill verb forms tense by tense."});
+/* ===================== Conjugation Station (mode 7) ===================== */
+MODES.push({id:7, name:"Conjugation Station", ico:"🚉", color:"#FFC48C", desc:"Drill verb forms tense by tense."});
 
 /* ---------- Spanish engine ---------- */
 const ESV = {};
@@ -10727,7 +10752,7 @@ function updateMenuExtras(){
   $("dailyBtn").innerHTML = `📅 <span>${esc(t("daily"))}</span>${done ? ` <small>✓ ${profile.daily.score}/10</small>` : ""}`;
   $("mistakesBtn").innerHTML = `🩹 <span>${esc(t("fixMistakes"))}</span>${profile.mistakes.length ? ` <small class="pill">${profile.mistakes.length}</small>` : ""}`;
 }
-renderDaily = (orig => function(){ orig(); try{ updateMenuExtras(); }catch(e){} })(renderDaily);
+renderDaily = wrap("renderDaily", "features3", renderDaily, orig => function(){ orig(); try{ updateMenuExtras(); }catch(e){} });
 
 /* ===================== Stories (bilingual: each line works in both directions) ===================== */
 // Line: {s: speaker (string, or [es, en]), es, en}. Question: {q:{es,en}, o:[{es,en}...], a: index of right option, ol:"t" if options are in the target language}
@@ -11258,20 +11283,20 @@ function renderQuests(){
     profile.quests.list.map(q => `<div class="quest ${q.done ? "done" : ""}"><span class="qi">${q.done ? "✅" : "🎁"}</span><span class="qt">${esc(t("q_" + q.id, {g:q.g}))}<span class="bar"><i style="width:${Math.round(100 * q.n / q.g)}%"></i></span></span><b>${q.n}/${q.g}</b></div>`).join("");
 }
 // hooks into existing tracking
-recordAnswer = (orig => function(correct, xp, forced){
+recordAnswer = wrap("recordAnswer", "features4", recordAnswer, orig => function(correct, xp, forced){
   orig(correct, xp, forced);
   if(forced) return;
   profile.combo = correct ? profile.combo + 1 : 0;
   if(correct){ questAdd("correct"); questAdd("combo", profile.combo, true); }
   if(xp > 0) questAdd("xp", xp);
-})(recordAnswer);
-recordTurn = (orig => function(prevCh, j){
+});
+recordTurn = wrap("recordTurn", "features4", recordTurn, orig => function(prevCh, j){
   orig(prevCh, j);
   if(!prevCh || !j || !j.correct || j.gaveUp || !S) return;
   if(prevCh.k === "c") questAdd("conj");
   if(S.mode === 8) questAdd("tricky");
   if(S.mode === 5) questAdd("vocab");
-})(recordTurn);
+});
 
 /* ---------- Stories ---------- */
 let SP = null;
@@ -11362,14 +11387,14 @@ $("storiesBtn").addEventListener("click", openStories);
 $("storiesBack").addEventListener("click", () => showMenu());
 $("storiesList").addEventListener("click", e => { const b = e.target.closest("[data-sid]"); if(b){ Sound.unlock(); openStory(b.dataset.sid); } });
 
-renderDaily = (orig => function(){ orig(); try{ renderQuests(); }catch(e){} })(renderDaily);
+renderDaily = wrap("renderDaily", "features4", renderDaily, orig => function(){ orig(); try{ renderQuests(); }catch(e){} });
 
 /* ===================== Island Hopper: study, hide, recall ===================== */
 // A new phrase never counts on the turn it is taught. It joins the review queue and is
 // conquered only after two correct recalls in later rounds, with no phrase card on screen.
 const islKey = (st, k) => String(k || "").toLowerCase();
 const inIslSrs = (st, k) => st.srs.some(x => x.k.toLowerCase() === islKey(st, k));
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "island", applyResult, orig => function(st, correct, plan){
   if(st.mode !== 6 || !plan || !st.syllabus) return orig(st, correct, plan);
   if(plan.kind === "syllabus"){
     orig(st, correct, Object.assign({}, plan, {kind:"teach"}));
@@ -11383,8 +11408,8 @@ applyResult = (orig => function(st, correct, plan){
     if(i >= 0) st.done[i] = true;
     if(st.done.length === st.syllabus.length && st.done.every(Boolean)) st.status = "conquered";
   }
-})(applyResult);
-makePlanCore = (orig => function(st, rolls, exclude){
+});
+makePlanCore = wrap("makePlanCore", "island", makePlanCore, orig => function(st, rolls, exclude){
   const p = orig(st, rolls, exclude);
   if(!p || st.mode !== 6 || !st.syllabus || p.newSyllabus) return p;
   const exKey = exclude ? islKey(st, exclude.kind === "syllabus" && st.syllabus ? st.syllabus[exclude.idx] : exclude.key) : "";
@@ -11400,7 +11425,7 @@ makePlanCore = (orig => function(st, rolls, exclude){
   if(fresh.length){ const nx = fresh.find(i => i > exIdx); return {kind:"syllabus", idx:nx !== undefined ? nx : fresh[0], game:p.game}; }
   if(st.srs.length) return {kind:"srs", key:st.srs[0].k, game:p.game};
   return p;
-})(makePlanCore);
+});
 
 // Study gate: on a teach turn the question stays hidden until the player hides the phrase.
 function islandGate(fresh){
@@ -11414,7 +11439,7 @@ function islandGate(fresh){
   b.innerHTML = `<button class="primary" id="islHide">🙈 ${esc(t("islHide"))}</button><p class="note">${esc(t("islHideNote"))}</p>`;
   $("lessonCard").querySelector(".in").appendChild(b);
 }
-renderExtras = (orig => function(fresh){ orig(fresh); islandGate(fresh); })(renderExtras);
+renderExtras = wrap("renderExtras", "island", renderExtras, orig => function(fresh){ orig(fresh); islandGate(fresh); });
 $("lessonCard").addEventListener("click", e => {
   if(!e.target.closest("#islHide") || !S || !S.current) return;
   Sound.unlock(); Sound.tap(); Narrator.stop();
@@ -11656,8 +11681,8 @@ $("notifyBanner").addEventListener("click", async e => {
 });
 
 /* ---------- Hooks ---------- */
-recordAnswer = (orig => function(correct, xp, forced){ const was = profile.last; orig(correct, xp, forced); if(profile.notify.on && (profile.last !== was || correct)) rescheduleSoon(); })(recordAnswer);
-renderDaily = (orig => function(){ orig(); try{ updateNotifyBanner(); }catch(e){} })(renderDaily);
+recordAnswer = wrap("recordAnswer", "notify", recordAnswer, orig => function(correct, xp, forced){ const was = profile.last; orig(correct, xp, forced); if(profile.notify.on && (profile.last !== was || correct)) rescheduleSoon(); });
+renderDaily = wrap("renderDaily", "notify", renderDaily, orig => function(){ orig(); try{ updateNotifyBanner(); }catch(e){} });
 document.addEventListener("visibilitychange", () => { if(profile.notify.on){ if(document.hidden) reschedule(); else { rescheduleSoon(); webTick(); } } });
 setInterval(webTick, 60000);
 setTimeout(() => {
@@ -11692,16 +11717,16 @@ function cefrOrder(tgt, lv){
 }
 const isCefr = st => st && st.cefr && (st.mode === 1 || st.mode === 2 || st.mode === 3);
 const isMastery = st => isCefr(st) && st.mode !== 3;   // Survivor is a gauntlet: one correct answer clears a lesson
-syllabusFor = (orig => function(st){
+syllabusFor = wrap("syllabusFor", "practice", syllabusFor, orig => function(st){
   if(!isCefr(st)) return orig(st);
   const tgt = LANG_CODE[st.target], lv = COURSE[tgt][st.level] ? st.level : "A1";
   return cefrOrder(tgt, lv).map(i => COURSE[tgt][lv][i].t);
-})(syllabusFor);
-conceptAt = (orig => function(st, idx){
+});
+conceptAt = wrap("conceptAt", "practice", conceptAt, orig => function(st, idx){
   if(!isCefr(st)) return orig(st, idx);
   const tgt = LANG_CODE[st.target], lv = COURSE[tgt][st.level] ? st.level : "A1", ord = cefrOrder(tgt, lv);
   return COURSE[tgt][lv][ord[idx] !== undefined ? ord[idx] : ord[0]];
-})(conceptAt);
+});
 
 // Other parts of the level that get mixed into practice
 function mixSources(st){
@@ -11713,7 +11738,7 @@ function mixSources(st){
 }
 const mixState = (st, src) => { const m = Object.assign({}, st, {mode:src, cefr:0}); m.syllabus = syllabusFor(m); m.done = m.syllabus.map(() => false); return m; };
 
-generate = (orig => function(st, plan){
+generate = wrap("generate", "practice", generate, orig => function(st, plan){
   if((st.mode === 1 || st.mode === 2 || st.mode === 3) && !st.syllabus && typeof S !== "undefined" && S && S.mode === st.mode && !S.syllabus){ S.cefr = 1; st.cefr = 1; }
   if(plan && plan.kind === "mix"){
     const m = mixState(st, plan.src);
@@ -11727,9 +11752,9 @@ generate = (orig => function(st, plan){
     return res;
   }
   return orig(st, plan);
-})(generate);
+});
 
-makePlanCore = (orig => function(st, rolls, exclude){
+makePlanCore = wrap("makePlanCore", "practice", makePlanCore, orig => function(st, rolls, exclude){
   const p = orig(st, rolls, exclude);
   if(!p || !isCefr(st) || !st.syllabus || p.newSyllabus) return p;
   const n = st.stats.answered;
@@ -11756,9 +11781,9 @@ makePlanCore = (orig => function(st, rolls, exclude){
   if(fresh.length){ const nx = fresh.find(i => i > exIdx); return {kind:"syllabus", idx:nx !== undefined ? nx : fresh[0], game}; }
   if(st.srs.length) return {kind:"srs", key:st.srs[0].k, game};
   return p;
-})(makePlanCore);
+});
 
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "practice", applyResult, orig => function(st, correct, plan){
   if(!isCefr(st) || !plan || !st.syllabus) return orig(st, correct, plan);
   if(plan.kind === "mix") return orig(st, correct, {kind:"mix"});
   if(!isMastery(st)) return orig(st, correct, plan);
@@ -11784,7 +11809,7 @@ applyResult = (orig => function(st, correct, plan){
     return;
   }
   return orig(st, correct, plan);
-})(applyResult);
+});
 
 // Level map in the side panel
 function sylHtml(){
@@ -11850,7 +11875,7 @@ function customCombos(cfg, target){
 }
 
 /* ---------- engine hooks ---------- */
-freshState = (orig => function(o){
+freshState = wrap("freshState", "custom", freshState, orig => function(o){
   const st = orig(o);
   if(o.mode === 9){
     const cfg = curCfg();
@@ -11861,9 +11886,9 @@ freshState = (orig => function(o){
     st.syllabus = [t("m9n")]; st.done = [false];
   }
   return st;
-})(freshState);
+});
 
-makePlanCore = (orig => function(st, rolls, exclude){
+makePlanCore = wrap("makePlanCore", "custom", makePlanCore, orig => function(st, rolls, exclude){
   if(st.mode !== 9) return orig(st, rolls, exclude);
   const cfg = st.custom;
   if(cfg.review && st.redo && st.redo.length && (st.redo.length >= 4 || rolls.r < 0.35)){
@@ -11875,9 +11900,9 @@ makePlanCore = (orig => function(st, rolls, exclude){
   const cb = combos[Math.floor(rolls.s * combos.length)];
   const games = cb.games.filter(g => g !== st.lastGame).length > 1 ? cb.games.filter(g => g !== st.lastGame) : cb.games;
   return {kind:"mix", src:cb.src, mode:cb.mode, lv:cb.lv, idx:cb.idxs[Math.floor(rolls.c * cb.idxs.length)], game:games[Math.floor(rolls.g * games.length)]};
-})(makePlanCore);
+});
 
-generate = (orig => function(st, plan){
+generate = wrap("generate", "custom", generate, orig => function(st, plan){
   if(st.mode !== 9 || !plan || plan.kind !== "mix") return orig(st, plan);
   const m = Object.assign({}, st, {mode:plan.mode, level:plan.lv, cefr:0});
   let res;
@@ -11905,9 +11930,9 @@ generate = (orig => function(st, plan){
   }
   if(res && res.challenge) res.challenge.cplan = plan;
   return res;
-})(generate);
+});
 
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "custom", applyResult, orig => function(st, correct, plan){
   if(st.mode !== 9) return orig(st, correct, plan);
   orig(st, correct, plan && plan.kind === "mix" ? {kind:"mix"} : plan);
   if(st.status !== "playing") return;
@@ -11920,21 +11945,21 @@ applyResult = (orig => function(st, correct, plan){
   }
   if(!correct && cfg.hearts){ st.hp--; if(st.hp <= 0){ st.status = "gameover"; return; } }
   if(cfg.rounds && st.stats.answered >= cfg.rounds) st.status = "conquered";
-})(applyResult);
+});
 
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "custom", gradeLocal, orig => function(st, ch, answer, force){
   if(st && st.mode === 9 && st.custom && st.custom.strict) return orig(Object.assign({}, st, {mode:3}), ch, answer, force);
   return orig(st, ch, answer, force);
-})(gradeLocal);
+});
 
-progress = (orig => function(){
+progress = wrap("progress", "custom", progress, orig => function(){
   if(!S || S.mode !== 9) return orig();
   const c = S.custom, n = S.stats.answered;
   if(c.rounds) return {n, d:c.rounds, label:t("cRound", {n:Math.min(n + 1, c.rounds), d:c.rounds})};
   return {n:S.stats.correct, d:Math.max(1, n), label:t("cScore", {c:S.stats.correct, n})};
-})(progress);
+});
 
-showOver = (orig => function(){
+showOver = wrap("showOver", "custom", showOver, orig => function(){
   orig();
   if(!S || S.mode !== 9) return;
   const done = S.status === "conquered";
@@ -11947,17 +11972,17 @@ showOver = (orig => function(){
   $("overIsland").hidden = true;
   const best = profile.customBest || 0;
   if(done && S.stats.correct > best){ profile.customBest = S.stats.correct; saveProfile(); }
-})(showOver);
+});
 
 /* ---------- HUD: hearts and timer ---------- */
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "custom", renderHud, orig => function(){
   orig();
   if(!S || S.mode !== 9) return;
   const max = S.custom.hearts;
   $("hudHearts").hidden = !max;
   if(max){ $("hudHearts").textContent = "❤️".repeat(Math.max(0, S.hp)) + "🖤".repeat(Math.max(0, max - S.hp)); $("hudHearts").setAttribute("aria-label", t("cHearts", {hp:S.hp, max})); }
   $("hudBadge").textContent = "🎛️ " + (S.custom.levels.length > 1 ? S.custom.levels[0] + "–" + S.custom.levels[S.custom.levels.length - 1] : S.custom.levels[0]);
-})(renderHud);
+});
 let cTimer = {cur:null, end:0};
 function timerTick(){
   let el = $("hudTimer");
@@ -12047,11 +12072,11 @@ document.addEventListener("click", e => {
   if(!e.target.closest || !e.target.closest("#startBtn") || setup.mode !== 9) return;
   if(!customCombos(curCfg(), setup.target).length){ e.stopImmediatePropagation(); e.preventDefault(); $("startNote").textContent = t("cEmpty"); }
 }, true);
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "custom", renderMenu, orig => function(){
   orig();
   $("customGroup").hidden = setup.mode !== 9;
   if(setup.mode === 9){ $("levelGroup").hidden = true; renderCustom(); }
-})(renderMenu);
+});
 
 /* ===================== The Clock: optional timers for every mode ===================== */
 Object.assign(I18N.en, {
@@ -12099,7 +12124,7 @@ function renderClock(){
   $("clockNote").textContent = t("ckn_" + c) + (c === "attack" && best ? " " + t("atkBest", {b:best}) + "." : "");
   $("clockGroup").hidden = setup.mode === 9;   // Custom Game has its own timer
 }
-renderMenu = (orig => function(){ orig(); renderClock(); })(renderMenu);
+renderMenu = wrap("renderMenu", "timer", renderMenu, orig => function(){ orig(); renderClock(); });
 $("clockChips").addEventListener("click", e => {
   const b = e.target.closest("[data-clock]"); if(!b) return;
   Sound.unlock(); Sound.tap();
@@ -12108,12 +12133,12 @@ $("clockChips").addEventListener("click", e => {
 document.addEventListener("click", e => { if(e.target.closest("[data-mode]")) setTimeout(renderClock, 0); });
 
 /* ---------- Every new run carries the chosen clock ---------- */
-freshState = (orig => function(o){
+freshState = wrap("freshState", "timer", freshState, orig => function(o){
   const st = orig(o);
   st.clock = o.mode === 9 ? "off" : (CLOCKS.includes(profile.clock) ? profile.clock : "off");
   if(st.clock === "attack") st.atk = {left:ATK_START};
   return st;
-})(freshState);
+});
 
 /* ---------- HUD chip and the draining bar ---------- */
 function ckEls(){
@@ -12192,7 +12217,7 @@ setInterval(ckTick, 100);
 document.addEventListener("visibilitychange", () => { CK.last = Date.now(); });
 
 /* ---------- Rewards: speed bonus, or time in Time Attack ---------- */
-grantRewards = (orig => function(plan, correct){
+grantRewards = wrap("grantRewards", "timer", grantRewards, orig => function(plan, correct){
   const fx = orig(plan, correct);
   if(!S || ((!S.clock || S.clock === "off") && !(plan && plan.boss))) return fx;
   if(ckMode() === "attack"){
@@ -12211,10 +12236,10 @@ grantRewards = (orig => function(plan, correct){
   fx.xp += bonus; S.xp = (S.xp || 0) + bonus;
   setTimeout(() => toast(msg, "badge"), 350);
   return fx;
-})(grantRewards);
+});
 
 /* ---------- Results ---------- */
-showOver = (orig => function(){
+showOver = wrap("showOver", "timer", showOver, orig => function(){
   orig();
   if(!S) return;
   if(S.clock && S.clock !== "off" && S.clock !== "attack" && S.stats.fast)
@@ -12226,7 +12251,7 @@ showOver = (orig => function(){
   $("overEmoji").textContent = "⏱️";
   $("overText").innerHTML = `${esc(t("atkOverB", {c:S.stats.correct, n:S.stats.answered}))}<br><b>${esc(isNew ? t("atkNew") : t("atkBest", {b:best}))}</b>`;
   $("overIsland").hidden = true; $("overRestart").hidden = false;
-})(showOver);
+});
 
 /* ===================== Boss battles that actually fight back ===================== */
 Object.assign(I18N.en, {
@@ -12257,7 +12282,7 @@ function bossPool(st){
 }
 
 /* ---------- Planning: start a fight, keep it going, point it at learned material ---------- */
-makePlan = (orig => function(st, rolls, exclude){
+makePlan = wrap("makePlan", "boss", makePlan, orig => function(st, rolls, exclude){
   const p = orig(st, rolls, exclude);
   if(!p) return p;
   if(!BOSS_MODES.includes(st.mode)){ p.boss = false; return p; }
@@ -12279,10 +12304,10 @@ makePlan = (orig => function(st, rolls, exclude){
     }
   }
   return p;
-})(makePlan);
+});
 
 /* ---------- Results: hits, shield, win or lose ---------- */
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "boss", applyResult, orig => function(st, correct, plan){
   st.bossJust = "";
   orig(st, correct, plan);
   const f = st.bossFight;
@@ -12292,7 +12317,7 @@ applyResult = (orig => function(st, correct, plan){
   if(st.bossJust === "won"){ st.bossFight = null; st.bossKills = (st.bossKills || 0) + 1; st.bossLastName = f.n; st.bossNext = st.stats.answered + 15; st.bossRematch = 0; }
   if(st.bossJust === "lost"){ st.bossFight = null; st.bossNext = st.stats.answered + 4; st.bossRematch = 1; st.bossLastName = f.n; }
   if(st.bossJust !== "won" && st.bossJust !== "lost") st.bossLastName = f.n;
-})(applyResult);
+});
 
 /* ---------- Generation: no peeking, strict accents, a double final blow ---------- */
 function bossCombine(a, b){
@@ -12300,7 +12325,7 @@ function bossCombine(a, b){
   for(const x of A) for(const y of B){ out.push(x + " " + y); if(out.length >= 120) return out; }
   return out;
 }
-generate = (orig => function(st, plan){
+generate = wrap("generate", "boss", generate, orig => function(st, plan){
   const res = orig(st, plan);
   if(!plan || !plan.boss || !st.bossFight || !res || !res.challenge) return res;
   const f = st.bossFight, name = bossName(st), L = GMT[LANG_CODE[st.native]] || GMT.en;
@@ -12329,9 +12354,9 @@ generate = (orig => function(st, plan){
   res.lesson = {title:"👹 " + name + (f.rematch ? " · " + t("bfRematch") : ""), body: f.hits === 0 ? t("bfIntro", {name, hp:f.max}) : t("bfPhase", {n:f.hits + 1, max:f.max, s:"🛡️".repeat(f.shield)}), words:[]};
   res.spotlight = null;
   return res;
-})(generate);
+});
 
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "boss", gradeLocal, orig => function(st, ch, answer, force){
   const g = ch && ch.strict && st && st.mode !== 3 ? Object.assign({}, st, {mode:3}) : st;
   // Final blow: try every split point and grade each sentence against its own answers,
   // so any valid wording of either sentence counts (the combined list is only a sample)
@@ -12346,10 +12371,10 @@ gradeLocal = (orig => function(st, ch, answer, force){
     }
   }
   return orig(g, ch, answer, force);
-})(gradeLocal);
+});
 
 /* ---------- Rewards and feedback ---------- */
-grantRewards = (orig => function(plan, correct){
+grantRewards = wrap("grantRewards", "boss", grantRewards, orig => function(plan, correct){
   const isBoss = !!(S && plan && plan.boss), adj = isBoss && correct;
   // the old rule paid +50 and counted a kill for any boss answer; now hits pay a little and only the kill counts
   if(adj && S.bossJust !== "won") S.bosses = (S.bosses || 0) - 1;
@@ -12365,7 +12390,7 @@ grantRewards = (orig => function(plan, correct){
   else if(just === "lost"){ setTimeout(() => { Sound.wrong(); toast(t("bfLost", {name}), "boss"); }, 500); }
   for(const b of BADGES) if(!S.badges.includes(b.id) && b.test(S)){ S.badges.push(b.id); fx.badges.push(b); }
   return fx;
-})(grantRewards);
+});
 
 /* ---------- The boss bar ---------- */
 function renderBossBar(){
@@ -12377,14 +12402,14 @@ function renderBossBar(){
   bar.innerHTML = `<span class="bb-hp" aria-label="${esc(t("bfHp"))}">👹 ${"<i class=\"on\"></i>".repeat(f.hp)}${"<i></i>".repeat(f.max - f.hp)}</span>` +
     `<span class="bb-sh" aria-label="${esc(t("bfShield"))}">${"🛡️".repeat(f.shield)}${"<b>✖</b>".repeat(BOSS_SHIELD - f.shield)}</span>`;
 }
-renderExtras = (orig => function(fresh){ orig(fresh); renderBossBar(); if(fresh && S && S.current && S.current.challenge && S.current.challenge.double) $("answer").setAttribute("rows", "3"); })(renderExtras);
+renderExtras = wrap("renderExtras", "boss", renderExtras, orig => function(fresh){ orig(fresh); renderBossBar(); if(fresh && S && S.current && S.current.challenge && S.current.challenge.double) $("answer").setAttribute("rows", "3"); });
 
 /* The big "BOSS BATTLE!" fanfare plays once per fight, not on every hit */
-bossIntro = (orig => function(){
+bossIntro = wrap("bossIntro", "boss", bossIntro, orig => function(){
   const f = S && S.bossFight;
   if(f && (f.hits > 0 || f.shield < BOSS_SHIELD)) return;
   orig();
-})(bossIntro);
+});
 
 /* ===================== Grammar tips matched to each sentence ===================== */
 /* Each rule looks at the correct answer (and what you typed) and explains the grammar
@@ -12784,7 +12809,7 @@ function renderCorrection(j, box){
   btns.forEach(b => box.appendChild(b));
 }
 (() => { const c = document.createElement("style"); c.textContent = ".ans .fbfix{margin-top:4px;padding:6px 8px;border-radius:10px;background:rgba(46,196,140,.10)}"; document.head.appendChild(c); })();
-renderExtras = (orig => function(fresh){ orig(fresh); renderFeedback(); })(renderExtras);
+renderExtras = wrap("renderExtras", "feedback", renderExtras, orig => function(fresh){ orig(fresh); renderFeedback(); });
 
 /* ===================== Keyboard play: everything without a mouse ===================== */
 Object.assign(I18N.en, {
@@ -12841,7 +12866,7 @@ function kbLabel(){
   L.forEach((b, i) => { if(i < 9) b.dataset.kb = i + 1; });
   R.forEach((b, i) => { if(i < 9) b.dataset.kb = "ABCDEFGHI"[i]; });
 }
-renderExtras = (orig => function(fresh){ orig(fresh); kbLabel(); kbFocus(); })(renderExtras);
+renderExtras = wrap("renderExtras", "keyboard", renderExtras, orig => function(fresh){ orig(fresh); kbLabel(); kbFocus(); });
 
 /* Typed text and tapped tiles must not fight: typing resets the tile picks */
 $("answer").addEventListener("input", () => {
@@ -13068,18 +13093,18 @@ if(window.MutationObserver && !window.__PGM_TEST){   // tests play thousands of 
 }
 
 /* Each new turn: cards slide in again, the verdict lands with a glow */
-renderExtras = (orig => function(fresh){
+renderExtras = wrap("renderExtras", "anim", renderExtras, orig => function(fresh){
   orig(fresh);
   if(!fresh || !animOn) return;
   replay($("challengeCard"), "a-in");
   if(!$("lessonCard").hidden) replay($("lessonCard"), "a-in");
   const j = $("judgeCard");
   if(!j.hidden){ replay(j, "a-pop"); animOnce($("challengeCard"), j.classList.contains("ok") ? "a-okglow" : "a-badglow", 900); }
-})(renderExtras);
+});
 
 /* HUD: hearts break, streak bumps, level badge pops */
 let animPrev = {hp:null, streak:0, badge:"", prog:""};
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "anim", renderHud, orig => function(){
   orig();
   if(!S) return;
   if(animPrev.hp !== null && S.hp < animPrev.hp) animOnce($("hudHearts"), "a-hurt", 700);
@@ -13089,7 +13114,7 @@ renderHud = (orig => function(){
   const prog = $("hudProg").textContent;
   if(animPrev.prog && prog !== animPrev.prog) animOnce($("hudProg"), "a-tick", 400);
   animPrev = {hp:S.hp, streak:S.stats.streak, badge, prog};
-})(renderHud);
+});
 
 /* Results: numbers count up */
 function countUp(el){
@@ -13103,13 +13128,13 @@ function countUp(el){
   };
   el.textContent = "0" + tail; requestAnimationFrame(step);
 }
-showOver = (orig => function(){
+showOver = wrap("showOver", "anim", showOver, orig => function(){
   animPrev.hp = null;
   orig();
   if(!animOn || window.__PGM_TEST) return;
   $("overStats").querySelectorAll("b").forEach((b, i) => setTimeout(() => countUp(b), 250 + i * 90));
   replay($("overEmoji"), "a-drop");
-})(showOver);
+});
 
 /* Match Madness: a satisfying snap when a pair locks in */
 $("pairs").addEventListener("click", e => {
@@ -13269,7 +13294,7 @@ function voiceUI(){
   document.body.classList.toggle("micok", !mic.hidden);
   if(!mic.hidden){ mic.setAttribute("aria-label", t("vMic")); mic.title = t("vMic"); }
 }
-renderExtras = (orig => function(fresh){ orig(fresh); voiceUI(); })(renderExtras);
+renderExtras = wrap("renderExtras", "voice", renderExtras, orig => function(fresh){ orig(fresh); voiceUI(); });
 
 function setListening(on){
   document.body.classList.toggle("listening", on);
@@ -14293,7 +14318,7 @@ syncMood = function(){
   }
   Music.setMood(m);
 };
-showOnly = (orig => function(id){ const r = orig.apply(this, arguments); try{ syncMood(); }catch(e){} return r; })(showOnly);
+showOnly = wrap("showOnly", "chiptune", showOnly, orig => function(id){ const r = orig.apply(this, arguments); try{ syncMood(); }catch(e){} return r; });
 
 /* Settings: pick a tune, or let the game choose */
 (() => {
@@ -14308,7 +14333,7 @@ showOnly = (orig => function(id){ const r = orig.apply(this, arguments); try{ sy
   };
   fill();
   $("trackSel").addEventListener("change", () => { Chip.setFixed($("trackSel").value); if(Music.isOn()) Music.start(); });
-  applyI18n = (orig => function(){ const r = orig.apply(this, arguments); fill(); return r; })(applyI18n);
+  applyI18n = wrap("applyI18n", "chiptune", applyI18n, orig => function(){ const r = orig.apply(this, arguments); fill(); return r; });
 })();
 
 /* ===================== Juice: arcade-style life everywhere =====================
@@ -14474,7 +14499,7 @@ function juHere(){
 
 /* Answers: pixels, +XP, combos, shakes */
 let juXp = null, juBest = 0;
-playOutcome = (orig => function(prevPlan){
+playOutcome = wrap("playOutcome", "juice", playOutcome, orig => function(prevPlan){
   orig.apply(this, arguments);
   try{
     if(!prevPlan || !S || !S.judgement || !juOn()) { if(S) juXp = S.xp || 0; return; }
@@ -14496,7 +14521,7 @@ playOutcome = (orig => function(prevPlan){
       if(S.status === "gameover") juFlash("#E5384F");
     }
   }catch(e){}
-})(playOutcome);
+});
 
 /* Boss arrives: the screen flashes red and the floor shakes */
 Sound.bossIntro = (orig => function(){ orig(); try{ juFlash("#E5384F"); juShake($("feed"), "jx-quake"); juBanner(t("ju_boss"), "boss"); }catch(e){} })(Sound.bossIntro);
@@ -14506,7 +14531,7 @@ Sound.loot = (orig => function(){ orig(); try{ juBurst(window.innerWidth / 2, 96
 
 /* HUD: streak catches fire, level ups get a banner */
 let juBadge = "";
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "juice", renderHud, orig => function(){
   orig.apply(this, arguments);
   if(!S) return;
   const st = S.stats.streak || 0, h = $("hudStreak");
@@ -14514,19 +14539,19 @@ renderHud = (orig => function(){
   const b = $("hudBadge"), txt = b ? b.textContent : "";
   if(juBadge && txt && txt !== juBadge && !$("game").hidden){ juBanner(t("ju_level") + " " + txt, "lvl"); const c = juCenter(b); juBurst(c.x, c.y, 18, null, 90); }
   juBadge = txt;
-})(renderHud);
+});
 
 /* The correct-answer verdict gets a spinning star */
-renderExtras = (orig => function(fresh){
+renderExtras = wrap("renderExtras", "juice", renderExtras, orig => function(fresh){
   orig.apply(this, arguments);
   const j = $("judgeCard");
   if(fresh && juOn() && j && !j.hidden && j.classList.contains("ok") && !j.querySelector(".jx-star")){
     const h = j.querySelector("h2, h3, .head, b"); if(h){ const s = document.createElement("span"); s.className = "jx-star"; s.setAttribute("aria-hidden", "true"); s.textContent = " ⭐"; h.appendChild(s); }
   }
-})(renderExtras);
+});
 
 /* Results screen: letters drop in, wins rain pixels */
-showOver = (orig => function(){
+showOver = wrap("showOver", "juice", showOver, orig => function(){
   orig.apply(this, arguments);
   juBadge = ""; juXp = null;
   if(!juOn()) return;
@@ -14537,7 +14562,7 @@ showOver = (orig => function(){
     ti.innerHTML = [...word].map((c, i) => c === " " ? " " : `<span class="jx-l" aria-hidden="true" style="--i:${i}">${esc(c)}</span>`).join("");
     if(win && juOn()){ const c = juCenter($("overEmoji")); [0, 350, 700].forEach(d => setTimeout(() => juBurst(c.x, c.y, 22, null, 160), d)); }
   }catch(e){}
-})(showOver);
+});
 
 /* Pulse with the music */
 document.addEventListener("pgm-beat", e => {
@@ -17303,7 +17328,7 @@ fillLangSelects = function(){
   $("uiSel").innerHTML = UI_LANGS.map(l => `<option value="${l.code}" ${l.code === UI.code ? "selected" : ""}>${l.label}</option>`).join("");
   $("nativeSel").title = xlIs(tgt) ? t("xl_onlyEn") : "";
 };
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "langs", renderMenu, orig => function(){
   const r = orig.apply(this, arguments);
   const x = xlIs(setup.target);
   if(x && !XL_MODES.includes(setup.mode)){ setup.mode = 1; return renderMenu(); }
@@ -17318,23 +17343,23 @@ renderMenu = (orig => function(){
   if(x) note.textContent = "🌍 " + t("xl_modesNote", {lang:LN[LANG_CODE[setup.native] || "en"][setup.target]});
   const sb = $("storiesBtn"); if(sb){ const none = x && !storiesFor(LANG_CODE[setup.target]).length; sb.disabled = none; sb.title = none ? t("xl_storiesNA") : ""; }
   return r;
-})(renderMenu);
-startNew = (orig => function(){
+});
+startNew = wrap("startNew", "langs", startNew, orig => function(){
   if(xlIs(setup.target)){ setup.native = "English"; if(!XL_MODES.includes(setup.mode)) setup.mode = 1; }
   return orig.apply(this, arguments);
-})(startNew);
+});
 document.addEventListener("change", e => {
   if(e.target && e.target.id === "targetSel" && xlIs(e.target.value)){ setup.target = e.target.value; setup.native = "English"; }
 }, true);
 
-mixSources = (orig => function(st){ return xlIs(st.target) ? [] : orig.apply(this, arguments); })(mixSources);
+mixSources = wrap("mixSources", "langs", mixSources, orig => function(st){ return xlIs(st.target) ? [] : orig.apply(this, arguments); });
 
 /* ---------- grading: spaces, tones and vowel marks don't count ---------- */
-norm = (orig => function(s, lang, strict){
+norm = wrap("norm", "langs", norm, orig => function(s, lang, strict){
   if(lang === "zh") return deacc(orig(s, lang, false)).replace(/[\s，。！？、]/g, "");
   if(lang === "ar") return orig(String(s).replace(/[ً-ْٰʾʿ]/g, ""), lang, false).replace(/[ʿʾ'’]/g, "").replace(/\s+/g, " ").trim();
   return orig.apply(this, arguments);
-})(norm);
+});
 
 /* ---------- tiles: tap the words instead of typing a new script ---------- */
 const xlShuf = a => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -17342,7 +17367,7 @@ function xlExtra(code, not, n){
   const pool = (XL_TOKENS[code] || []).filter(x => !not.includes(x));
   return xlShuf(pool).slice(0, n);
 }
-tileItems = (orig => function(ch){
+tileItems = wrap("tileItems", "langs", tileItems, orig => function(ch){
   const base = orig.apply(this, arguments);
   if(base || !ch || !(ch.al === "zh" || ch.al === "ar")) return base;
   const first = canon(ch.acc[ch.game === "Cloze Combat" ? 1 : 0]);
@@ -17356,12 +17381,12 @@ tileItems = (orig => function(ch){
     return {mode:"pick", items:xlShuf([cz].concat(xlExtra(ch.al, [cz], 3))), keepScreen:true};
   }
   return base;
-})(tileItems);
-renderExtras = (orig => function(fresh){
+});
+renderExtras = wrap("renderExtras", "langs", renderExtras, orig => function(fresh){
   const r = orig.apply(this, arguments);
   try{ xlDecorate(); }catch(e){}
   return r;
-})(renderExtras);
+});
 function xlDecorate(){
   const c = S && S.current, code = S && xlCode(S.target);
   const tiles = $("tiles");
@@ -17410,14 +17435,14 @@ function xlDecorate(){
 })();
 
 /* ---------- each language plays its own tune ---------- */
-syncMood = (orig => function(){
+syncMood = wrap("syncMood", "langs", syncMood, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const code = S && xlCode(S.target), g = $("game");
     if(code && g && !g.hidden && WL[code] && WL[code].music && S.mode !== 3 && !(S.current && S.current.plan && S.current.plan.boss) && S.clock !== "attack") Music.setMood(WL[code].music);
   }catch(e){}
   return r;
-})(syncMood);
+});
 setTimeout(() => { try{ fillLangSelects(); renderMenu(); }catch(e){} }, 0);
 if(window.__PGM_TEST) window.__xl = {XL, XL_ROM, XL_TOKROM, XL_TOKENS, XL_AUTO_WRONG, xlSpace, xlCode, xlKey};
 
@@ -17488,21 +17513,21 @@ for(const code of XLM_CODES){
     }
   });
 }
-genVocab = (orig => function(st){
+genVocab = wrap("genVocab", "langmodes", genVocab, orig => function(st){
   const code = xlmCode(st && st.target);
   if(!code || !XLV[code]) return orig.apply(this, arguments);
   const saved = {};
   for(const lv of LEVELS){ saved[lv] = VLIST[lv]; VLIST[lv] = XLV[code][lv] || XLV[code].A1; }
   try{ return orig.apply(this, arguments); }
   finally{ for(const lv of LEVELS){ if(saved[lv] === undefined) delete VLIST[lv]; else VLIST[lv] = saved[lv]; } }
-})(genVocab);
+});
 // French and Portuguese nouns are taught with their article; the bare word counts too
-wordForms = (orig => function(v, lang){
+wordForms = wrap("wordForms", "langmodes", wordForms, orig => function(v, lang){
   const out = orig.apply(this, arguments);
   if(lang === "fr"){ const m = String(v).trim().match(/^(le |la |les |l'|l’|un |une )(.+)$/i); if(m) out.push(m[2]); }
   if(lang === "pt"){ const m = String(v).trim().match(/^(o |a |os |as |um |uma )(.+)$/i); if(m) out.push(m[2]); }
   return out;
-})(wordForms);
+});
 
 /* ---------- Numbers ---------- */
 const FR_U = ["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize","dix-sept","dix-huit","dix-neuf"];
@@ -17722,9 +17747,9 @@ function xlNumQ(c, code, lastGame, plain){
     }
   }
 }
-numChallenge = (orig => function(c, tgt, lastGame, plain){
+numChallenge = wrap("numChallenge", "langmodes", numChallenge, orig => function(c, tgt, lastGame, plain){
   return XLM_CODES.includes(tgt) && c && c.tip ? xlNumQ(c, tgt, lastGame, plain) : orig.apply(this, arguments);
-})(numChallenge);
+});
 function xlGenNumber(st, plan, c, review, res){
   const nat = LANG_CODE[st.native], code = LANG_CODE[st.target], L = GMT[nat], T = LN[nat][st.target];
   const q = xlNumQ(c, code, st.lastGame, false);
@@ -17753,10 +17778,10 @@ function xlGenNumber(st, plan, c, review, res){
   res.spotlight = null;
   return res;
 }
-genNumber = (orig => function(st, plan, c, review, res){
+genNumber = wrap("genNumber", "langmodes", genNumber, orig => function(st, plan, c, review, res){
   const code = xlmCode(st && st.target);
   return code && c && c.tip ? xlGenNumber(st, plan, c, review, res) : orig.apply(this, arguments);
-})(genNumber);
+});
 // Arabic number words get their transliteration under the tiles and on the answer card
 for(let n = 0; n <= 100; n++){ const [w, r] = arNum(n); XL_ROM[xlKey(w)] = r; if(!/\s/.test(w)) XL_TOKROM.ar[w] = r; }
 for(let n = 0; n <= 100; n++){ const w = zhNum(n); XL_ROM[xlKey(w)] = zhPin(w); }
@@ -17932,7 +17957,7 @@ for(const v of Object.keys(ARV)) for(const ten of ["past","pres","fut"]) for(let
   const f = arForm(v, ten, p); XL_ROM[xlKey(f[0])] = f[1]; if(!/\s/.test(f[0])) XL_TOKROM.ar[f[0]] = f[1];
 }
 
-conjQuestion = (orig => function(c, tgt, recent){
+conjQuestion = wrap("conjQuestion", "langmodes", conjQuestion, orig => function(c, tgt, recent){
   if(!["fr", "pt", "ar"].includes(tgt)) return orig.apply(this, arguments);
   const n = xlPronList(tgt).length;
   for(let tries = 0; tries < 25; tries++){
@@ -17942,17 +17967,17 @@ conjQuestion = (orig => function(c, tgt, recent){
     return {inf, ten, p, pron:xlPronList(tgt)[p], forms, key};
   }
   return null;
-})(conjQuestion);
-conjWrongs = (orig => function(tgt, q){
+});
+conjWrongs = wrap("conjWrongs", "langmodes", conjWrongs, orig => function(tgt, q){
   if(!["fr", "pt", "ar"].includes(tgt)) return orig.apply(this, arguments);
   const right = new Set(q.forms.map(f => norm(f, tgt, false))), out = new Set();
   for(let p = 0; p < xlPronList(tgt).length; p++) if(p !== q.p){ const f = xlForm(tgt, q.inf, q.ten, p)[0]; if(!right.has(norm(f, tgt, false))) out.add(f); }
   return [...out];
-})(conjWrongs);
-conjAccepted = (orig => function(tgt, forms, pIdx, pron){
+});
+conjAccepted = wrap("conjAccepted", "langmodes", conjAccepted, orig => function(tgt, forms, pIdx, pron){
   if(!["fr", "pt", "ar"].includes(tgt)) return orig.apply(this, arguments);
   return uniq(forms.concat(forms.map(f => xlWithPron(tgt, pIdx, f))));
-})(conjAccepted);
+});
 function xlGenConj(st, plan, c, review, res){
   const nat = LANG_CODE[st.native], code = LANG_CODE[st.target], L = GMT[nat];
   const recent = new Set((st.recentK || []).map(k => String(k).replace(/^c:/, "")));
@@ -17987,24 +18012,24 @@ function xlGenConj(st, plan, c, review, res){
   res._k = "c:" + q.key;
   return res;
 }
-genConj = (orig => function(st, plan, c, review, res){
+genConj = wrap("genConj", "langmodes", genConj, orig => function(st, plan, c, review, res){
   const code = xlmCode(st && st.target);
   if(code === "zh") return genSentence(Object.assign({}, st, {mode:8}), plan, c, review, res);   // measure words play like Tricky Pairs
   if(code) return xlGenConj(st, plan, c, review, res);
   return orig.apply(this, arguments);
-})(genConj);
-gamesFor = (orig => function(st){
+});
+gamesFor = wrap("gamesFor", "langmodes", gamesFor, orig => function(st){
   if(st && st.mode === 7 && xlmCode(st.target) === "zh") return ["Word Duel", "Cloze Combat", "Classic Mine", "Error Hunter"];
   return orig.apply(this, arguments);
-})(gamesFor);
+});
 // Mandarin / Arabic number and verb rounds offer their options as tap tiles
-tileItems = (orig => function(ch){
+tileItems = wrap("tileItems", "langmodes", tileItems, orig => function(ch){
   if(ch && (ch.al === "zh" || ch.al === "ar") && (ch.k === "n" || ch.k === "c") && Array.isArray(ch.opts)) return {mode:"pick", items:ch.opts, keepScreen:true};
   return orig.apply(this, arguments);
-})(tileItems);
+});
 
 /* ---------- levels, syllabus and lookups per language ---------- */
-levelsFor = (orig => function(mode, target){
+levelsFor = wrap("levelsFor", "langmodes", levelsFor, orig => function(mode, target){
   const code = xlmCode(target);
   if(code){
     if(mode === 4) return Object.keys(XLNUM);
@@ -18013,18 +18038,18 @@ levelsFor = (orig => function(mode, target){
     if(mode === 8) return Object.keys(TRICKY[code] || {A1:1});
   }
   return orig.apply(this, arguments);
-})(levelsFor);
-syllabusFor = (orig => function(st){
+});
+syllabusFor = wrap("syllabusFor", "langmodes", syllabusFor, orig => function(st){
   const code = xlmCode(st && st.target);
   if(code && st.mode === 4) return xlNumSyl(code, st.level).map(c => c[LANG_CODE[st.native]]);
   return orig.apply(this, arguments);
-})(syllabusFor);
-conceptAt = (orig => function(st, idx){
+});
+conceptAt = wrap("conceptAt", "langmodes", conceptAt, orig => function(st, idx){
   const code = xlmCode(st && st.target);
   if(code && st.mode === 4) return xlNumSyl(code, st.level)[idx];
   return orig.apply(this, arguments);
-})(conceptAt);
-findConcept = (orig => function(st, key){
+});
+findConcept = wrap("findConcept", "langmodes", findConcept, orig => function(st, key){
   const code = xlmCode(st && st.target);
   if(code && st.mode === 4){
     const k = String(key || "").toLowerCase(), nat = LANG_CODE[st.native];
@@ -18032,12 +18057,12 @@ findConcept = (orig => function(st, key){
     return null;
   }
   return orig.apply(this, arguments);
-})(findConcept);
+});
 
 /* ---------- menu: Mandarin's mode 7 is about measure words ---------- */
 Object.assign(I18N.en, {zh_m7n:"Measure Words", zh_m7d:"个, 本, 张… plus 了 and 过: the little words Chinese can't do without."});
 Object.assign(I18N.es, {zh_m7n:"Clasificadores", zh_m7d:"个, 本, 张… y 了 y 过: las palabritas imprescindibles del chino."});
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "langmodes", renderMenu, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const TP8 = {fr:"tu or vous, c'est or il est, bon or bien…", pt:"ser or estar, por or para, mas or mais…", zh:"不 or 没, 二 or 两, 的 or 得…", ar:"هذا or هذه, ما or ماذا, في or إلى…"};
@@ -18049,7 +18074,7 @@ renderMenu = (orig => function(){
     }
   }catch(e){}
   return r;
-})(renderMenu);
+});
 if(window.__PGM_TEST) window.__xlm = {xlNumWords, xlTime, xlPrice, frNum, ptNum, zhNum, arNum, frForm, ptForm, arForm, XLV, XLNUM, xlNumSyl, WL, STORIES, ISLANDS, TRICKY, CONJ, levelsFor:(m, t) => levelsFor(m, t), renderMenu:() => renderMenu()};
 (() => { const c = document.createElement("style"); c.textContent = ".sline .srom{display:block;color:var(--violet);font-size:.85rem;margin-top:2px}"; document.head.appendChild(c); })();
 
@@ -18134,7 +18159,7 @@ function typoMatch(st, ch, answer){
   }
   return null;
 }
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "typo", gradeLocal, orig => function(st, ch, answer, force){
   const j = orig.apply(this, arguments);
   try{
     if(j.correct || answer === null || !st || !ch) return j;
@@ -18146,7 +18171,7 @@ gradeLocal = (orig => function(st, ch, answer, force){
     return Object.assign({}, j, {correct:true, typo:true, headline:pick(L.ok), feedback:`${L.typo} ${boldDiff(best, answer, ch, false)}`,
       answer:isCloze ? ch.answerKey : best, struggled:[]});
   }catch(e){ return j; }
-})(gradeLocal);
+});
 if(window.__PGM_TEST) window.__typo = {typoMatch, typoLex};
 
 /* ===================== Multiple choice answers =====================
@@ -18169,10 +18194,10 @@ const mcSave = () => { try{ localStorage.setItem("pgm-mc", MCS ? "1" : "0"); }ca
 const mcNoSp = s => String(s || "").replace(/\s+/g, " ").trim();
 const mcStrip = s => String(s || "").replace(/^~/, "");
 
-freshState = (orig => function(o){ const st = orig.apply(this, arguments); st.mc = MCS; return st; })(freshState);
+freshState = wrap("freshState", "mc", freshState, orig => function(o){ const st = orig.apply(this, arguments); st.mc = MCS; return st; });
 
 /* ---------- candidate pools, stashed by each generator ---------- */
-genSentence = (orig => function(st, plan, c){
+genSentence = wrap("genSentence", "mc", genSentence, orig => function(st, plan, c){
   const res = orig.apply(this, arguments);
   try{
     const ch = res && res.challenge;
@@ -18203,9 +18228,9 @@ genSentence = (orig => function(st, plan, c){
     }
   }catch(e){}
   return res;
-})(genSentence);
+});
 
-genVocab = (orig => function(st, plan){
+genVocab = wrap("genVocab", "mc", genVocab, orig => function(st, plan){
   const res = orig.apply(this, arguments);
   try{
     const ch = res && res.challenge;
@@ -18219,9 +18244,9 @@ genVocab = (orig => function(st, plan){
     }
   }catch(e){}
   return res;
-})(genVocab);
+});
 
-genNumber = (orig => function(st, plan, c){
+genNumber = wrap("genNumber", "mc", genNumber, orig => function(st, plan, c){
   const res = orig.apply(this, arguments);
   try{
     const ch = res && res.challenge;
@@ -18235,11 +18260,11 @@ genNumber = (orig => function(st, plan, c){
     }
   }catch(e){}
   return res;
-})(genNumber);
+});
 
 let mcLastQ = null;
-conjQuestion = (orig => function(){ const q = orig.apply(this, arguments); mcLastQ = q; return q; })(conjQuestion);
-genConj = (orig => function(st, plan, c){
+conjQuestion = wrap("conjQuestion", "mc", conjQuestion, orig => function(){ const q = orig.apply(this, arguments); mcLastQ = q; return q; });
+genConj = wrap("genConj", "mc", genConj, orig => function(st, plan, c){
   mcLastQ = null;
   const res = orig.apply(this, arguments);
   try{
@@ -18251,7 +18276,7 @@ genConj = (orig => function(st, plan, c){
     }
   }catch(e){}
   return res;
-})(genConj);
+});
 
 /* ---------- near misses made from the right answer ---------- */
 const MC_SWAP = {el:"la", la:"el", los:"las", las:"los", un:"una", una:"un", le:"la", du:"de la", o:"a", a:"o", os:"as", as:"os", um:"uma", uma:"um"};
@@ -18323,20 +18348,20 @@ function mcBuild(st, ch){
   ch.hint = "";                              // "starts with…" would give it away
 }
 
-generate = (orig => function(st){
+generate = wrap("generate", "mc", generate, orig => function(st){
   const res = orig.apply(this, arguments);
   try{ if(st && st.mc && res && res.challenge) mcBuild(st, res.challenge); else if(res && res.challenge) delete res.challenge.mcx; }catch(e){}
   return res;
-})(generate);
+});
 
 /* ---------- playing: options instead of the text box ---------- */
 const mcLive = () => { const ch = S && S.current && S.current.challenge; return !!(ch && Array.isArray(ch.opts) && ch.game !== "Word Duel" && (S.mc || MCG.has(ch.game))); };
-tileItems = (orig => function(ch){
+tileItems = wrap("tileItems", "mc", tileItems, orig => function(ch){
   if(ch && S && S.current && ch === S.current.challenge && mcLive()) return {mode:"pick", items:ch.opts, keepScreen:true, mc:true};
   return orig.apply(this, arguments);
-})(tileItems);
+});
 let mcBusy = false;
-renderExtras = (orig => function(fresh){
+renderExtras = wrap("renderExtras", "mc", renderExtras, orig => function(fresh){
   const r = orig.apply(this, arguments);
   const tiles = $("tiles"), live = mcLive();
   tiles.classList.toggle("mc", live);
@@ -18358,7 +18383,7 @@ renderExtras = (orig => function(fresh){
     });
   }
   return r;
-})(renderExtras);
+});
 // a tap answers straight away
 $("tiles").addEventListener("click", e => {
   const b = e.target.closest(".tile[data-i]");
@@ -18394,7 +18419,7 @@ function mcMenu(){
     <div class="tpseg" role="group" aria-label="${esc(t("mc_label"))}"><button type="button" data-mcs="0" aria-pressed="${!MCS}">⌨️ ${esc(t("mc_type"))}</button><button type="button" data-mcs="1" aria-pressed="${MCS}">🔘 ${esc(t("mc_pick"))}</button></div>
     ${MCS ? `<p class="note">${esc(t("mc_note"))}</p>` : ""}`;
 }
-renderMenu = (orig => function(){ const r = orig.apply(this, arguments); try{ mcMenu(); }catch(e){} return r; })(renderMenu);
+renderMenu = wrap("renderMenu", "mc", renderMenu, orig => function(){ const r = orig.apply(this, arguments); try{ mcMenu(); }catch(e){} return r; });
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-mcs]");
   if(b){ MCS = b.dataset.mcs === "1"; mcSave(); Sound.tap(); renderMenu(); }
@@ -18428,10 +18453,10 @@ const MCG_BASE = {"Quick Pick":"Classic Mine", "Meaning Match":"Reverse Mine", "
 const MCG_MODES = {1:["Quick Pick", "Meaning Match", "Right or Wrong", "Spot the Mistake"], 2:["Quick Pick", "Meaning Match", "Right or Wrong", "Spot the Mistake"],
   3:["Quick Pick", "Right or Wrong", "Spot the Mistake"], 6:["Quick Pick", "Meaning Match"], 5:["Quick Pick", "Meaning Match"], 7:["Quick Pick"], 8:["Right or Wrong", "Spot the Mistake"]};
 
-gamesFor = (orig => function(st){
+gamesFor = wrap("gamesFor", "mcgames", gamesFor, orig => function(st){
   const g = orig.apply(this, arguments), add = (MCG_MODES[st && st.mode] || []).filter(x => !g.includes(x));
   return g.concat(add);
-})(gamesFor);
+});
 
 function mcgPick(st, ch, name){
   const L = mcT(st), nat = LANG_CODE[st.native], Tn = LN[nat][st.target], Nn = LN[nat][st.native];
@@ -18500,12 +18525,12 @@ function mcgWrap(orig){
     return res;
   };
 }
-genSentence = mcgWrap(genSentence);
-genVocab = mcgWrap(genVocab);
-genConj = (w => function(){ return w.apply("conj", arguments); })(mcgWrap(genConj));
+genSentence = wrap("genSentence", "mcgames", genSentence, mcgWrap);
+genVocab = wrap("genVocab", "mcgames", genVocab, mcgWrap);
+genConj = wrap("genConj", "mcgames", genConj, orig => (w => function(){ return w.apply("conj", arguments); })(mcgWrap(orig)));
 
 /* feedback for the two judging games: a short verdict; the card shows the sentence and its correction */
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "mcgames", gradeLocal, orig => function(st, ch, answer, force){
   const j = orig.apply(this, arguments);
   try{
     if(!ch || !st || (ch.game !== "Right or Wrong" && ch.game !== "Spot the Mistake") || answer === null) return j;
@@ -18515,10 +18540,10 @@ gradeLocal = (orig => function(st, ch, answer, force){
     const fb = ch.game === "Spot the Mistake" ? (j.correct ? L.sOk : L.sBad) : j.correct ? (had ? L.rOkW : L.rOkR) : (had ? L.rBadW : L.rBadR);
     return Object.assign({}, j, {feedback:fb, struggled:[], rw:{shown:String(shown || ""), fix:String(T || ""), had}});
   }catch(e){ return j; }
-})(gradeLocal);
+});
 if(window.__PGM_TEST) window.__mcg = {gamesFor:st => gamesFor(st), MCG};
 // Spot the Mistake's prompt is an instruction, not a sentence to hear; each option shows its meaning
-renderExtras = (orig => function(){
+renderExtras = wrap("renderExtras", "mcgames", renderExtras, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const ch = S && S.current && S.current.challenge;
@@ -18531,7 +18556,7 @@ renderExtras = (orig => function(){
     }
   }catch(e){}
   return r;
-})(renderExtras);
+});
 (() => { const c = document.createElement("style"); c.textContent = ".tile.mcm::after{white-space:pre-line;color:var(--muted,#6b6b80);font-style:italic}"; document.head.appendChild(c); })();
 
 /* ===================== More mini-games (2.11) =====================
@@ -18565,13 +18590,13 @@ const mg2T = st => MG2T[LANG_CODE[st.native]] || MG2T.en;
 const MG2_BASE = {"Gap Fill":"Cloze Combat", "Order Up":"Syntax Scramble", "Meaning Check":"Reverse Mine"};
 const MG2_MODES = {1:["Gap Fill", "Order Up", "Meaning Check"], 2:["Gap Fill", "Order Up", "Meaning Check"], 3:["Order Up"], 5:["Meaning Check"],
   6:["Gap Fill", "Order Up", "Meaning Check"], 4:["Number Pick", "Number Match"], 7:["Who's Doing It?", "Tense Detective"]};
-gamesFor = (orig => function(st){
+gamesFor = wrap("gamesFor", "mcgames2", gamesFor, orig => function(st){
   const g = orig.apply(this, arguments);
   let add = (MG2_MODES[st && st.mode] || []).filter(x => !g.includes(x));
   if(st && st.mode === 7 && st.target && LANG_CODE[st.target] === "zh") add = [];   // Mandarin's mode 7 is measure words
   if(st && st.mode === 6 && st.target && !["es", "en"].includes(LANG_CODE[st.target])) add = add.filter(x => x !== "Gap Fill");   // their islands have no gaps
   return g.concat(add);
-})(gamesFor);
+});
 
 const mg2Ok = (st, ch, a) => { try{ return gradeLocal(st, ch, a, false).correct; }catch(e){ return false; } };
 const mg2Key = (ch, x) => norm(String(x), ch.al, false);
@@ -18651,12 +18676,12 @@ function mg2Wrap(orig){
     return res;
   };
 }
-genSentence = mg2Wrap(genSentence);
-genVocab = mg2Wrap(genVocab);
+genSentence = wrap("genSentence", "mcgames2", genSentence, mg2Wrap);
+genVocab = wrap("genVocab", "mcgames2", genVocab, mg2Wrap);
 
 /* ---------- number games ---------- */
 const MG2_NUMW = new Set(["Digit Dictation", "Real-World Numbers", "Clock Watcher"]);
-genNumber = (orig => function(st, plan, c){
+genNumber = wrap("genNumber", "mcgames2", genNumber, orig => function(st, plan, c){
   const res = orig.apply(this, arguments);
   const name = plan && plan.game, ch = res && res.challenge;
   if(!ch || !plan || plan.boss || (name !== "Number Pick" && name !== "Number Match") || !MG2_NUMW.has(ch.game) || !c) return res;
@@ -18684,7 +18709,7 @@ genNumber = (orig => function(st, plan, c){
     if(res._k) res._k = res._k.replace(/^[^|]*/, ch.game);
   }catch(e){}
   return res;
-})(genNumber);
+});
 
 /* ---------- conjugation games ---------- */
 const MG2_XL = ["fr", "pt", "ar"];
@@ -18707,7 +18732,7 @@ function mg2Tenses(st, tgt){
   for(const lv of Object.keys(C)) if(LEVELS.indexOf(lv) <= Math.max(top, 1)) for(const c of C[lv]) for(const t of c.ten || []) out.add(t);
   return [...out];
 }
-genConj = (orig => function(st, plan, c){
+genConj = wrap("genConj", "mcgames2", genConj, orig => function(st, plan, c){
   const name = plan && plan.game;
   if(!plan || plan.boss || (name !== "Who's Doing It?" && name !== "Tense Detective")) return orig.apply(this, arguments);
   const tgt = LANG_CODE[st.target];
@@ -18740,10 +18765,10 @@ genConj = (orig => function(st, plan, c){
       info:{kind:"conj", rows:[[L.form, `${mg2Show(tgt, q)} (${q.inf})`], [rowL, rowV]]}});
   }catch(e){}
   return res;
-})(genConj);
+});
 
 /* ---------- the answer card for the judging games ---------- */
-gradeLocal = (orig => function(st, ch, answer){
+gradeLocal = wrap("gradeLocal", "mcgames2", gradeLocal, orig => function(st, ch, answer){
   const j = orig.apply(this, arguments);
   try{
     if(!ch || !st || !ch.info || answer === null || (ch.game !== "Meaning Check" && ch.game !== "Who's Doing It?" && ch.game !== "Tense Detective")) return j;
@@ -18755,15 +18780,15 @@ gradeLocal = (orig => function(st, ch, answer){
     }
     return Object.assign({}, j, {feedback:j.correct ? L.ok : L.bad, struggled:[], rw:{rows:I.rows}});
   }catch(e){ return j; }
-})(gradeLocal);
-renderExtras = (orig => function(){
+});
+renderExtras = wrap("renderExtras", "mcgames2", renderExtras, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const ch = S && S.current && S.current.challenge, tl = $("tiles");
     if(ch && (ch.game === "Who's Doing It?" || ch.game === "Tense Detective" || ch.game === "Meaning Check" || ch.game === "Number Match")){ tl.dir = "ltr"; tl.querySelectorAll(".tile").forEach(t => t.dir = "ltr"); }
   }catch(e){}
   return r;
-})(renderExtras);
+});
 if(window.__PGM_TEST) window.__mg2 = {MG2, gamesFor:st => gamesFor(st), gen:(st, plan) => generate(st, plan)};
 
 /* ===================== Also-right answers (2.13.1) =====================
@@ -18888,7 +18913,7 @@ const ALT_TXT = {
   en:{ok:"That works too! This lesson is practising:", mine:"Accepted: you marked this answer right before. The lesson's version:"},
   es:{ok:"¡También vale! Esta lección practica:", mine:"Aceptada: ya marcaste esta respuesta como correcta. La versión de la lección:"}
 };
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "alts", gradeLocal, orig => function(st, ch, answer, force){
   const res = orig(st, ch, answer, force);
   if(answer === null || answer === undefined || !altOk(st, ch)) return res;
   const vars = variantsOf(ch);
@@ -18911,7 +18936,7 @@ gradeLocal = (orig => function(st, ch, answer, force){
     if(vars.some(v => altKey(v, lang, strict) === a)) return yes(T.ok);
   }
   return res;
-})(gradeLocal);
+});
 
 if(window.__PGM_TEST) window.__alts = {altKey, ALT_EQ, altLoose, ALT_ACC};
 
@@ -18988,7 +19013,7 @@ function szTexts(){
 }
 function szOpen(){ szTexts(); $("szSheet").hidden = false; try{ $("szUp").focus({preventScroll:true}); }catch(e){} }
 function szClose(){ $("szSheet").hidden = true; try{ $("menuSizeBtn").focus({preventScroll:true}); }catch(e){} }
-renderMenu = (orig => function(){ const r = orig.apply(this, arguments); try{ szRefresh(); }catch(e){} return r; })(renderMenu);
+renderMenu = wrap("renderMenu", "uisize", renderMenu, orig => function(){ const r = orig.apply(this, arguments); try{ szRefresh(); }catch(e){} return r; });
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-sz]");
   if(b){ e.preventDefault(); Sound.tap(); szApply(SZ + SZ_STEP * +b.dataset.sz); return; }
@@ -19069,7 +19094,7 @@ document.addEventListener("change", e => {
   if(e.target && e.target.classList && e.target.classList.contains("voiceChk")) setTimeout(vaRefresh, 0);
 });
 document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("vaSheet").hidden) vaClose(); });
-applyI18n = (orig => function(){ const r = orig.apply(this, arguments); try{ vaRefresh(); }catch(e){} return r; })(applyI18n);
+applyI18n = wrap("applyI18n", "voiceprefs", applyI18n, orig => function(){ const r = orig.apply(this, arguments); try{ vaRefresh(); }catch(e){} return r; });
 
 setTimeout(vaRefresh, 0);
 if(window.__PGM_TEST) window.__va = {vaOpen, vaClose, vaRefresh, get voiceOn(){ return voiceOn; }};
@@ -19198,7 +19223,7 @@ const SFX = (() => {
 })();
 
 /* Main game: one clear sound per outcome instead of a generic beep */
-playOutcome = (cur => function(prevPlan){
+playOutcome = wrap("playOutcome", "sfx", playOutcome, cur => function(prevPlan){
   SFX.mute(true);
   try{ cur.apply(this, arguments); } finally { SFX.mute(false); }
   if(!prevPlan || !S || !S.judgement) return;
@@ -19217,7 +19242,7 @@ playOutcome = (cur => function(prevPlan){
     Sound.wrong();
     if(S.mode === 3) setTimeout(() => Sound.heart(), 220);
   }
-})(playOutcome);
+});
 
 /* Tiles and pairs in the main game */
 $("tiles").addEventListener("click", e => {
@@ -19229,14 +19254,14 @@ $("pairs").addEventListener("click", e => {
   setTimeout(() => { if(b.classList.contains("done") && pairState && pairState.done.size < pairState.n) Sound.match(); }, 0);
 });
 /* Opening a page gets a soft swish */
-showOnly = (orig => function(){ Sound.page(); return orig.apply(this, arguments); })(showOnly);
+showOnly = wrap("showOnly", "sfx", showOnly, orig => function(){ Sound.page(); return orig.apply(this, arguments); });
 
 /* Over screen: the fanfare is the outcome sound, so the music comes back calmly instead of a second jingle */
-syncMood = (orig => function(){
+syncMood = wrap("syncMood", "sfx", syncMood, orig => function(){
   const ov = $("over");
   if(ov && !ov.hidden){ Music.setMood("title"); return; }
   return orig.apply(this, arguments);
-})(syncMood);
+});
 
 if(window.__PGM_TEST) window.__sfx = {SFX, Sound};
 
@@ -19373,7 +19398,7 @@ function tpMenu(){
       ${bad.length ? `<div class="tpwarn">⚠️ ${esc(t("tp_badMode", {name:bad.join(", ")}))}</div>` : ""}</div>` : ""}`;
   $("startBtn").disabled = TPS.on && bad.length > 0;
 }
-renderMenu = (orig => function(){ const r = orig.apply(this, arguments); try{ tpMenu(); }catch(e){} return r; })(renderMenu);
+renderMenu = wrap("renderMenu", "twoplayer", renderMenu, orig => function(){ const r = orig.apply(this, arguments); try{ tpMenu(); }catch(e){} return r; });
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-tpn]");
   if(b){ TPS.on = b.dataset.tpn === "2"; tpSaveSet(); Sound.tap(); renderMenu(); }
@@ -19418,10 +19443,10 @@ function tpStart(){
 }
 
 /* ---------- hooks into the engine ---------- */
-ckPaused = (orig => function(){ return orig.apply(this, arguments) || (TP.on && (!$("tpOv").hidden || !$("tpRes").hidden || TP.phase !== "play")); })(ckPaused);
-save = (orig => function(){ if(TP.on) return; return orig.apply(this, arguments); })(save);
-recordAnswer = (orig => function(){ if(TP.on) return; return orig.apply(this, arguments); })(recordAnswer);
-runTurn = (orig => function(answer, force){
+ckPaused = wrap("ckPaused", "twoplayer", ckPaused, orig => function(){ return orig.apply(this, arguments) || (TP.on && (!$("tpOv").hidden || !$("tpRes").hidden || TP.phase !== "play")); });
+save = wrap("save", "twoplayer", save, orig => function(){ if(TP.on) return; return orig.apply(this, arguments); });
+recordAnswer = wrap("recordAnswer", "twoplayer", recordAnswer, orig => function(){ if(TP.on) return; return orig.apply(this, arguments); });
+runTurn = wrap("runTurn", "twoplayer", runTurn, orig => function(answer, force){
   if(!TP.on || TP.inTurn) return orig.apply(this, arguments);
   const answering = !!(S && S.current && S.current.plan), me = TP.cur;
   TP.inTurn = true;
@@ -19433,30 +19458,30 @@ runTurn = (orig => function(answer, force){
   if(S.judgement) TP.hist[me].push(!!S.judgement.correct);
   if(S.status !== "playing") TP.out[me] = true;
   tpAfterAnswer();
-})(runTurn);
-showOver = (orig => function(){
+});
+showOver = wrap("showOver", "twoplayer", showOver, orig => function(){
   if(!TP.on) return orig.apply(this, arguments);
   TP.out[TP.cur] = true;
   if(!TP.inTurn){ TP.states[TP.cur] = S; tpAfterAnswer(); }   // e.g. Time Attack ran out of time
-})(showOver);
-renderGame = (orig => function(){
+});
+renderGame = wrap("renderGame", "twoplayer", renderGame, orig => function(){
   const r = orig.apply(this, arguments);
   if(TP.on) try{ tpDecorate(); }catch(e){}
   return r;
-})(renderGame);
-showMenu = (orig => function(){
+});
+showMenu = wrap("showMenu", "twoplayer", showMenu, orig => function(){
   if(TP.on) tpEnd(false);
   return orig.apply(this, arguments);
-})(showMenu);
+});
 // leaving a 2-player game takes two taps on ☰
 $("menuBtn").addEventListener("click", e => {
   if(!TP.on || TP.phase === "done") return;
   if(!TP.leaveArmed){ e.stopImmediatePropagation(); TP.leaveArmed = true; toast(t("tp_leave")); setTimeout(() => { TP.leaveArmed = false; }, 2500); }
 }, true);
-syncMood = (orig => function(){
+syncMood = wrap("syncMood", "twoplayer", syncMood, orig => function(){
   if(TP.on && !$("tpRes").hidden){ Music.setMood("title"); return; }
   return orig.apply(this, arguments);
-})(syncMood);
+});
 
 /* ---------- turn flow ---------- */
 const tpKind = () => TP.mode === 3 || (TP.states[0] && TP.states[0].clock === "attack") ? "elim" : TP.mode === 6 ? "race" : "score";
@@ -19682,7 +19707,7 @@ const gymSel = target => { const s = (profile.gymSel || {})[LANG_CODE[target]] |
 function gymSetSel(target, keys){ (profile.gymSel || (profile.gymSel = {}))[LANG_CODE[target]] = keys; saveProfile(); }
 
 /* ---------- engine hooks ---------- */
-freshState = (orig => function(o){
+freshState = wrap("freshState", "gym", freshState, orig => function(o){
   const st = orig(o);
   if(o.mode === 10){
     let picks = gymSel(o.target).map(k => gymFind(o.target, k)).filter(Boolean);
@@ -19694,9 +19719,9 @@ freshState = (orig => function(o){
     st.syllabus = [t("m10n")]; st.done = [false];
   }
   return st;
-})(freshState);
+});
 
-makePlanCore = (orig => function(st, rolls, exclude){
+makePlanCore = wrap("makePlanCore", "gym", makePlanCore, orig => function(st, rolls, exclude){
   if(st.mode !== 10) return orig(st, rolls, exclude);
   if(st.status !== "playing") return null;
   const g = st.gym, picks = g.picks;
@@ -19711,9 +19736,9 @@ makePlanCore = (orig => function(st, rolls, exclude){
   const low = Math.min(...cand.map(n)), least = cand.filter(p => n(p) === low);
   const p = least[Math.floor(rolls.s * least.length)];
   return {kind:"gym", lv:p.lv, idx:p.idx, t:p.t, game};
-})(makePlanCore);
+});
 
-generate = (orig => function(st, plan){
+generate = wrap("generate", "gym", generate, orig => function(st, plan){
   if(st.mode !== 10 || !plan || plan.kind !== "gym") return orig(st, plan);
   const m = Object.assign({}, st, {mode:2, level:plan.lv, cefr:0});
   m.syllabus = syllabusFor(m); m.done = m.syllabus.map(() => false);
@@ -19724,9 +19749,9 @@ generate = (orig => function(st, plan){
   for(let k = 0; k < others.length && res && res.challenge && GYM_SKIP.has(res.challenge.game); k++) res = orig(m, {kind:"syllabus", idx, game:others[k], boss:false});
   if(res && res.lesson) res.lesson = Object.assign({}, res.lesson, {title:"📐 " + plan.lv + " · " + (res.lesson.title || plan.t)});
   return res;
-})(generate);
+});
 
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "gym", applyResult, orig => function(st, correct, plan){
   // grammar results from the other modes feed the weak-spot list (not in two-player games).
   // runTurn also applies the result to a throwaway copy to plan the next round: record only for the live state
   const tp = (typeof TP !== "undefined" && TP.on) || st !== S;
@@ -19756,21 +19781,21 @@ applyResult = (orig => function(st, correct, plan){
   else if(plan.redo) g.redo = (g.redo || []).filter(x => !same(x));
   if(!tp){ gymRecord(st.target, plan.lv, plan.t, correct); saveProfile(); }
   if(st.status === "playing" && st.stats.answered >= g.rounds) st.status = "conquered";
-})(applyResult);
+});
 
-progress = (orig => function(){
+progress = wrap("progress", "gym", progress, orig => function(){
   if(!S || S.mode !== 10) return orig();
   const d = S.gym.rounds, n = S.stats.answered;
   return {n, d, label:t("cRound", {n:Math.min(n + 1, d), d})};
-})(progress);
+});
 
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "gym", renderHud, orig => function(){
   orig();
   if(!S || S.mode !== 10) return;
   $("hudHearts").hidden = true;
   const lv = [...new Set(S.gym.picks.map(p => p.lv))];
   $("hudBadge").textContent = "📐 " + (lv.length > 1 ? lv[0] + "–" + lv[lv.length - 1] : lv[0] || S.level);
-})(renderHud);
+});
 
 /* A workout that went badly (under 60%) still finishes, but without the victory fanfare,
    confetti and cheering Leo: those parts all key off "conquered", so they run as if it ended */
@@ -19780,9 +19805,9 @@ const gymCalm = f => function(){
   S.status = "gameover";
   try{ return f.apply(this, arguments); } finally { S.status = "conquered"; }
 };
-playOutcome = gymCalm(playOutcome);
-runJuice = gymCalm(runJuice);
-showOver = (orig => function(){
+playOutcome = wrap("playOutcome", "gym", playOutcome, gymCalm);
+runJuice = wrap("runJuice", "gym", runJuice, gymCalm);
+showOver = wrap("showOver", "gym", showOver, orig => function(){
   const poor = gymPoor();
   gymCalm(orig)();
   if(!S || S.mode !== 10) return;
@@ -19798,7 +19823,7 @@ showOver = (orig => function(){
   $("overText").innerHTML = esc(t("gDoneB", {c, n, p})) + (rows ? `<div class="gover"><b>${esc(t("gOverT"))}</b><ul>${rows}</ul></div>` : "");
   $("overIsland").hidden = true;
   if(done) $("overRestart").hidden = false;
-})(showOver);
+});
 
 /* ---------- Setup panel in the menu ---------- */
 (() => {
@@ -19868,7 +19893,7 @@ document.addEventListener("click", e => {
   if(!e.target.closest || !e.target.closest("#startBtn") || setup.mode !== 10) return;
   if(!gymSel(setup.target).length){ e.stopImmediatePropagation(); e.preventDefault(); $("startNote").textContent = t("gSelNone"); }
 }, true);
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "gym", renderMenu, orig => function(){
   orig();
   $("gymGroup").hidden = setup.mode !== 10;
   if(setup.mode === 10){
@@ -19876,7 +19901,7 @@ renderMenu = (orig => function(){
     if($("clockGroup")) $("clockGroup").hidden = true;
     renderGym();
   }
-})(renderMenu);
+});
 document.addEventListener("change", e => { if(e.target && e.target.id === "targetSel" && setup.mode === 10){ gymLv = null; setTimeout(renderGym, 0); } });
 
 if(window.__PGM_TEST) window.__gym = {gymLessons, gymLevels, gymSel, gymSetSel, gymWeak, gymMastery, gymRec, gymGames, gymFind, gymKey};
@@ -19938,7 +19963,7 @@ const CARD_STOP = new Set(["the","and","you","are","was","for","not","but","que"
 const cardLinkable = w => !CARD_STOP.has(w) && (w.length > 2 || /[\u3400-\u9fff]/.test(w));
 
 /* ---------- engine hooks ---------- */
-freshState = (orig => function(o){
+freshState = wrap("freshState", "cards", freshState, orig => function(o){
   const st = orig(o);
   if(o.mode === 11){
     st.hp = st.maxHp = CARD_HEARTS; st.clock = "off";
@@ -19947,9 +19972,9 @@ freshState = (orig => function(o){
     st.syllabus = [t("m11n")]; st.done = [false];
   }
   return st;
-})(freshState);
+});
 
-makePlanCore = (orig => function(st, rolls, exclude){
+makePlanCore = wrap("makePlanCore", "cards", makePlanCore, orig => function(st, rolls, exclude){
   if(st.mode !== 11) return orig(st, rolls, exclude);
   if(st.status !== "playing") return null;
   const L = (COURSE[LANG_CODE[st.target]] || {})[st.level] || [];
@@ -19960,9 +19985,9 @@ makePlanCore = (orig => function(st, rolls, exclude){
   // half the time stay in the same lesson: its sentences share words, so chains can link
   const idx = st.card.lastIdx != null && st.card.chain > 0 && rolls.r < 0.5 ? st.card.lastIdx : Math.floor(rolls.s * L.length);
   return {kind:"card", lv:st.level, idx: exclude && exclude.idx === idx && L.length > 1 ? (idx + 1) % L.length : idx, it:Math.floor(rolls.g * 1000)};
-})(makePlanCore);
+});
 
-generate = (orig => function(st, plan){
+generate = wrap("generate", "cards", generate, orig => function(st, plan){
   if(st.mode !== 11 || !plan || plan.kind !== "card") return orig(st, plan);
   // a missed sentence comes back exactly, with the hand shuffled again
   if(plan.redo && plan.ch){ const ch = JSON.parse(JSON.stringify(plan.ch)); ch.card.hand = shuffle(ch.card.hand); return {challenge:ch, lesson:null}; }
@@ -19995,15 +20020,15 @@ generate = (orig => function(st, plan){
   res.lesson = null;   // a battle: no lesson card every turn
   res.plan = Object.assign({}, plan, {idx:res.cardIdx});
   return res;
-})(generate);
+});
 
 /* the hand is dealt as word tiles (Mandarin / Arabic tiles get their romanization from langs.js) */
-tileItems = (orig => function(ch){
+tileItems = wrap("tileItems", "cards", tileItems, orig => function(ch){
   if(S && S.mode === 11 && ch && ch.card && Array.isArray(ch.card.hand)) return {mode:"words", items:ch.card.hand, keepScreen:true};
   return orig.apply(this, arguments);
-})(tileItems);
+});
 
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "cards", applyResult, orig => function(st, correct, plan){
   if(st.mode !== 11) return orig(st, correct, plan);
   orig(st, correct, plan && plan.kind === "card" ? {kind:"card"} : plan);
   const c = st.card, ch = st.current && st.current.challenge, cc = ch && ch.card;
@@ -20036,15 +20061,15 @@ applyResult = (orig => function(st, correct, plan){
     }
     if(st.hp <= 0) st.status = "gameover";
   }
-})(applyResult);
+});
 
-progress = (orig => function(){
+progress = wrap("progress", "cards", progress, orig => function(){
   if(!S || S.mode !== 11) return orig();
   const c = S.card, f = Math.min(c.foe + 1, CARD_FOES.length);
   return {n:c.foe, d:CARD_FOES.length, label:t("kFoe", {n:f, d:CARD_FOES.length})};
-})(progress);
+});
 
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "cards", renderHud, orig => function(){
   orig();
   if(!S || S.mode !== 11) return;
   const h = $("hudHearts");
@@ -20052,7 +20077,7 @@ renderHud = (orig => function(){
   h.textContent = "❤️".repeat(Math.max(0, S.hp)) + "🖤".repeat(Math.max(0, CARD_HEARTS - S.hp));
   h.setAttribute("aria-label", t("hearts", {hp:S.hp}));
   $("hudBadge").textContent = "🃏 " + S.level;
-})(renderHud);
+});
 
 /* the foe bar above the question, with the last hit floating over it */
 let cardShown = -1;
@@ -20077,7 +20102,7 @@ function renderCardBar(){
     try{ if(!window.__PGM_TEST){ if(ev.hit) Sound.bossAttack(); else if(ev.ko >= 0) Sound.bossDefeat(); else Sound.bossHit(); } }catch(e){}
   }
 }
-renderExtras = (orig => function(fresh){
+renderExtras = wrap("renderExtras", "cards", renderExtras, orig => function(fresh){
   orig(fresh);
   renderCardBar();
   const ch = S && S.mode === 11 && S.current && S.current.challenge;
@@ -20088,9 +20113,9 @@ renderExtras = (orig => function(fresh){
     $("accentKeys").hidden = true;                 // the cards carry every letter needed
     a.classList.add("kcard"); a.setAttribute("rows", "1");
   } else if(a.classList.contains("kcard")){ a.classList.remove("kcard"); if(CARD_ROWS) a.setAttribute("rows", CARD_ROWS); else a.removeAttribute("rows"); }
-})(renderExtras);
+});
 
-showOver = (orig => function(){
+showOver = wrap("showOver", "cards", showOver, orig => function(){
   orig();
   if(!S || S.mode !== 11) return;
   const c = S.card, won = S.status === "conquered";
@@ -20100,13 +20125,13 @@ showOver = (orig => function(){
   $("overIsland").hidden = true;
   if(won) $("overRestart").hidden = false;
   if($("cardBar")) $("cardBar").hidden = true;
-})(showOver);
+});
 
 /* battle music */
-syncMood = (orig => function(){
+syncMood = wrap("syncMood", "cards", syncMood, orig => function(){
   orig();
   try{ if(S && S.mode === 11 && S.status === "playing" && $("game") && !$("game").hidden) Music.setMood("boss"); }catch(e){}
-})(syncMood);
+});
 
 /* menu: a short how-to under the level picker */
 (() => {
@@ -20128,7 +20153,7 @@ syncMood = (orig => function(){
 #answer.kcard{min-height:0;height:auto;resize:none}`;
   document.head.appendChild(css);
 })();
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "cards", renderMenu, orig => function(){
   orig();
   let how = $("cardHow");
   if(setup.mode === 11){
@@ -20136,7 +20161,7 @@ renderMenu = (orig => function(){
     if(!how){ how = document.createElement("p"); how.id = "cardHow"; how.className = "note"; $("levelGroup").appendChild(how); }
     how.hidden = false; how.textContent = t("kHow");
   } else if(how) how.hidden = true;
-})(renderMenu);
+});
 
 if(window.__PGM_TEST) window.__cards = {CARD_FOES, cardWords, cardPool};
 
@@ -20256,9 +20281,9 @@ const LEO_HI = ["¡Hola!", "Hello!", "Bonjour !", "Olá!", "你好！", "مرح�
   }
 })();
 function leoLabel(){ const b = $("leoHero"); if(b) b.setAttribute("aria-label", t("leo_name")); }
-renderMenu = (orig => function(){ const r = orig.apply(this, arguments); try{ leoLabel(); }catch(e){} return r; })(renderMenu);
+renderMenu = wrap("renderMenu", "leo", renderMenu, orig => function(){ const r = orig.apply(this, arguments); try{ leoLabel(); }catch(e){} return r; });
 
-renderGame = (orig => function(){
+renderGame = wrap("renderGame", "leo", renderGame, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const st = document.querySelector("#judgeCard .stamp"), j = S && S.judgement;
@@ -20270,9 +20295,9 @@ renderGame = (orig => function(){
     }
   }catch(e){}
   return r;
-})(renderGame);
+});
 
-showOver = (orig => function(){
+showOver = wrap("showOver", "leo", showOver, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const el = $("overEmoji"), e = (el.textContent || "").trim();
@@ -20283,7 +20308,141 @@ showOver = (orig => function(){
     }
   }catch(e){}
   return r;
-})(showOver);
+});
+
+/* ===================== First run: "start here" (2.17) =====================
+   A brand-new player (nothing answered yet, no game to resume, never seen this) gets one sheet over the menu:
+   pick a course, then one big "Start with Practice" button (A1, mode 1) or "Show me the menu".
+   Until a first game ends, the Practice card carries a "Start here" badge.
+   Flags in localStorage: pgm-firstrun = "done" once the sheet is closed, pgm-firstgame = "done" after a first game.
+   Off under __PGM_TEST unless __FIRSTRUN_FORCE. */
+Object.assign(I18N.en, {
+  fr_title:"Welcome! What do you want to learn?", fr_note:"You can change the course or the app language from the menu any time.",
+  fr_go_title:"Start with Practice", fr_go_note:"Each lesson explains one rule, then you practise it with quick games. When you want more, there are 10 other modes in the menu.",
+  fr_go:"▶ Start with Practice", fr_menu:"Show me the menu", fr_back:"← Pick another course", fr_badge:"Start here",
+  fr_es:"Learn Spanish", fr_en:"Aprender inglés (en español)", fr_xl:"Learn {l} (taught in English)"
+});
+Object.assign(I18N.es, {
+  fr_title:"¡Bienvenido! ¿Qué quieres aprender?", fr_note:"Puedes cambiar el curso o el idioma de la app desde el menú cuando quieras.",
+  fr_go_title:"Empieza con Práctica", fr_go_note:"Cada lección explica una regla y luego la practicas con juegos rápidos. Cuando quieras más, hay otros 10 modos en el menú.",
+  fr_go:"▶ Empezar con Práctica", fr_menu:"Ver el menú", fr_back:"← Elegir otro curso", fr_badge:"Empieza aquí",
+  fr_es:"Learn Spanish (in English)", fr_en:"Aprender inglés", fr_xl:"Aprender {l} (en inglés)"
+});
+const FR_KEY = "pgm-firstrun", FR_GAME = "pgm-firstgame";
+const frGet = k => { try{ return localStorage.getItem(k); }catch(e){ return null; } };
+const frSet = k => { try{ localStorage.setItem(k, "done"); }catch(e){} };
+(() => {
+  const css = document.createElement("style");
+  css.textContent = `
+.frsheet{max-height:92vh;overflow:auto}
+.frhead{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.frhead svg{width:72px;height:72px;flex:none}
+.frhead h2{margin:0;font-size:1.3rem;line-height:1.2}
+.frcourses{display:grid;gap:8px;margin:10px 0 4px}
+.frcourse{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border:2px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);font:inherit;font-weight:700;cursor:pointer;min-height:52px}
+.frcourse:hover,.frcourse:focus-visible{border-color:var(--accent,#5B3FD9)}
+.frcourse .flag{font-size:1.5rem;line-height:1}
+.frcourse small{display:block;font-weight:500;color:var(--muted)}
+.frcourse .tx{flex:1;min-width:0}
+.mode .frbadge{position:absolute;top:-9px;right:10px;background:#FFD43B;color:#2D1B69;font-weight:800;font-size:.72rem;padding:3px 9px;border-radius:999px;box-shadow:0 2px 0 rgba(0,0,0,.15);animation:frPulse 1.8s ease-in-out infinite}
+.mode{position:relative}
+html.noanim .mode .frbadge{animation:none}
+@keyframes frPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+`;
+  document.head.appendChild(css);
+  const back = document.createElement("div");
+  back.className = "vaback"; back.id = "frSheet"; back.hidden = true;
+  back.innerHTML = `<div class="vasheet frsheet" role="dialog" aria-modal="true" aria-labelledby="frTitle">
+    <div class="frhead"><span id="frLeo"></span><h2 class="display" id="frTitle"></h2></div>
+    <p class="note" id="frNote"></p>
+    <div class="frcourses" id="frCourses"></div>
+    <div class="vabtns" id="frBtns"></div></div>`;
+  document.body.appendChild(back);
+})();
+const FR_FLAG = {Spanish:"🇪🇸", English:"🇺🇸", French:"🇫🇷", Portuguese:"🇧🇷", "Mandarin Chinese":"🇨🇳", Arabic:"🇸🇦"};
+// the course this player most likely wants comes first: Spanish for an English app, English for a Spanish one
+function frCourses(){
+  const all = [...$("targetSel").options].map(o => o.value).filter(v => FR_FLAG[v]);
+  const top = frUi() === "es" ? "English" : "Spanish";
+  return all.includes(top) ? [top].concat(all.filter(v => v !== top)) : all;
+}
+const FR_NAME = {en:{French:"French", Portuguese:"Portuguese", "Mandarin Chinese":"Chinese (Mandarin)", Arabic:"Arabic"},
+                 es:{French:"francés", Portuguese:"portugués", "Mandarin Chinese":"chino mandarín", Arabic:"árabe"}};
+function frLabel(v){
+  if(v === "Spanish") return t("fr_es");
+  if(v === "English") return t("fr_en");
+  return t("fr_xl", {l:(FR_NAME[frUi() === "es" ? "es" : "en"] || {})[v] || v});
+}
+function frLevels(v){
+  const L = Object.keys(COURSE[LANG_CODE[v]] || {});
+  return L.length ? L[0] + "–" + L[L.length - 1] : "";
+}
+const frUi = () => (typeof UI !== "undefined" && UI && UI.code) || "en";
+let frPick = null;
+function frRender(){
+  try{ $("frLeo").innerHTML = lionSVG(frPick ? "cheer" : "happy", {title:t("leo_name")}); }catch(e){}
+  if(!frPick){
+    $("frTitle").textContent = t("fr_title"); $("frNote").textContent = t("fr_note");
+    $("frCourses").hidden = false;
+    $("frCourses").innerHTML = frCourses().map(v => `<button class="frcourse" data-frcourse="${esc(v)}"><span class="flag">${FR_FLAG[v]}</span><span class="tx">${esc(frLabel(v))}<small>${esc(frLevels(v))}</small></span></button>`).join("");
+    $("frBtns").innerHTML = `<button class="ghost" id="frSkip">${esc(t("fr_menu"))}</button>`;
+  } else {
+    $("frTitle").textContent = t("fr_go_title"); $("frNote").textContent = t("fr_go_note");
+    $("frCourses").hidden = true; $("frCourses").innerHTML = "";
+    $("frBtns").innerHTML = `<button class="primary" id="frGo">${esc(t("fr_go"))}</button><button class="ghost" id="frSkip">${esc(t("fr_menu"))}</button><button class="ghost" id="frBack">${esc(t("fr_back"))}</button>`;
+  }
+}
+function frOpen(){ frPick = null; frRender(); $("frSheet").hidden = false; setTimeout(() => { const b = document.querySelector("#frSheet .frcourse"); if(b) b.focus(); }, 30); }
+function frClose(){ $("frSheet").hidden = true; frSet(FR_KEY); renderMenu(); }
+function frChoose(v){
+  const s = $("targetSel"); s.value = v; s.dispatchEvent(new Event("change", {bubbles:true}));
+  setup.mode = 1; setup.level = "A1"; renderMenu();
+  frPick = v; frRender();
+  setTimeout(() => { const g = $("frGo"); if(g) g.focus(); }, 30);
+}
+function frStart(){
+  $("frSheet").hidden = true; frSet(FR_KEY);
+  setup.mode = 1; setup.level = "A1"; renderMenu();
+  try{ Sound.unlock(); }catch(e){}
+  $("startBtn").click();
+}
+document.addEventListener("click", e => {
+  if($("frSheet").hidden) return;
+  const c = e.target.closest("[data-frcourse]");
+  if(c) return frChoose(c.dataset.frcourse);
+  if(e.target.closest("#frGo")) return frStart();
+  if(e.target.closest("#frBack")){ frPick = null; return frRender(); }
+  if(e.target.closest("#frSkip") || e.target.id === "frSheet") return frClose();
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !$("frSheet").hidden) frClose(); });
+$("uiSel").addEventListener("change", () => { if(!$("frSheet").hidden) setTimeout(frRender, 0); });
+function frIsNew(){
+  if(frGet(FR_KEY)) return false;
+  if(profile.answered > 0 || profile.xp > 0) return false;
+  try{ if(loadSave()) return false; }catch(e){}
+  return true;
+}
+// "Start here" on the Practice card until a first game has ended
+renderMenu = wrap("renderMenu", "firstrun", renderMenu, orig => function(){
+  orig.apply(this, arguments);
+  const card = document.querySelector('#modes [data-mode="1"]');
+  if(!card) return;
+  let b = card.querySelector(".frbadge");
+  const show = !frGet(FR_GAME) && profile.answered < 10;
+  if(show && !b){ b = document.createElement("span"); b.className = "frbadge"; card.appendChild(b); }
+  if(b){ b.hidden = !show; b.textContent = t("fr_badge"); }
+});
+showOver = wrap("showOver", "firstrun", showOver, orig => function(){
+  orig.apply(this, arguments);
+  if(!(typeof TP !== "undefined" && TP.on)) frSet(FR_GAME);
+});
+function frMaybe(){
+  if(window.__PGM_TEST && !window.__FIRSTRUN_FORCE) return;
+  if(!$("menu") || $("menu").hidden || !frIsNew()) return;
+  frOpen();
+}
+setTimeout(frMaybe, window.__PGM_TEST ? 0 : 700);
+if(window.__PGM_TEST) window.__fr = {frOpen, frClose, frMaybe, frIsNew, frChoose, frStart, over:() => showOver()};
 
 /* ===================== Phone layout (2.11.1) =====================
    On a phone (narrow screen), especially with a big system text size, the answer box used to sit
@@ -20355,7 +20514,7 @@ function mobDockIn(){
   if(on) requestAnimationFrame(() => { document.documentElement.style.setProperty("--mob-dock", dock.hidden ? "0px" : Math.round(dock.getBoundingClientRect().height + 12) + "px"); });
 }
 function mobHud(){ const h = document.querySelector("#game .hud"); if(h) document.documentElement.style.setProperty("--mob-hud", Math.round(h.getBoundingClientRect().height) + "px"); }
-renderGame = (orig => function(fresh){
+renderGame = wrap("renderGame", "mobile", renderGame, orig => function(fresh){
   const r = orig.apply(this, arguments);
   try{
     mobDock();
@@ -20401,7 +20560,7 @@ renderGame = (orig => function(fresh){
     }
   }catch(e){}
   return r;
-})(renderGame);
+});
 addEventListener("resize", () => { try{ if(mobOn()) mobHud(); }catch(e){} });
 
 function sail(id){
@@ -20453,7 +20612,7 @@ Object.assign(I18N.en, {
   stDailyH:"Daily challenges", stDailyLine:"{n} played · best score {b}/10", stMistH:"Mistakes", stMistLine:"{w} waiting · {f} fixed",
   b_daily1:"Daily player", b_daily1_d:"Finish a daily challenge", b_daily10:"Perfect day", b_daily10_d:"Score 10/10 on a daily challenge", b_fixer25:"Bug fixer", b_fixer25_d:"Fix 25 saved mistakes",
   m8n:"Tricky Pairs", m8d:"Words that look or sound alike: este or esto, si or sí, there or their.", "game.Word Duel":"Word Duel",
-  m7n:"Conjugation Gym", m7d:"Drill verb forms tense by tense, from the present to the subjunctive.", "game.Verb Forge":"Verb Forge", "game.Time Machine":"Time Machine", "game.Slip Fixer":"Slip Fixer",
+  m7n:"Conjugation Station", m7d:"Drill verb forms tense by tense, from the present to the subjunctive.", "game.Verb Forge":"Verb Forge", "game.Time Machine":"Time Machine", "game.Slip Fixer":"Slip Fixer",
   b_conj50:"Verb machine", b_conj50_d:"50 correct conjugations",
   cantListen:"Can't listen right now", echoSkipped:"Swapped for a reading round, no penalty. You can turn listening games off in 🎛️ settings.",
   voices:"Voices", voiceEs:"Spanish voice", voiceEn:"English voice", voiceAuto:"Best available", voiceTest:"Test",
@@ -20487,7 +20646,7 @@ Object.assign(I18N.es, {
   stDailyH:"Retos diarios", stDailyLine:"{n} jugados · mejor puntuación {b}/10", stMistH:"Errores", stMistLine:"{w} pendientes · {f} corregidos",
   b_daily1:"Jugador diario", b_daily1_d:"Termina un reto diario", b_daily10:"Día perfecto", b_daily10_d:"Saca 10/10 en un reto diario", b_fixer25:"Cazador de errores", b_fixer25_d:"Corrige 25 errores guardados",
   m8n:"Palabras trampa", m8d:"Palabras que se parecen o suenan igual: there o their, your o you're, si o sí.", "game.Word Duel":"Duelo de palabras",
-  m7n:"Gimnasio de verbos", m7d:"Practica las conjugaciones tiempo por tiempo, del presente al subjuntivo.", "game.Verb Forge":"Forja de verbos", "game.Time Machine":"Máquina del tiempo", "game.Slip Fixer":"Corrige el desliz",
+  m7n:"Estación de verbos", m7d:"Practica las conjugaciones tiempo por tiempo, del presente al subjuntivo.", "game.Verb Forge":"Forja de verbos", "game.Time Machine":"Máquina del tiempo", "game.Slip Fixer":"Corrige el desliz",
   b_conj50:"Máquina de verbos", b_conj50_d:"50 conjugaciones correctas",
   cantListen:"No puedo escuchar ahora", echoSkipped:"Cambiado por una ronda de lectura, sin penalización. Puedes apagar los juegos de escucha en 🎛️ ajustes.",
   voices:"Voces", voiceEs:"Voz en español", voiceEn:"Voz en inglés", voiceAuto:"La mejor disponible", voiceTest:"Probar",

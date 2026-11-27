@@ -71,7 +71,7 @@ function szTexts(){
 }
 function szOpen(){ szTexts(); $("szSheet").hidden = false; try{ $("szUp").focus({preventScroll:true}); }catch(e){} }
 function szClose(){ $("szSheet").hidden = true; try{ $("menuSizeBtn").focus({preventScroll:true}); }catch(e){} }
-renderMenu = (orig => function(){ const r = orig.apply(this, arguments); try{ szRefresh(); }catch(e){} return r; })(renderMenu);
+renderMenu = wrap("renderMenu", "uisize", renderMenu, orig => function(){ const r = orig.apply(this, arguments); try{ szRefresh(); }catch(e){} return r; });
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-sz]");
   if(b){ e.preventDefault(); Sound.tap(); szApply(SZ + SZ_STEP * +b.dataset.sz); return; }

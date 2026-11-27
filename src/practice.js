@@ -23,16 +23,16 @@ function cefrOrder(tgt, lv){
 }
 const isCefr = st => st && st.cefr && (st.mode === 1 || st.mode === 2 || st.mode === 3);
 const isMastery = st => isCefr(st) && st.mode !== 3;   // Survivor is a gauntlet: one correct answer clears a lesson
-syllabusFor = (orig => function(st){
+syllabusFor = wrap("syllabusFor", "practice", syllabusFor, orig => function(st){
   if(!isCefr(st)) return orig(st);
   const tgt = LANG_CODE[st.target], lv = COURSE[tgt][st.level] ? st.level : "A1";
   return cefrOrder(tgt, lv).map(i => COURSE[tgt][lv][i].t);
-})(syllabusFor);
-conceptAt = (orig => function(st, idx){
+});
+conceptAt = wrap("conceptAt", "practice", conceptAt, orig => function(st, idx){
   if(!isCefr(st)) return orig(st, idx);
   const tgt = LANG_CODE[st.target], lv = COURSE[tgt][st.level] ? st.level : "A1", ord = cefrOrder(tgt, lv);
   return COURSE[tgt][lv][ord[idx] !== undefined ? ord[idx] : ord[0]];
-})(conceptAt);
+});
 
 // Other parts of the level that get mixed into practice
 function mixSources(st){
@@ -44,7 +44,7 @@ function mixSources(st){
 }
 const mixState = (st, src) => { const m = Object.assign({}, st, {mode:src, cefr:0}); m.syllabus = syllabusFor(m); m.done = m.syllabus.map(() => false); return m; };
 
-generate = (orig => function(st, plan){
+generate = wrap("generate", "practice", generate, orig => function(st, plan){
   if((st.mode === 1 || st.mode === 2 || st.mode === 3) && !st.syllabus && typeof S !== "undefined" && S && S.mode === st.mode && !S.syllabus){ S.cefr = 1; st.cefr = 1; }
   if(plan && plan.kind === "mix"){
     const m = mixState(st, plan.src);
@@ -58,9 +58,9 @@ generate = (orig => function(st, plan){
     return res;
   }
   return orig(st, plan);
-})(generate);
+});
 
-makePlanCore = (orig => function(st, rolls, exclude){
+makePlanCore = wrap("makePlanCore", "practice", makePlanCore, orig => function(st, rolls, exclude){
   const p = orig(st, rolls, exclude);
   if(!p || !isCefr(st) || !st.syllabus || p.newSyllabus) return p;
   const n = st.stats.answered;
@@ -87,9 +87,9 @@ makePlanCore = (orig => function(st, rolls, exclude){
   if(fresh.length){ const nx = fresh.find(i => i > exIdx); return {kind:"syllabus", idx:nx !== undefined ? nx : fresh[0], game}; }
   if(st.srs.length) return {kind:"srs", key:st.srs[0].k, game};
   return p;
-})(makePlanCore);
+});
 
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "practice", applyResult, orig => function(st, correct, plan){
   if(!isCefr(st) || !plan || !st.syllabus) return orig(st, correct, plan);
   if(plan.kind === "mix") return orig(st, correct, {kind:"mix"});
   if(!isMastery(st)) return orig(st, correct, plan);
@@ -115,7 +115,7 @@ applyResult = (orig => function(st, correct, plan){
     return;
   }
   return orig(st, correct, plan);
-})(applyResult);
+});
 
 // Level map in the side panel
 function sylHtml(){

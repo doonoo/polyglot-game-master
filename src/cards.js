@@ -55,7 +55,7 @@ const CARD_STOP = new Set(["the","and","you","are","was","for","not","but","que"
 const cardLinkable = w => !CARD_STOP.has(w) && (w.length > 2 || /[\u3400-\u9fff]/.test(w));
 
 /* ---------- engine hooks ---------- */
-freshState = (orig => function(o){
+freshState = wrap("freshState", "cards", freshState, orig => function(o){
   const st = orig(o);
   if(o.mode === 11){
     st.hp = st.maxHp = CARD_HEARTS; st.clock = "off";
@@ -64,9 +64,9 @@ freshState = (orig => function(o){
     st.syllabus = [t("m11n")]; st.done = [false];
   }
   return st;
-})(freshState);
+});
 
-makePlanCore = (orig => function(st, rolls, exclude){
+makePlanCore = wrap("makePlanCore", "cards", makePlanCore, orig => function(st, rolls, exclude){
   if(st.mode !== 11) return orig(st, rolls, exclude);
   if(st.status !== "playing") return null;
   const L = (COURSE[LANG_CODE[st.target]] || {})[st.level] || [];
@@ -77,9 +77,9 @@ makePlanCore = (orig => function(st, rolls, exclude){
   // half the time stay in the same lesson: its sentences share words, so chains can link
   const idx = st.card.lastIdx != null && st.card.chain > 0 && rolls.r < 0.5 ? st.card.lastIdx : Math.floor(rolls.s * L.length);
   return {kind:"card", lv:st.level, idx: exclude && exclude.idx === idx && L.length > 1 ? (idx + 1) % L.length : idx, it:Math.floor(rolls.g * 1000)};
-})(makePlanCore);
+});
 
-generate = (orig => function(st, plan){
+generate = wrap("generate", "cards", generate, orig => function(st, plan){
   if(st.mode !== 11 || !plan || plan.kind !== "card") return orig(st, plan);
   // a missed sentence comes back exactly, with the hand shuffled again
   if(plan.redo && plan.ch){ const ch = JSON.parse(JSON.stringify(plan.ch)); ch.card.hand = shuffle(ch.card.hand); return {challenge:ch, lesson:null}; }
@@ -112,15 +112,15 @@ generate = (orig => function(st, plan){
   res.lesson = null;   // a battle: no lesson card every turn
   res.plan = Object.assign({}, plan, {idx:res.cardIdx});
   return res;
-})(generate);
+});
 
 /* the hand is dealt as word tiles (Mandarin / Arabic tiles get their romanization from langs.js) */
-tileItems = (orig => function(ch){
+tileItems = wrap("tileItems", "cards", tileItems, orig => function(ch){
   if(S && S.mode === 11 && ch && ch.card && Array.isArray(ch.card.hand)) return {mode:"words", items:ch.card.hand, keepScreen:true};
   return orig.apply(this, arguments);
-})(tileItems);
+});
 
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "cards", applyResult, orig => function(st, correct, plan){
   if(st.mode !== 11) return orig(st, correct, plan);
   orig(st, correct, plan && plan.kind === "card" ? {kind:"card"} : plan);
   const c = st.card, ch = st.current && st.current.challenge, cc = ch && ch.card;
@@ -153,15 +153,15 @@ applyResult = (orig => function(st, correct, plan){
     }
     if(st.hp <= 0) st.status = "gameover";
   }
-})(applyResult);
+});
 
-progress = (orig => function(){
+progress = wrap("progress", "cards", progress, orig => function(){
   if(!S || S.mode !== 11) return orig();
   const c = S.card, f = Math.min(c.foe + 1, CARD_FOES.length);
   return {n:c.foe, d:CARD_FOES.length, label:t("kFoe", {n:f, d:CARD_FOES.length})};
-})(progress);
+});
 
-renderHud = (orig => function(){
+renderHud = wrap("renderHud", "cards", renderHud, orig => function(){
   orig();
   if(!S || S.mode !== 11) return;
   const h = $("hudHearts");
@@ -169,7 +169,7 @@ renderHud = (orig => function(){
   h.textContent = "❤️".repeat(Math.max(0, S.hp)) + "🖤".repeat(Math.max(0, CARD_HEARTS - S.hp));
   h.setAttribute("aria-label", t("hearts", {hp:S.hp}));
   $("hudBadge").textContent = "🃏 " + S.level;
-})(renderHud);
+});
 
 /* the foe bar above the question, with the last hit floating over it */
 let cardShown = -1;
@@ -194,7 +194,7 @@ function renderCardBar(){
     try{ if(!window.__PGM_TEST){ if(ev.hit) Sound.bossAttack(); else if(ev.ko >= 0) Sound.bossDefeat(); else Sound.bossHit(); } }catch(e){}
   }
 }
-renderExtras = (orig => function(fresh){
+renderExtras = wrap("renderExtras", "cards", renderExtras, orig => function(fresh){
   orig(fresh);
   renderCardBar();
   const ch = S && S.mode === 11 && S.current && S.current.challenge;
@@ -205,9 +205,9 @@ renderExtras = (orig => function(fresh){
     $("accentKeys").hidden = true;                 // the cards carry every letter needed
     a.classList.add("kcard"); a.setAttribute("rows", "1");
   } else if(a.classList.contains("kcard")){ a.classList.remove("kcard"); if(CARD_ROWS) a.setAttribute("rows", CARD_ROWS); else a.removeAttribute("rows"); }
-})(renderExtras);
+});
 
-showOver = (orig => function(){
+showOver = wrap("showOver", "cards", showOver, orig => function(){
   orig();
   if(!S || S.mode !== 11) return;
   const c = S.card, won = S.status === "conquered";
@@ -217,13 +217,13 @@ showOver = (orig => function(){
   $("overIsland").hidden = true;
   if(won) $("overRestart").hidden = false;
   if($("cardBar")) $("cardBar").hidden = true;
-})(showOver);
+});
 
 /* battle music */
-syncMood = (orig => function(){
+syncMood = wrap("syncMood", "cards", syncMood, orig => function(){
   orig();
   try{ if(S && S.mode === 11 && S.status === "playing" && $("game") && !$("game").hidden) Music.setMood("boss"); }catch(e){}
-})(syncMood);
+});
 
 /* menu: a short how-to under the level picker */
 (() => {
@@ -245,7 +245,7 @@ syncMood = (orig => function(){
 #answer.kcard{min-height:0;height:auto;resize:none}`;
   document.head.appendChild(css);
 })();
-renderMenu = (orig => function(){
+renderMenu = wrap("renderMenu", "cards", renderMenu, orig => function(){
   orig();
   let how = $("cardHow");
   if(setup.mode === 11){
@@ -253,6 +253,6 @@ renderMenu = (orig => function(){
     if(!how){ how = document.createElement("p"); how.id = "cardHow"; how.className = "note"; $("levelGroup").appendChild(how); }
     how.hidden = false; how.textContent = t("kHow");
   } else if(how) how.hidden = true;
-})(renderMenu);
+});
 
 if(window.__PGM_TEST) window.__cards = {CARD_FOES, cardWords, cardPool};

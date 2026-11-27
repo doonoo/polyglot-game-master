@@ -27,7 +27,7 @@ function bossPool(st){
 }
 
 /* ---------- Planning: start a fight, keep it going, point it at learned material ---------- */
-makePlan = (orig => function(st, rolls, exclude){
+makePlan = wrap("makePlan", "boss", makePlan, orig => function(st, rolls, exclude){
   const p = orig(st, rolls, exclude);
   if(!p) return p;
   if(!BOSS_MODES.includes(st.mode)){ p.boss = false; return p; }
@@ -49,10 +49,10 @@ makePlan = (orig => function(st, rolls, exclude){
     }
   }
   return p;
-})(makePlan);
+});
 
 /* ---------- Results: hits, shield, win or lose ---------- */
-applyResult = (orig => function(st, correct, plan){
+applyResult = wrap("applyResult", "boss", applyResult, orig => function(st, correct, plan){
   st.bossJust = "";
   orig(st, correct, plan);
   const f = st.bossFight;
@@ -62,7 +62,7 @@ applyResult = (orig => function(st, correct, plan){
   if(st.bossJust === "won"){ st.bossFight = null; st.bossKills = (st.bossKills || 0) + 1; st.bossLastName = f.n; st.bossNext = st.stats.answered + 15; st.bossRematch = 0; }
   if(st.bossJust === "lost"){ st.bossFight = null; st.bossNext = st.stats.answered + 4; st.bossRematch = 1; st.bossLastName = f.n; }
   if(st.bossJust !== "won" && st.bossJust !== "lost") st.bossLastName = f.n;
-})(applyResult);
+});
 
 /* ---------- Generation: no peeking, strict accents, a double final blow ---------- */
 function bossCombine(a, b){
@@ -70,7 +70,7 @@ function bossCombine(a, b){
   for(const x of A) for(const y of B){ out.push(x + " " + y); if(out.length >= 120) return out; }
   return out;
 }
-generate = (orig => function(st, plan){
+generate = wrap("generate", "boss", generate, orig => function(st, plan){
   const res = orig(st, plan);
   if(!plan || !plan.boss || !st.bossFight || !res || !res.challenge) return res;
   const f = st.bossFight, name = bossName(st), L = GMT[LANG_CODE[st.native]] || GMT.en;
@@ -99,9 +99,9 @@ generate = (orig => function(st, plan){
   res.lesson = {title:"👹 " + name + (f.rematch ? " · " + t("bfRematch") : ""), body: f.hits === 0 ? t("bfIntro", {name, hp:f.max}) : t("bfPhase", {n:f.hits + 1, max:f.max, s:"🛡️".repeat(f.shield)}), words:[]};
   res.spotlight = null;
   return res;
-})(generate);
+});
 
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "boss", gradeLocal, orig => function(st, ch, answer, force){
   const g = ch && ch.strict && st && st.mode !== 3 ? Object.assign({}, st, {mode:3}) : st;
   // Final blow: try every split point and grade each sentence against its own answers,
   // so any valid wording of either sentence counts (the combined list is only a sample)
@@ -116,10 +116,10 @@ gradeLocal = (orig => function(st, ch, answer, force){
     }
   }
   return orig(g, ch, answer, force);
-})(gradeLocal);
+});
 
 /* ---------- Rewards and feedback ---------- */
-grantRewards = (orig => function(plan, correct){
+grantRewards = wrap("grantRewards", "boss", grantRewards, orig => function(plan, correct){
   const isBoss = !!(S && plan && plan.boss), adj = isBoss && correct;
   // the old rule paid +50 and counted a kill for any boss answer; now hits pay a little and only the kill counts
   if(adj && S.bossJust !== "won") S.bosses = (S.bosses || 0) - 1;
@@ -135,7 +135,7 @@ grantRewards = (orig => function(plan, correct){
   else if(just === "lost"){ setTimeout(() => { Sound.wrong(); toast(t("bfLost", {name}), "boss"); }, 500); }
   for(const b of BADGES) if(!S.badges.includes(b.id) && b.test(S)){ S.badges.push(b.id); fx.badges.push(b); }
   return fx;
-})(grantRewards);
+});
 
 /* ---------- The boss bar ---------- */
 function renderBossBar(){
@@ -147,11 +147,11 @@ function renderBossBar(){
   bar.innerHTML = `<span class="bb-hp" aria-label="${esc(t("bfHp"))}">👹 ${"<i class=\"on\"></i>".repeat(f.hp)}${"<i></i>".repeat(f.max - f.hp)}</span>` +
     `<span class="bb-sh" aria-label="${esc(t("bfShield"))}">${"🛡️".repeat(f.shield)}${"<b>✖</b>".repeat(BOSS_SHIELD - f.shield)}</span>`;
 }
-renderExtras = (orig => function(fresh){ orig(fresh); renderBossBar(); if(fresh && S && S.current && S.current.challenge && S.current.challenge.double) $("answer").setAttribute("rows", "3"); })(renderExtras);
+renderExtras = wrap("renderExtras", "boss", renderExtras, orig => function(fresh){ orig(fresh); renderBossBar(); if(fresh && S && S.current && S.current.challenge && S.current.challenge.double) $("answer").setAttribute("rows", "3"); });
 
 /* The big "BOSS BATTLE!" fanfare plays once per fight, not on every hit */
-bossIntro = (orig => function(){
+bossIntro = wrap("bossIntro", "boss", bossIntro, orig => function(){
   const f = S && S.bossFight;
   if(f && (f.hits > 0 || f.shield < BOSS_SHIELD)) return;
   orig();
-})(bossIntro);
+});

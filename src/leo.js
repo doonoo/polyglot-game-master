@@ -54,9 +54,9 @@ const LEO_HI = ["¡Hola!", "Hello!", "Bonjour !", "Olá!", "你好！", "مرح�
   }
 })();
 function leoLabel(){ const b = $("leoHero"); if(b) b.setAttribute("aria-label", t("leo_name")); }
-renderMenu = (orig => function(){ const r = orig.apply(this, arguments); try{ leoLabel(); }catch(e){} return r; })(renderMenu);
+renderMenu = wrap("renderMenu", "leo", renderMenu, orig => function(){ const r = orig.apply(this, arguments); try{ leoLabel(); }catch(e){} return r; });
 
-renderGame = (orig => function(){
+renderGame = wrap("renderGame", "leo", renderGame, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const st = document.querySelector("#judgeCard .stamp"), j = S && S.judgement;
@@ -68,9 +68,9 @@ renderGame = (orig => function(){
     }
   }catch(e){}
   return r;
-})(renderGame);
+});
 
-showOver = (orig => function(){
+showOver = wrap("showOver", "leo", showOver, orig => function(){
   const r = orig.apply(this, arguments);
   try{
     const el = $("overEmoji"), e = (el.textContent || "").trim();
@@ -81,4 +81,4 @@ showOver = (orig => function(){
     }
   }catch(e){}
   return r;
-})(showOver);
+});

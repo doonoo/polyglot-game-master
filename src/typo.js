@@ -79,7 +79,7 @@ function typoMatch(st, ch, answer){
   }
   return null;
 }
-gradeLocal = (orig => function(st, ch, answer, force){
+gradeLocal = wrap("gradeLocal", "typo", gradeLocal, orig => function(st, ch, answer, force){
   const j = orig.apply(this, arguments);
   try{
     if(j.correct || answer === null || !st || !ch) return j;
@@ -91,5 +91,5 @@ gradeLocal = (orig => function(st, ch, answer, force){
     return Object.assign({}, j, {correct:true, typo:true, headline:pick(L.ok), feedback:`${L.typo} ${boldDiff(best, answer, ch, false)}`,
       answer:isCloze ? ch.answerKey : best, struggled:[]});
   }catch(e){ return j; }
-})(gradeLocal);
+});
 if(window.__PGM_TEST) window.__typo = {typoMatch, typoLex};
