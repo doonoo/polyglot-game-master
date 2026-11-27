@@ -1,31 +1,35 @@
-Polyglot Game Master teaches <b>Spanish to English speakers</b> and <b>English to Spanish speakers</b> through short games. Everything is built in: no account, no ads, no tracking and no internet needed.
+Polyglot Game Master teaches languages through short games. Everything is built in: no account, no ads, no tracking and no internet needed.
+
+<b>Six languages</b>
+<ul>
+<li><b>Spanish</b> for English speakers and <b>English</b> for Spanish speakers, levels A1 to B2.</li>
+<li><b>French</b>, <b>Portuguese</b> (Brazil), <b>Mandarin Chinese</b> and <b>Arabic</b>, taught through English, levels A1 to B2. Mandarin shows pinyin and Arabic shows transliteration, and you can type either in plain letters.</li>
+</ul>
 
 <b>Learn step by step</b>
 <ul>
-<li>Practice teaches each lesson, then brings it back until you can recall it, so it sticks.</li>
-<li>Every lesson starts with a clear explanation of the rule and its key words.</li>
-<li>Each level covers what the CEFR expects: grammar, everyday topics and real communication (ordering, directions, opinions, complaints, formal emails and more).</li>
-<li>Bilingual stories with comprehension questions. Tap any line to see the translation or hear it.</li>
+<li>Every lesson starts with a short explanation of the rule and its key words, then drills it until it sticks.</li>
+<li>Each level covers grammar, everyday topics and real communication, the way the CEFR describes it.</li>
+<li>Mistakes come with a word-by-word comparison and a grammar tip. Other right answers count too, and small typos are forgiven.</li>
+<li>Bilingual stories with comprehension questions. Tap 🔊 to hear any sentence.</li>
 </ul>
 
 <b>Game modes</b>
 <ul>
-<li>Practice and Level Select: translate, unscramble, fill the gap and hunt for errors.</li>
-<li>Survivor: strict grading, one life.</li>
-<li>Number Cruncher: numbers, prices, dates and times.</li>
-<li>Lexicon Onslaught: fast vocabulary and Match Madness.</li>
-<li>Island Hopper: memorize useful phrases and recall them later.</li>
-<li>Conjugation Gym: the most common verbs in all the main tenses.</li>
-<li>Custom Game: pick the content, levels and mini-games, then set hearts, rounds, a timer and strict accents.</li>
-<li>Tricky Pairs: ser/estar, por/para, este/esto/aquel, make/do, since/for and more.</li>
+<li>Practice and Level Select: translate, unscramble, fill the gap, spot the mistake, and more than 20 other mini-games.</li>
+<li>Survivor: strict grading, one life. Boss battles every few rounds.</li>
+<li>Grammar Gym: pick the grammar points you want and drill only those, with mastery marks.</li>
+<li>Card Clash: build sentences from a hand of word cards to beat three foes.</li>
+<li>Number Cruncher, Lexicon Onslaught (vocabulary), Island Hopper, Conjugation Gym (Measure Words in Mandarin), Tricky Pairs and a Custom Game you set up yourself.</li>
+<li>Type your answers or switch to multiple choice. Add a clock or Time Attack.</li>
+<li>Two players on one phone, in every mode.</li>
 </ul>
 
 <b>Stay motivated</b>
 <ul>
-<li>Daily quests, a daily challenge, streaks, XP and trophies.</li>
+<li>Daily quests, a daily challenge, streaks, XP, trophies and practice reminders.</li>
 <li>Fix my mistakes: review exactly what you got wrong.</li>
-<li>Phrasebook of the sentences you have learned, and stats.</li>
-<li>Listening rounds use your phone's own text-to-speech voices.</li>
+<li>An original 8-bit soundtrack and sound effects, and Leo the lion cheering you on.</li>
 </ul>
 
-Progress is stored only on your device. A backup code lets you move it to another phone or to the web version.
+Progress is stored only on your device. A backup code lets you move it to another phone or to the web version. Display size can be set from 70% to 150%.

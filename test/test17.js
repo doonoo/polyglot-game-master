@@ -15,11 +15,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const st = {native:"English", mode:1};
   /* ---------- planted mistakes and romanization ---------- */
   for(const code of ["fr","pt","zh","ar"]){
-    const units = WL[code].units.filter(u => u.lv === "B1");
-    if(units.length < 8) fail(code, "B1 units", units.length);
+    const units = WL[code].units.filter(u => u.lv === "B1" || u.lv === "B2");
+    if(units.filter(u => u.lv === "B1").length < 8) fail(code, "B1 units", units.length);
     for(const u of units) for(const s of u.s){
       const [en, tgt, rom, wrong] = s;
-      if(!wrong) { fail(code, "B1 sentence without a planted mistake", tgt); continue; }
+      if(!wrong) { fail(code, u.lv, "sentence without a planted mistake", tgt); continue; }
       const ch = {game:"Classic Mine", al:code, k:"s", acc:[tgt + (rom ? "|" + rom : "")], answerKey:P.canon(tgt), target:en, cw:[], why:""};
       if(P.gradeLocal(st, ch, wrong, false).correct) fail(code, "planted mistake is accepted as right", wrong);
       if(!P.gradeLocal(st, ch, P.canon(tgt), false).correct) fail(code, "right answer rejected", tgt);

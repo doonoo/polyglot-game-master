@@ -1,31 +1,35 @@
-Polyglot Game Master enseña <b>inglés a hispanohablantes</b> y <b>español a angloparlantes</b> con juegos cortos. Todo viene incluido: sin cuenta, sin anuncios, sin rastreo y sin necesidad de internet.
+Polyglot Game Master enseña idiomas con juegos cortos. Todo viene incluido: sin cuenta, sin anuncios, sin rastreo y sin necesidad de internet.
+
+<b>Seis idiomas</b>
+<ul>
+<li><b>Inglés</b> para hispanohablantes y <b>español</b> para angloparlantes, niveles A1 a B2.</li>
+<li><b>Francés</b>, <b>portugués</b> (Brasil), <b>chino mandarín</b> y <b>árabe</b>, enseñados en inglés, niveles A1 a B2. El chino muestra pinyin y el árabe transliteración, y puedes escribir cualquiera de los dos con letras normales.</li>
+</ul>
 
 <b>Aprende paso a paso</b>
 <ul>
-<li>La Práctica enseña cada lección y la repite hasta que la recuerdas, para que se quede.</li>
-<li>Cada lección empieza con una explicación clara de la regla y sus palabras clave.</li>
-<li>Cada nivel cubre lo que pide el MCER: gramática, temas cotidianos y comunicación real (pedir, indicaciones, opiniones, quejas, correos formales y más).</li>
-<li>Historias bilingües con preguntas de comprensión. Toca cualquier línea para ver la traducción o escucharla.</li>
+<li>Cada lección empieza con una explicación corta de la regla y sus palabras clave, y luego la practicas hasta que se te queda.</li>
+<li>Cada nivel cubre gramática, temas cotidianos y comunicación real, como lo describe el MCER.</li>
+<li>Los errores vienen con una comparación palabra por palabra y un consejo de gramática. Otras respuestas correctas también cuentan, y se perdonan los errores de tecleo pequeños.</li>
+<li>Historias bilingües con preguntas de comprensión. Toca 🔊 para oír cualquier frase.</li>
 </ul>
 
 <b>Modos de juego</b>
 <ul>
-<li>Práctica y Selección de nivel: traduce, ordena, completa y encuentra errores.</li>
-<li>Superviviente: corrección estricta, una sola vida.</li>
-<li>Números: cifras, precios, fechas y horas.</li>
-<li>Avalancha de vocabulario y Pares locos.</li>
-<li>Saltador de islas: memoriza frases útiles y recuérdalas después.</li>
-<li>Gimnasio de conjugación: los verbos más usados en todos los tiempos principales.</li>
-<li>Juego personalizado: elige contenido, niveles y minijuegos, y ajusta corazones, rondas, tiempo y tildes.</li>
-<li>Pares engañosos: make/do, since/for, say/tell, ser/estar, por/para y más.</li>
+<li>Práctica y Elegir nivel: traduce, ordena, completa el hueco, encuentra el error y más de 20 minijuegos.</li>
+<li>Supervivencia: corrección estricta, una sola vida. Batallas contra jefes cada pocas rondas.</li>
+<li>Gimnasio de gramática: elige los puntos de gramática que quieras y practica solo esos, con marcas de dominio.</li>
+<li>Duelo de cartas: arma frases con una mano de cartas de palabras para vencer a tres rivales.</li>
+<li>Números, Avalancha de vocabulario, Salto de islas, Gimnasio de verbos (clasificadores en chino), Palabras trampa y un Juego personalizado.</li>
+<li>Escribe tus respuestas o cambia a opción múltiple. Añade un reloj o Contrarreloj.</li>
+<li>Dos jugadores en un mismo teléfono, en todos los modos.</li>
 </ul>
 
 <b>Mantén la motivación</b>
 <ul>
-<li>Misiones diarias, reto diario, rachas, XP y trofeos.</li>
-<li>Corregir mis errores: repasa exactamente lo que fallaste.</li>
-<li>Libro de frases con lo aprendido, y estadísticas.</li>
-<li>Las rondas de escucha usan las voces del propio teléfono.</li>
+<li>Misiones diarias, reto diario, rachas, XP, trofeos y recordatorios para practicar.</li>
+<li>Corrige mis errores: repasa exactamente lo que fallaste.</li>
+<li>Banda sonora original de 8 bits, efectos de sonido y Leo el león animándote.</li>
 </ul>
 
-El progreso se guarda solo en tu dispositivo. Un código de respaldo te permite pasarlo a otro teléfono o a la versión web.
+Tu progreso se guarda solo en tu dispositivo. Un código de copia de seguridad te permite pasarlo a otro teléfono o a la versión web. El tamaño de pantalla se puede ajustar del 70 % al 150 %.

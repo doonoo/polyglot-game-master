@@ -223,6 +223,9 @@ for(const list of [TIP_ES, TIP_EN]) for(const r of list){
 for(const list of [TIP_ES, TIP_EN]) list.sort((a, b) => (a.id === "pres") - (b.id === "pres"));
 
 function tipsFor(answer, yours, al, segs, skip){
+  // a tip explains the language being learned: none when the answer is in the player's own language
+  // (Reverse Mine / Meaning Match, and every English answer in the fr/pt/zh/ar courses)
+  if(typeof S !== "undefined" && S && S.native && S.target && LANG_CODE[S.native] === al && LANG_CODE[S.target] !== al) return [];
   const rules = al === "es" ? TIP_ES : al === "en" ? TIP_EN : null;
   if(!rules || !answer) return [];
   const low = s => String(s || "").toLowerCase().replace(/[“”"]/g, "");

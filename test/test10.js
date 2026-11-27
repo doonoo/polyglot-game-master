@@ -40,9 +40,19 @@ jc = play({game:"Classic Mine", target:"I want you to speak.", acc:["Quiero que 
 if(!/subjunctive/i.test(jc.querySelector(".fbtips") ? jc.querySelector(".fbtips").textContent : "")) fail("subjunctive tip missing", jc.textContent.slice(-300));
 if(!/same word, different ending/.test(jc.querySelector(".fbnotes").textContent)) fail("ending note missing");
 P.S.current.plan.boss = false; Object.assign(P.S.current.challenge, {game:"Classic Mine", target:"She works here.", acc:["She works here."], k:"s", al:"en", answerKey:"She works here.", why:"", cw:[]}); $("giveUpBtn").click();
-if(!/he\/she\/it/.test($("judgeCard").textContent)) fail("tip missing after I don't know");
+// an English answer in the Spanish course (native English) is the player's own language: no English grammar tip
+if(/he\/she\/it/.test($("judgeCard").textContent)) fail("English tip shown to an English speaker learning Spanish");
+{ const sv = [P.S.target, P.S.native]; [P.S.target, P.S.native] = ["English", "Spanish"];
+  P.S.current.plan.boss = false; Object.assign(P.S.current.challenge, {game:"Classic Mine", target:"Ella trabaja aquí.", acc:["She works here."], k:"s", al:"en", answerKey:"She works here.", why:"", cw:[]}); $("giveUpBtn").click();
+  if(!/he\/she\/it/.test($("judgeCard").textContent)) fail("tip missing after I don't know (learning English)");
+  [P.S.target, P.S.native] = sv; }
 const cov = {es:[0,0], en:[0,0]};
-for(const l of ["es","en"]) for(const lv in P.COURSE[l]) for(const c of P.COURSE[l][lv]) for(const it of c.it){ cov[l][1]++; if(P.tipsFor(P.first(it[1]), "", l, []).length) cov[l][0]++; }
+const sv = [P.S.target, P.S.native];
+for(const l of ["es","en"]){
+  [P.S.target, P.S.native] = l === "es" ? ["Spanish", "English"] : ["English", "Spanish"];   // tips are for the language being learned
+  for(const lv in P.COURSE[l]) for(const c of P.COURSE[l][lv]) for(const it of c.it){ cov[l][1]++; if(P.tipsFor(P.first(it[1]), "", l, []).length) cov[l][0]++; }
+}
+[P.S.target, P.S.native] = sv;
 for(const l of ["es","en"]) if(cov[l][0] / cov[l][1] < 0.95) fail("tip coverage too low", l, cov[l]);
 // content regression: soy casado is accepted
 const item = P.COURSE.es.A1.flatMap(c => c.it).find(it => it[0] === "I'm married.");

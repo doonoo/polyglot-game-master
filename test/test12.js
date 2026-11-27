@@ -20,7 +20,7 @@ const setTarget = L => { const s = $("targetSel"); s.value = L; s.dispatchEvent(
     const C = P.COURSE[code];
     if(!C || !C.A1 || !C.A2) { fail(code, "missing A1/A2"); continue; }
     if(C.A1.length < 8 || C.A2.length < 8) fail(code, "expected 8 lessons per level");
-    for(const lv of ["A1", "A2"]) for(const c of C[lv]){
+    for(const lv of Object.keys(C)) for(const c of C[lv]){
       if(!c.t || !c.b || !c.w.length || c.it.length < 4) fail(code, lv, c.t, "incomplete lesson");
       for(const it of c.it){
         if(!P.blank(P.canon(it[1]), it[2])) fail(code, c.t, "cloze word not in sentence", it[1], it[2]);

@@ -161,12 +161,14 @@ function xlDecorate(){
   // answer card: show the answer the way it is written, plus how to read it
   const jc = $("judgeCard");
   if(jc && !jc.hidden){
-    jc.querySelectorAll(".ans > div").forEach(d => { if(code === "zh") d.childNodes.forEach(n => { if(n.nodeType === 3) n.textContent = xlSpace(n.textContent); }); });
+    // Chinese is written without spaces everywhere on the card (headline, answer rows); xlSpace only joins Chinese characters
+    if(code === "zh"){ const tw = document.createTreeWalker(jc, NodeFilter.SHOW_TEXT); for(let n = tw.nextNode(); n; n = tw.nextNode()) if(!n.parentElement.closest(".xlrom")){ const t = xlSpace(n.textContent); if(t !== n.textContent) n.textContent = t; } }
     const best = jc.querySelectorAll(".ans > div")[jc.querySelectorAll(".ans > div").length - 1];
     if(best && (code === "zh" || code === "ar") && !jc.querySelector(".xlrom")){
-      const key = xlKey(ch.answerKey || "");
+      // the judged question, not S.current: by now that is already the next question
+      const J = S.judgement || {}, key = xlKey(J.answer || "");
       const r = XL_ROM[key];
-      if(r && ch.al === code){ const s = document.createElement("div"); s.className = "xlrom"; s.textContent = r; s.dir = "ltr"; best.after(s); }
+      if(r && J.qal === code){ const s = document.createElement("div"); s.className = "xlrom"; s.textContent = r; s.dir = "ltr"; best.after(s); }
     }
     if(code === "ar") jc.querySelectorAll(".ans > div").forEach(d => d.dir = "auto");
   }
@@ -195,4 +197,4 @@ syncMood = (orig => function(){
   return r;
 })(syncMood);
 setTimeout(() => { try{ fillLangSelects(); renderMenu(); }catch(e){} }, 0);
-if(window.__PGM_TEST) window.__xl = {XL, XL_ROM, XL_TOKROM, XL_TOKENS, XL_AUTO_WRONG, xlSpace, xlCode};
+if(window.__PGM_TEST) window.__xl = {XL, XL_ROM, XL_TOKROM, XL_TOKENS, XL_AUTO_WRONG, xlSpace, xlCode, xlKey};
